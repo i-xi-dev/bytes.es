@@ -1,0 +1,35 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+  ],
+  "rules": {
+    "array-bracket-newline": ["error", "consistent"],
+    "array-bracket-spacing": ["error", "always"],
+    "array-element-newline": ["error", "consistent"],
+    "block-spacing": "error",
+    "brace-style": ["error", "stroustrup"],
+    "comma-dangle": ["error", "always-multiline"],
+    "comma-spacing": "error",
+    "comma-style": "error",
+    "computed-property-spacing": "error",
+    "eol-last": "error",
+    "func-call-spacing": "error",
+    "indent": ["error", 2],
+    "no-var": "error",
+    "semi": "error",
+    "semi-spacing": "error",
+    "semi-style": "error",
+    "unicode-bom": "error"
+  }
+}
