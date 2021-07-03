@@ -12,15 +12,15 @@ type ByteFormatRadix = 2 | 8 | 10 | 16;
  */
 export type ByteFormatOptions = {
   /** 基数 */
-  radix: ByteFormatRadix;
+  radix?: ByteFormatRadix;
   /** 前方ゼロ埋め結果の文字列長 */
-  zeroPaddedLength: number;
+  zeroPaddedLength?: number;
   /** 16進数のa-fを大文字にするか否か */
-  upperCase: boolean;
+  upperCase?: boolean;
   /** プレフィックス */
-  prefix: string;
+  prefix?: string;
   /** サフィックス */
-  suffix: string;
+  suffix?: string;
 };
 
 /**
@@ -28,6 +28,26 @@ export type ByteFormatOptions = {
  *     不変オブジェクト
  */
 class ByteFormat {
+  /**
+   * フォーマット結果の基数のデフォルト
+   */
+  static readonly #DEFAULT_RADIX: ByteFormatRadix = 16;
+
+  /**
+   * フォーマット結果の16進数のa-fを大文字にするか否かのデフォルト
+   */
+  static readonly #DEFAULT_UPPER_CASE: boolean = false;
+
+  /**
+   * フォーマット結果のプレフィックスのデフォルト
+   */
+  static readonly #DEFAULT_PREFIX: string = "";
+
+  /**
+   * フォーマット結果のサフィックスのデフォルト
+   */
+  static readonly #DEFAULT_SUFFIX: string = "";
+
   /**
    * フォーマット結果の基数
    */
@@ -54,33 +74,24 @@ class ByteFormat {
   #suffix: string;
 
   /**
-   * デフォルトのフォーマットオプション
+   * @param options フォーマットオプション
    */
-  static #DEFAULT_OPTIONS: ByteFormatOptions = {
-    radix: 16,
-    zeroPaddedLength: 2,
-    upperCase: false,
-    prefix: "",
-    suffix: "",
-  };
-
-  /**
-   * @param param0 フォーマットオプション
-   */
-  constructor({
-    radix = ByteFormat.#DEFAULT_OPTIONS.radix,
-    zeroPaddedLength = ByteFormat.#DEFAULT_OPTIONS.zeroPaddedLength,
-    upperCase = ByteFormat.#DEFAULT_OPTIONS.upperCase,
-    prefix = ByteFormat.#DEFAULT_OPTIONS.prefix,
-    suffix = ByteFormat.#DEFAULT_OPTIONS.suffix,
-  } = {}) {
+  constructor(options: ByteFormatOptions = {}) {
+    const radix: ByteFormatRadix = (typeof options.radix === "number") ? options.radix : ByteFormat.#DEFAULT_RADIX;
+    const minZeroPaddedLength: number = ByteFormat.#minZeroPaddedLengthOf(radix);
+    const zeroPaddedLength: number = (typeof options.zeroPaddedLength === "number") ? options.zeroPaddedLength : minZeroPaddedLength;
     if (Number.isSafeInteger(zeroPaddedLength) !== true) {
       throw new TypeError("zeroPaddedLength");
     }
-    const minZeroPaddedLength = ByteFormat.#minZeroPaddedLengthOf(radix);
+    if (zeroPaddedLength < minZeroPaddedLength) {
+      throw new RangeError("zeroPaddedLength");
+    }
+    const upperCase: boolean = (typeof options.upperCase === "boolean") ? options.upperCase : ByteFormat.#DEFAULT_UPPER_CASE;
+    const prefix: string = (typeof options.prefix === "string") ? options.prefix : ByteFormat.#DEFAULT_PREFIX;
+    const suffix: string = (typeof options.suffix === "string") ? options.suffix : ByteFormat.#DEFAULT_SUFFIX;
 
     this.#radix = radix;
-    this.#zeroPaddedLength = (zeroPaddedLength < minZeroPaddedLength) ? minZeroPaddedLength : zeroPaddedLength;
+    this.#zeroPaddedLength = zeroPaddedLength;
     this.#upperCase = upperCase;
     this.#prefix = prefix;
     this.#suffix = suffix;
@@ -140,7 +151,7 @@ class ByteFormat {
    * @returns 文字列がフォーマットオプションに合致しているか否か
    */
   #test(formatted: string): boolean {
-    let charsPattern;
+    let charsPattern: string;
     switch (this.#radix) {
     case 2:
       charsPattern = "[01]";

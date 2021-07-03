@@ -6,14 +6,14 @@ export class Exception extends Error {
   /**
    * 元の例外の配列
    */
-  #causes: Error[];
+  #causes: Array<Error>;
 
   /**
    * @param name 名称
    * @param message メッセージ
    * @param causes 元の例外の配列
    */
-  constructor (name: string, message: string, causes: Error[] = []) {
+  constructor (name: string, message: string, causes: Array<Error> = []) {
     super(message);
 
     this.name = name;
@@ -29,7 +29,7 @@ export class Exception extends Error {
   /**
    * 元の例外の配列
    */
-  get causes(): Error[] {
+  get causes(): Array<Error> {
     return this.#causes;
   }
 }
@@ -42,7 +42,7 @@ export class Exception extends Error {
  * @param paddingUnit 分割結果の配列の最後の要素がunitGroupSizeに満たない場合、最後の要素の末尾を埋める文字列
  * @returns strをunitGroupSize UTF-16コードユニットごとに分割した文字列配列
  */
-export function devideStringByLength(str: string, segmentLength: number, paddingUnit?: string): string[] {
+export function devideStringByLength(str: string, segmentLength: number, paddingUnit?: string): Array<string> {
   if (Number.isSafeInteger(segmentLength) !== true) {
     throw new TypeError("TODO");
   }
@@ -54,7 +54,7 @@ export function devideStringByLength(str: string, segmentLength: number, padding
   }
 
   const segemntsCount = Math.ceil(str.length / segmentLength);
-  const segments: string[] = new Array<string>(segemntsCount);
+  const segments: Array<string> = new Array<string>(segemntsCount);
   let pos = 0;
   for (let i = 0; i < segemntsCount; i++) {
     segments[i] = str.substring(pos, pos + segmentLength);

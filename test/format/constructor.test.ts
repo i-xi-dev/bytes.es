@@ -37,9 +37,9 @@ describe("ByteFormat", (): void => {
     expect(i1.format(Uint8Array.of(0))).toBe("00");
     expect(i1.format(Uint8Array.of(255))).toBe("ff");
 
-    const i2 = new ByteFormat({zeroPaddedLength:1});
-    expect(i2.format(Uint8Array.of(0))).toBe("00");
-    expect(i2.format(Uint8Array.of(255))).toBe("ff");
+    //const i2 = new ByteFormat({zeroPaddedLength:1});
+    //expect(i2.format(Uint8Array.of(0))).toBe("00");
+    //expect(i2.format(Uint8Array.of(255))).toBe("ff");
 
     const i3 = new ByteFormat({zeroPaddedLength:3});
     expect(i3.format(Uint8Array.of(0))).toBe("000");
@@ -52,6 +52,9 @@ describe("ByteFormat", (): void => {
     expect(() => {
       new ByteFormat({zeroPaddedLength:1.1});
     }).toThrow(new TypeError("zeroPaddedLength"));
+    expect(() => {
+      new ByteFormat({zeroPaddedLength:1});
+    }).toThrow(new RangeError("zeroPaddedLength"));
   });
 
   test("ByteFormat(ByteFormatOptions) - upperCase", (): void => {
