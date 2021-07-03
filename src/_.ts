@@ -13,7 +13,7 @@ export class Exception extends Error {
    * @param message メッセージ
    * @param causes 元の例外の配列
    */
-  constructor (name: string, message: string, causes: Array<Error> = []) {
+  constructor(name: string, message: string, causes: Array<Error> = []) {
     super(message);
 
     this.name = name;

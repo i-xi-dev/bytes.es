@@ -1,6 +1,6 @@
 
 import { devideStringByLength, Exception } from "./_";
-//import { isByte } from "./type";
+// import { isByte } from "./type";
 
 /**
  * フォーマッターで対応する基数
@@ -138,9 +138,9 @@ class ByteFormat {
     }
 
     const integer = Number.parseInt(work, this.#radix);
-    //if (isByte(integer) !== true) {
+    // if (isByte(integer) !== true) {
     //  throw new Exception("InvalidCharacterError", "parse error");
-    //}
+    // }
 
     return integer;
   }

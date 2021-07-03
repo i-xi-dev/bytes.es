@@ -26,10 +26,19 @@
     "eol-last": "error",
     "func-call-spacing": "error",
     "indent": ["error", 2],
+    "no-duplicate-imports": "error",
     "no-var": "error",
+    "rest-spread-spacing": "error",
     "semi": "error",
     "semi-spacing": "error",
     "semi-style": "error",
+    "space-before-blocks": "error",
+    "space-before-function-paren": ["error", {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
+    "space-in-parens": "error",
+    "space-infix-ops": "error",
+    "space-unary-ops": "error",
+    "spaced-comment": "error",
+    "symbol-description": "error",
     "unicode-bom": "error"
   }
 }

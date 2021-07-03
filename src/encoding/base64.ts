@@ -6,13 +6,13 @@ import { ByteEncodingOptions, ByteEncodingImpl } from "../encoding";
  * Base64変換テーブルの62番目の文字
  * ※追加する場合、追加可能な文字はコードポイント255以下かつ、非制御文字かつ、変換テーブルおよびパディングと重複しない文字
  */
-type Base64_62ndChar = "+" | "-"; //XXX Base64_63rdCharと重複する文字を追加した場合、Base64Encodingコンストラクターで重複はエラーにする必要あり
+type Base64_62ndChar = "+" | "-"; // XXX Base64_63rdCharと重複する文字を追加した場合、Base64Encodingコンストラクターで重複はエラーにする必要あり
 
 /**
  * Base64変換テーブルの63番目の文字
  * ※追加する場合、追加可能な文字はコードポイント255以下かつ、非制御文字かつ、変換テーブルおよびパディングと重複しない文字
  */
-type Base64_63rdChar = "/" | "_"; //XXX Base64_62ndCharと重複する文字を追加した場合、Base64Encodingコンストラクターで重複はエラーにする必要あり
+type Base64_63rdChar = "/" | "_"; // XXX Base64_62ndCharと重複する文字を追加した場合、Base64Encodingコンストラクターで重複はエラーにする必要あり
 
 /**
  * Base64符号化方式オプション
@@ -98,8 +98,8 @@ class Base64Encoding implements ByteEncodingImpl {
     "7",  // 59
     "8",  // 60
     "9",  // 61
-    //"+",  // 62
-    //"/",  // 63
+    // "+",  // 62
+    // "/",  // 63
   ];
 
   /**
@@ -145,18 +145,18 @@ class Base64Encoding implements ByteEncodingImpl {
   /**
    * @param options Base64符号化方式オプション
    */
-  constructor (options: Base64EncodingOptions = {}) {
+  constructor(options: Base64EncodingOptions = {}) {
     const _62ndChar: Base64_62ndChar = (typeof options._62ndChar === "string") ? options._62ndChar : Base64Encoding.#DEFAULT_62ND_CHAR;
-    //if (Base64Encoding.#TABLE.includes(_62ndChar)) { Base64_62ndCharに不正な値を追加しない限り不要
+    // if (Base64Encoding.#TABLE.includes(_62ndChar)) { Base64_62ndCharに不正な値を追加しない限り不要
     //  throw new TypeError("_62ndChar");
-    //}
+    // }
     const _63rdChar: Base64_63rdChar = (typeof options._63rdChar === "string") ? options._63rdChar : Base64Encoding.#DEFAULT_63RD_CHAR;
-    //if (Base64Encoding.#TABLE.includes(_63rdChar)) { Base64_63rdCharに不正な値を追加しない限り不要
+    // if (Base64Encoding.#TABLE.includes(_63rdChar)) { Base64_63rdCharに不正な値を追加しない限り不要
     //  throw new TypeError("_63rdChar");
-    //}
-    //if (_62ndChar === _63rdChar) { XXX 今のところ不要
+    // }
+    // if (_62ndChar === _63rdChar) { XXX 今のところ不要
     //  throw new TypeError("_62ndChar, _63rdChar");
-    //}
+    // }
     const usePadding: boolean = (typeof options.usePadding === "boolean") ? options.usePadding : Base64Encoding.#DEFAULT_USE_PADDING;
 
     this.#_62ndChar = _62ndChar;
@@ -228,9 +228,9 @@ class Base64Encoding implements ByteEncodingImpl {
       }
     }
     else {
-      //if (paddingStart >= 0) {
+      // if (paddingStart >= 0) {
       //  throw new _ixi.Exception("_ixi.InvalidCharacterError", "decode error (3)"); (1)で例外になる
-      //}
+      // }
       paddingCount = 4 - (encoded.length % 4);
       encodedBody = encoded;
     }

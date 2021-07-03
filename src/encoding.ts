@@ -41,7 +41,7 @@ class ByteEncoding {
    */
   static readonly #registry: Map<string, ByteEncodingImplConstructor> = new Map();
 
-  private constructor () {
+  private constructor() {
     throw new Error();
   }
 
