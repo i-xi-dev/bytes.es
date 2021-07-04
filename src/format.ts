@@ -1,6 +1,6 @@
 
 import { devideStringByLength, Exception } from "./_";
-// import { isByte } from "./type";
+import { uint8, isByte } from "./type";
 
 /**
  * フォーマッターで対応する基数
@@ -122,7 +122,7 @@ class ByteFormat {
    * @param formatted 文字列
    * @returns 8-bit符号なし整数
    */
-  #parseByte(formatted: string): number {
+  #parseByte(formatted: string): uint8 {
     let work = formatted;
     if (this.#prefix.length > 0) {
       if (formatted.startsWith(this.#prefix) !== true) {
@@ -138,11 +138,12 @@ class ByteFormat {
     }
 
     const integer = Number.parseInt(work, this.#radix);
-    // if (isByte(integer) !== true) {
-    //  throw new Exception("InvalidCharacterError", "parse error");
-    // }
+    if (isByte(integer)) {
+      return integer;
+    }
 
-    return integer;
+    // 今のところ到達しない（事前に#testを通る）
+    throw new Exception("InvalidCharacterError", "parse error");
   }
 
   /**
@@ -201,11 +202,11 @@ class ByteFormat {
 
   /**
    * 8-bit符号なし整数を文字列にフォーマットし返却
-   * @param uint8 8-bit符号なし整数
+   * @param byte 8-bit符号なし整数
    * @returns 文字列
    */
-  #formatByte(uint8: number): string {
-    let str = uint8.toString(this.#radix);
+  #formatByte(byte: uint8): string {
+    let str = byte.toString(this.#radix);
     if (this.#upperCase === true) {
       str = str.toUpperCase();
     }
@@ -219,8 +220,8 @@ class ByteFormat {
    * @returns 文字列
    */
   format(bytes: Uint8Array): string {
-    const byteStringArray = [ ...bytes ].map((uint8) => {
-      return this.#formatByte(uint8);
+    const byteStringArray = [ ...bytes ].map((byte) => {
+      return this.#formatByte(byte as uint8);
     });
     return byteStringArray.join("");
   }

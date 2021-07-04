@@ -1,5 +1,6 @@
 
 import { Exception } from "../_";
+import { uint8 } from "../type";
 import { ByteEncodingOptions, ByteEncodingImpl } from "../encoding";
 
 /**
@@ -258,7 +259,6 @@ class Base64Encoding implements ByteEncodingImpl {
         _6bit3 = this.#table.indexOf(encodedBody[i + 2] as string);
         decodedBytes[_8bitI++] = ((_6bit2 & 0b001111) << 4) | (_6bit3 >> 2);
 
-
         // 8-bit (3)
         if (typeof encodedBody[i + 3] !== "string") {
           decodedBytes[_8bitI++] = ((_6bit3 & 0b000011) << 6);
@@ -284,8 +284,8 @@ class Base64Encoding implements ByteEncodingImpl {
     let encodedChars = "";
     for (let i = 0; i < toEncode.byteLength; i = i + 3) { 
       const [ _n8bit1, _n8bit2, _n8bit3 ] = toEncode.subarray(i, i + 3);
-      const _8bit1 = _n8bit1 as number;
-      const _8bit2 = (_n8bit2 !== undefined ? _n8bit2 : 0);
+      const _8bit1: uint8 = _n8bit1 as uint8;
+      const _8bit2: uint8 = (_n8bit2 !== undefined) ? (_n8bit2 as uint8) : 0;
 
       // 6-bit (1)
       _6bit1e = this.#table[_8bit1 >> 2] as string;
@@ -293,8 +293,8 @@ class Base64Encoding implements ByteEncodingImpl {
       // 6-bit (2)
       _6bit2e = this.#table[((_8bit1 & 0b00000011) << 4) | (_8bit2 >> 4)] as string;
 
-      if (_n8bit2 !== undefined) { // _8bit2が0でも_n8bit2がundefinedの場合は除外になる
-        const _8bit3 = (_n8bit3 !== undefined ? _n8bit3 : 0);
+      if (_n8bit2 !== undefined) {
+        const _8bit3: uint8 = (_n8bit3 !== undefined) ? (_n8bit3 as uint8) : 0;
 
         // 6-bit (3)
         _6bit3e = this.#table[((_8bit2 & 0b00001111) << 2) | (_8bit3 >> 6)] as string;
