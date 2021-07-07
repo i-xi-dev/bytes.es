@@ -20,6 +20,7 @@ export type PercentEncodingOptions = ByteEncodingOptions & {
    * デコード時、パーセント符号化方式オプションに合致しない文字列が出現した場合エラーにするか否か
    *     ※エンコードには影響しない
    *     ※strict=falseでのデコード結果は、同じオプションで再エンコードしても元に戻らない可能性あり
+   *     ※strict=falseの場合、デコード結果のlengthとbuffer.lengthが一致しなくなる可能性あり
    */
   strict?: boolean,
 };
@@ -158,8 +159,7 @@ class PercentEncoding implements ByteEncodingImpl {
           if (this.#strict === true) {
             throw new Exception("EncodingError", "decode error (3)");
           }
-          byte = 0x25;// c.charCodeAt(0) as uint8;
-          i = i + 1;
+          i = i + 3;
         }
       }
       else if (c === "+") {
@@ -177,6 +177,10 @@ class PercentEncoding implements ByteEncodingImpl {
       }
 
       decoded[j++] = byte;
+    }
+
+    if (decoded.length > j) {
+      return decoded.subarray(0, j);
     }
     return decoded;
   }

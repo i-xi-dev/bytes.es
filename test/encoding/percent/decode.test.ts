@@ -37,6 +37,17 @@ describe("PercentEncoding.prototype.decode", (): void => {
     const decoded43 = i3.decode(globalThis.encodeURIComponent("1\u{0} !~\u{7F}あ+"));
     expect(JSON.stringify([...decoded43])).toBe(JSON.stringify([...utf8Bytes1]));
 
+    const i5 = new PercentEncoding({strict:false});
+    const decoded51 = i5.decode("");
+    expect(JSON.stringify([...decoded51])).toBe("[]");
+    const decoded52 = i5.decode("%03%02%01%00%FF%FE%FD%FC");
+    expect(JSON.stringify([...decoded52])).toBe("[3,2,1,0,255,254,253,252]");
+    const decoded53 = i5.decode("1%00 !~%7F%E3%81%82+");
+    expect(JSON.stringify([...decoded53])).toBe(JSON.stringify([...utf8Bytes1]));
+
+    const decoded52b = i5.decode("%03%02%01%00%FF%FE%FD%FC%20%41");
+    expect(JSON.stringify([...decoded52b])).toBe("[3,2,1,0,255,254,253,252,32,65]");
+
     expect(() => {
       i1.decode("あ");
     }).toThrow("decode error (1)");
