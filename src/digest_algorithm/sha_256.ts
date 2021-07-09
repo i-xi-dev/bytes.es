@@ -1,4 +1,5 @@
 
+import { Exception } from "../_";
 import { DigestAlgorithmOptions, DigestAlgorithmImpl } from "./index";
 
 /**
@@ -9,7 +10,7 @@ class Sha256Algorithm implements DigestAlgorithmImpl {
    * @param options ハッシュアルゴリズムオプション
    */
   constructor(options: DigestAlgorithmOptions = {}) {
-    console.debug(options);
+    void options;
     Object.freeze(this);
   }
 
@@ -18,7 +19,7 @@ class Sha256Algorithm implements DigestAlgorithmImpl {
    * @returns Cryptoオブジェクト
    */
   static async #getCrypto(): Promise<Crypto> {
-    if (globalThis.crypto && (globalThis.crypto instanceof globalThis.Crypto)) {
+    if (globalThis.crypto?.subtle) { //XXX globalThis.cryptoがCrypto型かどうかでは判定できない（Node, Jest環境）Cryptoが値扱いの為
       // ブラウザー, Deno
       return globalThis.crypto;
     }
@@ -26,7 +27,7 @@ class Sha256Algorithm implements DigestAlgorithmImpl {
       // Node.js 条件不十分？
       return ((await import("crypto")).webcrypto as unknown) as Crypto;
     }
-    throw new Error("Crypto unsupported");
+    throw new Exception("NotSupportedError", "Crypto unsupported");
   }
 
   /**

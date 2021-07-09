@@ -1,8 +1,8 @@
-import { Byte } from "../../src/index";
-import { Sha256Algorithm } from "../../src/digest_algorithm/sha_256";
+import { Byte } from "../../dist/index.js";
+import { Sha256Algorithm } from "../../dist/digest_algorithm/sha_256.js";
 
-describe("DigestAlgorithm.for", (): void => {
-  test("for(string)", (): void => {
+describe("DigestAlgorithm.for", () => {
+  test("for(string)", () => {
     expect(Byte.DigestAlgorithm.for("sha-256") instanceof Sha256Algorithm).toBe(true);
 
     expect(() => {

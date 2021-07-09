@@ -1,7 +1,7 @@
-import { ByteFormat } from "../../src/format";
+import { ByteFormat } from "../../dist/format.js";
 
-describe("ByteFormat.prototype.parse", (): void => {
-  test("parse(string)", (): void => {
+describe("ByteFormat.prototype.parse", () => {
+  test("parse(string)", () => {
     const i1 = new ByteFormat();
     const parsed10 = i1.parse("");
     expect(parsed10.length).toBe(0);
@@ -106,7 +106,7 @@ describe("ByteFormat.prototype.parse", (): void => {
 
   });
 
-  test("DataError", (): void => {
+  test("DataError", () => {
     const i0 = new ByteFormat();
     expect(() => {
       i0.parse("a");
@@ -116,7 +116,7 @@ describe("ByteFormat.prototype.parse", (): void => {
     }).toThrow("parse error");
   });
 
-  test("InvalidCharacterError - prefix", (): void => {
+  test("InvalidCharacterError - prefix", () => {
     const i0 = new ByteFormat({prefix:"-"});
     expect(() => {
       i0.parse("#00");
@@ -126,7 +126,7 @@ describe("ByteFormat.prototype.parse", (): void => {
     }).toThrow("unprefixed");
   });
 
-  test("InvalidCharacterError - suffix", (): void => {
+  test("InvalidCharacterError - suffix", () => {
     const i0 = new ByteFormat({suffix:"-"});
     expect(() => {
       i0.parse("00#");

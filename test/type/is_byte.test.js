@@ -1,7 +1,7 @@
-import { isByte } from "../../src/type";
+import { isByte } from "../../dist/type.js";
 
-describe("Type.isByte", (): void => {
-  test("isByte(number)", (): void => {
+describe("Type.isByte", () => {
+  test("isByte(number)", () => {
     expect(isByte(-1)).toBe(false);
     expect(isByte(-0)).toBe(true);
     expect(isByte(0)).toBe(true);
@@ -12,7 +12,7 @@ describe("Type.isByte", (): void => {
     expect(isByte(1.1)).toBe(false);
   });
 
-  test("isByte(*)", (): void => {
+  test("isByte(*)", () => {
     expect(isByte("")).toBe(false);
     expect(isByte("0")).toBe(false);
     expect(isByte([])).toBe(false);

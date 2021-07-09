@@ -1,7 +1,7 @@
-import { Byte } from "../../../src/index";
+import { Byte } from "../../../dist/index.js";
 
-describe("Sha256Algorithm.prototype.compute", (): void => {
-  test("compute(Uint8Array)", async (): Promise<void> => {
+describe("Sha256Algorithm.prototype.compute", () => {
+  test("compute(Uint8Array)", async () => {
     const bf = new Byte.Format();
     const d0 = Byte.DigestAlgorithm.for("sha-256");
 

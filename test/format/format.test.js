@@ -1,7 +1,7 @@
-import { ByteFormat } from "../../src/format";
+import { ByteFormat } from "../../dist/format.js";
 
-describe("ByteFormat.prototype.format", (): void => {
-  test("format(Uint8Array)", (): void => {
+describe("ByteFormat.prototype.format", () => {
+  test("format(Uint8Array)", () => {
     const i1 = new ByteFormat();
     const formatted10 = i1.format(Uint8Array.of());
     expect(formatted10).toBe("");

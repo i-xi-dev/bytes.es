@@ -1,7 +1,7 @@
-import { PercentEncoding } from "../../../src/encoding/percent";
+import { PercentEncoding } from "../../../dist/encoding/percent.js";
 
-describe("PercentEncoding.prototype.decode", (): void => {
-  test("decode(string)", (): void => {
+describe("PercentEncoding.prototype.decode", () => {
+  test("decode(string)", () => {
     const utf8 = new TextEncoder();
     const utf8Bytes1 = utf8.encode("1\u{0} !~\u{7F}あ+");
 

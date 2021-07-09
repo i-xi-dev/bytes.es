@@ -1,8 +1,7 @@
-import { Byte } from "../../../src/index";
-import crypto from "crypto";
+import { Byte } from "../../../dist/index.js";
 
-describe("Base64Encoding.prototype.encode", (): void => {
-  test("encode(Uint8Array)", (): void => {
+describe("Base64Encoding.prototype.encode", () => {
+  test("encode(Uint8Array)", () => {
     const i1 = Byte.Encoding.for("base64");
     expect(i1.encode(Uint8Array.of())).toBe("");
     expect(i1.encode(Uint8Array.of(3,2,1,0,255,254,253,252))).toBe("AwIBAP/+/fw=");
@@ -16,16 +15,15 @@ describe("Base64Encoding.prototype.encode", (): void => {
     const i4 = Byte.Encoding.for("base64", {_62ndChar:"-", _63rdChar:"_", usePadding:false});
     expect(i4.encode(Uint8Array.of(3,2,1,0,255,254,253,252))).toBe("AwIBAP_-_fw");
 
-    const webcrypto = (crypto.webcrypto as unknown) as Crypto;
-    const r1 = webcrypto.getRandomValues(new Uint8Array(256));
-    const r2 = webcrypto.getRandomValues(new Uint8Array(255));
-    const r3 = webcrypto.getRandomValues(new Uint8Array(254));
-    const r4 = webcrypto.getRandomValues(new Uint8Array(253));
-    const r5 = webcrypto.getRandomValues(new Uint8Array(252));
-    const r6 = webcrypto.getRandomValues(new Uint8Array(251));
-    const r7 = webcrypto.getRandomValues(new Uint8Array(250));
-    const r8 = webcrypto.getRandomValues(new Uint8Array(249));
-    const r9 = webcrypto.getRandomValues(new Uint8Array(248));
+    const r1 = crypto.getRandomValues(new Uint8Array(256));
+    const r2 = crypto.getRandomValues(new Uint8Array(255));
+    const r3 = crypto.getRandomValues(new Uint8Array(254));
+    const r4 = crypto.getRandomValues(new Uint8Array(253));
+    const r5 = crypto.getRandomValues(new Uint8Array(252));
+    const r6 = crypto.getRandomValues(new Uint8Array(251));
+    const r7 = crypto.getRandomValues(new Uint8Array(250));
+    const r8 = crypto.getRandomValues(new Uint8Array(249));
+    const r9 = crypto.getRandomValues(new Uint8Array(248));
 
     expect(i1.encode(r1)).toBe(Buffer.from(r1.buffer).toString("base64"));
     expect(i1.encode(r2)).toBe(Buffer.from(r2.buffer).toString("base64"));

@@ -230,7 +230,7 @@ class Base64Encoding implements ByteEncodingImpl {
     }
     else {
       // if (paddingStart >= 0) {
-      //  throw new _ixi.Exception("_ixi.InvalidCharacterError", "decode error (3)"); (1)で例外になる
+      //  throw new _ixi.Exception("InvalidCharacterError", "decode error (3)"); (1)で例外になる
       // }
       paddingCount = (encoded.length % 4 === 0) ? 0 : 4 - (encoded.length % 4);
       encodedBody = encoded;

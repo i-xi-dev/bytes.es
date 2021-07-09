@@ -1,13 +1,12 @@
-import { uint8 } from "../../../src/type";
-import { PercentEncoding } from "../../../src/encoding/percent";
+import { PercentEncoding } from "../../../dist/encoding/percent.js";
 
-describe("PercentEncoding", (): void => {
-  test("PercentEncoding()", (): void => {
+describe("PercentEncoding", () => {
+  test("PercentEncoding()", () => {
     const i1 = new PercentEncoding();
     expect(i1.encode(Uint8Array.of(255))).toBe("%FF");
   });
 
-  test("PercentEncoding(PercentEncodingOptions)", (): void => {
+  test("PercentEncoding(PercentEncodingOptions)", () => {
     const i1 = new PercentEncoding();
     expect(i1.encode(Uint8Array.of(0))).toBe("%00");
     expect(i1.encode(Uint8Array.of(255))).toBe("%FF");
@@ -33,8 +32,8 @@ describe("PercentEncoding", (): void => {
     expect(i5.encode(Uint8Array.of(255))).toBe("%FF");
 
     expect(() => {
-      const t: Array<number> = [-1];
-      new PercentEncoding({inclusions:t as Array<uint8>});
+      const t = [-1];
+      new PercentEncoding({inclusions:t});
     }).toThrow("options.inclusions");
 
     expect(() => {

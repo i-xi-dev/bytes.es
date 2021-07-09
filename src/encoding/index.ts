@@ -43,7 +43,7 @@ class ByteEncoding {
   static readonly #registry: Map<string, ByteEncodingImplConstructor> = new Map();
 
   private constructor() {
-    throw new Error();
+    throw new Exception("NotSupportedError", "not constructible");
   }
 
   /**

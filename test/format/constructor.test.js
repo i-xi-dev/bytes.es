@@ -1,7 +1,7 @@
-import { ByteFormat } from "../../src/format";
+import { ByteFormat } from "../../dist/format.js";
 
-describe("ByteFormat", (): void => {
-  test("ByteFormat()", (): void => {
+describe("ByteFormat", () => {
+  test("ByteFormat()", () => {
     const i1 = new ByteFormat();
     expect(i1.format(Uint8Array.of(0))).toBe("00");
     expect(i1.format(Uint8Array.of(255))).toBe("ff");
@@ -10,7 +10,7 @@ describe("ByteFormat", (): void => {
     expect(Object.isFrozen(i1)).toBe(true);
   });
 
-  test("ByteFormat(ByteFormatOptions) - radix", (): void => {
+  test("ByteFormat(ByteFormatOptions) - radix", () => {
     const i1 = new ByteFormat({});
     expect(i1.format(Uint8Array.of(0))).toBe("00");
     expect(i1.format(Uint8Array.of(255))).toBe("ff");
@@ -32,7 +32,7 @@ describe("ByteFormat", (): void => {
     expect(i5.format(Uint8Array.of(255))).toBe("ff");
   });
 
-  test("ByteFormat(ByteFormatOptions) - zeroPaddedLength", (): void => {
+  test("ByteFormat(ByteFormatOptions) - zeroPaddedLength", () => {
     const i1 = new ByteFormat({});
     expect(i1.format(Uint8Array.of(0))).toBe("00");
     expect(i1.format(Uint8Array.of(255))).toBe("ff");
@@ -70,7 +70,7 @@ describe("ByteFormat", (): void => {
     }).toThrow(new RangeError("zeroPaddedLength"));
   });
 
-  test("ByteFormat(ByteFormatOptions) - upperCase", (): void => {
+  test("ByteFormat(ByteFormatOptions) - upperCase", () => {
     const i1 = new ByteFormat({});
     expect(i1.format(Uint8Array.of(0))).toBe("00");
     expect(i1.format(Uint8Array.of(255))).toBe("ff");
@@ -80,7 +80,7 @@ describe("ByteFormat", (): void => {
     expect(i2.format(Uint8Array.of(255))).toBe("FF");
   });
 
-  test("ByteFormat(ByteFormatOptions) - prefix", (): void => {
+  test("ByteFormat(ByteFormatOptions) - prefix", () => {
     const i1 = new ByteFormat({});
     expect(i1.format(Uint8Array.of(0))).toBe("00");
     expect(i1.format(Uint8Array.of(255))).toBe("ff");
@@ -94,7 +94,7 @@ describe("ByteFormat", (): void => {
     expect(i3.format(Uint8Array.of(255))).toBe("ff");
   });
 
-  test("ByteFormat(ByteFormatOptions) - suffix", (): void => {
+  test("ByteFormat(ByteFormatOptions) - suffix", () => {
     const i1 = new ByteFormat({});
     expect(i1.format(Uint8Array.of(0))).toBe("00");
     expect(i1.format(Uint8Array.of(255))).toBe("ff");

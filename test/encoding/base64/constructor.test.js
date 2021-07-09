@@ -1,12 +1,12 @@
-import { Base64Encoding } from "../../../src/encoding/base64";
+import { Base64Encoding } from "../../../dist/encoding/base64.js";
 
-describe("Base64Encoding", (): void => {
-  test("Base64Encoding()", (): void => {
+describe("Base64Encoding", () => {
+  test("Base64Encoding()", () => {
     const i1 = new Base64Encoding();
     expect(i1.encode(Uint8Array.of(255))).toBe("/w==");
   });
 
-  test("Base64Encoding(Base64EncodingOptions)", (): void => {
+  test("Base64Encoding(Base64EncodingOptions)", () => {
     const i1 = new Base64Encoding();
     expect(i1.encode(Uint8Array.of(255))).toBe("/w==");
     expect(i1.encode(Uint8Array.of(251))).toBe("+w==");
