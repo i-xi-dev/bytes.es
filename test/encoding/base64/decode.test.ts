@@ -29,18 +29,30 @@ describe("Base64Encoding.prototype.decode", (): void => {
     const r3 = webcrypto.getRandomValues(new Uint8Array(254));
     const r4 = webcrypto.getRandomValues(new Uint8Array(253));
     const r5 = webcrypto.getRandomValues(new Uint8Array(252));
+    const r6 = webcrypto.getRandomValues(new Uint8Array(251));
+    const r7 = webcrypto.getRandomValues(new Uint8Array(250));
+    const r8 = webcrypto.getRandomValues(new Uint8Array(249));
+    const r9 = webcrypto.getRandomValues(new Uint8Array(248));
 
     expect(Array.from(i1.decode(Buffer.from(r1).toString('base64'))).join(",")).toBe(Array.from(r1).join(","));
     expect(Array.from(i1.decode(Buffer.from(r2).toString('base64'))).join(",")).toBe(Array.from(r2).join(","));
     expect(Array.from(i1.decode(Buffer.from(r3).toString('base64'))).join(",")).toBe(Array.from(r3).join(","));
     expect(Array.from(i1.decode(Buffer.from(r4).toString('base64'))).join(",")).toBe(Array.from(r4).join(","));
     expect(Array.from(i1.decode(Buffer.from(r5).toString('base64'))).join(",")).toBe(Array.from(r5).join(","));
+    expect(Array.from(i1.decode(Buffer.from(r6).toString('base64'))).join(",")).toBe(Array.from(r6).join(","));
+    expect(Array.from(i1.decode(Buffer.from(r7).toString('base64'))).join(",")).toBe(Array.from(r7).join(","));
+    expect(Array.from(i1.decode(Buffer.from(r8).toString('base64'))).join(",")).toBe(Array.from(r8).join(","));
+    expect(Array.from(i1.decode(Buffer.from(r9).toString('base64'))).join(",")).toBe(Array.from(r9).join(","));
 
     expect(Array.from(i3.decode(Buffer.from(r1).toString('base64').replace(/=*$/, ""))).join(",")).toBe(Array.from(r1).join(","));
     expect(Array.from(i3.decode(Buffer.from(r2).toString('base64').replace(/=*$/, ""))).join(",")).toBe(Array.from(r2).join(","));
     expect(Array.from(i3.decode(Buffer.from(r3).toString('base64').replace(/=*$/, ""))).join(",")).toBe(Array.from(r3).join(","));
     expect(Array.from(i3.decode(Buffer.from(r4).toString('base64').replace(/=*$/, ""))).join(",")).toBe(Array.from(r4).join(","));
     expect(Array.from(i3.decode(Buffer.from(r5).toString('base64').replace(/=*$/, ""))).join(",")).toBe(Array.from(r5).join(","));
+    expect(Array.from(i3.decode(Buffer.from(r6).toString('base64').replace(/=*$/, ""))).join(",")).toBe(Array.from(r6).join(","));
+    expect(Array.from(i3.decode(Buffer.from(r7).toString('base64').replace(/=*$/, ""))).join(",")).toBe(Array.from(r7).join(","));
+    expect(Array.from(i3.decode(Buffer.from(r8).toString('base64').replace(/=*$/, ""))).join(",")).toBe(Array.from(r8).join(","));
+    expect(Array.from(i3.decode(Buffer.from(r9).toString('base64').replace(/=*$/, ""))).join(",")).toBe(Array.from(r9).join(","));
 
     expect(() => {
       i1.decode("あ");

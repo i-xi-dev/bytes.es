@@ -52,8 +52,21 @@ describe("ByteFormat", (): void => {
     expect(() => {
       new ByteFormat({zeroPaddedLength:1.1});
     }).toThrow(new TypeError("zeroPaddedLength"));
+
     expect(() => {
       new ByteFormat({zeroPaddedLength:1});
+    }).toThrow(new RangeError("zeroPaddedLength"));
+    expect(() => {
+      new ByteFormat({radix:10, zeroPaddedLength:2});
+    }).toThrow(new RangeError("zeroPaddedLength"));
+    expect(() => {
+      new ByteFormat({radix:2, zeroPaddedLength:7});
+    }).toThrow(new RangeError("zeroPaddedLength"));
+    expect(() => {
+      new ByteFormat({radix:8, zeroPaddedLength:2});
+    }).toThrow(new RangeError("zeroPaddedLength"));
+    expect(() => {
+      new ByteFormat({radix:16, zeroPaddedLength:1});
     }).toThrow(new RangeError("zeroPaddedLength"));
   });
 

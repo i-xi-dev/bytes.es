@@ -22,18 +22,30 @@ describe("Base64Encoding.prototype.encode", (): void => {
     const r3 = webcrypto.getRandomValues(new Uint8Array(254));
     const r4 = webcrypto.getRandomValues(new Uint8Array(253));
     const r5 = webcrypto.getRandomValues(new Uint8Array(252));
+    const r6 = webcrypto.getRandomValues(new Uint8Array(251));
+    const r7 = webcrypto.getRandomValues(new Uint8Array(250));
+    const r8 = webcrypto.getRandomValues(new Uint8Array(249));
+    const r9 = webcrypto.getRandomValues(new Uint8Array(248));
 
     expect(i1.encode(r1)).toBe(Buffer.from(r1.buffer).toString("base64"));
     expect(i1.encode(r2)).toBe(Buffer.from(r2.buffer).toString("base64"));
     expect(i1.encode(r3)).toBe(Buffer.from(r3.buffer).toString("base64"));
     expect(i1.encode(r4)).toBe(Buffer.from(r4.buffer).toString("base64"));
     expect(i1.encode(r5)).toBe(Buffer.from(r5.buffer).toString("base64"));
+    expect(i1.encode(r6)).toBe(Buffer.from(r6.buffer).toString("base64"));
+    expect(i1.encode(r7)).toBe(Buffer.from(r7.buffer).toString("base64"));
+    expect(i1.encode(r8)).toBe(Buffer.from(r8.buffer).toString("base64"));
+    expect(i1.encode(r9)).toBe(Buffer.from(r9.buffer).toString("base64"));
 
     expect(i3.encode(r1)).toBe(Buffer.from(r1.buffer).toString("base64").replace(/=*$/, ""));
     expect(i3.encode(r2)).toBe(Buffer.from(r2.buffer).toString("base64").replace(/=*$/, ""));
     expect(i3.encode(r3)).toBe(Buffer.from(r3.buffer).toString("base64").replace(/=*$/, ""));
     expect(i3.encode(r4)).toBe(Buffer.from(r4.buffer).toString("base64").replace(/=*$/, ""));
     expect(i3.encode(r5)).toBe(Buffer.from(r5.buffer).toString("base64").replace(/=*$/, ""));
+    expect(i3.encode(r6)).toBe(Buffer.from(r6.buffer).toString("base64").replace(/=*$/, ""));
+    expect(i3.encode(r7)).toBe(Buffer.from(r7.buffer).toString("base64").replace(/=*$/, ""));
+    expect(i3.encode(r8)).toBe(Buffer.from(r8.buffer).toString("base64").replace(/=*$/, ""));
+    expect(i3.encode(r9)).toBe(Buffer.from(r9.buffer).toString("base64").replace(/=*$/, ""));
 
   });
 
