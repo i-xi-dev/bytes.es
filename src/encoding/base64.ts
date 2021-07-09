@@ -232,7 +232,7 @@ class Base64Encoding implements ByteEncodingImpl {
       // if (paddingStart >= 0) {
       //  throw new _ixi.Exception("_ixi.InvalidCharacterError", "decode error (3)"); (1)で例外になる
       // }
-      paddingCount = 4 - (encoded.length % 4);
+      paddingCount = (encoded.length % 4 === 0) ? 0 : 4 - (encoded.length % 4);
       encodedBody = encoded;
     }
 
@@ -241,7 +241,8 @@ class Base64Encoding implements ByteEncodingImpl {
     let _6bit3: number;
     let _6bit4: number;
     let _8bitI = 0;
-    const decodedBytes = new Uint8Array(((encodedBody.length + paddingCount) * 3 / 4) - paddingCount);
+    const encodedByteCount = ((encodedBody.length + paddingCount) * 3 / 4) - paddingCount;
+    const decodedBytes = new Uint8Array(encodedByteCount);
 
     let i = 0;
     if (encodedBody.length >= 4) {

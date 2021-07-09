@@ -37,9 +37,6 @@ describe("PercentEncoding", (): void => {
       new PercentEncoding({inclusions:t as Array<uint8>});
     }).toThrow("options.inclusions");
 
-
-
-
     expect(() => {
       new PercentEncoding({inclusions:[32],spaceAsPlus:true});
     }).toThrow("options.inclusions, options.spaceAsPlus");

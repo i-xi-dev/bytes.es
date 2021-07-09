@@ -1,3 +1,4 @@
+import { Exception } from "./_";
 
 /**
  * バイト符号化方式の実装のインスタンス
@@ -49,14 +50,15 @@ class ByteEncoding {
    * 名称からByteEncodingImplのインスタンスを生成し返却
    * @param encodingName 符号化方式の名称（実装登録簿に登録した名前）
    * @param options バイト符号化方式オプション
-   * @returns ByteEncodingImplのインスタンス、実装登録簿に存在しない場合null
+   * @returns ByteEncodingImplのインスタンス
+   * @throws 実装登録簿に存在しない場合NotFoundErrorをスロー
    */
-  static for(encodingName: string, options?: ByteEncodingOptions): ByteEncodingImpl | null {
+  static for(encodingName: string, options?: ByteEncodingOptions): ByteEncodingImpl {
     const normalizedName = encodingName.toLowerCase();
 
     const impl = ByteEncoding.#registry.get(normalizedName);
     if (impl === undefined) {
-      return null;
+      throw new Exception("NotFoundError", "unknown encodingName");
     }
     return new impl(options);
   }
