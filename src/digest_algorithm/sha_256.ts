@@ -1,5 +1,5 @@
 
-import { DigestAlgorithmOptions, DigestAlgorithmImpl } from "../digest_algorithm";
+import { DigestAlgorithmOptions, DigestAlgorithmImpl } from "./index";
 
 /**
  * SHA-256ハッシュアルゴリズム

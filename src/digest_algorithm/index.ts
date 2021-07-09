@@ -1,4 +1,4 @@
-import { Exception } from "./_";
+import { Exception } from "../_";
 
 /**
  * ハッシュアルゴリズムの実装のインスタンス

@@ -2,7 +2,7 @@
 import { Exception } from "../_";
 import { uint8, isByte } from "../type";
 import { ByteFormat } from "../format";
-import { ByteEncodingOptions, ByteEncodingImpl } from "../encoding";
+import { ByteEncodingOptions, ByteEncodingImpl } from "./index";
 
 /**
  * パーセント符号化方式オプション

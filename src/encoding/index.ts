@@ -1,4 +1,4 @@
-import { Exception } from "./_";
+import { Exception } from "../_";
 
 /**
  * バイト符号化方式の実装のインスタンス

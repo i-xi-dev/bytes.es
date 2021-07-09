@@ -1,7 +1,7 @@
 
 import { Exception } from "../_";
 import { uint8 } from "../type";
-import { ByteEncodingOptions, ByteEncodingImpl } from "../encoding";
+import { ByteEncodingOptions, ByteEncodingImpl } from "./index";
 
 /**
  * Base64変換テーブルの62番目の文字
