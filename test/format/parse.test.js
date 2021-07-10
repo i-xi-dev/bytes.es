@@ -1,8 +1,8 @@
-import { ByteFormat } from "../../dist/format.js";
+import { ByteFormat } from "../../dist/format/index.js";
 
 describe("ByteFormat.prototype.parse", () => {
   test("parse(string)", () => {
-    const i1 = new ByteFormat();
+    const i1 = ByteFormat.for("hexadecimal");
     const parsed10 = i1.parse("");
     expect(parsed10.length).toBe(0);
     const parsed11 = i1.parse("00");
@@ -14,7 +14,7 @@ describe("ByteFormat.prototype.parse", () => {
     expect(parsed12[1]).toBe(255);
     expect(parsed12[2]).toBe(1);
 
-    const i2 = new ByteFormat({radix:10});
+    const i2 = ByteFormat.for("decimal");
     const parsed21 = i2.parse("000");
     expect(parsed21.length).toBe(1);
     expect(parsed21[0]).toBe(0);
@@ -24,7 +24,7 @@ describe("ByteFormat.prototype.parse", () => {
     expect(parsed22[1]).toBe(255);
     expect(parsed22[2]).toBe(1);
 
-    const i2b = new ByteFormat({radix:2});
+    const i2b = ByteFormat.for("binary");
     const parsed21b = i2b.parse("00000000");
     expect(parsed21b.length).toBe(1);
     expect(parsed21b[0]).toBe(0);
@@ -34,7 +34,7 @@ describe("ByteFormat.prototype.parse", () => {
     expect(parsed22b[1]).toBe(255);
     expect(parsed22b[2]).toBe(1);
 
-    const i2c = new ByteFormat({radix:8});
+    const i2c = ByteFormat.for("octal");
     const parsed21c = i2c.parse("000");
     expect(parsed21c.length).toBe(1);
     expect(parsed21c[0]).toBe(0);
@@ -44,7 +44,7 @@ describe("ByteFormat.prototype.parse", () => {
     expect(parsed22c[1]).toBe(255);
     expect(parsed22c[2]).toBe(1);
 
-    const i3 = new ByteFormat({zeroPaddedLength:3});
+    const i3 = ByteFormat.for("hexadecimal", {zeroPaddedLength:3});
     const parsed31 = i3.parse("000");
     expect(parsed31.length).toBe(1);
     expect(parsed31[0]).toBe(0);
@@ -54,7 +54,7 @@ describe("ByteFormat.prototype.parse", () => {
     expect(parsed32[1]).toBe(255);
     expect(parsed32[2]).toBe(1);
 
-    const i4 = new ByteFormat({upperCase:true});
+    const i4 = ByteFormat.for("hexadecimal", {upperCase:true});
     const parsed41 = i4.parse("00");
     expect(parsed41.length).toBe(1);
     expect(parsed41[0]).toBe(0);
@@ -64,7 +64,7 @@ describe("ByteFormat.prototype.parse", () => {
     expect(parsed42[1]).toBe(255);
     expect(parsed42[2]).toBe(1);
 
-    const i5 = new ByteFormat({prefix:"-"});
+    const i5 = ByteFormat.for("hexadecimal", {prefix:"-"});
     const parsed51 = i5.parse("-00");
     expect(parsed51.length).toBe(1);
     expect(parsed51[0]).toBe(0);
@@ -74,7 +74,7 @@ describe("ByteFormat.prototype.parse", () => {
     expect(parsed52[1]).toBe(255);
     expect(parsed52[2]).toBe(1);
 
-    const i6 = new ByteFormat({suffix:"-"});
+    const i6 = ByteFormat.for("hexadecimal", {suffix:"-"});
     const parsed61 = i6.parse("00-");
     expect(parsed61.length).toBe(1);
     expect(parsed61[0]).toBe(0);
@@ -84,7 +84,7 @@ describe("ByteFormat.prototype.parse", () => {
     expect(parsed62[1]).toBe(255);
     expect(parsed62[2]).toBe(1);
 
-    const i7 = new ByteFormat({zeroPaddedLength:3,upperCase:true,prefix:"-",suffix:"-"});
+    const i7 = ByteFormat.for("hexadecimal", {zeroPaddedLength:3,upperCase:true,prefix:"-",suffix:"-"});
     const parsed71 = i7.parse("-000-");
     expect(parsed71.length).toBe(1);
     expect(parsed71[0]).toBe(0);
@@ -94,7 +94,7 @@ describe("ByteFormat.prototype.parse", () => {
     expect(parsed72[1]).toBe(255);
     expect(parsed72[2]).toBe(1);
 
-    const i8 = new ByteFormat({radix:10,zeroPaddedLength:3,upperCase:true,prefix:"-",suffix:"-"});
+    const i8 = ByteFormat.for("decimal", {zeroPaddedLength:3,upperCase:true,prefix:"-",suffix:"-"});
     const parsed81 = i8.parse("-000-");
     expect(parsed81.length).toBe(1);
     expect(parsed81[0]).toBe(0);
@@ -107,7 +107,7 @@ describe("ByteFormat.prototype.parse", () => {
   });
 
   test("DataError", () => {
-    const i0 = new ByteFormat();
+    const i0 = ByteFormat.for("hexadecimal");
     expect(() => {
       i0.parse("a");
     }).toThrow("parse error");
@@ -117,7 +117,7 @@ describe("ByteFormat.prototype.parse", () => {
   });
 
   test("InvalidCharacterError - prefix", () => {
-    const i0 = new ByteFormat({prefix:"-"});
+    const i0 = ByteFormat.for("hexadecimal", {prefix:"-"});
     expect(() => {
       i0.parse("#00");
     }).toThrow("unprefixed");
@@ -127,7 +127,7 @@ describe("ByteFormat.prototype.parse", () => {
   });
 
   test("InvalidCharacterError - suffix", () => {
-    const i0 = new ByteFormat({suffix:"-"});
+    const i0 = ByteFormat.for("hexadecimal", {suffix:"-"});
     expect(() => {
       i0.parse("00#");
     }).toThrow("unsuffixed");

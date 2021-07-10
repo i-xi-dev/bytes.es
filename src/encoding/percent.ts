@@ -1,7 +1,7 @@
 
 import { Exception } from "../_";
 import { uint8, isByte } from "../type";
-import { ByteFormat } from "../format";
+import { ByteFormatName, ByteFormat } from "../format/index";
 import { ByteEncodingOptions, ByteEncodingImpl } from "./index";
 
 /**
@@ -49,7 +49,7 @@ class PercentEncoding implements ByteEncodingImpl {
   /**
    * "%XX"のフォーマッター
    */
-  static readonly #byteFormatter = new ByteFormat({
+  static readonly #byteFormatter = ByteFormat.for(ByteFormatName.HEXADECIMAL, {
     upperCase: true,
     prefix: "%",
   });
@@ -115,7 +115,7 @@ class PercentEncoding implements ByteEncodingImpl {
    * @returns パーセント符号化された文字列から、"%XX"の形にエンコードされているバイトの数を取得する正規表現
    */
   #encodedPattern(): RegExp {
-    const inclusionsStr = this.#inclusions.map(i => i.toString(16)).join("|");
+    const inclusionsStr = this.#inclusions.map((i) => i.toString(16)).join("|");
     let pattern = "%([0189a-f][0-9a-f]|25|7f";
     if (inclusionsStr.length > 0) {
       pattern = pattern + "|" + inclusionsStr;

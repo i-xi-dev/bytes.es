@@ -17,6 +17,8 @@
     "array-bracket-newline": ["error", "consistent"],
     "array-bracket-spacing": ["error", "always"],
     "array-element-newline": ["error", "consistent"],
+    "arrow-parens": "error",
+    "arrow-spacing": "error",
     "block-spacing": "error",
     "brace-style": ["error", "stroustrup"],
     "comma-dangle": ["error", "always-multiline"],

@@ -32,9 +32,9 @@ export type DigestAlgorithmOptions = {
  */
 class DigestAlgorithm {
   /**
-   * バイト符号化方式の実装登録簿
+   * ハッシュアルゴリズムの実装登録簿
    */
-  static readonly #registry: Map<string, DigestAlgorithmImplConstructor> = new Map();
+  static readonly #registry: Map<string, DigestAlgorithmImplConstructor> = new Map<string, DigestAlgorithmImplConstructor>();
 
   private constructor() {
     throw new Exception("NotSupportedError", "not constructible");

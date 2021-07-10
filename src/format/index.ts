@@ -1,18 +1,26 @@
 
-import { devideStringByLength, Exception } from "./_";
-import { uint8, isByte } from "./type";
+import { devideStringByLength, Exception } from "../_";
+import { uint8, isByte } from "../type";
 
 /**
- * フォーマッターで対応する基数
+ * フォーマット名（基数で表すことにする）
  */
-type ByteFormatRadix = 2 | 8 | 10 | 16;
+export const ByteFormatName = {
+  /** 初期状態 */
+  BINARY: "binary",
+  /** 読取中 */
+  OCTAL: "octal",
+  /** 読取終了後 */
+  DECIMAL: "decimal",
+  /** 読取終了後 */
+  HEXADECIMAL: "hexadecimal",
+} as const;
+type ByteFormatName = typeof ByteFormatName[keyof typeof ByteFormatName];
 
 /**
  * フォーマッターのオプション
  */
 export type ByteFormatOptions = {
-  /** 基数 */
-  radix?: ByteFormatRadix;
   /** 前方ゼロ埋め結果の文字列長 */
   zeroPaddedLength?: number;
   /** 16進数のa-fを大文字にするか否か */
@@ -24,15 +32,15 @@ export type ByteFormatOptions = {
 };
 
 /**
+ * フォーマッターで対応する基数
+ */
+type ByteFormatRadix = 2 | 8 | 10 | 16;
+
+/**
  * バイトのフォーマッター
  *     不変オブジェクト
  */
 class ByteFormat {
-  /**
-   * フォーマット結果の基数のデフォルト
-   */
-  static readonly #DEFAULT_RADIX: ByteFormatRadix = 16;
-
   /**
    * フォーマット結果の16進数のa-fを大文字にするか否かのデフォルト
    */
@@ -74,10 +82,10 @@ class ByteFormat {
   #suffix: string;
 
   /**
+   * @param radix フォーマット結果の基数
    * @param options フォーマットオプション
    */
-  constructor(options: ByteFormatOptions = {}) {
-    const radix: ByteFormatRadix = (typeof options.radix === "number") ? options.radix : ByteFormat.#DEFAULT_RADIX;
+  private constructor(radix: ByteFormatRadix, options: ByteFormatOptions = {}) {
     const minZeroPaddedLength: number = ByteFormat.#minZeroPaddedLengthOf(radix);
     const zeroPaddedLength: number = (typeof options.zeroPaddedLength === "number") ? options.zeroPaddedLength : minZeroPaddedLength;
     if (Number.isSafeInteger(zeroPaddedLength) !== true) {
@@ -100,6 +108,32 @@ class ByteFormat {
   }
 
   /**
+   * 名称からインスタンスを生成し返却
+   * @param formatName フォーマット名称
+   * @param options フォーマットオプション
+   * @returns インスタンス
+   */
+  static for(formatName: ByteFormatName, options: ByteFormatOptions = {}): ByteFormat {
+    switch (formatName.toLowerCase()) {
+      case ByteFormatName.HEXADECIMAL:
+        return new ByteFormat(16, options);
+
+      case ByteFormatName.BINARY:
+        return new ByteFormat(2, options);
+
+      case ByteFormatName.DECIMAL:
+        return new ByteFormat(10, options);
+
+      case ByteFormatName.OCTAL:
+        return new ByteFormat(8, options);
+
+      default:
+        // neverだがjsから利用した場合、普通に到達する
+        throw new Exception("NotFoundError", "unknown formatName");
+    }
+  }
+
+  /**
    * 基数に応じた前方ゼロ埋め結果の最小文字列長を返却
    * @param radix フォーマット結果の基数
    * @returns フォーマット結果の前方ゼロ埋め結果の最小文字列長
@@ -114,6 +148,9 @@ class ByteFormat {
       return 3;
     case 16:
       return 2;
+    default:
+      // neverだがjsから利用した場合、普通に到達する
+      throw new Exception("NotFoundError", "unsupported radix");
     }
   }
 

@@ -19,7 +19,7 @@ class Sha256Algorithm implements DigestAlgorithmImpl {
    * @returns Cryptoオブジェクト
    */
   static async #getCrypto(): Promise<Crypto> {
-    if (globalThis.crypto?.subtle) { //XXX globalThis.cryptoがCrypto型かどうかでは判定できない（Node, Jest環境）Cryptoが値扱いの為
+    if (globalThis.crypto?.subtle) { // XXX globalThis.cryptoがCrypto型かどうかでは判定できない（Node, Jest環境）Cryptoが値扱いの為
       // ブラウザー, Deno
       return globalThis.crypto;
     }

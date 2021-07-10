@@ -1,7 +1,7 @@
 import { Exception } from "../_";
 
 /**
- * バイト符号化方式の実装のインスタンス
+ * バイト列符号化方式の実装のインスタンス
  */
 export interface ByteEncodingImpl {
   /**
@@ -18,7 +18,7 @@ export interface ByteEncodingImpl {
 }
 
 /**
- * バイト符号化方式の実装
+ * バイト列符号化方式の実装
  */
 interface ByteEncodingImplConstructor {
   /**
@@ -28,19 +28,19 @@ interface ByteEncodingImplConstructor {
 }
 
 /**
- * バイト符号化方式オプション
+ * 符号化方式オプション
  */
 export type ByteEncodingOptions = {
 };
 
 /**
- * バイト符号化方式
+ * バイト列符号化方式
  */
 class ByteEncoding {
   /**
-   * バイト符号化方式の実装登録簿
+   * バイト列符号化方式の実装登録簿
    */
-  static readonly #registry: Map<string, ByteEncodingImplConstructor> = new Map();
+  static readonly #registry: Map<string, ByteEncodingImplConstructor> = new Map<string, ByteEncodingImplConstructor>();
 
   private constructor() {
     throw new Exception("NotSupportedError", "not constructible");
@@ -49,7 +49,7 @@ class ByteEncoding {
   /**
    * 名称からByteEncodingImplのインスタンスを生成し返却
    * @param encodingName 符号化方式の名称（実装登録簿に登録した名前）
-   * @param options バイト符号化方式オプション
+   * @param options 符号化方式オプション
    * @returns ByteEncodingImplのインスタンス
    * @throws 実装登録簿に存在しない場合NotFoundErrorをスロー
    */

@@ -1,5 +1,5 @@
 
-import { ByteFormat } from "./format";
+import { ByteFormat } from "./format/index";
 import { ByteEncoding } from "./encoding/index";
 import { DigestAlgorithm } from "./digest_algorithm/index";
 
