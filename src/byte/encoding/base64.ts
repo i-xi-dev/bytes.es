@@ -1,7 +1,7 @@
 
 import { Exception } from "../../_";
 import { uint8 } from "../type";
-import { ByteEncodingImpl, ByteEncodingOptions } from "./index";
+import { ByteEncoding, ByteEncodingImpl, ByteEncodingOptions } from "./index";
 
 /**
  * Base64変換テーブルの62番目の文字
@@ -319,4 +319,4 @@ class Base64Encoding implements ByteEncodingImpl {
 }
 Object.freeze(Base64Encoding);
 
-export { Base64Encoding };
+ByteEncoding.register("base64", Base64Encoding);

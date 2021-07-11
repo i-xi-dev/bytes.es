@@ -1,18 +1,18 @@
-import { Byte } from "../../../../dist/byte/index.js";
+import { ByteEncoding } from "../../../../dist/byte/index.js";
 
 describe("Base64Encoding.prototype.encode", () => {
   test("encode(Uint8Array)", () => {
-    const i1 = Byte.Encoding.for("base64");
+    const i1 = ByteEncoding.for("base64");
     expect(i1.encode(Uint8Array.of())).toBe("");
     expect(i1.encode(Uint8Array.of(3,2,1,0,255,254,253,252))).toBe("AwIBAP/+/fw=");
 
-    const i2 = Byte.Encoding.for("base64", {_62ndChar:"-", _63rdChar:"_"});
+    const i2 = ByteEncoding.for("base64", {_62ndChar:"-", _63rdChar:"_"});
     expect(i2.encode(Uint8Array.of(3,2,1,0,255,254,253,252))).toBe("AwIBAP_-_fw=");
 
-    const i3 = Byte.Encoding.for("base64", {usePadding:false});
+    const i3 = ByteEncoding.for("base64", {usePadding:false});
     expect(i3.encode(Uint8Array.of(3,2,1,0,255,254,253,252))).toBe("AwIBAP/+/fw");
 
-    const i4 = Byte.Encoding.for("base64", {_62ndChar:"-", _63rdChar:"_", usePadding:false});
+    const i4 = ByteEncoding.for("base64", {_62ndChar:"-", _63rdChar:"_", usePadding:false});
     expect(i4.encode(Uint8Array.of(3,2,1,0,255,254,253,252))).toBe("AwIBAP_-_fw");
 
     const r1 = crypto.getRandomValues(new Uint8Array(256));

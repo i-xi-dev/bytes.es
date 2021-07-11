@@ -1,22 +1,22 @@
-import { Byte } from "../../../../dist/byte/index.js";
+import { ByteEncoding } from "../../../../dist/byte/index.js";
 
 describe("Base64Encoding.prototype.decode", () => {
   test("decode(string)", () => {
-    const i1 = Byte.Encoding.for("base64");
+    const i1 = ByteEncoding.for("base64");
     const decoded11 = i1.decode("");
     expect(JSON.stringify([...decoded11])).toBe("[]");
     const decoded12 = i1.decode("AwIBAP/+/fw=");
     expect(JSON.stringify([...decoded12])).toBe("[3,2,1,0,255,254,253,252]");
 
-    const i2 = Byte.Encoding.for("base64", {_62ndChar:"-", _63rdChar:"_"});
+    const i2 = ByteEncoding.for("base64", {_62ndChar:"-", _63rdChar:"_"});
     const decoded22 = i2.decode("AwIBAP_-_fw=");
     expect(JSON.stringify([...decoded22])).toBe("[3,2,1,0,255,254,253,252]");
 
-    const i3 = Byte.Encoding.for("base64", {usePadding:false});
+    const i3 = ByteEncoding.for("base64", {usePadding:false});
     const decoded32 = i3.decode("AwIBAP/+/fw");
     expect(JSON.stringify([...decoded32])).toBe("[3,2,1,0,255,254,253,252]");
 
-    const i4 = Byte.Encoding.for("base64", {_62ndChar:"-", _63rdChar:"_", usePadding:false});
+    const i4 = ByteEncoding.for("base64", {_62ndChar:"-", _63rdChar:"_", usePadding:false});
     const decoded42 = i4.decode("AwIBAP_-_fw");
     expect(JSON.stringify([...decoded42])).toBe("[3,2,1,0,255,254,253,252]");
 

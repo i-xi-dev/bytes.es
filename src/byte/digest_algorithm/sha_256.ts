@@ -1,6 +1,6 @@
 
 import { getCrypto } from "../../_";
-import { DigestAlgorithmImpl, DigestAlgorithmOptions } from "./index";
+import { DigestAlgorithm, DigestAlgorithmImpl, DigestAlgorithmOptions } from "./index";
 
 /**
  * SHA-256ハッシュアルゴリズム
@@ -25,4 +25,4 @@ class Sha256Algorithm implements DigestAlgorithmImpl {
 }
 Object.freeze(Sha256Algorithm);
 
-export { Sha256Algorithm };
+DigestAlgorithm.register("sha-256", Sha256Algorithm);

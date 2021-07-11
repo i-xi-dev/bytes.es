@@ -1,4 +1,4 @@
-import { ByteStreamReader } from "../../../dist/byte/stream_reader.js";
+import { ByteStreamReader } from "../../../dist/byte/index.js";
 import fs from "fs";
 
 describe("ByteStreamReader.prototype.addEventListener", () => {

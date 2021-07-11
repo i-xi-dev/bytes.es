@@ -1,24 +1,10 @@
 
-import { ByteFormat } from "./format/index";
-import { ByteEncoding } from "./encoding/index";
-import { DigestAlgorithm } from "./digest_algorithm/index";
-import { ByteStreamReader } from "./stream_reader";
+export { ByteFormat } from "./format/index";
+export { ByteEncoding } from "./encoding/index";
+export { DigestAlgorithm } from "./digest_algorithm/index";
+export { ByteStreamReader } from "./stream_reader";
 
-// ByteEncoding.register("base64", (await import("./encoding/base64")).Base64Encoding); //XXX Jestで実行時エラーになる
-// ByteEncoding.register("percent", (await import("./encoding/percent")).PercentEncoding);
-import { Base64Encoding } from "./encoding/base64";
-ByteEncoding.register("base64", Base64Encoding);
-import { PercentEncoding } from "./encoding/percent";
-ByteEncoding.register("percent", PercentEncoding);
+import "./encoding/base64";
+import "./encoding/percent";
 
-import { Sha256Algorithm } from "./digest_algorithm/sha_256";
-DigestAlgorithm.register("sha-256", Sha256Algorithm);
-
-const Byte = Object.freeze({
-  Format: ByteFormat,
-  Encoding: ByteEncoding,
-  DigestAlgorithm,
-  StreamReader: ByteStreamReader,
-});
-
-export { Byte };
+import "./digest_algorithm/sha_256";

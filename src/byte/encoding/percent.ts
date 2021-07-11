@@ -2,7 +2,7 @@
 import { Exception } from "../../_";
 import { isByte, uint8 } from "../type";
 import { ByteFormat, ByteFormatName } from "../format/index";
-import { ByteEncodingImpl, ByteEncodingOptions } from "./index";
+import { ByteEncoding, ByteEncodingImpl, ByteEncodingOptions } from "./index";
 
 /**
  * パーセント符号化方式オプション
@@ -220,4 +220,4 @@ class PercentEncoding implements ByteEncodingImpl {
 }
 Object.freeze(PercentEncoding);
 
-export { PercentEncoding };
+ByteEncoding.register("percent", PercentEncoding);

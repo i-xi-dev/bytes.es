@@ -1,12 +1,13 @@
-import { Byte } from "../../../dist/byte/index.js";
-import { Sha256Algorithm } from "../../../dist/byte/digest_algorithm/sha_256.js";
+import { DigestAlgorithm } from "../../../dist/byte/index.js";
 
 describe("DigestAlgorithm.for", () => {
   test("for(string)", () => {
-    expect(Byte.DigestAlgorithm.for("sha-256") instanceof Sha256Algorithm).toBe(true);
+    expect(typeof DigestAlgorithm.for("sha-256").compute).toBe("function");
+
+    expect(typeof DigestAlgorithm.for("sha-256", {}).compute).toBe("function");
 
     expect(() => {
-      Byte.DigestAlgorithm.for("md5");
+      DigestAlgorithm.for("md5");
     }).toThrow("unknown algorithmName");
   });
 });

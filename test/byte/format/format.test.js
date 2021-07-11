@@ -1,4 +1,4 @@
-import { ByteFormat } from "../../../dist/byte/format/index.js";
+import { ByteFormat } from "../../../dist/byte/index.js";
 
 describe("ByteFormat.prototype.format", () => {
   test("format(Uint8Array)", () => {

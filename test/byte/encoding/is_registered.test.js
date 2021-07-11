@@ -1,9 +1,9 @@
-import { Byte } from "../../../dist/byte/index.js";
+import { ByteEncoding } from "../../../dist/byte/index.js";
 
 describe("ByteEncoding.isRegistered", () => {
   test("isRegistered(string)", () => {
-    expect(Byte.Encoding.isRegistered("base64")).toBe(true);
-    expect(Byte.Encoding.isRegistered("hoge")).toBe(false);
+    expect(ByteEncoding.isRegistered("base64")).toBe(true);
+    expect(ByteEncoding.isRegistered("hoge")).toBe(false);
 
   });
 });
