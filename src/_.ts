@@ -1,5 +1,18 @@
 
 /**
+ * Cryptoオブジェクト
+ */
+let _crypto: Crypto;
+if (globalThis.crypto?.subtle) { // XXX globalThis.cryptoがCrypto型かどうかでは判定できない（Node, Jest環境）Cryptoが値扱いの為
+  // ブラウザー, Deno
+  _crypto = globalThis.crypto;
+}
+else if (globalThis.process) {
+  // Node.js 条件不十分？
+  _crypto = ((await import("crypto")).webcrypto as unknown) as Crypto;
+}
+
+/**
  * 例外
  */
 export class Exception extends Error {
@@ -72,6 +85,17 @@ export function devideStringByLength(str: string, segmentLength: number, padding
 }
 
 /**
+ * Cryptoオブジェクトを返却
+ * @returns Cryptoオブジェクト
+ */
+export function getCrypto(): Crypto {
+  if (_crypto) {
+    return _crypto;
+  }
+  throw new Exception("NotSupportedError", "Crypto unsupported");
+}
+
+/**
  * DOMのProgressEventと同じインターフェースのイベント
  * Node.js用
  */
@@ -93,7 +117,7 @@ class _ProgressEvent extends Event implements ProgressEvent<EventTarget> {
 
   /**
    * @param type イベント型名
-   * @param [init] EventInit
+   * @param init EventInit
    */
   constructor(type: string, init?: ProgressEventInit) {
     super(type, init);
