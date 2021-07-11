@@ -1,37 +1,20 @@
 
-import { getCrypto } from "../_";
-import { uint8 } from "./type";
-import { ByteFormat, ByteFormatName, ByteFormatOptions } from "./format/index";
-import { ByteEncoding, ByteEncodingOptions } from "./encoding/index";
-import { DigestAlgorithm, DigestAlgorithmOptions } from "./digest_algorithm/index";
-import { ByteStreamReader } from "./stream_reader"
+import { getCrypto } from "./_";
+import { uint8 } from "./byte/type";
+import { ByteFormat, ByteFormatName, ByteFormatOptions } from "./byte/format/index";
+import { ByteEncoding, ByteEncodingOptions } from "./byte/encoding/index";
+import { DigestAlgorithm, DigestAlgorithmOptions } from "./byte/digest_algorithm/index";
+import { ByteStreamReader } from "./byte/stream_reader"
 
+/**
+ * バイト列を表す整数の配列
+ */
 type ByteArray = Array<uint8> | Uint8Array | Uint8ClampedArray;
 
-// function isByteArray(test: unknown): test is ByteArray {
-//   if (Array.isArray(test) && test.every((i) => isByte(i))) {
-//     return true;
-//   }
-//   if (test instanceof Uint8Array) {
-//     return true;
-//   }
-//   if (test instanceof Uint8ClampedArray) {
-//     return true;
-//   }
-//   return false;
-// }
-
+/**
+ * バイト列を表すオブジェクト
+ */
 type Bytes = ByteSequence | ByteArray;
-
-// function isBytes(test: unknown): test is Bytes {
-//   if (test instanceof ByteSequence) {
-//     return true;
-//   }
-//   if (isByteArray(test)) {
-//     return true;
-//   }
-//   return false;
-// }
 
 /**
  * バイト列
@@ -84,7 +67,7 @@ class ByteSequence {
       offset = byteOffset;
     }
 
-    let count = 0;
+    let count = this.count;
     if (typeof byteCount === "number") {
       if (Number.isSafeInteger(byteCount) !== true) {
         throw new TypeError("byteCount");
@@ -98,6 +81,7 @@ class ByteSequence {
     return new Uint8Array(this.#bytes.buffer, offset, count);
   }
 
+  // viewで取得すればいい
   // /**
   // * 指定した位置のバイトを返却
   // * @param index 位置
@@ -107,18 +91,20 @@ class ByteSequence {
   //   return this.#bytes.at(index);
   // }
 
-  /**
-   * 1バイト単位のイテレーターを返却
-   * @returns 1バイト単位のイテレーター
-   */
-  [Symbol.iterator](): IterableIterator<uint8> {
-    return this.#bytes[Symbol.iterator]() as IterableIterator<uint8>;
-  }
+  // viewで取得すればいい
+  // /**
+  //  * 1バイト単位のイテレーターを返却
+  //  * @returns 1バイト単位のイテレーター
+  //  */
+  // [Symbol.iterator](): IterableIterator<uint8> {
+  //   return this.#bytes[Symbol.iterator]() as IterableIterator<uint8>;
+  // }
 
   // async *[Symbol.asyncIterator]() {
   //  yield* this[Symbol.iterator]();
   // }
 
+  // viewで取得すればいい
   // /**
   //  * 指定した範囲のバイト列を返却
   //  *     ※ArrayBufferは新たに生成する
@@ -148,6 +134,7 @@ class ByteSequence {
   //   return Uint8Array.from(this.#bytes.subarray(byteOffset, (byteOffset + byteCount)));
   // }
 
+  // viewで取得すればいい
   // /**
   //  * 指定した範囲のバイトを書き換え
   //  * @param byteOffset 書き換え開始位置
@@ -171,20 +158,6 @@ class ByteSequence {
   //   //TODO source.length <= (this.count - byteOffset) ではなかったらどうなる
 
   //   this.#bytes.set(source, byteOffset);
-  // }
-
-  // *segments(segmentByteCount: number) {
-  //   precondition(() => Number.isSafeInteger(segmentByteCount) && (segmentByteCount > 0));
-
-  //   let i = 0;
-  //   let itemLength = segmentByteCount;
-  //   while (i < this.count) {
-  //     if ((i + segmentByteCount) > this.count) {
-  //       itemLength = this.count - i;
-  //     }
-  //     yield this.get(i, itemLength); //TODO padするか否か
-  //     i = i + segmentByteCount;
-  //   }
   // }
 
   /**
@@ -227,7 +200,7 @@ class ByteSequence {
   /**
    * バイト列をもとにインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
-   *     ※bytesがArrayBufferViewの場合、ビューの範囲外は無視する（切り落とす）
+   *     ※bytesがArrayBufferViewの場合、ビューの範囲外は無視する
    * @param bytes バイト列
    * @returns 生成したインスタンス
    */
@@ -467,6 +440,20 @@ class ByteSequence {
     const slicedBuffer = this.#bytes.buffer.slice(start, end);
     return new ByteSequence(slicedBuffer);
   }
+
+  // *segments(segmentByteCount: number) {
+  //   precondition(() => Number.isSafeInteger(segmentByteCount) && (segmentByteCount > 0));
+
+  //   let i = 0;
+  //   let itemLength = segmentByteCount;
+  //   while (i < this.count) {
+  //     if ((i + segmentByteCount) > this.count) {
+  //       itemLength = this.count - i;
+  //     }
+  //     yield this.get(i, itemLength); //TODO padするか否か
+  //     i = i + segmentByteCount;
+  //   }
+  // }
 
   /**
    * 可読ストリームを読み取り、自身にロードする
