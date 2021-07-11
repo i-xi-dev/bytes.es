@@ -5,7 +5,7 @@ import { isByte, uint8 } from "../type";
 /**
  * フォーマット名（基数で表すことにする）
  */
-export const ByteFormatName = {
+const ByteFormatName = {
   /** 初期状態 */
   BINARY: "binary",
   /** 読取中 */

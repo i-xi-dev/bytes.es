@@ -1,7 +1,7 @@
 
 import { Exception } from "../../_";
 import { isByte, uint8 } from "../type";
-import { ByteFormat, ByteFormatName } from "../format/index";
+import { ByteFormat } from "../format/index";
 import { ByteEncoding, ByteEncodingImpl, ByteEncodingOptions } from "./index";
 
 /**
@@ -49,7 +49,7 @@ class PercentEncoding implements ByteEncodingImpl {
   /**
    * "%XX"のフォーマッター
    */
-  static readonly #byteFormatter = ByteFormat.for(ByteFormatName.HEXADECIMAL, {
+  static readonly #byteFormatter = ByteFormat.for("hexadecimal", {
     upperCase: true,
     prefix: "%",
   });

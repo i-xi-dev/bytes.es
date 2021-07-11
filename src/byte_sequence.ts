@@ -1,10 +1,16 @@
 
 import { getCrypto } from "./_";
 import { uint8 } from "./byte/type";
-import { ByteFormat, ByteFormatName, ByteFormatOptions } from "./byte/format/index";
-import { ByteEncoding, ByteEncodingOptions } from "./byte/encoding/index";
-import { DigestAlgorithm, DigestAlgorithmOptions } from "./byte/digest_algorithm/index";
-import { ByteStreamReader } from "./byte/stream_reader"
+import {
+  ByteFormat,
+  ByteFormatName,
+  ByteFormatOptions,
+  ByteEncoding,
+  ByteEncodingOptions,
+  ByteStreamReader,
+  DigestAlgorithm,
+  DigestAlgorithmOptions,
+} from "./byte/index";
 
 /**
  * バイト列を表す整数の配列
@@ -277,7 +283,7 @@ class ByteSequence {
    * @param options フォーマットオプション
    * @returns 生成したインスタンス
    */
-  static parse(toParse: string, formatName: ByteFormatName = ByteFormatName.HEXADECIMAL, options?: ByteFormatOptions): ByteSequence {
+  static parse(toParse: string, formatName: ByteFormatName = "hexadecimal", options?: ByteFormatOptions): ByteSequence {
     const formatter = ByteFormat.for(formatName, options);
     const bytes = formatter.parse(toParse);
     return new ByteSequence(bytes.buffer);
@@ -289,7 +295,7 @@ class ByteSequence {
    * @param options フォーマットオプション
    * @returns バイト列をフォーマットした文字列
    */
-  format(formatName: ByteFormatName = ByteFormatName.HEXADECIMAL, options?: ByteFormatOptions): string {
+  format(formatName: ByteFormatName = "hexadecimal", options?: ByteFormatOptions): string {
     const formatter = ByteFormat.for(formatName, options);
     return formatter.format(this.#bytes);
   }
