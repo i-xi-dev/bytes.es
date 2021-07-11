@@ -67,7 +67,7 @@ class ByteSequence {
       offset = byteOffset;
     }
 
-    let count = this.count;
+    let count = this.count - offset;
     if (typeof byteCount === "number") {
       if (Number.isSafeInteger(byteCount) !== true) {
         throw new TypeError("byteCount");
