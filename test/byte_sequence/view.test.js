@@ -18,13 +18,14 @@ describe("ByteSequence.prototype.view", () => {
     expect(bs1.view(0).byteLength).toBe(1000);
     expect(bs1.view(1).byteLength).toBe(999);
     expect(bs1.view(999).byteLength).toBe(1);
+    expect(bs1.view(1000).byteLength).toBe(0);
 
     expect(() => {
       bs1.view(-1)
     }).toThrow("byteOffset");
 
     expect(() => {
-      bs1.view(1000)
+      bs1.view(1001)
     }).toThrow("byteOffset");
 
     expect(() => {
@@ -43,6 +44,8 @@ describe("ByteSequence.prototype.view", () => {
     expect(bs1.view(0, 1).byteLength).toBe(1);
     expect(bs1.view(0, 1000).byteLength).toBe(1000);
     expect(bs1.view(999, 1).byteLength).toBe(1);
+    expect(bs1.view(1000, 0).byteLength).toBe(0);
+    expect(bs1.view(0, 0).byteLength).toBe(0);
 
     expect(() => {
       bs1.view(0, Number.NaN)
@@ -58,10 +61,6 @@ describe("ByteSequence.prototype.view", () => {
 
     expect(() => {
       bs1.view(999, 2)
-    }).toThrow("byteCount");
-
-    expect(() => {
-      bs1.view(0, 0)
     }).toThrow("byteCount");
 
   });

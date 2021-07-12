@@ -5,8 +5,12 @@ import { Readable } from "stream";
 describe("ByteStreamReader.prototype.read", () => {
   test("read(NodeJS.ReadableStream)", async () => {
     const r0 = new ByteStreamReader();
-    const stream = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
 
+    const stream0 = fs.createReadStream("./test/_data/0.txt", { highWaterMark: 64 });
+    const bytes0 = await r0.read(stream0);
+    expect(bytes0.byteLength).toBe(0);
+
+    const stream = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
     const bytes = await r0.read(stream);
     expect(bytes.byteLength).toBe(128);
 
@@ -40,6 +44,11 @@ describe("ByteStreamReader.prototype.read", () => {
 
   test("read(NodeJS.ReadableStream, number)", async () => {
     const r0 = new ByteStreamReader();
+
+    const stream0 = fs.createReadStream("./test/_data/0.txt", { highWaterMark: 64 });
+    const bytes0 = await r0.read(stream0, 0);
+    expect(bytes0.byteLength).toBe(0);
+    expect(bytes0.buffer.byteLength).toBe(0);
 
     const stream = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
     const bytes = await r0.read(stream, 128);

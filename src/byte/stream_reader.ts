@@ -1,6 +1,11 @@
 import { Exception, ProgressEvent } from "../_";
 
 /**
+ * 可読ストリームの型
+ */
+export type ReadableStreamType = ReadableStream<Uint8Array> | NodeJS.ReadStream;
+
+/**
  * 読取器の状態
  */
 const ReadingState = {
@@ -112,7 +117,7 @@ class ByteStreamReader extends EventTarget {
    * @returns バイト列
    * @throws #stateが読み取り中のときに実行した場合スロー
    */
-  async read(stream: ReadableStream<Uint8Array> | NodeJS.ReadStream, totalByteCount?: number, options: StreamReadingOptions = {}): Promise<Uint8Array> {
+  async read(stream: ReadableStreamType, totalByteCount?: number, options: StreamReadingOptions = {}): Promise<Uint8Array> {
     if (totalByteCount !== undefined) {
       if (Number.isSafeInteger(totalByteCount) !== true) {
         throw new TypeError("totalByteCount");

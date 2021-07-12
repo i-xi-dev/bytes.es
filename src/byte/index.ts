@@ -8,4 +8,4 @@ export { ByteEncoding, ByteEncodingOptions } from "./encoding/index";
 export { Base64EncodingOptions } from "./encoding/base64";
 export { PercentEncodingOptions } from "./encoding/percent";
 export { DigestAlgorithm, DigestAlgorithmOptions } from "./digest_algorithm/index";
-export { ByteStreamReader } from "./stream_reader";
+export { ByteStreamReader, StreamReadingOptions, ReadableStreamType } from "./stream_reader";

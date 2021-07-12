@@ -12,6 +12,8 @@ import {
   DigestAlgorithm,
   DigestAlgorithmOptions,
   PercentEncodingOptions,
+  ReadableStreamType,
+  StreamReadingOptions,
 } from "./byte/index";
 
 /**
@@ -63,110 +65,38 @@ class ByteSequence {
    * @param byteCount ビューのバイト数
    * @returns 自身のArrayBufferのビュー
    */
-  view(byteOffset?: number, byteCount?: number): Uint8Array {
-    let offset = 0;
-    if (typeof byteOffset === "number") {
-      if (Number.isSafeInteger(byteOffset) !== true) {
-        throw new TypeError("byteOffset");
-      }
-      if ((byteOffset < 0) || (byteOffset >= this.count)) {
-        throw new RangeError("byteOffset");
-      }
-      offset = byteOffset;
+  view(byteOffset: number = 0, byteCount: number = (this.count - byteOffset)): Uint8Array {
+    if (Number.isSafeInteger(byteOffset) !== true) {
+      throw new TypeError("byteOffset");
+    }
+    if ((byteOffset < 0) || (byteOffset > this.count)) {
+      throw new RangeError("byteOffset");
     }
 
-    let count = this.count - offset;
-    if (typeof byteCount === "number") {
-      if (Number.isSafeInteger(byteCount) !== true) {
-        throw new TypeError("byteCount");
-      }
-      if ((byteCount <= 0) || (byteCount > (this.count - offset))) {
-        throw new RangeError("byteCount");
-      }
-      count = byteCount;
+    if (Number.isSafeInteger(byteCount) !== true) {
+      throw new TypeError("byteCount");
+    }
+    if ((byteCount < 0) || (byteCount > (this.count - byteOffset))) {
+      throw new RangeError("byteCount");
     }
 
-    return new Uint8Array(this.#bytes.buffer, offset, count);
+    return new Uint8Array(this.#bytes.buffer, byteOffset, byteCount);
   }
 
   // viewで取得すればいい
-  // /**
-  // * 指定した位置のバイトを返却
-  // * @param index 位置
-  // * @returns バイト
-  // */
-  // at(index: number): uint8 {
-  //   return this.#bytes.at(index);
-  // }
+  // at(index: number): uint8;
 
   // viewで取得すればいい
-  // /**
-  //  * 1バイト単位のイテレーターを返却
-  //  * @returns 1バイト単位のイテレーター
-  //  */
-  // [Symbol.iterator](): IterableIterator<uint8> {
-  //   return this.#bytes[Symbol.iterator]() as IterableIterator<uint8>;
-  // }
-
-  // async *[Symbol.asyncIterator]() {
-  //  yield* this[Symbol.iterator]();
-  // }
+  // [Symbol.iterator](): IterableIterator<uint8>;
 
   // viewで取得すればいい
-  // /**
-  //  * 指定した範囲のバイト列を返却
-  //  *     ※ArrayBufferは新たに生成する
-  //  * @param byteOffset 取得開始位置
-  //  * @param byteCount 取得するバイト数
-  //  * @returns バイト列
-  //  */
-  // get(byteOffset: number, byteCount: number = 1): Uint8Array {
-  //   if (Number.isSafeInteger(byteOffset) !== true) {
-  //     throw new TypeError("byteOffset");
-  //   }
-  //   if ((byteOffset < 0) || (byteOffset >= this.count)) {
-  //     throw new RangeError("byteOffset");
-  //   }
-
-  //   if (Number.isSafeInteger(byteCount) !== true) {
-  //     throw new TypeError("byteCount");
-  //   }
-  //   // if ((byteCount <= 0) || (byteCount > (this.count - byteOffset))) {
-  //   //   throw new RangeError("byteCount");
-  //   // }
-  //   // 0以上、上限なしとする
-  //   if (byteCount < 0) {
-  //     throw new RangeError("byteCount");
-  //   }
-
-  //   return Uint8Array.from(this.#bytes.subarray(byteOffset, (byteOffset + byteCount)));
-  // }
+  // async *[Symbol.asyncIterator](): AsyncIterableIterator<uint8>;
 
   // viewで取得すればいい
-  // /**
-  //  * 指定した範囲のバイトを書き換え
-  //  * @param byteOffset 書き換え開始位置
-  //  * @param bytes バイト列
-  //  */
-  // set(byteOffset: number, bytes: Bytes): void {
-  //   if (Number.isSafeInteger(byteOffset) !== true) {
-  //     throw new TypeError("byteOffset");
-  //   }
-  //   if ((byteOffset < 0) || (byteOffset >= this.count)) {
-  //     throw new RangeError("byteOffset");
-  //   }
+  // get(byteOffset: number, byteCount: number = 1): Uint8Array;
 
-  //   let source: Array<uint8> | Uint8Array | Uint8ClampedArray;
-  //   if (bytes instanceof ByteSequence) {
-  //     source = bytes.#bytes;
-  //   }
-  //   else {
-  //     source = bytes;
-  //   }
-  //   //TODO source.length <= (this.count - byteOffset) ではなかったらどうなる
-
-  //   this.#bytes.set(source, byteOffset);
-  // }
+  // viewで取得すればいい
+  // set(byteOffset: number, bytes: Bytes): void;
 
   /**
    * 指定したバイト数でインスタンスを生成し返却
@@ -474,7 +404,7 @@ class ByteSequence {
    * @param end 終了インデックス
    * @returns 自身のバイト列の部分複製
    */
-  subsequence(start: number, end?: number): ByteSequence {
+  subsequence(start: number = 0, end?: number): ByteSequence {
     if (Number.isSafeInteger(start) !== true) {
       throw new TypeError("start");
     }
@@ -486,7 +416,7 @@ class ByteSequence {
       if (Number.isSafeInteger(end) !== true) {
         throw new TypeError("end");
       }
-      if ((end < start) || (end > this.count)) {
+      if (end < start) {
         throw new RangeError("end");
       }
     }
@@ -495,49 +425,29 @@ class ByteSequence {
     return new ByteSequence(slicedBuffer);
   }
 
-  // *segments(segmentByteCount: number) {
-  //   precondition(() => Number.isSafeInteger(segmentByteCount) && (segmentByteCount > 0));
-
-  //   let i = 0;
-  //   let itemLength = segmentByteCount;
-  //   while (i < this.count) {
-  //     if ((i + segmentByteCount) > this.count) {
-  //       itemLength = this.count - i;
-  //     }
-  //     yield this.get(i, itemLength); //TODO padするか否か
-  //     i = i + segmentByteCount;
-  //   }
-  // }
-
   /**
-   * 可読ストリームを読み取り、自身にロードする
-   * ストリームを終端まで読んだら終了
-   * @param stream 可読ストリーム
-   *     ※NodeJS.ReadStreamの場合、チャンクがBufferのストリーム
-   * @param byteOffset 自身へのセット開始位置
-   *     省略した場合0
-   * @param byteCount ストリームから読み取るバイト数
-   *     省略した場合、自身のcount
+   * 指定したバイト数毎に自身のバイト列の部分複製を生成し返却するジェネレーター
+   *     ※参照するArrayBufferも複製する
+   * @param segmentByteCount 分割するバイト数
+   * @returns 自身のバイト列の部分複製を返却するジェネレーター
    */
-  async loadFromStream(stream: ReadableStream<Uint8Array> | NodeJS.ReadStream, byteOffset = 0, byteCount = (this.count - byteOffset)): Promise<void> {
-    if (Number.isSafeInteger(byteOffset) !== true) {
-      throw new TypeError("byteOffset");
+  *segmentedSequences(segmentByteCount: number): Generator<ByteSequence, void, void> {
+    if (Number.isSafeInteger(segmentByteCount) !== true) {
+      throw new TypeError("segmentByteCount");
     }
-    if ((byteOffset < 0) || (byteOffset >= this.count)) {
-      throw new RangeError("byteOffset");
-    }
-
-    if (Number.isSafeInteger(byteCount) !== true) {
-      throw new TypeError("byteCount");
-    }
-    if ((byteCount < 0) || (byteCount > (this.count - byteOffset))) {
-      throw new RangeError("byteCount");
+    if (segmentByteCount <= 0) {
+      throw new RangeError("segmentByteCount");
     }
 
-    const reader = new ByteStreamReader();
-    // 中断不可、サイズ不一致はエラー、で読取
-    const bytes = await reader.read(stream, byteCount);
-    this.#bytes.set(bytes, byteOffset);
+    let i = 0;
+    let itemLength = segmentByteCount;
+    while (i < this.count) {
+      if ((i + segmentByteCount) > this.count) {
+        itemLength = this.count - i;
+      }
+      yield this.subsequence(i, itemLength);
+      i = i + segmentByteCount;
+    }
   }
 
   /**
@@ -545,10 +455,10 @@ class ByteSequence {
    * @param stream 可読ストリーム
    *     ※NodeJS.ReadStreamの場合、チャンクがBufferのストリーム
    * @param totalByteCount ストリームから読み取るバイト数
-   * @param acceptSizeMismatch totalByteCountを指定した場合に、streamから読み取ったバイト数とtotalByteCountの不一致を許容するか否か
+   * @param options 読み取りオプション
    * @returns 生成したインスタンス
    */
-  static async fromStream(stream: ReadableStream<Uint8Array> | NodeJS.ReadStream, totalByteCount?: number, acceptSizeMismatch = true): Promise<ByteSequence> {
+  static async fromStream(stream: ReadableStreamType, totalByteCount?: number, options?: StreamReadingOptions): Promise<ByteSequence> {
     if (typeof totalByteCount === "number") {
       if (Number.isSafeInteger(totalByteCount) !== true) {
         throw new TypeError("totalByteCount");
@@ -560,12 +470,12 @@ class ByteSequence {
 
     const reader = new ByteStreamReader();
     // 中断不可、で読取
-    const bytes = await reader.read(stream, totalByteCount, { acceptSizeMismatch });
+    const bytes = await reader.read(stream, totalByteCount, options);
     return ByteSequence.from(bytes);
   }
 
   //TODO
-  //readAsText(): string {
+  //asText(): string {
     
   //}
 
