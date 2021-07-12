@@ -3,6 +3,14 @@ import { ByteSequence } from "../../dist/byte_sequence.js";
 describe("ByteSequence.prototype.subsequence", () => {
   const bs0 = ByteSequence.create(0);
 
+  test("subsequence()", () => {
+    expect(bs0.subsequence().count).toBe(0);
+    const bs1 = ByteSequence.generateRandom(1000);
+    expect(bs1.subsequence().count).toBe(1000);
+    expect(bs1.subsequence().toString()).toBe(bs1.toString());
+
+  });
+
   test("subsequence(number)", () => {
     const bs1 = ByteSequence.generateRandom(1000);
 

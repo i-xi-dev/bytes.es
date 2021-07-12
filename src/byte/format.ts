@@ -115,21 +115,21 @@ class ByteFormat {
    */
   static for(formatName: ByteFormatName, options: ByteFormatOptions = {}): ByteFormat {
     switch (formatName.toLowerCase()) {
-      case ByteFormatName.HEXADECIMAL:
-        return new ByteFormat(16, options);
+    case ByteFormatName.HEXADECIMAL:
+      return new ByteFormat(16, options);
 
-      case ByteFormatName.BINARY:
-        return new ByteFormat(2, options);
+    case ByteFormatName.BINARY:
+      return new ByteFormat(2, options);
 
-      case ByteFormatName.DECIMAL:
-        return new ByteFormat(10, options);
+    case ByteFormatName.DECIMAL:
+      return new ByteFormat(10, options);
 
-      case ByteFormatName.OCTAL:
-        return new ByteFormat(8, options);
+    case ByteFormatName.OCTAL:
+      return new ByteFormat(8, options);
 
-      default:
-        // neverだがjsから利用した場合、普通に到達する
-        throw new Exception("NotFoundError", "unknown formatName");
+    default:
+      // neverだがjsから利用した場合、普通に到達する
+      throw new Exception("NotFoundError", "unknown formatName");
     }
   }
 

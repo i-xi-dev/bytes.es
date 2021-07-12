@@ -71,7 +71,7 @@ class DigestAlgorithm {
    * @param encodingName 符号化方式の名称
    * @returns 符号化方式が実装登録簿に登録済か否か
    */
-   static isRegistered(algorithmName: string): boolean {
+  static isRegistered(algorithmName: string): boolean {
     return [ ...DigestAlgorithm.#registry.keys() ].includes(algorithmName.toLowerCase());
   }
 }

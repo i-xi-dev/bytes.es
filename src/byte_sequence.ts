@@ -39,7 +39,7 @@ class ByteSequence {
    * ArrayBufferをラップするインスタンスを生成
    *     ※外部からのArrayBufferの変更は当インスタンスに影響する
    */
-  constructor (buffer: ArrayBuffer) {
+  constructor(buffer: ArrayBuffer) {
     this.#bytes = new Uint8Array(buffer);
     Object.freeze(this);
   }
@@ -65,7 +65,7 @@ class ByteSequence {
    * @param byteCount ビューのバイト数
    * @returns 自身のArrayBufferのビュー
    */
-  view(byteOffset: number = 0, byteCount: number = (this.count - byteOffset)): Uint8Array {
+  view(byteOffset = 0, byteCount: number = (this.count - byteOffset)): Uint8Array {
     if (Number.isSafeInteger(byteOffset) !== true) {
       throw new TypeError("byteOffset");
     }
@@ -404,7 +404,7 @@ class ByteSequence {
    * @param end 終了インデックス
    * @returns 自身のバイト列の部分複製
    */
-  subsequence(start: number = 0, end?: number): ByteSequence {
+  subsequence(start = 0, end?: number): ByteSequence {
     if (Number.isSafeInteger(start) !== true) {
       throw new TypeError("start");
     }
@@ -445,7 +445,7 @@ class ByteSequence {
       if ((i + segmentByteCount) > this.count) {
         itemLength = this.count - i;
       }
-      yield this.subsequence(i, itemLength);
+      yield this.subsequence(i, i + itemLength);
       i = i + segmentByteCount;
     }
   }
@@ -474,10 +474,10 @@ class ByteSequence {
     return ByteSequence.from(bytes);
   }
 
-  //TODO
-  //asText(): string {
+  // TODO
+  // asText(): string {
     
-  //}
+  // }
 
 
 
