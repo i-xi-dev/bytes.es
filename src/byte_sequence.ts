@@ -2,6 +2,7 @@
 import { getCrypto } from "./_";
 import { uint8 } from "./byte/type";
 import {
+  Base64EncodingOptions,
   ByteFormat,
   ByteFormatName,
   ByteFormatOptions,
@@ -10,6 +11,7 @@ import {
   ByteStreamReader,
   DigestAlgorithm,
   DigestAlgorithmOptions,
+  PercentEncodingOptions,
 } from "./byte/index";
 
 /**
@@ -324,6 +326,44 @@ class ByteSequence {
   }
 
   /**
+   * Base64符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
+   * @param base64Encoded Base64符号化された文字列
+   * @param options 符号化方式オプション
+   * @returns 生成したインスタンス
+   */
+  static fromBase64Encoded(base64Encoded: string, options?: Base64EncodingOptions): ByteSequence {
+    return ByteSequence.fromEncoded(base64Encoded, "base64", options);
+  }
+
+  /**
+   * 自身のバイト列をBase64符号化した文字列を返却
+   * @param options 符号化方式のオプション
+   * @returns Base64符号化した文字列
+   */
+  toBase64Encoded(options?: Base64EncodingOptions): string {
+    return this.toEncoded("base64", options);
+  }
+
+  /**
+   * パーセント符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
+   * @param percentEncoded パーセント符号化された文字列
+   * @param options 符号化方式オプション
+   * @returns 生成したインスタンス
+   */
+  static fromPercentEncoded(percentEncoded: string, options?: PercentEncodingOptions): ByteSequence {
+    return ByteSequence.fromEncoded(percentEncoded, "percent", options);
+  }
+
+  /**
+   * 自身のバイト列をパーセント符号化した文字列を返却
+   * @param options 符号化方式のオプション
+   * @returns パーセント符号化した文字列
+   */
+  toPercentEncoded(options?: PercentEncodingOptions): string {
+    return this.toEncoded("percent", options);
+  }
+
+  /**
    * 自身のバイト列のハッシュを生成し返却
    * @param algorithmName ハッシュアルゴリズム名
    * @param options ハッシュアルゴリズムのオプション
@@ -333,6 +373,14 @@ class ByteSequence {
     const algorithm = DigestAlgorithm.for(algorithmName, options);
     const digestBytes = await algorithm.compute(this.#bytes);
     return new ByteSequence(digestBytes.buffer);
+  }
+
+  /**
+   * 自身のバイト列のSHA-256ハッシュを生成し返却
+   * @returns 生成したハッシュのバイト列で解決されるPromise
+   */
+  async toSha256Digest(): Promise<ByteSequence> {
+    return this.toDigest("sha-256");
   }
 
   /**

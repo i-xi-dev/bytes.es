@@ -1,7 +1,7 @@
 
 import { Exception } from "../../_";
 import { isByte, uint8 } from "../type";
-import { ByteFormat } from "../format/index";
+import { ByteFormat } from "../format";
 import { ByteEncoding, ByteEncodingImpl, ByteEncodingOptions } from "./index";
 
 /**

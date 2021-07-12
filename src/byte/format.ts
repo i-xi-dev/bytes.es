@@ -1,6 +1,6 @@
 
-import { devideStringByLength, Exception } from "../../_";
-import { isByte, uint8 } from "../type";
+import { devideStringByLength, Exception } from "../_";
+import { isByte, uint8 } from "./type";
 
 /**
  * フォーマット名（基数で表すことにする）
