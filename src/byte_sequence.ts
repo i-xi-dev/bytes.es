@@ -2,18 +2,17 @@
 import { getCrypto } from "./_";
 import { uint8 } from "./byte/type";
 import {
-  Base64EncodingOptions,
-  ByteFormat,
-  ByteFormatName,
-  ByteFormatOptions,
-  ByteEncoding,
-  ByteEncodingOptions,
-  ByteStreamReader,
-  DigestAlgorithm,
-  DigestAlgorithmOptions,
-  PercentEncodingOptions,
-  ReadableStreamType,
-  StreamReadingOptions,
+  Base64,
+  Base64Options,
+  Format,
+  FormatOptions,
+  FormatRadix,
+  // Percent,
+  // PercentOptions,
+  // ReadableStreamType,
+  Sha256,
+  // StreamReader,
+  // StreamReadingOptions,
 } from "./byte/index";
 
 /**
@@ -211,58 +210,34 @@ class ByteSequence {
    * バイト列をフォーマットした文字列からインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
    * @param toParse バイト列をフォーマットした文字列
-   * @param formatName フォーマット名
+   * @param radix フォーマット結果の基数
    * @param options フォーマットオプション
    * @returns 生成したインスタンス
    */
-  static parse(toParse: string, formatName: ByteFormatName = "hexadecimal", options?: ByteFormatOptions): ByteSequence {
-    const formatter = ByteFormat.for(formatName, options);
-    const bytes = formatter.parse(toParse);
-    return new ByteSequence(bytes.buffer);
+  static parse(toParse: string, radix: FormatRadix = 16, options?: FormatOptions): ByteSequence {
+    const parsed = Format.parse(toParse, radix, options);
+    return new ByteSequence(parsed.buffer);
   }
 
   /**
    * 自身のバイト列をフォーマットした文字列を生成し返却
-   * @param formatName フォーマット名
+   * @param radix フォーマット結果の基数
    * @param options フォーマットオプション
    * @returns バイト列をフォーマットした文字列
    */
-  format(formatName: ByteFormatName = "hexadecimal", options?: ByteFormatOptions): string {
-    const formatter = ByteFormat.for(formatName, options);
-    return formatter.format(this.#bytes);
-  }
-
-  /**
-   * 符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
-   * @param encoded 符号化された文字列
-   * @param encodingName バイト列符号化方式名
-   * @param options 符号化方式オプション
-   * @returns 生成したインスタンス
-   */
-  static fromEncoded(encoded: string, encodingName: string, options?: ByteEncodingOptions): ByteSequence {
-    const encoding = ByteEncoding.for(encodingName, options);
-    return new ByteSequence(encoding.decode(encoded).buffer);
-  }
-
-  /**
-   * 自身のバイト列を符号化した文字列を返却
-   * @param encodingName バイト列符号化方式名
-   * @param options 符号化方式のオプション
-   * @returns バイト列を符号化した文字列
-   */
-  toEncoded(encodingName: string, options?: ByteEncodingOptions): string {
-    const encoding = ByteEncoding.for(encodingName, options);
-    return encoding.encode(this.view());
+  format(radix: FormatRadix = 16, options?: FormatOptions): string {
+    return Format.format(this.#bytes, radix, options);
   }
 
   /**
    * Base64符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
    * @param base64Encoded Base64符号化された文字列
-   * @param options 符号化方式オプション
+   * @param options 符号化方式のオプション
    * @returns 生成したインスタンス
    */
-  static fromBase64Encoded(base64Encoded: string, options?: Base64EncodingOptions): ByteSequence {
-    return ByteSequence.fromEncoded(base64Encoded, "base64", options);
+  static fromBase64(base64Encoded: string, options?: Base64Options): ByteSequence {
+    const decoded = Base64.decode(base64Encoded, options);
+    return new ByteSequence(decoded.buffer);
   }
 
   /**
@@ -270,28 +245,31 @@ class ByteSequence {
    * @param options 符号化方式のオプション
    * @returns Base64符号化した文字列
    */
-  toBase64Encoded(options?: Base64EncodingOptions): string {
-    return this.toEncoded("base64", options);
+  toBase64(options?: Base64Options): string {
+    return Base64.encode(this.view(), options);
   }
 
-  /**
-   * パーセント符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
-   * @param percentEncoded パーセント符号化された文字列
-   * @param options 符号化方式オプション
-   * @returns 生成したインスタンス
-   */
-  static fromPercentEncoded(percentEncoded: string, options?: PercentEncodingOptions): ByteSequence {
-    return ByteSequence.fromEncoded(percentEncoded, "percent", options);
-  }
+  // TODO
+  // /**
+  //  * パーセント符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
+  //  * @param percentEncoded パーセント符号化された文字列
+  //  * @param options 符号化方式オプション
+  //  * @returns 生成したインスタンス
+  //  */
+  // static fromPercent(percentEncoded: string, options?: PercentOptions): ByteSequence {
+  //   const decoded = Percent.decode(percentEncoded, options);
+  //   return new ByteSequence(decoded.buffer);
+  // }
 
-  /**
-   * 自身のバイト列をパーセント符号化した文字列を返却
-   * @param options 符号化方式のオプション
-   * @returns パーセント符号化した文字列
-   */
-  toPercentEncoded(options?: PercentEncodingOptions): string {
-    return this.toEncoded("percent", options);
-  }
+  // TODO
+  // /**
+  //  * 自身のバイト列をパーセント符号化した文字列を返却
+  //  * @param options 符号化方式のオプション
+  //  * @returns パーセント符号化した文字列
+  //  */
+  // toPercent(options?: PercentOptions): string {
+  //   return Percent.encode(this.view(), options);
+  // }
 
   /**
    * 自身のバイト列のハッシュを生成し返却
@@ -299,18 +277,9 @@ class ByteSequence {
    * @param options ハッシュアルゴリズムのオプション
    * @returns 生成したハッシュのバイト列で解決されるPromise
    */
-  async toDigest(algorithmName: string, options?: DigestAlgorithmOptions): Promise<ByteSequence> {
-    const algorithm = DigestAlgorithm.for(algorithmName, options);
-    const digestBytes = await algorithm.compute(this.#bytes);
-    return new ByteSequence(digestBytes.buffer);
-  }
-
-  /**
-   * 自身のバイト列のSHA-256ハッシュを生成し返却
-   * @returns 生成したハッシュのバイト列で解決されるPromise
-   */
-  async toSha256Digest(): Promise<ByteSequence> {
-    return this.toDigest("sha-256");
+  async toSha256(): Promise<ByteSequence> {
+    const digest = await Sha256.compute(this.#bytes);
+    return new ByteSequence(digest.buffer);
   }
 
   /**
@@ -450,29 +419,30 @@ class ByteSequence {
     }
   }
 
-  /**
-   * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
-   * @param stream 可読ストリーム
-   *     ※NodeJS.ReadStreamの場合、チャンクがBufferのストリーム
-   * @param totalByteCount ストリームから読み取るバイト数
-   * @param options 読み取りオプション
-   * @returns 生成したインスタンス
-   */
-  static async fromStream(stream: ReadableStreamType, totalByteCount?: number, options?: StreamReadingOptions): Promise<ByteSequence> {
-    if (typeof totalByteCount === "number") {
-      if (Number.isSafeInteger(totalByteCount) !== true) {
-        throw new TypeError("totalByteCount");
-      }
-      if (totalByteCount < 0) {
-        throw new RangeError("totalByteCount");
-      }
-    }
+  // TODO
+  // /**
+  //  * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
+  //  * @param stream 可読ストリーム
+  //  *     ※NodeJS.ReadStreamの場合、チャンクがBufferのストリーム
+  //  * @param totalByteCount ストリームから読み取るバイト数
+  //  * @param options 読み取りオプション
+  //  * @returns 生成したインスタンス
+  //  */
+  // static async fromStream(stream: ReadableStreamType, totalByteCount?: number, options?: StreamReadingOptions): Promise<ByteSequence> {
+  //   if (typeof totalByteCount === "number") {
+  //     if (Number.isSafeInteger(totalByteCount) !== true) {
+  //       throw new TypeError("totalByteCount");
+  //     }
+  //     if (totalByteCount < 0) {
+  //       throw new RangeError("totalByteCount");
+  //     }
+  //   }
 
-    const reader = new ByteStreamReader();
-    // 中断不可、で読取
-    const bytes = await reader.read(stream, totalByteCount, options);
-    return ByteSequence.from(bytes);
-  }
+  //   const reader = new ByteStreamReader();
+  //   // 中断不可、で読取
+  //   const bytes = await reader.read(stream, totalByteCount, options);
+  //   return ByteSequence.from(bytes);
+  // }
 
   // TODO
   // asText(): string {
