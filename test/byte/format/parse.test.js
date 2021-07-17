@@ -85,10 +85,10 @@ describe("Format.parse", () => {
     expect(parsed72[1]).toBe(255);
     expect(parsed72[2]).toBe(1);
 
-    const parsed81 = Format.parse("-000-", 16, {paddedLength:3,upperCase:true,prefix:"-",suffix:"-"});
+    const parsed81 = Format.parse("-000-", 10, {paddedLength:3,upperCase:true,prefix:"-",suffix:"-"});
     expect(parsed81.length).toBe(1);
     expect(parsed81[0]).toBe(0);
-    const parsed82 = Format.parse("-000--255--001-", 16, {paddedLength:3,upperCase:true,prefix:"-",suffix:"-"});
+    const parsed82 = Format.parse("-000--255--001-", 10, {paddedLength:3,upperCase:true,prefix:"-",suffix:"-"});
     expect(parsed82.length).toBe(3);
     expect(parsed82[0]).toBe(0);
     expect(parsed82[1]).toBe(255);

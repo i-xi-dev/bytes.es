@@ -9,10 +9,10 @@ import {
   FormatRadix,
   // Percent,
   // PercentOptions,
-  // ReadableStreamType,
+  ReadableStreamType,
   Sha256,
-  // StreamReader,
-  // StreamReadingOptions,
+  StreamReader,
+  StreamReaderOptions,
 } from "./byte/index";
 
 /**
@@ -419,30 +419,28 @@ class ByteSequence {
     }
   }
 
-  // TODO
-  // /**
-  //  * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
-  //  * @param stream 可読ストリーム
-  //  *     ※NodeJS.ReadStreamの場合、チャンクがBufferのストリーム
-  //  * @param totalByteCount ストリームから読み取るバイト数
-  //  * @param options 読み取りオプション
-  //  * @returns 生成したインスタンス
-  //  */
-  // static async fromStream(stream: ReadableStreamType, totalByteCount?: number, options?: StreamReadingOptions): Promise<ByteSequence> {
-  //   if (typeof totalByteCount === "number") {
-  //     if (Number.isSafeInteger(totalByteCount) !== true) {
-  //       throw new TypeError("totalByteCount");
-  //     }
-  //     if (totalByteCount < 0) {
-  //       throw new RangeError("totalByteCount");
-  //     }
-  //   }
+  /**
+   * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
+   * @param stream 可読ストリーム
+   *     ※NodeJS.ReadStreamの場合、チャンクがBufferのストリーム
+   * @param totalByteCount ストリームから読み取るバイト数
+   * @param options 読み取りオプション
+   * @returns 生成したインスタンス
+   */
+  static async fromStream(stream: ReadableStreamType, totalByteCount?: number, options?: StreamReaderOptions): Promise<ByteSequence> {
+    if (typeof totalByteCount === "number") {
+      if (Number.isSafeInteger(totalByteCount) !== true) {
+        throw new TypeError("totalByteCount");
+      }
+      if (totalByteCount < 0) {
+        throw new RangeError("totalByteCount");
+      }
+    }
 
-  //   const reader = new ByteStreamReader();
-  //   // 中断不可、で読取
-  //   const bytes = await reader.read(stream, totalByteCount, options);
-  //   return ByteSequence.from(bytes);
-  // }
+    // 中断不可、で読取
+    const bytes = await StreamReader.read(stream, totalByteCount, options);
+    return ByteSequence.from(bytes);
+  }
 
   // TODO
   // asText(): string {

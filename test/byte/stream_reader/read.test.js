@@ -1,92 +1,58 @@
-import { ByteStreamReader } from "../../../dist/byte/index.js";
+import { StreamReader } from "../../../dist/byte/index.js";
 import fs from "fs";
 import { Readable } from "stream";
 
-describe("ByteStreamReader.prototype.read", () => {
+describe("StreamReader.read", () => {
   test("read(NodeJS.ReadableStream)", async () => {
-    const r0 = new ByteStreamReader();
-
     const stream0 = fs.createReadStream("./test/_data/0.txt", { highWaterMark: 64 });
-    const bytes0 = await r0.read(stream0);
+    const bytes0 = await StreamReader.read(stream0);
     expect(bytes0.byteLength).toBe(0);
 
     const stream = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
-    const bytes = await r0.read(stream);
+    const bytes = await StreamReader.read(stream);
     expect(bytes.byteLength).toBe(128);
-
-    // 読み取り中に読取
-    const r0b = new ByteStreamReader();
-    const stream3a = new Readable({
-      read() {}
-    });
-    const stream3b = new Readable({
-      read() {}
-    });
-    let i = 0;
-    const t = setInterval(() => {
-      i++;
-      if (i > 10) {
-        stream3a.push(null);
-        stream3b.push(null);
-        clearInterval(t);
-      }
-      else {
-        stream3a.push(new Uint8Array(64));
-        stream3b.push(new Uint8Array(64));
-      }
-    }, 2);
-    await expect(Promise.all([
-      r0b.read(stream3a),
-      r0b.read(stream3b)
-    ])).rejects.toThrow("invalid state");
 
   });
 
   test("read(NodeJS.ReadableStream, number)", async () => {
-    const r0 = new ByteStreamReader();
-
     const stream0 = fs.createReadStream("./test/_data/0.txt", { highWaterMark: 64 });
-    const bytes0 = await r0.read(stream0, 0);
+    const bytes0 = await StreamReader.read(stream0, 0);
     expect(bytes0.byteLength).toBe(0);
     expect(bytes0.buffer.byteLength).toBe(0);
 
     const stream = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
-    const bytes = await r0.read(stream, 128);
+    const bytes = await StreamReader.read(stream, 128);
     expect(bytes.byteLength).toBe(128);
     expect(bytes.buffer.byteLength).toBe(128);
 
     // const stream2 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
-    // const bytes2 = await r0.read(stream2, 256);
+    // const bytes2 = await StreamReader.read(stream2, 256);
     // expect(bytes2.byteLength).toBe(128);
     // expect(bytes2.buffer.byteLength).toBe(256);
 
     const stream3 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
     await expect(
-      r0.read(stream3, 64)
+      StreamReader.read(stream3, 64)
     ).rejects.toThrow("Stream size too long");
 
-    const r0b = new ByteStreamReader();
     const stream4 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
     await expect(
-      r0b.read(stream4, 256)
+      StreamReader.read(stream4, 256)
     ).rejects.toThrow("Stream size too short");
 
   });
 
-  test("read(NodeJS.ReadableStream, number, StreamReadingOptions)", async () => {
-    const r0 = new ByteStreamReader();
-
-    // abortSignal
+  test("read(NodeJS.ReadableStream, number, StreamReaderOptions) - abortSignal", async () => {
     const stream = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
     const ac = new AbortController();
-    const bytes = await r0.read(stream, 128, {abortSignal: ac.signal});
+    const bytes = await StreamReader.read(stream, 128, {abortSignal: ac.signal});
     expect(bytes.byteLength).toBe(128);
 
     const stream2 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
     const ac2 = new AbortController();
     ac2.abort();
     await expect(
-      r0.read(stream2, 128, {abortSignal: ac2.signal})
+      StreamReader.read(stream2, 128, {abortSignal: ac2.signal})
     ).rejects.toThrow("aborted");
 
     const stream3 = new Readable({
@@ -104,7 +70,7 @@ describe("ByteStreamReader.prototype.read", () => {
         stream3.push(new Uint8Array(64));
       }
     }, 2);
-    const bytes3 = await r0.read(stream3, undefined, {abortSignal: ac3.signal});
+    const bytes3 = await StreamReader.read(stream3, undefined, {abortSignal: ac3.signal});
     expect(bytes3.byteLength).toBe(640);
 
     const stream4 = new Readable({
@@ -123,20 +89,66 @@ describe("ByteStreamReader.prototype.read", () => {
       }
     }, 2);
     await expect(
-      r0.read(stream4, undefined, {abortSignal: ac4.signal})
+      StreamReader.read(stream4, undefined, {abortSignal: ac4.signal})
     ).rejects.toThrow("aborted");
 
-    // acceptSizeMismatch
+  });
+
+  test("read(NodeJS.ReadableStream, number, StreamReaderOptions) - acceptSizeMismatch", async () => {
     const stream5 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
-    const bytes5 = await r0.read(stream5, 64, { acceptSizeMismatch:true, });
+    const bytes5 = await StreamReader.read(stream5, 64, { acceptSizeMismatch:true, });
     expect(bytes5.byteLength).toBe(128);
     //expect(bytes5.buffer.byteLength).toBe(10485824);
 
     const stream6 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
-    const bytes6 = await r0.read(stream6, 256, { acceptSizeMismatch:true, });
+    const bytes6 = await StreamReader.read(stream6, 256, { acceptSizeMismatch:true, });
     expect(bytes6.byteLength).toBe(128);
     expect(bytes6.buffer.byteLength).toBe(256);
 
+  });
+
+  test("read(NodeJS.ReadableStream, number, StreamReaderOptions) - listenerTarget", async () => {
+
+    const stream = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
+    const et = new EventTarget();
+    let es = [];
+    et.addEventListener("progress", (e) => {
+      es.push({
+        loaded: e.loaded,
+        total: e.total,
+        lengthComputable: e.lengthComputable,
+      });
+    });
+    const bytes = await StreamReader.read(stream, undefined, { listenerTarget: et, });
+    expect(bytes.byteLength).toBe(128);
+    let i = 0;
+    for (const e of es) {
+      i = i + 64;
+      expect(e.total).toBe(0);
+      expect(e.lengthComputable).toBe(false);
+      expect(e.loaded).toBe(i);
+    }
+
+
+    const stream2 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
+    const et2 = new EventTarget();
+    let es2 = [];
+    et2.addEventListener("progress", (e) => {
+      es2.push({
+        loaded: e.loaded,
+        total: e.total,
+        lengthComputable: e.lengthComputable,
+      });
+    });
+    const bytes2 = await StreamReader.read(stream2, 128, { listenerTarget: et2, });
+    expect(bytes2.byteLength).toBe(128);
+    let i2 = 0;
+    for (const e of es2) {
+      i2 = i2 + 64;
+      expect(e.total).toBe(128);
+      expect(e.lengthComputable).toBe(true);
+      expect(e.loaded).toBe(i2);
+    }
 
   });
 
