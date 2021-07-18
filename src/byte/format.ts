@@ -24,7 +24,6 @@ type Options = {
   /** サフィックス */
   suffix?: string;
 };
-// TODO paddingChar, , 
 // TODO ParserOptions caseInsensitive,
 
 /**
@@ -40,6 +39,11 @@ type ResolvedOptions = {
   /** サフィックス */
   suffix: string;
 };
+
+/**
+ * パディング文字
+ */
+const PADDING_CHAR = "0";
 
 /**
  * フォーマット結果の16進数のa-fを大文字にするか否かのデフォルト
@@ -167,7 +171,7 @@ function isFormatted(formatted: string, radix: Radix, resolvedOptions: ResolvedO
   const suffixPattern = (resolvedOptions.suffix.length > 0) ? `.{${ resolvedOptions.suffix.length }}` : "";
   const bodyLength = minPaddedLengthOf(radix);
   const paddingLength = resolvedOptions.paddedLength - bodyLength;
-  const paddingPattern = (paddingLength > 0) ? `[0]{${ paddingLength }}` : "";
+  const paddingPattern = (paddingLength > 0) ? `[${ PADDING_CHAR }]{${ paddingLength }}` : ""; // XXX PADDING_CHARが要エスケープの場合が未実装
   const regex = new RegExp(`^(${ prefixPattern }${ paddingPattern }${ charsPattern }{${ bodyLength }}${ suffixPattern })*$`, "s");
 
   return regex.test(formatted);
@@ -206,7 +210,7 @@ function formatByte(byte: uint8, radix: Radix, resolvedOptions: ResolvedOptions)
   if (resolvedOptions.upperCase === true) {
     str = str.toUpperCase();
   }
-  str = str.padStart(resolvedOptions.paddedLength, "0");
+  str = str.padStart(resolvedOptions.paddedLength, PADDING_CHAR);
   return resolvedOptions.prefix + str + resolvedOptions.suffix;
 }
 
