@@ -7,8 +7,9 @@ import {
   Format,
   FormatOptions,
   FormatRadix,
-  // Percent,
-  // PercentOptions,
+  Percent,
+  PercentDecodingOptions,
+  PercentEncodingOptions,
   ReadableStreamType,
   Sha256,
   StreamReader,
@@ -249,27 +250,25 @@ class ByteSequence {
     return Base64.encode(this.view(), options);
   }
 
-  // TODO
-  // /**
-  //  * パーセント符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
-  //  * @param percentEncoded パーセント符号化された文字列
-  //  * @param options 符号化方式オプション
-  //  * @returns 生成したインスタンス
-  //  */
-  // static fromPercent(percentEncoded: string, options?: PercentOptions): ByteSequence {
-  //   const decoded = Percent.decode(percentEncoded, options);
-  //   return new ByteSequence(decoded.buffer);
-  // }
+  /**
+   * パーセント符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
+   * @param percentEncoded パーセント符号化された文字列
+   * @param options 符号化方式オプション
+   * @returns 生成したインスタンス
+   */
+  static fromPercent(percentEncoded: string, options?: PercentDecodingOptions): ByteSequence {
+    const decoded = Percent.decode(percentEncoded, options);
+    return new ByteSequence(decoded.buffer);
+  }
 
-  // TODO
-  // /**
-  //  * 自身のバイト列をパーセント符号化した文字列を返却
-  //  * @param options 符号化方式のオプション
-  //  * @returns パーセント符号化した文字列
-  //  */
-  // toPercent(options?: PercentOptions): string {
-  //   return Percent.encode(this.view(), options);
-  // }
+  /**
+   * 自身のバイト列をパーセント符号化した文字列を返却
+   * @param options 符号化方式のオプション
+   * @returns パーセント符号化した文字列
+   */
+  toPercent(options?: PercentEncodingOptions): string {
+    return Percent.encode(this.view(), options);
+  }
 
   /**
    * 自身のバイト列のハッシュを生成し返却
