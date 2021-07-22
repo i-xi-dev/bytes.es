@@ -1,38 +1,47 @@
 
 import { Exception } from "../_";
-import { TextEncoding, TextEncodingImpl, TextEncodingOptions } from "./index";
+import { BOM, TextDecodeOptions, TextEncodeOptions, TextEncodingImpl } from "./_";
 
-class Utf8Encoding implements TextEncodingImpl {
+/**
+ * 符号化方式名
+ */
+const NAME = "UTF-8";
 
-  #decoder: TextDecoder;
-
-  #encoder: TextEncoder;
-
-  constructor(options: TextEncodingOptions = {}) {
-    void options;
-    // replacementFallback
-    // exceptionFallback
-    // prependBom,removeBom
-
-
-    this.#decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
-    this.#encoder = new TextEncoder();
-    Object.freeze(this);
+/**
+ * バイト列を文字列に復号し、結果のバイト列を返却
+ * @param encoded 符号化されたバイト列
+ * @param options 復号オプション
+ * @returns 復号した文字列
+ */
+function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
+  try {
+    const decoder = new TextDecoder(NAME, {
+      fatal: (options.fallback === "exception"),
+      ignoreBOM: (options.removeBom === true) ? false : true,
+    });
+    return decoder.decode(encoded);
   }
-
-  decode(encoded: Uint8Array): string {
-    try {
-      return this.#decoder.decode(encoded);
-    }
-    catch (exception) {
-      throw new Exception("EncodingError", "decode error", exception);
-    }
-  }
-
-  encode(toEncode: string): Uint8Array {
-    return this.#encoder.encode(toEncode);
+  catch (exception) {
+    throw new Exception("EncodingError", "decode error", [ exception ]);
   }
 }
-Object.freeze(Utf8Encoding);
 
-TextEncoding.register("base64", Utf8Encoding);
+/**
+ * 文字列をバイト列に符号化し、結果のバイト列を返却
+ * @param toEncode 文字列
+ * @param options 符号化オプション
+ * @returns 符号化したバイト列
+ */
+function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
+  const encoder = new TextEncoder();
+  if ((options.addBom === true) && (toEncode.startsWith(BOM) !== true)) {
+    return encoder.encode(BOM + toEncode);
+  }
+  return encoder.encode(toEncode);
+}
+
+export const Utf8: TextEncodingImpl = {
+  name: NAME,
+  decode,
+  encode,
+};

@@ -1,5 +1,5 @@
 
-import { getCrypto } from "./_";
+import { Exception, getCrypto } from "./_";
 import { uint8 } from "./byte/type";
 import {
   Base64,
@@ -8,13 +8,14 @@ import {
   FormatOptions,
   FormatRadix,
   Percent,
-  PercentDecodingOptions,
-  PercentEncodingOptions,
+  PercentDecodeOptions,
+  PercentEncodeOptions,
   ReadableStreamType,
   Sha256,
   StreamReader,
-  StreamReaderOptions,
+  StreamReadOptions,
 } from "./byte/index";
+import { TextDecodeOptions, TextEncodeOptions, TextEncoding } from "./text_encoding/index";
 
 /**
  * バイト列を表す整数の配列
@@ -256,7 +257,7 @@ class ByteSequence {
    * @param options 符号化方式オプション
    * @returns 生成したインスタンス
    */
-  static fromPercent(percentEncoded: string, options?: PercentDecodingOptions): ByteSequence {
+  static fromPercent(percentEncoded: string, options?: PercentDecodeOptions): ByteSequence {
     const decoded = Percent.decode(percentEncoded, options);
     return new ByteSequence(decoded.buffer);
   }
@@ -266,7 +267,7 @@ class ByteSequence {
    * @param options 符号化方式のオプション
    * @returns パーセント符号化した文字列
    */
-  toPercent(options?: PercentEncodingOptions): string {
+  toPercent(options?: PercentEncodeOptions): string {
     return Percent.encode(this.view(), options);
   }
 
@@ -420,13 +421,14 @@ class ByteSequence {
 
   /**
    * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
+   * @experimental
    * @param stream 可読ストリーム
    *     ※NodeJS.ReadStreamの場合、チャンクがBufferのストリーム
    * @param totalByteCount ストリームから読み取るバイト数
    * @param options 読み取りオプション
    * @returns 生成したインスタンス
    */
-  static async fromStream(stream: ReadableStreamType, totalByteCount?: number, options?: StreamReaderOptions): Promise<ByteSequence> {
+  static async fromByteStream(stream: ReadableStreamType, totalByteCount?: number, options?: StreamReadOptions): Promise<ByteSequence> {
     if (typeof totalByteCount === "number") {
       if (Number.isSafeInteger(totalByteCount) !== true) {
         throw new TypeError("totalByteCount");
@@ -441,12 +443,35 @@ class ByteSequence {
     return ByteSequence.from(bytes);
   }
 
-  // TODO
-  // asText(): string {
-    
-  // }
+  /**
+   * 文字列を指定した符号化方式で符号化したバイト列からインスタンスを生成し返却
+   * @param text 文字列
+   * @param encodingName 文字符号化方式名
+   * @param options 文字符号化方式オプション
+   * @returns 生成したインスタンス
+   */
+  static fromText(text: string, encodingName = "UTF-8", options?: TextEncodeOptions): ByteSequence {
+    const encoding = TextEncoding.for(encodingName);
+    if (encoding === undefined) {
+      throw new Exception("NotFoundException", "encodingName not found");
+    }
+    const bytes = encoding.encode(text, options);
+    return new ByteSequence(bytes.buffer);
+  }
 
-
+  /**
+   * 文字列として復号し、結果の文字列を返却
+   * @param encodingName 文字符号化方式名
+   * @param options 文字符号化方式オプション
+   * @returns 文字列
+   */
+  asText(encodingName = "UTF-8", options?: TextDecodeOptions): string {
+    const encoding = TextEncoding.for(encodingName);
+    if (encoding === undefined) {
+      throw new Exception("NotFoundException", "encodingName not found");
+    }
+    return encoding.decode(this.view(), options);
+  }
 
 
 

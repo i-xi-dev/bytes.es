@@ -234,7 +234,7 @@ function addToBuffer(buffer: Uint8Array, loadedByteCount: number, chunkBytes: Ui
 
 export {
   Stream as ReadableStreamType,
-  Options as StreamReaderOptions,
+  Options as StreamReadOptions,
 };
 
 export const StreamReader = {

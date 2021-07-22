@@ -27,7 +27,7 @@ type Options = {
 /**
  * パーセント符号化の復号オプション
  */
-type DecodingOptions = Options & {
+type DecodeOptions = Options & {
   /**
    * デコード時、パーセント符号化方式オプションに合致しない文字列が出現した場合エラーにするか否か
    *     ※エンコードには影響しない
@@ -52,7 +52,7 @@ type ResolvedDecodingOptions = {
 /**
  * パーセント符号化の符号化オプション
  */
-type EncodingOptions = Options & {
+type EncodeOptions = Options & {
   /**
    * "%"に後続する16進数の大文字小文字を無視するか否か
    */
@@ -110,7 +110,7 @@ function normalizeInclusions(inclusions?: Array<uint8>): Array<uint8> {
  * @param options パーセント符号化の復号オプション
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたパーセント符号化の復号オプション
  */
-function resolveDecodingOptions(options: DecodingOptions = {}): ResolvedDecodingOptions {
+function resolveDecodingOptions(options: DecodeOptions = {}): ResolvedDecodingOptions {
   const inclusions = normalizeInclusions(options.inclusions);
   const spaceAsPlus: boolean = (typeof options.spaceAsPlus === "boolean") ? options.spaceAsPlus : DEFAULT_SPACE_AS_PLUS;
   const strict: boolean = (typeof options.strict === "boolean") ? options.strict : DEFAULT_STRICT;
@@ -131,7 +131,7 @@ function resolveDecodingOptions(options: DecodingOptions = {}): ResolvedDecoding
  * @param options パーセント符号化の符号化オプション
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたパーセント符号化の符号化オプション
  */
-function resolveEncodingOptions(options: EncodingOptions = {}): ResolvedEncodingOptions {
+function resolveEncodingOptions(options: EncodeOptions = {}): ResolvedEncodingOptions {
   const inclusions = normalizeInclusions(options.inclusions);
   const spaceAsPlus: boolean = (typeof options.spaceAsPlus === "boolean") ? options.spaceAsPlus : DEFAULT_SPACE_AS_PLUS;
   //  const caseInsensitive: boolean = (typeof options.caseInsensitive === "boolean") ? options.caseInsensitive : DEFAULT_CASE_INSENSITIVE;
@@ -178,7 +178,7 @@ function isTargetByte(byte: uint8, inclusions: Array<uint8>): boolean {
  * @param options パーセント符号化の復号オプション
  * @returns バイト列
  */
-function decode(encoded: string, options?: DecodingOptions): Uint8Array {
+function decode(encoded: string, options?: DecodeOptions): Uint8Array {
   if (/^[\u0020-\u007E]*$/.test(encoded) !== true) {
     throw new Exception("EncodingError", "decode error (1)");
   }
@@ -242,7 +242,7 @@ function decode(encoded: string, options?: DecodingOptions): Uint8Array {
  * @param options パーセント符号化の符号化オプション
  * @returns パーセント符号化された文字列
  */
-function encode(toEncode: Uint8Array, options?: EncodingOptions): string {
+function encode(toEncode: Uint8Array, options?: EncodeOptions): string {
   const resolvedOptions: ResolvedEncodingOptions = resolveEncodingOptions(options);
   const formatOptions = { upperCase: true, prefix: "%" };
 
@@ -274,8 +274,8 @@ function encode(toEncode: Uint8Array, options?: EncodingOptions): string {
 }
 
 export {
-  DecodingOptions as PercentDecodingOptions,
-  EncodingOptions as PercentEncodingOptions,
+  DecodeOptions as PercentDecodeOptions,
+  EncodeOptions as PercentEncodeOptions,
 };
 
 export const Percent = {

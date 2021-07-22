@@ -1,4 +1,5 @@
-import { TextEncoder } from "util";
+import { TextDecoder, TextEncoder } from "util";
+globalThis.TextDecoder = TextDecoder;
 globalThis.TextEncoder = TextEncoder;
 
 import { webcrypto } from "crypto";
