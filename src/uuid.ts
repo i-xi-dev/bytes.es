@@ -1,4 +1,4 @@
-import { ByteSequence } from "./byte_sequence";
+import { ByteSequence } from "./data/byte_sequence";
 
 /**
  * UUID（RFC 4122）
