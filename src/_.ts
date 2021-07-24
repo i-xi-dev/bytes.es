@@ -1,3 +1,6 @@
+//
+
+//
 
 /**
  * Cryptoオブジェクト
@@ -50,6 +53,7 @@ export class Exception extends Error {
 /**
  * 文字列を、指定したUTF-16コードユニット数ごとに分割し返却
  *     ※サロゲートペア、合成文字が分割される可能性あり
+ * 
  * @param str 分割する文字列
  * @param segmentLength 分割単位とするUTF-16コードユニット数
  * @param paddingUnit 分割結果の配列の最後の要素がunitGroupSizeに満たない場合、最後の要素の末尾を埋める文字列
@@ -86,6 +90,7 @@ export function devideStringByLength(str: string, segmentLength: number, padding
 
 /**
  * Cryptoオブジェクトを返却
+ * 
  * @returns Cryptoオブジェクト
  */
 export function getCrypto(): Crypto {
@@ -150,3 +155,115 @@ class _ProgressEvent extends Event implements ProgressEvent<EventTarget> {
 }
 const pe = (globalThis.ProgressEvent) ? globalThis.ProgressEvent : _ProgressEvent;
 export { pe as ProgressEvent };
+
+/**
+ * 文字列が{@link https://mimesniff.spec.whatwg.org/#http-token-code-point HTTP token code point}のみからなる文字列
+ * であるか否かを返却
+ * 
+ * @param str 文字列
+ * @returns 結果
+ */
+export function matchHttpToken(str: string): boolean {
+  return /^[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}\u{2E}0-9A-Za-z\u{5E}\u{5F}\u{60}\u{7C}\u{7E}]*$/u.test(str);
+}
+
+/**
+ * 文字列が{@link https://mimesniff.spec.whatwg.org/#http-quoted-string-token-code-point HTTP quoted-string token code point}のみからなる文字列
+ * であるか否かを返却
+ * 
+ * @param str 文字列
+ * @returns 結果
+ */
+export function matchHttpQuotedStringToken(str: string): boolean {
+  return /^[\u{9}\u{20}-\u{7E}\u{80}-\u{FF}]*$/u.test(str);
+}
+
+/**
+ * 文字列から先頭および末尾の{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}を削除した文字列を返却
+ * 
+ * @param str 文字列
+ * @returns 文字列
+ */
+export function trimHttpSpace(str: string): string {
+  return str.replace(/^[\u{9}\u{A}\u{D}\u{20}]+/u, "").replace(/[\u{9}\u{A}\u{D}\u{20}]+$/u, "");
+}
+
+/**
+ * 文字列から末尾の{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}を削除した文字列を返却
+ * 
+ * @param str 文字列
+ * @returns 文字列
+ */
+export function trimHttpSpaceEnd(str: string): string {
+  return str.replace(/[\u{9}\u{A}\u{D}\u{20}]+$/u, "");
+}
+
+/**
+ * 文字列から先頭の{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}の連続を取得し返却
+ *     存在しない場合、空文字列を返却
+ * 
+ * @param str 文字列
+ * @returns 結果
+ */
+export function collectHttpSpaceStart(str: string): string {
+  const regex = /[\u{9}\u{A}\u{D}\u{20}]/u;
+  let httpSpace = "";
+  for (const c of str) {
+    if (regex.test(c) !== true) {
+      break;
+    }
+    httpSpace = httpSpace + c;
+  }
+  return httpSpace;
+}
+
+type ResultString = {
+  value: string,
+  length: number,
+};
+
+/**
+ * 文字列の先頭のHTTP quoted stringを取得し返却
+ *     仕様は https://fetch.spec.whatwg.org/#collect-an-http-quoted-string
+ * 
+ * @param str 先頭がU+0022の文字列
+ * @returns 結果
+ */
+export function httpQuotedString(str: string): ResultString {
+  let work = "";
+  let escaped = false;
+
+  const text2 = str.substring(1);
+  let i = 0;
+  for (i = 0; i < text2.length; i++) {
+    const c: string = text2[i] as string;
+
+    if (escaped === true) {
+      work = work + c;
+      escaped = false;
+      continue;
+    }
+    else {
+      if (c === '"') {
+        break;
+      }
+      else if (c === "\\") {
+        escaped = true;
+        continue;
+      }
+      else {
+        work = work + c;
+        continue;
+      }
+    }
+  }
+
+  if (escaped === true) {
+    work = work + "\\";
+  }
+
+  return {
+    value: work,
+    length: (i + 1),
+  };
+}

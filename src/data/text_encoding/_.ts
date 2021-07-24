@@ -1,3 +1,6 @@
+//
+
+// 文字符号化
 
 /**
  * 文字符号化の復号オプション
@@ -48,6 +51,7 @@ interface TextEncodingImpl {
 
   /**
    * バイト列を文字列に復号し、結果のバイト列を返却
+   * 
    * @param encoded 符号化されたバイト列
    * @param options 復号オプション
    * @returns 復号した文字列
@@ -56,6 +60,7 @@ interface TextEncodingImpl {
 
   /**
    * 文字列をバイト列に符号化し、結果のバイト列を返却
+   * 
    * @param toEncode 文字列
    * @param options 符号化オプション
    * @returns 符号化したバイト列

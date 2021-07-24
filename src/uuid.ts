@@ -1,3 +1,7 @@
+//
+
+// UUID
+
 import { ByteSequence } from "./data/byte_sequence";
 
 /**
@@ -25,6 +29,7 @@ class Uuid {
 
   /**
    * Nil UUID（全ビットが0のUUID）を生成し返却
+   * 
    * @returns {Uuid}
    */
   static nil(): Uuid {
@@ -33,6 +38,7 @@ class Uuid {
 
   /**
    * version4バリアント（乱数形式）のUUIDを生成し返却
+   * 
    * @returns {Uuid}
    */
   static generateRandom(): Uuid {
@@ -56,6 +62,7 @@ class Uuid {
   /**
    * UUIDの文字列表現からインスタンスを生成し返却
    *     RFC 4122にのっとり入力の大文字小文字を区別しない
+   * 
    * @param uuidString UUIDの文字列表現
    * @returns 生成したインスタンス
    */
@@ -71,6 +78,7 @@ class Uuid {
   /**
    * 自身のUUIDの文字列表現を返却
    *     RFC 4122にのっとり小文字で出力する
+   * 
    * @returns UUIDの文字列表現
    */
   format(): string {
@@ -80,6 +88,7 @@ class Uuid {
 
   /**
    * 自身のUUIDと、他のオブジェクトの表すUUIDが等しいか否かを返却
+   * 
    * @param uuid 比較対象
    * @returns 自身のUUIDと、他のオブジェクトの表すUUIDが等しいか否か
    */
@@ -97,6 +106,7 @@ class Uuid {
 
   /**
    * 自身のUUIDの文字列表現を返却
+   * 
    * @override
    * @returns UUIDの文字列表現
    */
@@ -106,6 +116,7 @@ class Uuid {
 
   /**
    * 自身のUUIDの文字列表現を返却
+   * 
    * @returns UUIDの文字列表現
    */
   toJSON(): string {
@@ -114,6 +125,7 @@ class Uuid {
 
   /**
    * 自身のUUIDのURNを返却
+   * 
    * @returns UUID URN
    */
   toUrn(): string {

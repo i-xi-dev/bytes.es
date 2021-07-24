@@ -1,9 +1,6 @@
+//
 
-/**
- * @fileoverview パーセント符号化方式
- * 0x20～0x7E(0x25を除く)は、オプションのinclusionsで指定されていなければ"%XX"に変換しないことに注意。
- * すなわち、URLエンコードとして使用するにはURLコンポーネントに応じた変換対象を追加する必要がある。
- */
+// パーセント符号化方式
 
 import { Exception } from "../../../_";
 import { isByte, uint8 } from "../type";
@@ -88,8 +85,9 @@ const DEFAULT_STRICT = true;
 
 /**
  * 変換対象とするバイトの配列を正規化し返却
- *     変換対象とするバイトの配列を重複排除しソートして返却
- *     配列ではない場合はDEFAULT_INCLUSIONSを返却
+ *     ・変換対象とするバイトの配列を重複排除しソートして返却
+ *     ・配列ではない場合はDEFAULT_INCLUSIONSを返却
+ * 
  * @param inclusions 変換対象とするバイトの配列
  * @returns 正規化した変換対象バイト配列
  */
@@ -107,6 +105,7 @@ function normalizeInclusions(inclusions?: Array<uint8>): Array<uint8> {
 
 /**
  * パーセント符号化の復号オプションを補正したコピーを返却
+ * 
  * @param options パーセント符号化の復号オプション
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたパーセント符号化の復号オプション
  */
@@ -128,6 +127,7 @@ function resolveDecodingOptions(options: DecodeOptions = {}): ResolvedDecodingOp
 
 /**
  * パーセント符号化の符号化オプションを補正したコピーを返却
+ * 
  * @param options パーセント符号化の符号化オプション
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたパーセント符号化の符号化オプション
  */
@@ -149,6 +149,7 @@ function resolveEncodingOptions(options: EncodeOptions = {}): ResolvedEncodingOp
 
 /**
  * パーセント符号化された文字列から、"%XX"の形にエンコードされているバイトの数を取得する正規表現を生成し返却
+ * 
  * @param inclusions 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトの配列
  * @returns パーセント符号化された文字列から、"%XX"の形にエンコードされているバイトの数を取得する正規表現
  */
@@ -164,6 +165,7 @@ function encodedPattern(inclusions: Array<uint8>): RegExp {
 
 /**
  * バイトが"%XX"の形にする対象か否かを返却
+ * 
  * @param byte バイト
  * @param inclusions 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトの配列
  * @returns バイトが"%XX"の形にする対象か否か
@@ -174,6 +176,7 @@ function isTargetByte(byte: uint8, inclusions: Array<uint8>): boolean {
 
 /**
  * 文字列をバイト列にパーセント復号し、結果のバイト列を返却
+ * 
  * @param encoded パーセント符号化された文字列
  * @param options パーセント符号化の復号オプション
  * @returns バイト列
@@ -238,6 +241,10 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
 
 /**
  * バイト列を文字列にパーセント符号化し、結果の文字列を返却
+ * 
+ * 0x20～0x7E(0x25を除く)は、オプションのinclusionsで指定されていなければ"%XX"形式にしないことに注意。
+ * すなわち、URLエンコードとして使用するにはURLコンポーネントに応じた変換対象を追加する必要がある。
+ * 
  * @param toEncode バイト列
  * @param options パーセント符号化の符号化オプション
  * @returns パーセント符号化された文字列

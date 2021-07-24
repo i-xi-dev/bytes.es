@@ -1,3 +1,6 @@
+//
+
+// UTF-8符号化方式
 
 import { Exception } from "../../_";
 import { BOM, TextDecodeOptions, TextEncodeOptions, TextEncodingImpl } from "./_";
@@ -9,6 +12,9 @@ const NAME = "UTF-8";
 
 /**
  * バイト列を文字列に復号し、結果のバイト列を返却
+ * 
+ * TextDecoderに丸投げ。
+ * 
  * @param encoded 符号化されたバイト列
  * @param options 復号オプション
  * @returns 復号した文字列
@@ -28,6 +34,9 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
 
 /**
  * 文字列をバイト列に符号化し、結果のバイト列を返却
+ * 
+ * TextEncoderに丸投げ。
+ * 
  * @param toEncode 文字列
  * @param options 符号化オプション
  * @returns 符号化したバイト列

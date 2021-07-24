@@ -1,12 +1,14 @@
+//
 
-/**
- * @fileoverview SHA-256ハッシュアルゴリズム
- */
+// SHA-256ハッシュアルゴリズム
 
 import { getCrypto } from "../../../_";
 
 /**
  * バイト列のSHA-256ハッシュを生成し、ハッシュのバイト列を返却
+ * 
+ * 実装はSubtleCryptoへの丸投げ。
+ * 
  * @param toCompute バイト列
  * @returns SHA-256ハッシュのバイト列で解決されるPromise
  */

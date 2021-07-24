@@ -1,12 +1,6 @@
+//
 
-/**
- * Shift_JIS符号化方式
- * https://encoding.spec.whatwg.org/ の仕様に従った
- * （よってWindows-31J(MS932)やUnicodeの変換表(Shift_JIS)とは完全一致しない。外字も非対応）
- * 
- * 復号器はTextDecoderを使用
- * 符号化器は https://encoding.spec.whatwg.org/#shift_jis-encoder のとおりに実装
- */
+// Shift_JIS符号化方式
 
 import { Exception } from "../../_";
 import { uint8 } from "../byte/type";
@@ -19,6 +13,9 @@ const NAME = "Shift_JIS";
 
 /**
  * バイト列を文字列に復号し、結果のバイト列を返却
+ * 
+ * TextDecoderに丸投げ。
+ * 
  * @param encoded 符号化されたバイト列
  * @param options 復号オプション
  * @returns 復号した文字列
@@ -35,6 +32,14 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
   }
 }
 
+/**
+ * 1文字をバイト列に変換
+ * 
+ * {@link https://encoding.spec.whatwg.org/#shift_jis-encoder Shift_JIS encoder}の仕様に従った。
+ * 
+ * @param char 1文字
+ * @returns バイト列
+ */
 function shiftJisBytes(char: string): [ uint8 ] | [ uint8, uint8 ] {
   let codePoint = char.codePointAt(0) as number;
   if (codePoint <= 0x80) {
@@ -86,6 +91,10 @@ function shiftJisBytes(char: string): [ uint8 ] | [ uint8, uint8 ] {
 
 /**
  * 文字列をバイト列に符号化し、結果のバイト列を返却
+ * 
+ * {@link https://encoding.spec.whatwg.org/ Encoding Standard}の仕様に従った。
+ * （よってWindows-31J(MS932)やUnicodeの変換表(Shift_JIS)とは完全一致しない。外字も非対応）
+ * 
  * @param toEncode 文字列
  * @param options 符号化オプション
  * @returns 符号化したバイト列
@@ -108,13 +117,11 @@ function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
   return Uint8Array.from(tmp.slice(0, i));
 }
 
-export const ShiftJis: TextEncodingImpl = {
-  name: NAME,
-  decode,
-  encode,
-};
-
-// index-jis0208.txtを加工 https://encoding.spec.whatwg.org/index-jis0208.txt
+/**
+ * JIS 0208インデックステーブル
+ * 
+ * {@link https://encoding.spec.whatwg.org/index-jis0208.txt index-jis0208.txt}を加工
+ */
 const TABLE = new Map<number, number>([
   [ 0x3000, 0 ],
   [ 0x3001, 1 ],
@@ -7843,3 +7850,9 @@ const TABLE = new Map<number, number>([
   [ 0x9E19, 11102 ],
   [ 0x9ED1, 11103 ],
 ]);
+
+export const ShiftJis: TextEncodingImpl = {
+  name: NAME,
+  decode,
+  encode,
+};

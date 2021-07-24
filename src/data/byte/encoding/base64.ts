@@ -1,9 +1,6 @@
+//
 
-/**
- * @fileoverview Base64符号化方式
- * RFC 4648 {@link https://datatracker.ietf.org/doc/html/rfc4648} の仕様に準拠したつもり。
- * 改行には非対応（必要であればencode結果を改行し、また、改行を除去してからdecodeすべし）
- */
+// Base64符号化方式
 
 import { Exception } from "../../../_";
 import { uint8 } from "../type";
@@ -136,6 +133,7 @@ const DEFAULT_USE_PADDING = true;
 
 /**
  * Base64符号化方式オプションを補正したコピーを返却
+ * 
  * @param options Base64符号化方式オプション
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたBase64符号化方式オプション
  */
@@ -162,6 +160,7 @@ function resolveOptions(options: Options = {}): ResolvedOptions {
 
 /**
  * 変換テーブルを生成し返却
+ * 
  * @param _62ndChar 変換テーブルの62番目の文字
  * @param _63rdChar 変換テーブルの63番目の文字
  * @returns 0～63番目の文字までの変換テーブル
@@ -175,6 +174,7 @@ function createTable(_62ndChar: string, _63rdChar: string): ReadonlyArray<string
 
 /**
  * 文字列が符号化方式オプションに合致しているか否かを返却
+ * 
  * @param encoded 文字列
  * @param resolvedOptions 解決済のBase64符号化方式オプション
  * @returns 文字列が符号化方式オプションに合致しているか否か
@@ -197,6 +197,10 @@ function isEncoded(encoded: string, resolvedOptions: ResolvedOptions): boolean {
 
 /**
  * 文字列をバイト列にBase64復号し、結果のバイト列を返却
+ * 
+ * {@link https://datatracker.ietf.org/doc/html/rfc4648 RFC 4648}の仕様に従った。
+ * 改行には非対応（必要であれば改行を除去してからdecodeすべし）。
+ * 
  * @param encoded Base64符号化された文字列
  * @param options Base64符号化方式オプション
  * @returns バイト列
@@ -272,6 +276,10 @@ function decode(encoded: string, options?: Options): Uint8Array {
 
 /**
  * バイト列を文字列にBase64符号化し、結果の文字列を返却
+ * 
+ * {@link https://datatracker.ietf.org/doc/html/rfc4648 RFC 4648}の仕様に従った。
+ * 改行には非対応（必要であればencode結果を改行すべし）。
+ * 
  * @param toEncode バイト列
  * @param options Base64符号化方式オプション
  * @returns Base64符号化された文字列

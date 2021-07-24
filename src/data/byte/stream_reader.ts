@@ -1,3 +1,7 @@
+//
+
+// バイトストリーム読取
+
 import { Exception, ProgressEvent } from "../../_";
 
 /**
@@ -44,6 +48,7 @@ type ResolvedOptions = {
 
 /**
  * ストリーム読取オプションを補正したコピーを返却
+ * 
  * @param options ストリーム読取オプション
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたストリーム読取オプション
  */
@@ -66,7 +71,9 @@ const DEFAULT_BUFFER_SIZE = 1_048_576;
 
 /**
  * 可読ストリームを読み取り、チャンクを返却する非同期ジェネレーターを返却
+ * 
  * ブラウザーとDeno用
+ * 
  * @experimental
  * @param reader 可読ストリームのリーダー
  * @returns チャンクを返却する非同期ジェネレーター
@@ -81,7 +88,9 @@ async function* createChunkGeneratorW(reader: ReadableStreamDefaultReader<Uint8A
 
 /**
  * 可読ストリームを読み取り、チャンクを返却する非同期ジェネレーターを返却
+ * 
  * Node.js用
+ * 
  * @param stream 可読ストリーム ※チャンクがBufferのストリーム
  * @returns チャンクを返却する非同期ジェネレーター
  */
@@ -98,6 +107,7 @@ async function* createChunkGeneratorN(stream: NodeJS.ReadStream): AsyncGenerator
 
 /**
  * イベントターゲットにプログレスイベントを発火する
+ * 
  * @param target イベントターゲット
  * @param eventName イベント名
  * @param loadedByteCount 読み取ったバイト数
@@ -118,6 +128,7 @@ function notify(target: EventTarget | null, eventName: string, loadedByteCount: 
 
 /**
  * 可読ストリームをすべて読み取り、1つのバイト列として返却する
+ * 
  * @param stream 可読ストリーム
  * @param totalByteCount ストリームの見積バイト数
  *     不明な場合は省略（undefined）可
@@ -215,6 +226,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
  * bufferのloadedByteCountの位置にchunkBytesをセットする
  * bufferのサイズが不足する場合、新たにサイズ拡張したUint8Arrayを生成しbufferの内容をコピーする
  * サイズ拡張したUint8Arrayを生成した場合、生成したUint8Arrayを返却し、それ以外の場合は引数bufferをそのまま返却する
+ * 
  * @param buffer chunkBytesをセットする先のUint8Array
  * @param loadedByteCount bufferのchunkBytesをセットする開始位置
  * @param chunkBytes bufferの指定位置にセットするUint8Array

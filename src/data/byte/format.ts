@@ -1,7 +1,6 @@
+//
 
-/**
- * @fileoverview バイト列のフォーマッター
- */
+// バイト列のフォーマッター
 
 import { devideStringByLength, Exception } from "../../_";
 import { isByte, uint8 } from "./type";
@@ -62,6 +61,7 @@ const DEFAULT_SUFFIX = "";
 
 /**
  * フォーマッターオプションを補正したコピーを返却
+ * 
  * @param radix フォーマット結果の基数
  * @param options フォーマッターオプション
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたフォーマッターオプション
@@ -89,6 +89,7 @@ function resolveOptions(radix: Radix, options: Options = {}): ResolvedOptions {
 
 /**
  * 基数に応じた前方ゼロ埋め結果の最小文字列長を返却
+ * 
  * @param radix フォーマット結果の基数
  * @returns フォーマット結果の前方ゼロ埋め結果の最小文字列長
  */
@@ -110,6 +111,7 @@ function minPaddedLengthOf(radix: Radix): number {
 
 /**
  * 文字列を8-bit符号なし整数にパースし返却
+ * 
  * @param formatted 文字列
  * @param radix フォーマット結果の基数
  * @param resolvedOptions フォーマッターオプション
@@ -141,6 +143,7 @@ function parseByte(formatted: string, radix: Radix, resolvedOptions: ResolvedOpt
 
 /**
  * 文字列がフォーマットオプションに合致しているか否かを返却
+ * 
  * @param formatted 文字列
  * @param radix フォーマット結果の基数
  * @param resolvedOptions フォーマッターオプション
@@ -179,6 +182,7 @@ function isFormatted(formatted: string, radix: Radix, resolvedOptions: ResolvedO
 
 /**
  * 文字列をバイト列にパースし返却
+ * 
  * @param toParse 文字列
  * @param radix フォーマット結果の基数
  * @param resolvedOptions フォーマッターオプション
@@ -200,6 +204,7 @@ function parse(toParse: string, radix: Radix, options?: Options): Uint8Array {
 
 /**
  * 8-bit符号なし整数を文字列にフォーマットし返却
+ * 
  * @param byte 8-bit符号なし整数
  * @param radix フォーマット結果の基数
  * @param resolvedOptions フォーマッターオプション
@@ -216,6 +221,7 @@ function formatByte(byte: uint8, radix: Radix, resolvedOptions: ResolvedOptions)
 
 /**
  * バイト列を文字列にフォーマットし返却
+ * 
  * @param bytes バイト列
  * @param radix フォーマット結果の基数
  * @param resolvedOptions フォーマッターオプション

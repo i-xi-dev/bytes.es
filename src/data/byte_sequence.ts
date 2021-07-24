@@ -1,3 +1,6 @@
+//
+
+// バイト列
 
 import { Exception, getCrypto } from "../_";
 import { uint8 } from "./byte/type";
@@ -62,6 +65,7 @@ class ByteSequence {
 
   /**
    * 自身のArrayBufferのビューを返却
+   * 
    * @param byteOffset ビューのオフセット
    * @param byteCount ビューのバイト数
    * @returns 自身のArrayBufferのビュー
@@ -103,6 +107,7 @@ class ByteSequence {
    * 指定したバイト数でインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
    *     ※各バイトは0
+   * 
    * @param byteCount 生成するバイト列のバイト数
    * @returns 生成したインスタンス
    */
@@ -120,6 +125,7 @@ class ByteSequence {
   /**
    * ランダムなバイトからなるインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
+   * 
    * @param {number} byteCount - 生成するバイト列のバイト数
    *     RandomSource.getRandomValuesの制約により、最大値は65536
    * @returns 生成したインスタンス
@@ -140,6 +146,7 @@ class ByteSequence {
    * バイト列をもとにインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
    *     ※bytesがArrayBufferViewの場合、ビューの範囲外は無視する
+   * 
    * @param bytes バイト列
    * @returns 生成したインスタンス
    */
@@ -154,6 +161,7 @@ class ByteSequence {
   /**
    * バイト列を表す整数の配列をもとにインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
+   * 
    * @param bytes バイト列を表す整数の配列
    * @returns 生成したインスタンス
    */
@@ -163,6 +171,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列を表す整数の配列を生成し返却
+   * 
    * @returns バイト列を表す整数の配列
    */
   toArray(): Array<uint8> {
@@ -172,6 +181,7 @@ class ByteSequence {
   /**
    * 自身のバイト列を表す整数の配列を生成し返却
    *     ※ArrayBufferは新たに生成する
+   * 
    * @returns バイト列を表す整数の配列
    */
   toUint8Array(): Uint8Array {
@@ -181,6 +191,7 @@ class ByteSequence {
   /**
    * バイト列を表すBinary stringをもとにインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
+   * 
    * @deprecated
    * @param binaryString バイト列を表すBinary string
    * @returns 生成したインスタンス
@@ -198,6 +209,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列を表すBinary stringを生成し返却
+   * 
    * @deprecated
    * @returns Binary string
    */
@@ -211,6 +223,7 @@ class ByteSequence {
   /**
    * バイト列をフォーマットした文字列からインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
+   * 
    * @param toParse バイト列をフォーマットした文字列
    * @param radix フォーマット結果の基数
    * @param options フォーマットオプション
@@ -223,6 +236,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列をフォーマットした文字列を生成し返却
+   * 
    * @param radix フォーマット結果の基数
    * @param options フォーマットオプション
    * @returns バイト列をフォーマットした文字列
@@ -233,6 +247,7 @@ class ByteSequence {
 
   /**
    * Base64符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
+   * 
    * @param base64Encoded Base64符号化された文字列
    * @param options 符号化方式のオプション
    * @returns 生成したインスタンス
@@ -244,6 +259,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列をBase64符号化した文字列を返却
+   * 
    * @param options 符号化方式のオプション
    * @returns Base64符号化した文字列
    */
@@ -253,6 +269,7 @@ class ByteSequence {
 
   /**
    * パーセント符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
+   * 
    * @param percentEncoded パーセント符号化された文字列
    * @param options 符号化方式オプション
    * @returns 生成したインスタンス
@@ -264,6 +281,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列をパーセント符号化した文字列を返却
+   * 
    * @param options 符号化方式のオプション
    * @returns パーセント符号化した文字列
    */
@@ -273,6 +291,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列のハッシュを生成し返却
+   * 
    * @param algorithmName ハッシュアルゴリズム名
    * @param options ハッシュアルゴリズムのオプション
    * @returns 生成したハッシュのバイト列で解決されるPromise
@@ -284,6 +303,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列をフォーマットした文字列を生成し返却
+   * 
    * @override
    * @returns 自身のバイト列をフォーマットした文字列
    */
@@ -293,6 +313,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列を表す整数の配列を生成し返却
+   * 
    * @returns 自身のバイト列を表す整数の配列
    */
   toJSON(): Array<uint8> {
@@ -301,6 +322,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否かを返却
+   * 
    * @param otherBytes バイト列
    * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
    */
@@ -315,6 +337,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列と、他のオブジェクトの表すバイト列が等しいか否かを返却
+   * 
    * @param bytes バイト列
    * @returns 自身のバイト列と、他のオブジェクトの表すバイト列が等しいか否か
    */
@@ -336,6 +359,7 @@ class ByteSequence {
 
   /**
    * 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否かを返却
+   * 
    * @param bytes バイト列
    * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
    */
@@ -358,6 +382,7 @@ class ByteSequence {
   /**
    * 自身のバイト列の複製を生成し返却
    *     ※参照するArrayBufferも複製する
+   * 
    * @returns 自身のバイト列の複製
    */
   clone(): ByteSequence {
@@ -369,6 +394,7 @@ class ByteSequence {
    * 自身のバイト列の部分複製を生成し返却
    *     ※参照するArrayBufferも複製する
    *     ※コピーではなくビューが欲しい場合は、bufferプロパティでArrayBufferを取得してビューを作ればよい（new Uint8Array(xf0ByteSequence.buffer, 24, 128)など）
+   * 
    * @param start 開始インデックス
    * @param end 終了インデックス
    * @returns 自身のバイト列の部分複製
@@ -397,6 +423,7 @@ class ByteSequence {
   /**
    * 指定したバイト数毎に自身のバイト列の部分複製を生成し返却するジェネレーター
    *     ※参照するArrayBufferも複製する
+   * 
    * @param segmentByteCount 分割するバイト数
    * @returns 自身のバイト列の部分複製を返却するジェネレーター
    */
@@ -421,6 +448,7 @@ class ByteSequence {
 
   /**
    * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
+   * 
    * @experimental
    * @param stream 可読ストリーム
    *     ※NodeJS.ReadStreamの場合、チャンクがBufferのストリーム
@@ -445,6 +473,7 @@ class ByteSequence {
 
   /**
    * 文字列を指定した符号化方式で符号化したバイト列からインスタンスを生成し返却
+   * 
    * @param text 文字列
    * @param encodingName 文字符号化方式名
    * @param options 文字符号化方式オプション
@@ -461,6 +490,7 @@ class ByteSequence {
 
   /**
    * 文字列として復号し、結果の文字列を返却
+   * 
    * @param encodingName 文字符号化方式名
    * @param options 文字符号化方式オプション
    * @returns 文字列
