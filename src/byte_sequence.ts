@@ -2,7 +2,7 @@
 
 // バイト列
 
-import { Exception, getBlobConstructor, getCrypto } from "./_";
+import { Exception, getCrypto } from "./_";
 import { uint8 } from "./byte/type";
 import {
   Base64,
@@ -19,7 +19,6 @@ import {
   StreamReadOptions,
 } from "./byte/index";
 import { TextDecodeOptions, TextEncodeOptions, TextEncoding } from "./text_encoding/index";
-import { MediaType } from "./media/media_type";
 
 /**
  * バイト列を表す整数の配列
@@ -509,102 +508,6 @@ class ByteSequence {
     }
     return encoding.decode(this.view(), options);
   }
-
-  // -----------------------------------------------------------------
-  // File-like
-  // -----------------------------------------------------------------
-
-  /**
-   * Blobからインスタンスを生成し返却
-   * メディアタイプの情報は失われる
-   * 
-   * @experimental
-   * @param blob Blob
-   * @returns 生成したインスタンス
-   */
-  static async fromBlob(blob: Blob): Promise<ByteSequence> {
-    try {
-      const buffer = await blob.arrayBuffer();
-      return new ByteSequence(buffer);
-    }
-    catch (exception) {
-      // NotFoundError | SecurityError | NotReadableError
-      throw new Exception("Error", "reading failed", exception);
-    }
-  }
-
-  //TODO
-  /**
-   * 自身のバイト列から、指定されたメディアタイプのBlobを生成し返却
-   * 
-   * @experimental
-   * @param mediaType メディアタイプ
-   * @returns Blob
-   */
-  // toBlob(mediaType: string): Blob {
-  //   const mediaTypeObj = MediaType.fromString(mediaType);
-
-  //   const Blob = getBlobConstructor();
-  //   return new Blob([ this.#bytes.buffer ], {
-  //     type: mediaTypeObj.toString(),
-  //   });
-  // }
-
-  /**
-   * Blobを表すData URLからインスタンスを生成し返却
-   * メディアタイプの情報は失われる
-   * 
-   * @experimental
-   * @param dataUrl Data URL
-   * @returns 生成したインスタンス
-   */
-  // static fromDataUrl(dataUrl: string): ByteSequence {
-  //   if (/^data:/i.test(dataUrl) !== true) {
-  //     throw new TypeError("dataUrl");
-  //   }
-
-  //   let work = dataUrl.substring(5);
-  //   const mediaTypeObj = MediaType.fromString(work, true);
-  //   work = work.substring(mediaTypeObj.originalString.length);
-  //   let encoded;
-  //   if (work.startsWith(";base64,")) {
-  //     encoded = work.substring(8);
-  //     return ByteSequence.fromBase64(encoded);
-  //   }
-  //   else if (work.startsWith(",")) {
-  //     encoded = work.substring(1);
-  //     return ByteSequence.fromPercent(encoded);
-  //   }
-  //   else {
-  //     throw new Exception("DataError", "parsing error");
-  //   }
-  // }
-
-  /**
-   * 自身のバイト列から、指定されたメディアタイプのBlobを表すData URLを生成し返却
-   * 
-   * Base64符号化が必要か否かの判断は呼び出す側の責任において行うこと。
-   * 
-   * @experimental
-   * @param mediaType メディアタイプ
-   * @param base64 バイト列をBase64符号化するか否か
-   * @returns Data URL
-   */
-  // toDataUrl(mediaType: string, base64 = true): string {
-  //   const mediaTypeObj = MediaType.fromString(mediaType);
-
-  //   let encoding = "";
-  //   let dataText = "";
-  //   if (base64 === true) {
-  //     encoding = ";base64";
-  //     dataText = this.toBase64();
-  //   }
-  //   else {
-  //     dataText = this.toPercent({ TODO });
-  //   }
-
-  //   return "data:" + mediaTypeObj.toString() + encoding + "," + dataText;
-  // }
 }
 Object.freeze(ByteSequence);
 
