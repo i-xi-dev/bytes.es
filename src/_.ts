@@ -16,6 +16,45 @@ else if (globalThis.process) {
 }
 
 /**
+ * Cryptoオブジェクトを返却
+ * 
+ * @returns Cryptoオブジェクト
+ */
+export function getCrypto(): Crypto {
+  if (_crypto) {
+    return _crypto;
+  }
+  throw new Exception("NotSupportedError", "Crypto unsupported");
+}
+
+/**
+ * Blobコンストラクター
+ */
+export type BlobConstructor = {
+  new (blobParts?: BlobPart[] | undefined, options?: BlobPropertyBag | undefined): Blob;
+  prototype: Blob;
+};
+let _BlobConstructor: BlobConstructor;
+if (globalThis.Blob) {
+  _BlobConstructor = Blob;
+}
+else if (globalThis.process) {
+  _BlobConstructor = (await import("buffer")).Blob as BlobConstructor;
+}
+
+/**
+ * Blobコンストラクターを返却
+ * 
+ * @returns Blobコンストラクター
+ */
+export function getBlobConstructor(): BlobConstructor {
+  if (_BlobConstructor) {
+    return _BlobConstructor;
+  }
+  throw new Exception("NotSupportedError", "Blob unsupported");
+}
+
+/**
  * 例外
  */
 export class Exception extends Error {
@@ -86,18 +125,6 @@ export function devideStringByLength(str: string, segmentLength: number, padding
   }
 
   return segments;
-}
-
-/**
- * Cryptoオブジェクトを返却
- * 
- * @returns Cryptoオブジェクト
- */
-export function getCrypto(): Crypto {
-  if (_crypto) {
-    return _crypto;
-  }
-  throw new Exception("NotSupportedError", "Crypto unsupported");
 }
 
 /**

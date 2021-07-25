@@ -164,14 +164,14 @@ describe("MediaType.fromString", () => {
     expect(MediaType.fromString("text/plain ;charset =utf-8 ; test=test2;base64,", true).toString()).toBe("text/plain;test=test2");
     expect(MediaType.fromString("text/plain ;charset= utf-8 ; test=test2;base64,", true).toString()).toBe("text/plain;charset=\" utf-8\";test=test2");
     expect(MediaType.fromString("text/plain ;charset=\"utf-8\" ; test=test2;base64,", true).toString()).toBe("text/plain;charset=utf-8;test=test2");
-    expect(MediaType.fromString("text/plain ;charset=\"ut\\f-8\" ; test=t\\est,2;base64,", true).toString()).toBe("text/plain;charset=utf-8;test=\"t\\\\est\"");
+    expect(MediaType.fromString("text/plain ;charset=\"ut\\f-8\" ; test=t\\est,2;base64,", true).toString()).toBe("text/plain;charset=utf-8;test=\"t\\\\est,2\"");
     expect(MediaType.fromString("text/plain ;charset=\"ut\\\"f-8\" ; test=test2;base64,", true).toString()).toBe("text/plain;charset=\"ut\\\"f-8\";test=test2");
     expect(MediaType.fromString("text/plain ;charset=\\ ; test=test2;base64,", true).toString()).toBe("text/plain;charset=\"\\\\\";test=test2");
-    expect(MediaType.fromString("text/plain ;charset=\"\\ ; test=test2;base64,", true).toString()).toBe("text/plain;charset=\" ; test=test2\"");
-    expect(MediaType.fromString("text/plain ;charset=\" ; test=test2;base64,", true).toString()).toBe("text/plain;charset=\" ; test=test2\"");
+    expect(MediaType.fromString("text/plain ;charset=\"\\ ; test=test2;base64,", true).toString()).toBe("text/plain;charset=\" ; test=test2;base64,\"");
+    expect(MediaType.fromString("text/plain ;charset=\" ; test=test2;base64,", true).toString()).toBe("text/plain;charset=\" ; test=test2;base64,\"");
     expect(MediaType.fromString("text/plain ;charset=\"\" ; test=test2;base64,", true).toString()).toBe("text/plain;charset=;test=test2");
     expect(MediaType.fromString('text/plain ;charset="utf-16" utf-8 ; test=test2;base64,', true).toString()).toBe("text/plain;charset=utf-16;test=test2");
-    expect(MediaType.fromString("text/plain ;charset=\"\\;base64,", true).toString()).toBe("text/plain;charset=\"\\\\\"");
+    expect(MediaType.fromString("text/plain ;charset=\"\\;base64,", true).toString()).toBe("text/plain;charset=\";base64,\"");
     expect(MediaType.fromString('text/plain ;charset="aa\\\\a\\"a";base64,', true).toString()).toBe("text/plain;charset=\"aa\\\\a\\\"a\"");
     expect(MediaType.fromString('text/plain ;charset=a;x="http://example.com/x?a=1";base64,', true).toString()).toBe("text/plain;charset=a;x=\"http://example.com/x?a=1\"");
     expect(MediaType.fromString('text/plain ;x="http://example.com/x?a=1";charset=a;base64,', true).toString()).toBe("text/plain;charset=a;x=\"http://example.com/x?a=1\"");

@@ -2,7 +2,7 @@
 
 // UUID
 
-import { ByteSequence } from "./data/byte_sequence";
+import { ByteSequence } from "./byte_sequence";
 
 /**
  * UUID（RFC 4122）
