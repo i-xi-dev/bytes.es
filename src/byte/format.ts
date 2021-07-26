@@ -15,28 +15,43 @@ type Radix = 2 | 8 | 10 | 16;
  */
 type Options = {
   /** 前方埋め結果の文字列長 */
-  paddedLength?: number;
+  paddedLength?: number,
   /** 16進数のa-fを大文字にするか否か */
-  upperCase?: boolean;
+  upperCase?: boolean,
   /** プレフィックス */
-  prefix?: string;
+  prefix?: string,
   /** サフィックス */
-  suffix?: string;
+  suffix?: string,
 };
-// TODO ParserOptions caseInsensitive,
+
+/**
+ * フォーマッターのパースオプション
+ */
+type ParseOptions = Options & {
+  /** 基数が16の場合のA-Fの大文字小文字を無視するか否か */
+  caseInsensitive?: boolean,
+};
+
+/**
+ * フォーマッターのフォーマットオプション
+ */
+type FormatOptions = Options & {
+};
 
 /**
  * 未設定を許可しないフォーマッターのオプション
  */
 type ResolvedOptions = {
   /** 前方埋め結果の文字列長 */
-  paddedLength: number;
+  paddedLength: number,
   /** 16進数のa-fを大文字にするか否か */
-  upperCase: boolean;
+  upperCase: boolean,
   /** プレフィックス */
-  prefix: string;
+  prefix: string,
   /** サフィックス */
-  suffix: string;
+  suffix: string,
+  /** 基数が16の場合のA-Fの大文字小文字を無視するか否か（パースでのみ使用。フォーマットでは無視する） */
+  caseInsensitive: boolean,
 };
 
 /**
@@ -60,13 +75,18 @@ const DEFAULT_PREFIX = "";
 const DEFAULT_SUFFIX = "";
 
 /**
+ * （パースのみ）基数が16の場合のA-Fの大文字小文字を無視するか否かのデフォルト
+ */
+ const DEFAULT_CASE_INSENSITIVE = false;
+
+/**
  * フォーマッターオプションを補正したコピーを返却
  * 
  * @param radix フォーマット結果の基数
  * @param options フォーマッターオプション
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたフォーマッターオプション
  */
-function resolveOptions(radix: Radix, options: Options = {}): ResolvedOptions {
+function resolveOptions(radix: Radix, options: ParseOptions | FormatOptions = {}): ResolvedOptions {
   const minPaddedLength: number = minPaddedLengthOf(radix);
   const paddedLength: number = (typeof options.paddedLength === "number") ? options.paddedLength : minPaddedLength;
   if (Number.isSafeInteger(paddedLength) !== true) {
@@ -79,11 +99,17 @@ function resolveOptions(radix: Radix, options: Options = {}): ResolvedOptions {
   const prefix: string = (typeof options.prefix === "string") ? options.prefix : DEFAULT_PREFIX;
   const suffix: string = (typeof options.suffix === "string") ? options.suffix : DEFAULT_SUFFIX;
 
+  let caseInsensitive: boolean = DEFAULT_CASE_INSENSITIVE;
+  if ("caseInsensitive" in options) {
+    caseInsensitive = (typeof options.caseInsensitive === "boolean") ? options.caseInsensitive : DEFAULT_CASE_INSENSITIVE;
+  }
+
   return {
     paddedLength,
     upperCase,
     prefix,
     suffix,
+    caseInsensitive,
   };
 }
 
@@ -162,7 +188,10 @@ function isFormatted(formatted: string, radix: Radix, resolvedOptions: ResolvedO
     charsPattern = "[0-9]";
     break;
   case 16:
-    if (resolvedOptions.upperCase === true) {
+    if (resolvedOptions.caseInsensitive === true) {
+      charsPattern = "[0-9A-Fa-f]";
+    }
+    else if (resolvedOptions.upperCase === true) {
       charsPattern = "[0-9A-F]";
     }
     else {
@@ -188,7 +217,7 @@ function isFormatted(formatted: string, radix: Radix, resolvedOptions: ResolvedO
  * @param resolvedOptions フォーマッターオプション
  * @returns バイト列
  */
-function parse(toParse: string, radix: Radix, options?: Options): Uint8Array {
+function parse(toParse: string, radix: Radix, options?: ParseOptions): Uint8Array {
   const resolvedOptions = resolveOptions(radix, options);
   if (isFormatted(toParse, radix, resolvedOptions) !== true) {
     throw new Exception("DataError", "parse error");
@@ -227,7 +256,7 @@ function formatByte(byte: uint8, radix: Radix, resolvedOptions: ResolvedOptions)
  * @param resolvedOptions フォーマッターオプション
  * @returns 文字列
  */
-function format(bytes: Uint8Array, radix: Radix, options?: Options): string {
+function format(bytes: Uint8Array, radix: Radix, options?: FormatOptions): string {
   const resolvedOptions = resolveOptions(radix, options);
   const byteStringArray = [ ...bytes ].map((byte) => {
     return formatByte(byte as uint8, radix, resolvedOptions);
@@ -237,7 +266,8 @@ function format(bytes: Uint8Array, radix: Radix, options?: Options): string {
 
 export {
   Radix as FormatRadix,
-  Options as FormatOptions,
+  ParseOptions,
+  FormatOptions,
 };
 
 export const Format = {

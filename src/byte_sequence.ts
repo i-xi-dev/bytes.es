@@ -10,6 +10,7 @@ import {
   Format,
   FormatOptions,
   FormatRadix,
+  ParseOptions,
   Percent,
   PercentDecodeOptions,
   PercentEncodeOptions,
@@ -226,10 +227,10 @@ class ByteSequence {
    * 
    * @param toParse バイト列をフォーマットした文字列
    * @param radix フォーマット結果の基数
-   * @param options フォーマットオプション
+   * @param options パースオプション
    * @returns 生成したインスタンス
    */
-  static parse(toParse: string, radix: FormatRadix = 16, options?: FormatOptions): ByteSequence {
+  static parse(toParse: string, radix: FormatRadix = 16, options?: ParseOptions): ByteSequence {
     const parsed = Format.parse(toParse, radix, options);
     return new ByteSequence(parsed.buffer);
   }

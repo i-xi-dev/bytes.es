@@ -92,18 +92,42 @@ class FileLike {
   /**
    * Data URLからインスタンスを生成し返却
    * 
+   * https://fetch.spec.whatwg.org/#data-urls に従っていない点
+   * ・メディアタイプの省略は受け入れない（エラーとする）
+   * ・charsetパラメーターの省略時初期値も定義しない
+   * 
    * @experimental
    * @param dataUrl Data URL
+   * @param forceSplitAtFirstComma 最初に出現した","をメディアタイプとデータの区切りとみなすか否か
+   *     trueが{@link https://fetch.spec.whatwg.org Fetch Standard}の仕様通りの挙動（主要ブラウザーの挙動も同じ）
+   *     falseの場合、","がメディアタイプのquotedなパラメーター値に含まれているとみなせる場合は区切らない
+   *     ※falseにした場合はFetch Standard仕様違反となる。それ以前のRFCにも違反するので、falseにする必要性は無いと思われる //XXX 引数自体廃止するか
    * @returns 生成したインスタンス
    */
-  static fromDataUrl(dataUrl: string): FileLike {
+  static fromDataUrl(dataUrl: string, forceSplitAtFirstComma = true): FileLike {
     if (/^data:/i.test(dataUrl) !== true) {
       throw new TypeError("dataUrl");
     }
 
     let work = dataUrl.substring(5);
-    const mediaType = MediaType.fromString(work, true);
-    work = work.substring(mediaType.originalString.length);
+    let mediaType: MediaType;
+    if (forceSplitAtFirstComma === true) {
+      if (work.includes(",") !== true) {
+        throw new Exception("DataError", "U+002C not found");
+      }
+
+      let mediaTypeOriginal = work.split(",")[0] as string;
+      if (mediaTypeOriginal.endsWith(";base64")) {
+        mediaTypeOriginal = mediaTypeOriginal.substring(0, mediaTypeOriginal.length - 7);
+      }
+      mediaType = MediaType.fromString(mediaTypeOriginal);
+      work = work.substring(mediaTypeOriginal.length);
+    }
+    else {
+      mediaType = MediaType.fromString(work, true);
+      work = work.substring(mediaType.originalString.length);
+    }
+
     let encoded: string;
     let bytes: ByteSequence;
     if (work.startsWith(";base64,")) {
@@ -112,9 +136,10 @@ class FileLike {
     }
     else if (work.startsWith(",")) {
       encoded = work.substring(1);
-      bytes = ByteSequence.fromPercent(encoded);
+      bytes = ByteSequence.fromPercent(encoded, { strict: false });
     }
     else {
+      // ","がメディアタイプに後続していない場合
       throw new Exception("DataError", "parsing error");
     }
 
@@ -144,6 +169,9 @@ class FileLike {
 
   //   return "data:" + this.#mediaType.toString() + encoding + "," + dataText;
   // }
+
+  // fromRespomse
+  // toRequest
 }
 Object.freeze(FileLike);
 

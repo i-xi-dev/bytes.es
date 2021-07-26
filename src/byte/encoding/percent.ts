@@ -26,46 +26,37 @@ type Options = {
  */
 type DecodeOptions = Options & {
   /**
-   * デコード時、パーセント符号化方式オプションに合致しない文字列が出現した場合エラーにするか否か
+   * パーセント符号化方式オプションに合致しない文字列が出現した場合エラーにするか否か
    *     ※エンコードには影響しない
    *     ※strict=falseでのデコード結果は、同じオプションで再エンコードしても元に戻らない可能性あり
    *     ※strict=falseの場合、デコード結果のlengthとbuffer.lengthが一致しなくなる可能性あり
    */
    strict?: boolean,
-};
 
-/**
- * 未設定を許可しないパーセント符号化の復号オプション
- */
-type ResolvedDecodingOptions = {
-  /** 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトの配列 */
-  inclusions: Array<uint8>,
-  /** inclusionsに0x20が含まれているときに、0x20を"+"に符号化するか否か */
-  spaceAsPlus: boolean,
-  /** デコード時、パーセント符号化方式オプションに合致しない文字列が出現した場合エラーにするか否か */
-  strict: boolean,
+   /**
+    * "%"に後続する16進数の大文字小文字を無視するか否か
+    */
+   caseInsensitive?: boolean,
 };
 
 /**
  * パーセント符号化の符号化オプション
  */
 type EncodeOptions = Options & {
-  /**
-   * "%"に後続する16進数の大文字小文字を無視するか否か
-   */
-// TODO  caseInsensitive?: boolean,
 };
 
 /**
- * 未設定を許可しないパーセント符号化の符号化オプション
+ * 未設定を許可しないパーセント符号化の復号オプション
  */
-type ResolvedEncodingOptions = {
+type ResolvedOptions = {
   /** 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトの配列 */
   inclusions: Array<uint8>,
   /** inclusionsに0x20が含まれているときに、0x20を"+"に符号化するか否か */
   spaceAsPlus: boolean,
-  /** "%"に後続する16進数の大文字小文字を無視するか否か */
-//  caseInsensitive: boolean,
+  /** デコード時、パーセント符号化方式オプションに合致しない文字列が出現した場合エラーにするか否か（エンコードでは無視する） */
+  strict: boolean,
+  /** デコード時、"%"に後続する16進数の大文字小文字を無視するか否か（エンコードでは無視する） */
+  caseInsensitive: boolean,
 };
 
 /**
@@ -82,6 +73,11 @@ const DEFAULT_SPACE_AS_PLUS = false;
  * デコード時、パーセント符号化方式オプションに合致しない文字列が出現した場合エラーにするか否かのデフォルト
  */
 const DEFAULT_STRICT = true;
+
+/**
+ * デコード時、"%"に後続する16進数の大文字小文字を無視するか否かのデフォルト
+ */
+const DEFAULT_CASE_INSENSITIVE = false;
 
 /**
  * 変換対象とするバイトの配列を正規化し返却
@@ -106,13 +102,20 @@ function normalizeInclusions(inclusions?: Array<uint8>): Array<uint8> {
 /**
  * パーセント符号化の復号オプションを補正したコピーを返却
  * 
- * @param options パーセント符号化の復号オプション
- * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたパーセント符号化の復号オプション
+ * @param options パーセント符号化のオプション
+ * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたパーセント符号化のオプション
  */
-function resolveDecodingOptions(options: DecodeOptions = {}): ResolvedDecodingOptions {
+function resolveOptions(options: DecodeOptions | EncodeOptions = {}): ResolvedOptions {
   const inclusions = normalizeInclusions(options.inclusions);
   const spaceAsPlus: boolean = (typeof options.spaceAsPlus === "boolean") ? options.spaceAsPlus : DEFAULT_SPACE_AS_PLUS;
-  const strict: boolean = (typeof options.strict === "boolean") ? options.strict : DEFAULT_STRICT;
+  let strict: boolean = DEFAULT_STRICT;
+  if ("strict" in options) {
+    strict = (typeof options.strict === "boolean") ? options.strict : DEFAULT_STRICT;
+  }
+  let caseInsensitive: boolean = DEFAULT_CASE_INSENSITIVE;
+  if ("caseInsensitive" in options) {
+    caseInsensitive = (typeof options.caseInsensitive === "boolean") ? options.caseInsensitive : DEFAULT_CASE_INSENSITIVE;
+  }
 
   if ((spaceAsPlus === true) && (inclusions.includes(0x2B) !== true)) {
     throw new TypeError("options.inclusions, options.spaceAsPlus");
@@ -122,45 +125,26 @@ function resolveDecodingOptions(options: DecodeOptions = {}): ResolvedDecodingOp
     inclusions,
     spaceAsPlus,
     strict,
-  };
-}
-
-/**
- * パーセント符号化の符号化オプションを補正したコピーを返却
- * 
- * @param options パーセント符号化の符号化オプション
- * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたパーセント符号化の符号化オプション
- */
-function resolveEncodingOptions(options: EncodeOptions = {}): ResolvedEncodingOptions {
-  const inclusions = normalizeInclusions(options.inclusions);
-  const spaceAsPlus: boolean = (typeof options.spaceAsPlus === "boolean") ? options.spaceAsPlus : DEFAULT_SPACE_AS_PLUS;
-  //  const caseInsensitive: boolean = (typeof options.caseInsensitive === "boolean") ? options.caseInsensitive : DEFAULT_CASE_INSENSITIVE;
-
-  if ((spaceAsPlus === true) && (inclusions.includes(0x2B) !== true)) {
-    throw new TypeError("options.inclusions, options.spaceAsPlus");
-  }
-
-  return {
-    inclusions,
-    spaceAsPlus,
-    //    caseInsensitive,
+    caseInsensitive,
   };
 }
 
 /**
  * パーセント符号化された文字列から、"%XX"の形にエンコードされているバイトの数を取得する正規表現を生成し返却
  * 
- * @param inclusions 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトの配列
+ * @param resolvedOptions パーセント符号化のオプション
  * @returns パーセント符号化された文字列から、"%XX"の形にエンコードされているバイトの数を取得する正規表現
  */
-function encodedPattern(inclusions: Array<uint8>): RegExp {
+function encodedPattern(resolvedOptions: ResolvedOptions): RegExp {
   let pattern = "%([0189A-F][0-9A-F]|25|7F";
-  const inclusionsStr = inclusions.map((i) => i.toString(16).toUpperCase()).join("|");
+  const inclusionsStr = resolvedOptions.inclusions.map((i) => i.toString(16).toUpperCase()).join("|");
   if (inclusionsStr.length > 0) {
     pattern = pattern + "|" + inclusionsStr;
   }
   pattern = pattern + ")";
-  return new RegExp(pattern, "gi");
+
+  const flags = (resolvedOptions.caseInsensitive === true) ? "gi" : "g";
+  return new RegExp(pattern, flags);
 }
 
 /**
@@ -186,11 +170,12 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
     throw new Exception("EncodingError", "decode error (1)");
   }
 
-  const resolvedOptions: ResolvedDecodingOptions = resolveDecodingOptions(options);
+  const resolvedOptions: ResolvedOptions = resolveOptions(options);
 
-  const encodedCount = [ ...encoded.matchAll(encodedPattern(resolvedOptions.inclusions)) ].length;
+  const encodedCount = [ ...encoded.matchAll(encodedPattern(resolvedOptions)) ].length;
   const decoded = new Uint8Array(encoded.length - (encodedCount * 3) + encodedCount);
 
+  const hexRegExp = (resolvedOptions.caseInsensitive === true) ? /^[0-9A-Fa-f]{2}$/ : /^[0-9A-F]{2}$/;
   const spaceAsPlus = (resolvedOptions.spaceAsPlus === true) && resolvedOptions.inclusions.includes(0x20);
 
   let i = 0;
@@ -201,7 +186,7 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
     let byte: uint8;
     if (c === "%") {
       const byteString = encoded.substring((i + 1), (i + 3));
-      if (/^[0-9A-Fa-f]{2}$/.test(byteString) !== true) {
+      if (hexRegExp.test(byteString) !== true) {
         throw new Exception("EncodingError", "decode error (2)");
       }
       byte = Number.parseInt(byteString, 16) as uint8;
@@ -242,6 +227,9 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
 /**
  * バイト列を文字列にパーセント符号化し、結果の文字列を返却
  * 
+ * {@link https://url.spec.whatwg.org/ URL Standard}の仕様に従い、"%"に後続する16進数は大文字で固定。
+ * （小文字にする必要性は無いと思われるので、小文字にするオプションは提供しない）
+ * 
  * 0x20～0x7E(0x25を除く)は、オプションのinclusionsで指定されていなければ"%XX"形式にしないことに注意。
  * すなわち、URLエンコードとして使用するにはURLコンポーネントに応じた変換対象を追加する必要がある。
  * 
@@ -250,7 +238,7 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
  * @returns パーセント符号化された文字列
  */
 function encode(toEncode: Uint8Array, options?: EncodeOptions): string {
-  const resolvedOptions: ResolvedEncodingOptions = resolveEncodingOptions(options);
+  const resolvedOptions: ResolvedOptions = resolveOptions(options);
   const formatOptions = { upperCase: true, prefix: "%" };
 
   let work: Array<uint8> = [];

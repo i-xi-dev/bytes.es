@@ -23,13 +23,6 @@ describe("Percent.encode", () => {
 
     expect(Percent.encode(utf8Bytes1, {inclusions:[32,0x2B]})).toBe(globalThis.encodeURIComponent("1\u{0} !~\u{7F}あ+"));
 
-    expect(Percent.encode(Uint8Array.of(), {strict:false})).toBe("");
-    expect(Percent.encode(Uint8Array.of(3,2,1,0,0xFF,0xFE,0xFD,0xFC), {strict:false})).toBe("%03%02%01%00%FF%FE%FD%FC");
-    expect(Percent.encode(utf8Bytes1, {strict:false})).toBe("1%00 !~%7F%E3%81%82+");
-
-    expect(Percent.encode(Uint8Array.of(0,32,65), {strict:true})).toBe("%00 A");
-    expect(Percent.encode(Uint8Array.of(255), {strict:true})).toBe("%FF");
-
     expect(() => {
       const t = [-1];
       Percent.encode(Uint8Array.of(), {inclusions:t})

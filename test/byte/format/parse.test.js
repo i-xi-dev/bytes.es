@@ -105,6 +105,20 @@ describe("Format.parse", () => {
     }).toThrow("parse error");
   });
 
+  test("InvalidCharacterError - upperCase", () => {
+    expect(() => {
+      Format.parse("ff", 16, {upperCase:true});
+    }).toThrow("parse error");
+    expect(() => {
+      Format.parse("FF", 16, {upperCase:false});
+    }).toThrow("parse error");
+  });
+
+  test("InvalidCharacterError - caseInsensitive", () => {
+    expect(Format.parse("ff", 16, {upperCase:true,caseInsensitive:true}).join(",")).toBe("255");
+    expect(Format.parse("FF", 16, {upperCase:false,caseInsensitive:true}).join(",")).toBe("255");
+  });
+
   test("InvalidCharacterError - prefix", () => {
     expect(() => {
       Format.parse("#00", 16, {prefix:"-"});

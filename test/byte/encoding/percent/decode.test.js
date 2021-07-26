@@ -43,6 +43,9 @@ describe("Percent.decode", () => {
     const decoded52b = Percent.decode("%03%02%01%00%FF%FE%FD%FC%20%41", {strict:false});
     expect(JSON.stringify([...decoded52b])).toBe("[3,2,1,0,255,254,253,252,32,65]");
 
+    const decoded54 = Percent.decode("%ff", {caseInsensitive:true});
+    expect(JSON.stringify([...decoded54])).toBe("[255]");
+
     expect(() => {
       Percent.decode("あ");
     }).toThrow("decode error (1)");
@@ -54,6 +57,14 @@ describe("Percent.decode", () => {
     expect(() => {
       Percent.decode("%41");
     }).toThrow("decode error (3)");
+
+    expect(() => {
+      Percent.decode("%ff", { caseInsensitive:false });
+    }).toThrow("decode error (2)");
+
+    expect(() => {
+      Percent.decode("%ff");
+    }).toThrow("decode error (2)");
 
   });
 
