@@ -26,7 +26,7 @@ describe("Percent.encode", () => {
     expect(() => {
       const t = [-1];
       Percent.encode(Uint8Array.of(), {inclusions:t})
-    }).toThrow("options.inclusions");
+    }).toThrow("inclusions");
 
     expect(() => {
       Percent.encode(Uint8Array.of(), {inclusions:[32],spaceAsPlus:true});

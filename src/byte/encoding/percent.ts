@@ -93,7 +93,7 @@ function normalizeInclusions(inclusions?: Array<uint8>): Array<uint8> {
       return [ ...new Set(inclusions) ].sort();
     }
     else {
-      throw new TypeError("options.inclusions");
+      throw new TypeError("inclusions");
     }
   }
   return [ ...DEFAULT_INCLUSIONS ].sort();
@@ -160,6 +160,7 @@ function isTargetByte(byte: uint8, inclusions: Array<uint8>): boolean {
 
 /**
  * 文字列をバイト列にパーセント復号し、結果のバイト列を返却
+ * //TODO URL Standardの仕様に合わせる
  * 
  * @param encoded パーセント符号化された文字列
  * @param options パーセント符号化の復号オプション
@@ -186,19 +187,27 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
     let byte: uint8;
     if (c === "%") {
       const byteString = encoded.substring((i + 1), (i + 3));
-      if (hexRegExp.test(byteString) !== true) {
-        throw new Exception("EncodingError", "decode error (2)");
-      }
-      byte = Number.parseInt(byteString, 16) as uint8;
-
-      if (isTargetByte(byte, resolvedOptions.inclusions)) {
-        i = i + 3;
+      if (byteString.length === 2) {
+        if (hexRegExp.test(byteString) !== true) {
+          throw new Exception("EncodingError", "decode error (2)");//TODO strictではない場合はokにする？
+        }
+        byte = Number.parseInt(byteString, 16) as uint8;
+        if (isTargetByte(byte, resolvedOptions.inclusions)) {
+          i = i + 3;
+        }
+        else {
+          if (resolvedOptions.strict === true) {
+            throw new Exception("EncodingError", "decode error (3)");
+          }
+          i = i + 3;
+        }
       }
       else {
         if (resolvedOptions.strict === true) {
-          throw new Exception("EncodingError", "decode error (3)");
+          throw new Exception("EncodingError", "decode error (4)");
         }
-        i = i + 3;
+        byte = c.charCodeAt(0) as uint8;
+        i = i + 1;
       }
     }
     else if (c === "+") {

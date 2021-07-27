@@ -75,30 +75,17 @@ function parseTypeName(str: string): ParseResult {
  * 文字列の先頭からメディアタイプのサブタイプ名を抽出し返却
  * 
  * @param str 文字列
- * @param dataUriMode Data URIとしてパースするか否か
  * @returns パース結果
  */
-function parseSubtypeName(str: string, dataUriMode: boolean): ParseResult {
+function parseSubtypeName(str: string): ParseResult {
   let subtypeName: string;
   let progression: number;
   let noParameters = false;
   if (str.includes(";")) {
-    // 「;」あり（パラメーターあり、または";base64,"あり）
+    // 「;」あり（パラメーターあり）
     const u003BIndex = str.indexOf(";");
     subtypeName = str.substring(0, u003BIndex);
     progression = u003BIndex;
-
-    if ((dataUriMode === true) && str.substring(progression).startsWith(";base64,")) {
-      // パラメーター無し
-      noParameters = true;
-    }
-  }
-  else if ((dataUriMode === true) && str.includes(",")) {
-    // パラメーター無し、「,」あり
-    const u002CIndex = str.indexOf(",");
-    subtypeName = str.substring(0, u002CIndex);
-    progression = u002CIndex;
-    noParameters = true;
   }
   else {
     // パラメーター無し
@@ -120,28 +107,14 @@ function parseSubtypeName(str: string, dataUriMode: boolean): ParseResult {
  * 文字列の先頭からメディアタイプのパラメーター値終端位置を抽出し返却
  * 
  * @param str 文字列
- * @param dataUriMode Data URIとしてパースするか否か
  * @returns パラメーター値終端位置
  */
-function detectPrameterValueEnd(str: string, dataUriMode: boolean) {
+function detectPrameterValueEnd(str: string) {
   let valueEndIndex = -1;
   let parseEnd = false;
   const u003BIndex = str.indexOf(";");
   if (u003BIndex >= 0) {
     valueEndIndex = u003BIndex;
-
-    if (dataUriMode === true) {
-      if (str.substring(valueEndIndex).startsWith(";base64,")) {
-        parseEnd = true;
-      }
-    }
-  }
-  else if (dataUriMode === true) {
-    const u002CIndex = str.indexOf(",");
-    if (u002CIndex >= 0) {
-      valueEndIndex = u002CIndex;
-      parseEnd = true;
-    }
   }
 
   if (valueEndIndex < 0) {
@@ -258,10 +231,9 @@ class MediaType {
    *     パースの仕様はhttps://mimesniff.spec.whatwg.org/#parsing-a-mime-type
    * 
    * @param text 文字列
-   * @param dataUriMode Data URIとしてパースするか否か
    * @returns 生成したインスタンス
    */
-  static fromString(text: string, dataUriMode = false): MediaType {
+  static fromString(text: string): MediaType {
     const trimmedText = trimHttpSpace(text);
 
     let work = trimmedText;
@@ -282,7 +254,7 @@ class MediaType {
     i = i + typeNameLength + 1;
 
     // [mimesniff 4.4.]-7,8
-    const { component: subtypeName, progression: subtypeNameEnd, parseEnd } = parseSubtypeName(work, dataUriMode);
+    const { component: subtypeName, progression: subtypeNameEnd, parseEnd } = parseSubtypeName(work);
     work = (parseEnd === true) ? "" : work.substring(subtypeNameEnd);
     i = i + subtypeNameEnd;
 
@@ -321,15 +293,6 @@ class MediaType {
         delimIndex = u003DIndex;
       }
 
-      let u002CFound = false;
-      if (dataUriMode === true) {
-        const u002CIndex = work.indexOf(",");
-        if ((u002CIndex >= 0) && (u002CIndex < delimIndex)) {
-          delimIndex = u002CIndex;
-          u002CFound = true;
-        }
-      }
-
       let parameterName: string;
       if (delimIndex >= 0) {
         parameterName = work.substring(0, delimIndex);
@@ -344,14 +307,7 @@ class MediaType {
 
       // [mimesniff 4.4.]-11.5.1
       if (work.startsWith(";")) {
-        if ((dataUriMode === true) && work.startsWith(";base64,")) {
-          break;
-        }
         continue;
-      }
-
-      if (u002CFound === true) {
-        break;
       }
 
       // [mimesniff 4.4.]-11.5.2
@@ -362,10 +318,6 @@ class MediaType {
 
       // [mimesniff 4.4.]-11.6
       if (work.length <= 0) {
-        break;
-      }
-
-      if ((dataUriMode === true) && (work.startsWith(";base64,") || work.startsWith(","))) {
         break;
       }
 
@@ -380,13 +332,13 @@ class MediaType {
         parameterValue = value;
 
         // [mimesniff 4.4.]-11.8.2
-        const { valueEndIndex, parseEnd } = detectPrameterValueEnd(work, dataUriMode);
+        const { valueEndIndex, parseEnd } = detectPrameterValueEnd(work);
         work = (parseEnd === true) ? "" : work.substring(valueEndIndex);
         i = i + valueEndIndex;
       }
       else {
         // [mimesniff 4.4.]-11.9.1
-        const { valueEndIndex, parseEnd } = detectPrameterValueEnd(work, dataUriMode);
+        const { valueEndIndex, parseEnd } = detectPrameterValueEnd(work);
         parameterValue = work.substring(0, valueEndIndex);
         work = (parseEnd === true) ? "" : work.substring(valueEndIndex);
         i = i + valueEndIndex;

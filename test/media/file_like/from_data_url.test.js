@@ -48,12 +48,19 @@ describe("FileLike.fromDataUrl", () => {
     expect(b22.size).toBe(5);
     expect(b22.mediaType.toString()).toBe("text/plain;p1=a;p2=b");
 
-    const b23 = FileLike.fromDataUrl("data:text/plain; p1=a;p2=\"b,c\",a1", false);
-    const b23v = b23.bytes.view();
-    expect(b23v[0]).toBe(97);
-    expect(b23v[1]).toBe(49);
-    expect(b23.size).toBe(2);
-    expect(b23.mediaType.toString()).toBe("text/plain;p1=a;p2=\"b,c\"");
+    const b31 = FileLike.fromDataUrl("data:text/plain,%FF%");
+    const b31v = b31.bytes.view();
+    expect(b31v[0]).toBe(255);
+    expect(b31v[1]).toBe(0x25);
+    expect(b31.size).toBe(2);
+    expect(b31.mediaType.toString()).toBe("text/plain");
+
+    const b32 = FileLike.fromDataUrl("data:text/plain,%fff");
+    const b32v = b32.bytes.view();
+    expect(b32v[0]).toBe(255);
+    expect(b32v[1]).toBe(0x66);
+    expect(b32.size).toBe(2);
+    expect(b32.mediaType.toString()).toBe("text/plain");
 
   });
 

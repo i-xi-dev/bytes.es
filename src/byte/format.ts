@@ -77,7 +77,7 @@ const DEFAULT_SUFFIX = "";
 /**
  * （パースのみ）基数が16の場合のA-Fの大文字小文字を無視するか否かのデフォルト
  */
- const DEFAULT_CASE_INSENSITIVE = false;
+const DEFAULT_CASE_INSENSITIVE = false;
 
 /**
  * フォーマッターオプションを補正したコピーを返却

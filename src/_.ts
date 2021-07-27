@@ -206,6 +206,16 @@ export function matchHttpQuotedStringToken(str: string): boolean {
 }
 
 /**
+ * 文字列から先頭および末尾の{@link https://infra.spec.whatwg.org/#ascii-whitespace ASCII whitespace}を削除した文字列を返却
+ * 
+ * @param str 文字列
+ * @returns 文字列
+ */
+export function trimAsciiSpace(str: string): string {
+  return str.replace(/^[\u{9}\u{A}\u{C}\u{D}\u{20}]+/u, "").replace(/[\u{9}\u{A}\u{C}\u{D}\u{20}]+$/u, "");
+}
+
+/**
  * 文字列から先頭および末尾の{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}を削除した文字列を返却
  * 
  * @param str 文字列
