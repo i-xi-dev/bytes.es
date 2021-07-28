@@ -107,19 +107,18 @@ class FileLike {
     }
 
     let work = dataUrl.substring(5);
-    let mediaType: MediaType;
 
     if (work.includes(",") !== true) {
       throw new Exception("DataError", "U+002C not found");
     }
 
     let mediaTypeOriginal = work.split(",")[0] as string;
-    if (mediaTypeOriginal.endsWith(";base64")) {//TODO 末尾スペースでもok
+    if (mediaTypeOriginal.endsWith(";base64")) { // TODO 末尾スペースでもok
       mediaTypeOriginal = mediaTypeOriginal.substring(0, mediaTypeOriginal.length - 7);
     }
     mediaTypeOriginal = trimAsciiSpace(mediaTypeOriginal);
 
-    mediaType = MediaType.fromString(mediaTypeOriginal);
+    const mediaType = MediaType.fromString(mediaTypeOriginal);
     work = work.substring(mediaTypeOriginal.length);
 
     let encoded: string;
@@ -130,10 +129,7 @@ class FileLike {
     }
     else if (work.startsWith(",")) {
       encoded = work.substring(1);
-      bytes = ByteSequence.fromPercent(encoded, {
-        strict: false,
-        caseInsensitive: true,
-      });
+      bytes = ByteSequence.fromPercent(encoded);
     }
     else {
       // ","がメディアタイプに後続していない場合

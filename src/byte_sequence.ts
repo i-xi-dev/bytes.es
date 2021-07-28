@@ -277,7 +277,7 @@ class ByteSequence {
    */
   static fromPercent(percentEncoded: string, options?: PercentDecodeOptions): ByteSequence {
     const decoded = Percent.decode(percentEncoded, options);
-    return new ByteSequence(decoded.buffer);
+    return ByteSequence.from(decoded); // decoded.bufferには未使用領域がある可能性がある為、複製して未使用領域は切り捨てる
   }
 
   /**
@@ -469,7 +469,7 @@ class ByteSequence {
 
     // 中断不可、で読取
     const bytes = await StreamReader.read(stream, totalByteCount, options);
-    return ByteSequence.from(bytes);
+    return ByteSequence.from(bytes); // bytes.bufferには未使用領域がある可能性がある為、複製して未使用領域は切り捨てる
   }
 
   // XXX これ以下は分離する？

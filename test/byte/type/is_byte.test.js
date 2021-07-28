@@ -18,5 +18,6 @@ describe("Type.isByte", () => {
     expect(isByte([])).toBe(false);
     expect(isByte({})).toBe(false);
     expect(isByte(null)).toBe(false);
+    expect(isByte()).toBe(false);
   });
 });

@@ -33,38 +33,30 @@ describe("Percent.decode", () => {
     const decoded43 = Percent.decode(globalThis.encodeURIComponent("1\u{0} !~\u{7F}あ+"), {inclusions:[32,0x2B]});
     expect(JSON.stringify([...decoded43])).toBe(JSON.stringify([...utf8Bytes1]));
 
-    const decoded51 = Percent.decode("", {strict:false});
-    expect(JSON.stringify([...decoded51])).toBe("[]");
-    const decoded52 = Percent.decode("%03%02%01%00%FF%FE%FD%FC", {strict:false});
-    expect(JSON.stringify([...decoded52])).toBe("[3,2,1,0,255,254,253,252]");
-    const decoded53 = Percent.decode("1%00 !~%7F%E3%81%82+", {strict:false});
-    expect(JSON.stringify([...decoded53])).toBe(JSON.stringify([...utf8Bytes1]));
-
-    const decoded52b = Percent.decode("%03%02%01%00%FF%FE%FD%FC%20%41", {strict:false});
+    const decoded52b = Percent.decode("%03%02%01%00%FF%FE%FD%FC%20%41");
     expect(JSON.stringify([...decoded52b])).toBe("[3,2,1,0,255,254,253,252,32,65]");
-
-    const decoded54 = Percent.decode("%ff", {caseInsensitive:true});
-    expect(JSON.stringify([...decoded54])).toBe("[255]");
 
     expect(() => {
       Percent.decode("あ");
     }).toThrow("decode error (1)");
 
-    expect(() => {
-      Percent.decode("%%65A");
-    }).toThrow("decode error (2)");
+    const decoded55 = Percent.decode("%%65A");
+    expect(JSON.stringify([...decoded55])).toBe("[37,101,65]");
 
-    expect(() => {
-      Percent.decode("%41");
-    }).toThrow("decode error (3)");
+    const decoded56 = Percent.decode("%41");
+    expect(JSON.stringify([...decoded56])).toBe("[65]");
 
-    expect(() => {
-      Percent.decode("%ff", { caseInsensitive:false });
-    }).toThrow("decode error (2)");
+    const decoded57 = Percent.decode("%ff");
+    expect(JSON.stringify([...decoded57])).toBe("[255]");
 
-    expect(() => {
-      Percent.decode("%ff");
-    }).toThrow("decode error (2)");
+    const decoded57b = Percent.decode("%FF");
+    expect(JSON.stringify([...decoded57b])).toBe("[255]");
+
+    const decoded57c = Percent.decode("%f");
+    expect(JSON.stringify([...decoded57c])).toBe("[37,102]");
+
+    const decoded57d = Percent.decode("%fff");
+    expect(JSON.stringify([...decoded57d])).toBe("[255,102]");
 
   });
 
