@@ -4,6 +4,7 @@
 
 import { Exception, getBlobConstructor, trimAsciiSpace } from "../_";
 import { ByteSequence } from "../byte_sequence";
+import { Uri } from "../uri";
 import { MediaType } from "./media_type";
 
 /**
@@ -92,51 +93,77 @@ class FileLike {
   /**
    * Data URLからインスタンスを生成し返却
    * 
-   * TODO https://fetch.spec.whatwg.org/#data-urls に合っていない点を合わせる（mediatype省略時、charset初期値、base64前後のスペース）
-   * 
-   * {@link https://fetch.spec.whatwg.org Fetch Standard}の仕様に従った。
+   * {@link https://fetch.spec.whatwg.org/#data-urls Fetch Standard}の仕様に従った。
    * 最初に出現した","をメディアタイプとデータの区切りとみなす。（メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする）
    * 
    * @experimental
    * @param dataUrl Data URL
    * @returns 生成したインスタンス
    */
-  static fromDataUrl(dataUrl: string): FileLike {
-    if (/^data:/i.test(dataUrl) !== true) {
+  static fromDataUrl(dataUrl: Uri | string): FileLike {
+    let uri: Uri;
+    if (dataUrl instanceof Uri) {
+      uri = dataUrl;
+    }
+    else {
+      uri = new Uri(dataUrl);
+    }
+
+    // 1
+    if (uri.scheme !== "data") {
       throw new TypeError("dataUrl");
     }
 
-    let work = dataUrl.substring(5);
+    // 2
+    uri = uri.withoutFragment();
 
-    if (work.includes(",") !== true) {
+    // 3, 4
+    let bodyStringWork = uri.toString().substring(5);
+
+    // 5, 6, 7
+    if (bodyStringWork.includes(",") !== true) {
       throw new Exception("DataError", "U+002C not found");
     }
 
-    let mediaTypeOriginal = work.split(",")[0] as string;
-    if (mediaTypeOriginal.endsWith(";base64")) { // TODO 末尾スペースでもok
-      mediaTypeOriginal = mediaTypeOriginal.substring(0, mediaTypeOriginal.length - 7);
-    }
-    mediaTypeOriginal = trimAsciiSpace(mediaTypeOriginal);
+    const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
+    let mediaTypeWork = trimAsciiSpace(mediaTypeOriginal);
 
-    const mediaType = MediaType.fromString(mediaTypeOriginal);
-    work = work.substring(mediaTypeOriginal.length);
+    // 8, 9
+    bodyStringWork = bodyStringWork.substring(mediaTypeOriginal.length + 1);
 
-    let encoded: string;
-    let bytes: ByteSequence;
-    if (work.startsWith(";base64,")) {
-      encoded = work.substring(8);
-      bytes = ByteSequence.fromBase64(encoded);
-    }
-    else if (work.startsWith(",")) {
-      encoded = work.substring(1);
-      bytes = ByteSequence.fromPercent(encoded);
-    }
-    else {
-      // ","がメディアタイプに後続していない場合
-      throw new Exception("DataError", "parsing error");
+    // 10
+    let bodyWork = ByteSequence.fromPercent(bodyStringWork);
+
+    // 11
+    const base64Indicator = /;[\u0020]*base64$/i;
+    const base64: boolean = base64Indicator.test(mediaTypeWork);
+    if (base64 === true) {
+      // 11.1
+      bodyStringWork = bodyWork.toBinaryString();
+
+      // 11.2, 11.3
+      bodyWork = ByteSequence.fromBase64(bodyStringWork, { forgiving: true });
+
+      // 11.4, 11.5, 11.6
+      mediaTypeWork = mediaTypeWork.replace(base64Indicator, "");
     }
 
-    return new FileLike(mediaType, bytes);
+    // 12
+    if (mediaTypeWork.startsWith(";")) {
+      mediaTypeWork = "text/plain" + mediaTypeWork;
+    }
+
+    // 13, 14
+    let mediaType: MediaType;
+    try {
+      mediaType = MediaType.fromString(mediaTypeWork);
+    }
+    catch (exception) {
+      void exception;
+      mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
+    }
+
+    return new FileLike(mediaType, bodyWork);
   }
 
   // TODO
@@ -149,7 +176,7 @@ class FileLike {
    * @param base64 バイト列をBase64符号化するか否か
    * @returns Data URL
    */
-  // toDataUrl(base64 = true): string {
+  // toDataUrl(base64 = true): Uri {
   //   let encoding = "";
   //   let dataText = "";
   //   if (base64 === true) {

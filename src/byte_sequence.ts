@@ -6,7 +6,8 @@ import { Exception, getCrypto } from "./_";
 import { uint8 } from "./byte/type";
 import {
   Base64,
-  Base64Options,
+  Base64DecodeOptions,
+  Base64EncodeOptions,
   Format,
   FormatOptions,
   FormatRadix,
@@ -190,7 +191,7 @@ class ByteSequence {
   }
 
   /**
-   * バイト列を表すBinary stringをもとにインスタンスを生成し返却
+   * バイト列を表すBinary stringを同型符号化し、インスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
    * 
    * @param binaryString バイト列を表すBinary string
@@ -208,7 +209,7 @@ class ByteSequence {
   }
 
   /**
-   * 自身のバイト列を表すBinary stringを生成し返却
+   * 自身のバイト列を同型復号し、結果のBinary stringを生成し返却
    * 
    * @returns Binary string
    */
@@ -251,7 +252,7 @@ class ByteSequence {
    * @param options 符号化方式のオプション
    * @returns 生成したインスタンス
    */
-  static fromBase64(base64Encoded: string, options?: Base64Options): ByteSequence {
+  static fromBase64(base64Encoded: string, options?: Base64DecodeOptions): ByteSequence {
     const decoded = Base64.decode(base64Encoded, options);
     return new ByteSequence(decoded.buffer);
   }
@@ -262,7 +263,7 @@ class ByteSequence {
    * @param options 符号化方式のオプション
    * @returns Base64符号化した文字列
    */
-  toBase64(options?: Base64Options): string {
+  toBase64(options?: Base64EncodeOptions): string {
     return Base64.encode(this.view(), options);
   }
 
