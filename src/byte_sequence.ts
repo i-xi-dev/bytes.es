@@ -8,6 +8,8 @@ import {
   Base64,
   Base64DecodeOptions,
   Base64EncodeOptions,
+  DigestAlgorithm,
+  DigestAlgorithmImplementation,
   Format,
   FormatOptions,
   FormatRadix,
@@ -16,7 +18,6 @@ import {
   PercentDecodeOptions,
   PercentEncodeOptions,
   ReadableStreamType,
-  Sha256,
   StreamReader,
   StreamReadOptions,
 } from "./byte/index";
@@ -292,13 +293,22 @@ class ByteSequence {
   /**
    * 自身のバイト列のハッシュを生成し返却
    * 
-   * @param algorithmName ハッシュアルゴリズム名
-   * @param options ハッシュアルゴリズムのオプション
+   * @param algorithm ハッシュアルゴリズム
+   * @returns 生成したハッシュのバイト列で解決されるPromise
+   */
+  async toDigest(algorithm: DigestAlgorithmImplementation): Promise<ByteSequence> {
+    const digest = await algorithm.compute(this.#bytes);
+    return new ByteSequence(digest.buffer);
+  }
+
+  /**
+   * 自身のバイト列のSHA-256ハッシュを生成し返却
+   * 
    * @returns 生成したハッシュのバイト列で解決されるPromise
    */
   async toSha256(): Promise<ByteSequence> {
-    const digest = await Sha256.compute(this.#bytes);
-    return new ByteSequence(digest.buffer);
+    const algorithm = DigestAlgorithm.for("SHA-256");
+    return this.toDigest(algorithm);
   }
 
   /**

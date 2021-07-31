@@ -4,18 +4,18 @@ import { getCrypto } from "../../_";
 import { DigestAlgorithmImplementation } from "./_";
 
 /**
- * Computes the SHA-256 digest for the byte sequence.
+ * Computes the SHA-384 digest for the byte sequence.
  * 
  * @see {@link DigestAlgorithmImplementation.compute}
  */
 async function compute(input: Uint8Array): Promise<Uint8Array> {
-  const digestBuffer = await getCrypto().subtle.digest("SHA-256", input);
+  const digestBuffer = await getCrypto().subtle.digest("SHA-384", input);
   return new Uint8Array(digestBuffer);
 }
 
 /**
- * SHA-256 digest algorithm
+ * SHA-384 digest algorithm
  */
-export const Sha256: DigestAlgorithmImplementation = {
+export const Sha384: DigestAlgorithmImplementation = {
   compute,
 };

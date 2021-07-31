@@ -1,8 +1,10 @@
-import { Format, Sha256 } from "../../../../dist/byte/index.js";
+import { Format, DigestAlgorithm } from "../../../../dist/byte/index.js";
 
 describe("Sha256.compute", () => {
+  const sha256 = DigestAlgorithm.for("SHA-256");
+
   test("compute(Uint8Array)", async () => {
-    const digest = await Sha256.compute(Uint8Array.of());
+    const digest = await sha256.compute(Uint8Array.of());
     expect(Format.format(digest, 16)).toBe("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
 
   });
