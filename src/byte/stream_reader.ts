@@ -21,7 +21,7 @@ type Options = {
   /**
    * 中断シグナル（絶え間なく読めるストリームの場合、すべて読み取るまで中断されない）
    */
-  abortSignal?: AbortSignal,
+  signal?: AbortSignal,
 
   // /**
   //  * 未実装（絶え間なく読めるストリームの場合、すべて読み取るまでタイムアウトされない）
@@ -38,13 +38,19 @@ type Options = {
  * 未設定を許可しないストリーム読取オプション
  */
 type ResolvedOptions = {
-  /** 読取ProgressEventのターゲット */
+  /**
+   * @see {@link Options.listenerTarget}
+   */
   listenerTarget: EventTarget | null,
 
-  /** 中断シグナル */
-  abortSignal: AbortSignal | null,
+  /**
+   * @see {@link Options.signal}
+   */
+  signal: AbortSignal | null,
 
-  /** 見積サイズが明示されている場合に、見積サイズと実サイズの不一致を許容するか否か */
+  /**
+   * @see {@link Options.acceptSizeMismatch}
+   */
   acceptSizeMismatch: boolean,
 };
 
@@ -56,12 +62,12 @@ type ResolvedOptions = {
  */
 function resolveOptions(options: Options = {}): ResolvedOptions {
   const listenerTarget = (options.listenerTarget instanceof EventTarget) ? options.listenerTarget : null;
-  const abortSignal = (options.abortSignal instanceof AbortSignal) ? options.abortSignal : null;
+  const signal = (options.signal instanceof AbortSignal) ? options.signal : null;
   const acceptSizeMismatch: boolean = (typeof options.acceptSizeMismatch === "boolean") ? options.acceptSizeMismatch : false;
 
   return {
     listenerTarget,
-    abortSignal,
+    signal,
     acceptSizeMismatch,
   };
 }
@@ -159,13 +165,13 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
     chunkGenerator = createChunkGeneratorN(stream as NodeJS.ReadStream);
   }
 
-  if (resolvedOptions.abortSignal !== null) {
-    if (resolvedOptions.abortSignal.aborted === true) {
+  if (resolvedOptions.signal !== null) {
+    if (resolvedOptions.signal.aborted === true) {
       throw new Exception("AbortError", "already aborted");
     }
 
     if (globalThis.ReadableStream && (stream instanceof ReadableStream)) {
-      resolvedOptions.abortSignal.addEventListener("abort", (): void => {
+      resolvedOptions.signal.addEventListener("abort", (): void => {
         // stream.cancel()しても読取終了まで待ちになるので、reader.cancel()する
         void reader.cancel().catch(); // XXX closeで良い？
       }, {
@@ -173,7 +179,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
       });
     }
     else {
-      resolvedOptions.abortSignal.addEventListener("abort", () => {
+      resolvedOptions.signal.addEventListener("abort", () => {
         (stream as NodeJS.ReadStream).destroy();
       }, {
         once: true,
@@ -202,7 +208,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
 
     notify(resolvedOptions.listenerTarget, "progress", loadedByteCount, totalByteCount);
   }
-  if (resolvedOptions.abortSignal?.aborted === true) {
+  if (resolvedOptions.signal?.aborted === true) {
     throw new Exception("AbortError", "aborted");
   }
 

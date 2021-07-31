@@ -42,17 +42,17 @@ describe("StreamReader.read", () => {
 
   });
 
-  test("read(NodeJS.ReadableStream, number, StreamReaderOptions) - abortSignal", async () => {
+  test("read(NodeJS.ReadableStream, number, StreamReaderOptions) - signal", async () => {
     const stream = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
     const ac = new AbortController();
-    const bytes = await StreamReader.read(stream, 128, {abortSignal: ac.signal});
+    const bytes = await StreamReader.read(stream, 128, {signal: ac.signal});
     expect(bytes.byteLength).toBe(128);
 
     const stream2 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
     const ac2 = new AbortController();
     ac2.abort();
     await expect(
-      StreamReader.read(stream2, 128, {abortSignal: ac2.signal})
+      StreamReader.read(stream2, 128, {signal: ac2.signal})
     ).rejects.toThrow("aborted");
 
     const stream3 = new Readable({
@@ -70,7 +70,7 @@ describe("StreamReader.read", () => {
         stream3.push(new Uint8Array(64));
       }
     }, 2);
-    const bytes3 = await StreamReader.read(stream3, undefined, {abortSignal: ac3.signal});
+    const bytes3 = await StreamReader.read(stream3, undefined, {signal: ac3.signal});
     expect(bytes3.byteLength).toBe(640);
 
     const stream4 = new Readable({
@@ -89,7 +89,7 @@ describe("StreamReader.read", () => {
       }
     }, 2);
     await expect(
-      StreamReader.read(stream4, undefined, {abortSignal: ac4.signal})
+      StreamReader.read(stream4, undefined, {signal: ac4.signal})
     ).rejects.toThrow("aborted");
 
   });

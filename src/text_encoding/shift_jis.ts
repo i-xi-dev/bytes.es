@@ -1,10 +1,8 @@
 //
 
-// Shift_JIS符号化方式
-
 import { Exception } from "../_";
 import { uint8 } from "../byte/type";
-import { TextDecodeOptions, TextEncodeOptions, TextEncodingImpl } from "./_";
+import { TextDecodeOptions, TextEncodeOptions, TextEncodingImplementation } from "./_";
 
 /**
  * 符号化方式名
@@ -28,6 +26,7 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
     return decoder.decode(encoded);
   }
   catch (exception) {
+    // encodedのバイトの並びがおかしい場合
     throw new Exception("EncodingError", "decode error", [ exception ]);
   }
 }
@@ -69,7 +68,7 @@ function shiftJisBytes(char: string): [ uint8 ] | [ uint8, uint8 ] {
 
   // 8.
   if (typeof pointer !== "number") {
-    // XXX 置換もできるようにする
+    // XXX options.fallback未実装
     throw new Exception("EncodingError", `U+${ codePoint.toString(16).toUpperCase().padStart(4, "0") }`);
   }
 
@@ -7851,7 +7850,12 @@ const TABLE = new Map<number, number>([
   [ 0x9ED1, 11103 ],
 ]);
 
-export const ShiftJis: TextEncodingImpl = {
+/**
+ * Windows-31J encoding of JIS X 0201 and JIS X 0208 characters
+ * 
+ * Implements "Shift_JIS" of {@link https://encoding.spec.whatwg.org/ Encoding Standard}.
+ */
+export const ShiftJis: TextEncodingImplementation = {
   name: NAME,
   decode,
   encode,

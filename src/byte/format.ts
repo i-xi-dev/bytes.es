@@ -1,7 +1,5 @@
 //
 
-// バイト列のフォーマッター
-
 import { devideStringByLength, Exception } from "../_";
 import { isByte, uint8 } from "./type";
 
@@ -14,16 +12,24 @@ type Radix = 2 | 8 | 10 | 16;
  * フォーマッターのオプション
  */
 type Options = {
-  /** 前方埋め結果の文字列長 */
+  /**
+   * 前方埋め結果の文字列長
+   */
   paddedLength?: number,
 
-  /** 16進数のa-fを大文字にするか否か */
+  /**
+   * 16進数のa-fを大文字にするか否か
+   */
   upperCase?: boolean,
 
-  /** プレフィックス */
+  /**
+   * プレフィックス
+   */
   prefix?: string,
 
-  /** サフィックス */
+  /**
+   * サフィックス
+   */
   suffix?: string,
 };
 
@@ -31,7 +37,9 @@ type Options = {
  * フォーマッターのパースオプション
  */
 type ParseOptions = Options & {
-  /** 基数が16の場合のA-Fの大文字小文字を無視するか否か */
+  /**
+   * 基数が16の場合のA-Fの大文字小文字を無視するか否か
+   */
   caseInsensitive?: boolean,
 };
 
@@ -45,19 +53,29 @@ type FormatOptions = Options & {
  * 未設定を許可しないフォーマッターのオプション
  */
 type ResolvedOptions = {
-  /** 前方埋め結果の文字列長 */
+  /**
+   * @see {@link Options.paddedLength}
+   */
   paddedLength: number,
 
-  /** 16進数のa-fを大文字にするか否か */
+  /**
+   * @see {@link Options.upperCase}
+   */
   upperCase: boolean,
 
-  /** プレフィックス */
+  /**
+   * @see {@link Options.prefix}
+   */
   prefix: string,
 
-  /** サフィックス */
+  /**
+   * @see {@link Options.suffix}
+   */
   suffix: string,
 
-  /** 基数が16の場合のA-Fの大文字小文字を無視するか否か（パースでのみ使用。フォーマットでは無視する） */
+  /**
+   * @see {@link ParseOptions.caseInsensitive}
+   */
   caseInsensitive: boolean,
 };
 
@@ -277,6 +295,9 @@ export {
   FormatOptions,
 };
 
+/**
+ * Byte Formatting
+ */
 export const Format = {
   parse,
   format,

@@ -51,7 +51,7 @@ describe("ByteSequence.fromByteStream", () => {
     const ac = new AbortController();
     ac.abort();
     await expect(
-      ByteSequence.fromByteStream(streamb, 128, { abortSignal: ac.signal })
+      ByteSequence.fromByteStream(streamb, 128, { signal: ac.signal })
     ).rejects.toThrow("already aborted");
 
   });

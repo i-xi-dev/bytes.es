@@ -43,7 +43,7 @@ const BOM = "\u{FEFF}";
 /**
  * 文字符号化方式
  */
-interface TextEncodingImpl {
+interface TextEncodingImplementation {
   /**
    * 名称
    */
@@ -72,5 +72,5 @@ export {
   DecodeOptions as TextDecodeOptions,
   EncodeOptions as TextEncodeOptions,
   BOM,
-  TextEncodingImpl,
+  TextEncodingImplementation,
 };
