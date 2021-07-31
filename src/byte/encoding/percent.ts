@@ -1,7 +1,5 @@
 //
 
-// パーセント符号化方式
-
 import { Exception } from "../../_";
 import { isByte, uint8 } from "../type";
 import { Format } from "../format";
@@ -311,6 +309,9 @@ export {
   EncodeOptions as PercentEncodeOptions,
 };
 
+/**
+ * Percent encoding
+ */
 export const Percent = {
   decode,
   encode,

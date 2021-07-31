@@ -7,6 +7,28 @@ describe("Base64.decode", () => {
     const decoded12 = Base64.decode("AwIBAP/+/fw=");
     expect(JSON.stringify([...decoded12])).toBe("[3,2,1,0,255,254,253,252]");
 
+    expect(() => {
+      Base64.decode("あ");
+    }).toThrow("decode error (1)");
+    expect(() => {
+      Base64.decode("AwIBAP_-_fw=");
+    }).toThrow("decode error (1)");
+    expect(() => {
+      Base64.decode("AwIBAP/+/fw");
+    }).toThrow("decode error (2)");
+    expect(() => {
+      Base64.decode("=AwIBAP/+/fw");
+    }).toThrow("decode error (1)");
+    expect(() => {
+      Base64.decode("=");
+    }).toThrow("decode error (1)");
+    expect(() => {
+      Base64.decode("AwIBAP/+/fw,");
+    }).toThrow("decode error (1)");
+
+  });
+
+  test("decode(string, Object)", () => {
     const decoded22 = Base64.decode("AwIBAP_-_fw=", {_62ndChar:"-", _63rdChar:"_"});
     expect(JSON.stringify([...decoded22])).toBe("[3,2,1,0,255,254,253,252]");
 
@@ -49,26 +71,24 @@ describe("Base64.decode", () => {
     expect(Array.from(Base64.decode(Buffer.from(r9).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r9).join(","));
 
     expect(() => {
-      Base64.decode("あ");
-    }).toThrow("decode error (1)");
-    expect(() => {
-      Base64.decode("AwIBAP_-_fw=");
-    }).toThrow("decode error (1)");
-    expect(() => {
-      Base64.decode("AwIBAP/+/fw");
-    }).toThrow("decode error (2)");
-    expect(() => {
-      Base64.decode("=AwIBAP/+/fw");
-    }).toThrow("decode error (1)");
-    expect(() => {
-      Base64.decode("=");
-    }).toThrow("decode error (1)");
-    expect(() => {
-      Base64.decode("AwIBAP/+/fw,");
-    }).toThrow("decode error (1)");
-
-    expect(() => {
       Base64.decode("AwIBAP/+/fw=", {usePadding:false});
     }).toThrow("decode error (1)");
+
+    const decoded52 = Base64.decode("AwIBAP/+/fw=", { forgiving: true });
+    expect(JSON.stringify([...decoded52])).toBe("[3,2,1,0,255,254,253,252]");
+    const decoded53 = Base64.decode("AwIBAP/+/fw=", { forgiving: false });
+    expect(JSON.stringify([...decoded53])).toBe("[3,2,1,0,255,254,253,252]");
+    const decoded54 = Base64.decode(" AwIB AP/+/fw= ", { forgiving: true });
+    expect(JSON.stringify([...decoded54])).toBe("[3,2,1,0,255,254,253,252]");
+    const decoded55 = Base64.decode("AwIBAP/+/fw", { forgiving: true });
+    expect(JSON.stringify([...decoded55])).toBe("[3,2,1,0,255,254,253,252]");
+
+    expect(() => {
+      Base64.decode("AwIあAP/+/fw", { forgiving: true });
+    }).toThrow("decode error (1)");
+    expect(() => {
+      Base64.decode("AAAAA", { forgiving: true });
+    }).toThrow("forgiving decode error");
+
   });
 });

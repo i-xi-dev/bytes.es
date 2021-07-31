@@ -11,6 +11,18 @@ describe("FileLike.fromDataUrl", () => {
     expect(b0b.size).toBe(0);
     expect(b0b.mediaType.toString()).toBe("text/plain");
 
+    const b0c = FileLike.fromDataUrl("data: ,");
+    expect(b0c.size).toBe(0);
+    expect(b0c.mediaType.toString()).toBe("text/plain;charset=US-ASCII");
+
+    const b0d = FileLike.fromDataUrl("data: ; ,");
+    expect(b0d.size).toBe(0);
+    expect(b0d.mediaType.toString()).toBe("text/plain");
+
+    const b0e = FileLike.fromDataUrl("data: ; x=y ,");
+    expect(b0e.size).toBe(0);
+    expect(b0e.mediaType.toString()).toBe("text/plain;x=y");
+
     const b11 = FileLike.fromDataUrl("data:text/plain,a1");
     const b11v = b11.bytes.view();
     expect(b11v[0]).toBe(97);

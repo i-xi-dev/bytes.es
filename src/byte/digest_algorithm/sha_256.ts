@@ -1,7 +1,5 @@
 //
 
-// SHA-256ハッシュアルゴリズム
-
 import { getCrypto } from "../../_";
 
 /**
@@ -17,6 +15,9 @@ async function compute(toCompute: Uint8Array): Promise<Uint8Array> {
   return new Uint8Array(digestBuffer);
 }
 
+/**
+ * SHA-256 digest algorithm
+ */
 export const Sha256 = {
   compute,
 };

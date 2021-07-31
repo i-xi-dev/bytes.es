@@ -1,7 +1,5 @@
 //
 
-// Base64符号化方式
-
 import { Exception } from "../../_";
 import { uint8 } from "../type";
 
@@ -32,6 +30,20 @@ type Options = {
 };
 
 /**
+ * Base64符号化の復号オプション
+ */
+type DecodeOptions = Options & {
+  /** https://infra.spec.whatwg.org/#forgiving-base64-decode の仕様でデコードするか否か */
+  forgiving?: boolean,
+};
+
+/**
+ * Base64符号化の符号化オプション
+ */
+type EncodeOptions = Options & {
+};
+
+/**
  * 未設定を許可しないBase64符号化方式オプション
  */
 type ResolvedOptions = {
@@ -43,6 +55,9 @@ type ResolvedOptions = {
 
   /** パディングを付加するか否か */
   usePadding: boolean,
+
+  /** https://infra.spec.whatwg.org/#forgiving-base64-decode の仕様でデコードするか否か */
+  forgiving: boolean,
 };
 
 /**
@@ -141,7 +156,7 @@ const DEFAULT_USE_PADDING = true;
  * @param options Base64符号化方式オプション
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたBase64符号化方式オプション
  */
-function resolveOptions(options: Options = {}): ResolvedOptions {
+function resolveOptions(options: DecodeOptions | EncodeOptions = {}): ResolvedOptions {
   const _62ndChar: _62ndCharType = (typeof options._62ndChar === "string") ? options._62ndChar : DEFAULT_62ND_CHAR;
   // if (BASE_TABLE.includes(_62ndChar)) { Base64_62ndCharに不正な値を追加しない限り不要
   //  throw new TypeError("_62ndChar");
@@ -155,10 +170,16 @@ function resolveOptions(options: Options = {}): ResolvedOptions {
   // }
   const usePadding: boolean = (typeof options.usePadding === "boolean") ? options.usePadding : DEFAULT_USE_PADDING;
 
+  let forgiving = false;
+  if ("forgiving" in options) {
+    forgiving = (options.forgiving === true);
+  }
+
   return {
     _62ndChar,
     _63rdChar,
     usePadding,
+    forgiving,
   };
 }
 
@@ -188,7 +209,7 @@ function isEncoded(encoded: string, resolvedOptions: ResolvedOptions): boolean {
   const _63rdCharPattern = `\\u{${ resolvedOptions._63rdChar.charCodeAt(0).toString(16) }}`;
   const bodyPattern = `[A-Za-z0-9${ _62ndCharPattern }${ _63rdCharPattern }]`;
   let regex: RegExp;
-  if (resolvedOptions.usePadding === true) {
+  if ((resolvedOptions.usePadding === true) && (resolvedOptions.forgiving !== true)) {
     const paddingPattern = `\\u{${ PADDING_CHAR.charCodeAt(0).toString(16) }}`;
     regex = new RegExp(`^(${ bodyPattern }+${ paddingPattern }*|${ bodyPattern }*)$`, "u");
   }
@@ -202,6 +223,7 @@ function isEncoded(encoded: string, resolvedOptions: ResolvedOptions): boolean {
 /**
  * 文字列をバイト列にBase64復号し、結果のバイト列を返却
  * 
+ * {@link https://infra.spec.whatwg.org/#forgiving-base64-decode Infra Standard}および、
  * {@link https://datatracker.ietf.org/doc/html/rfc4648 RFC 4648}の仕様に従った。
  * 改行には非対応（必要であれば改行を除去してからdecodeすべし）。
  * 
@@ -209,37 +231,63 @@ function isEncoded(encoded: string, resolvedOptions: ResolvedOptions): boolean {
  * @param options Base64符号化方式オプション
  * @returns バイト列
  */
-function decode(encoded: string, options?: Options): Uint8Array {
+function decode(encoded: string, options?: DecodeOptions): Uint8Array {
   const resolvedOptions: ResolvedOptions = resolveOptions(options);
-  if (isEncoded(encoded, resolvedOptions) !== true) {
+
+  let work: string = encoded;
+  if (resolvedOptions.forgiving === true) {
+    work = work.replaceAll(/[\u{9}\u{A}\u{C}\u{D}\u{20}]/gu, "");
+  }
+
+  if (resolvedOptions.forgiving === true) {
+    // work.lengthの箇所は、仕様では符号位置数だがlengthを使用する
+    // length !== 符号位置数の場合の処理結果が正しくなくなるが、そうなったとしてもisEncodedでエラーとなる為問題は無いはず
+
+    if ((work.length % 4) === 0) {
+      for (let i = 0; i < 2; i++) {
+        if (work.endsWith(PADDING_CHAR)) {
+          work = work.substring(0, (work.length - 1));
+        }
+        else {
+          break;
+        }
+      }
+    }
+
+    if ((work.length % 4) === 1) {
+      throw new Exception("EncodingError", "forgiving decode error");
+    }
+  }
+
+  if (isEncoded(work, resolvedOptions) !== true) {
     throw new Exception("EncodingError", "decode error (1)");
   }
 
   const table: ReadonlyArray<string> = createTable(resolvedOptions._62ndChar, resolvedOptions._63rdChar);
 
-  const paddingStart = encoded.indexOf(PADDING_CHAR);
+  const paddingStart = work.indexOf(PADDING_CHAR);
   let paddingCount: number;
   let encodedBody: string;
-  if (resolvedOptions.usePadding === true) {
-    if ((encoded.length % 4) !== 0) {
+  if ((resolvedOptions.usePadding === true) && (resolvedOptions.forgiving !== true)) {
+    if ((work.length % 4) !== 0) {
       throw new Exception("EncodingError", "decode error (2)");
     }
 
     if (paddingStart >= 0) {
-      paddingCount = encoded.length - paddingStart;
-      encodedBody = encoded.substring(0, paddingStart);
+      paddingCount = work.length - paddingStart;
+      encodedBody = work.substring(0, paddingStart);
     }
     else {
       paddingCount = 0;
-      encodedBody = encoded;
+      encodedBody = work;
     }
   }
   else {
     // if (paddingStart >= 0) {
     //  throw new Exception("InvalidCharacterError", "decode error (3)"); (1)で例外になる
     // }
-    paddingCount = (encoded.length % 4 === 0) ? 0 : 4 - (encoded.length % 4);
-    encodedBody = encoded;
+    paddingCount = (work.length % 4 === 0) ? 0 : 4 - (work.length % 4);
+    encodedBody = work;
   }
 
   let _6bit1: number;
@@ -281,6 +329,7 @@ function decode(encoded: string, options?: Options): Uint8Array {
 /**
  * バイト列を文字列にBase64符号化し、結果の文字列を返却
  * 
+ * {@link https://infra.spec.whatwg.org/#forgiving-base64-decode Infra Standard}および、
  * {@link https://datatracker.ietf.org/doc/html/rfc4648 RFC 4648}の仕様に従った。
  * 改行には非対応（必要であればencode結果を改行すべし）。
  * 
@@ -288,7 +337,7 @@ function decode(encoded: string, options?: Options): Uint8Array {
  * @param options Base64符号化方式オプション
  * @returns Base64符号化された文字列
  */
-function encode(toEncode: Uint8Array, options?: Options): string {
+function encode(toEncode: Uint8Array, options?: EncodeOptions): string {
   const resolvedOptions: ResolvedOptions = resolveOptions(options);
   const table: ReadonlyArray<string> = createTable(resolvedOptions._62ndChar, resolvedOptions._63rdChar);
 
@@ -332,9 +381,13 @@ function encode(toEncode: Uint8Array, options?: Options): string {
 }
 
 export {
-  Options as Base64Options,
+  DecodeOptions as Base64DecodeOptions,
+  EncodeOptions as Base64EncodeOptions,
 };
 
+/**
+ * Base64 encoding
+ */
 export const Base64 = {
   decode,
   encode,
