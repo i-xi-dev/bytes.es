@@ -95,6 +95,7 @@ class FileLike {
    * 
    * {@link https://fetch.spec.whatwg.org/#data-urls Fetch Standard}の仕様に従った。
    * 最初に出現した","をメディアタイプとデータの区切りとみなす。（メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする）
+   * クエリはデータの一部とみなす。
    * 
    * @experimental
    * @param dataUrl Data URL

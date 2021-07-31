@@ -74,6 +74,16 @@ describe("FileLike.fromDataUrl", () => {
     expect(b32.size).toBe(2);
     expect(b32.mediaType.toString()).toBe("text/plain");
 
+    const b33 = FileLike.fromDataUrl("data:text/plain,a?a=2");
+    const b33v = b33.bytes.view();
+    expect(b33v[0]).toBe(0x61);
+    expect(b33v[1]).toBe(0x3F);
+    expect(b33v[2]).toBe(0x61);
+    expect(b33v[3]).toBe(0x3D);
+    expect(b33v[4]).toBe(0x32);
+    expect(b33.size).toBe(5);
+    expect(b33.mediaType.toString()).toBe("text/plain");
+
   });
 
 });
