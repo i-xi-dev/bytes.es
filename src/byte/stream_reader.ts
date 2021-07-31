@@ -40,8 +40,10 @@ type Options = {
 type ResolvedOptions = {
   /** 読取ProgressEventのターゲット */
   listenerTarget: EventTarget | null,
+
   /** 中断シグナル */
   abortSignal: AbortSignal | null,
+
   /** 見積サイズが明示されている場合に、見積サイズと実サイズの不一致を許容するか否か */
   acceptSizeMismatch: boolean,
 };
@@ -165,7 +167,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
     if (globalThis.ReadableStream && (stream instanceof ReadableStream)) {
       resolvedOptions.abortSignal.addEventListener("abort", (): void => {
         // stream.cancel()しても読取終了まで待ちになるので、reader.cancel()する
-        void reader.cancel().catch(); // TODO closeで良い？
+        void reader.cancel().catch(); // XXX closeで良い？
       }, {
         once: true,
       });

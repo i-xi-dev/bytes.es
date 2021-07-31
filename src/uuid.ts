@@ -3,6 +3,7 @@
 // UUID
 
 import { ByteSequence } from "./byte_sequence";
+import { Uri } from "./uri";
 
 /**
  * UUID（RFC 4122）
@@ -128,8 +129,8 @@ class Uuid {
    * 
    * @returns UUID URN
    */
-  toUrn(): string {
-    return "urn:uuid:" + this.format();
+  toUrn(): Uri {
+    return new Uri("urn:uuid:" + this.format());
   }
 }
 Object.freeze(Uuid);

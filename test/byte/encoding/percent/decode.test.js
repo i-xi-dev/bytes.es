@@ -12,25 +12,25 @@ describe("Percent.decode", () => {
     const decoded13 = Percent.decode("1%00 !~%7F%E3%81%82+");
     expect(JSON.stringify([...decoded13])).toBe(JSON.stringify([...utf8Bytes1]));
 
-    const decoded21 = Percent.decode("%03%02%01%00%FF%FE%FD%FC", {inclusions:[32]});
+    const decoded21 = Percent.decode("%03%02%01%00%FF%FE%FD%FC");
     expect(JSON.stringify([...decoded21])).toBe("[3,2,1,0,255,254,253,252]");
-    const decoded22 = Percent.decode("%03%20%02%01%00%FF%FE%FD%FC", {inclusions:[32]});
+    const decoded22 = Percent.decode("%03%20%02%01%00%FF%FE%FD%FC");
     expect(JSON.stringify([...decoded22])).toBe("[3,32,2,1,0,255,254,253,252]");
-    const decoded23 = Percent.decode("1%00%20!~%7F%E3%81%82+", {inclusions:[32]});
+    const decoded23 = Percent.decode("1%00%20!~%7F%E3%81%82+");
     expect(JSON.stringify([...decoded23])).toBe(JSON.stringify([...utf8Bytes1]));
 
-    const decoded31 = Percent.decode("%03+%02%01%00%FF%FE%FD%FC", {inclusions:[32,0x2B],spaceAsPlus:true});
+    const decoded31 = Percent.decode("%03+%02%01%00%FF%FE%FD%FC", {spaceAsPlus:true});
     expect(JSON.stringify([...decoded31])).toBe("[3,32,2,1,0,255,254,253,252]");
-    const decoded32 = Percent.decode("%03+%02%01%00%FF%FE%FD%2B%FC", {inclusions:[32,0x2B],spaceAsPlus:true});
+    const decoded32 = Percent.decode("%03+%02%01%00%FF%FE%FD%2B%FC", {spaceAsPlus:true});
     expect(JSON.stringify([...decoded32])).toBe("[3,32,2,1,0,255,254,253,43,252]");
-    const decoded33 = Percent.decode("1%00+!~%7F%E3%81%82%2B", {inclusions:[32,0x2B],spaceAsPlus:true});
+    const decoded33 = Percent.decode("1%00+!~%7F%E3%81%82%2B", {spaceAsPlus:true});
     expect(JSON.stringify([...decoded33])).toBe(JSON.stringify([...utf8Bytes1]));
 
-    const decoded41 = Percent.decode("%03%20%02%01%00%FF%FE%FD%FC", {inclusions:[32,0x2B]});
+    const decoded41 = Percent.decode("%03%20%02%01%00%FF%FE%FD%FC");
     expect(JSON.stringify([...decoded41])).toBe("[3,32,2,1,0,255,254,253,252]");
-    const decoded42 = Percent.decode("%03%20%02%01%00%FF%FE%FD%2B%FC", {inclusions:[32,0x2B]});
+    const decoded42 = Percent.decode("%03%20%02%01%00%FF%FE%FD%2B%FC");
     expect(JSON.stringify([...decoded42])).toBe("[3,32,2,1,0,255,254,253,43,252]");
-    const decoded43 = Percent.decode(globalThis.encodeURIComponent("1\u{0} !~\u{7F}あ+"), {inclusions:[32,0x2B]});
+    const decoded43 = Percent.decode(globalThis.encodeURIComponent("1\u{0} !~\u{7F}あ+"));
     expect(JSON.stringify([...decoded43])).toBe(JSON.stringify([...utf8Bytes1]));
 
     const decoded52b = Percent.decode("%03%02%01%00%FF%FE%FD%FC%20%41");

@@ -69,7 +69,7 @@ function shiftJisBytes(char: string): [ uint8 ] | [ uint8, uint8 ] {
 
   // 8.
   if (typeof pointer !== "number") {
-    // TODO
+    // XXX 置換もできるようにする
     throw new Exception("EncodingError", `U+${ codePoint.toString(16).toUpperCase().padStart(4, "0") }`);
   }
 

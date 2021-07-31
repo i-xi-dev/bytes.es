@@ -23,8 +23,10 @@ type _63rdCharType = "/" | "_"; // XXX Base64_62ndCharと重複する文字を�
 type Options = {
   /** 変換テーブルの62番目の文字 */
   _62ndChar?: _62ndCharType,
+
   /** 変換テーブルの63番目の文字 */
   _63rdChar?: _63rdCharType,
+
   /** パディングを付加するか否か */
   usePadding?: boolean,
 };
@@ -35,8 +37,10 @@ type Options = {
 type ResolvedOptions = {
   /** 変換テーブルの62番目の文字 */
   _62ndChar: _62ndCharType,
+
   /** 変換テーブルの63番目の文字 */
   _63rdChar: _63rdCharType,
+
   /** パディングを付加するか否か */
   usePadding: boolean,
 };

@@ -16,10 +16,13 @@ type Radix = 2 | 8 | 10 | 16;
 type Options = {
   /** 前方埋め結果の文字列長 */
   paddedLength?: number,
+
   /** 16進数のa-fを大文字にするか否か */
   upperCase?: boolean,
+
   /** プレフィックス */
   prefix?: string,
+
   /** サフィックス */
   suffix?: string,
 };
@@ -44,12 +47,16 @@ type FormatOptions = Options & {
 type ResolvedOptions = {
   /** 前方埋め結果の文字列長 */
   paddedLength: number,
+
   /** 16進数のa-fを大文字にするか否か */
   upperCase: boolean,
+
   /** プレフィックス */
   prefix: string,
+
   /** サフィックス */
   suffix: string,
+
   /** 基数が16の場合のA-Fの大文字小文字を無視するか否か（パースでのみ使用。フォーマットでは無視する） */
   caseInsensitive: boolean,
 };

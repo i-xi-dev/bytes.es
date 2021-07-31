@@ -193,7 +193,6 @@ class ByteSequence {
    * バイト列を表すBinary stringをもとにインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
    * 
-   * @deprecated
    * @param binaryString バイト列を表すBinary string
    * @returns 生成したインスタンス
    */
@@ -211,7 +210,6 @@ class ByteSequence {
   /**
    * 自身のバイト列を表すBinary stringを生成し返却
    * 
-   * @deprecated
    * @returns Binary string
    */
   toBinaryString(): string {
