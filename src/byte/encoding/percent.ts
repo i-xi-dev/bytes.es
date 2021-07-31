@@ -9,10 +9,10 @@ import { Format } from "../format";
  */
 type Options = {
   /**
-   * エンコード時、encodeSetに0x20が含まれているときに、0x20を"+"に符号化するか否か
+   * 符号化時、encodeSetに0x20が含まれているときに、0x20を"+"に符号化するか否か
    *     encodeSetに0x20が含まれていなければ無視する
    *     trueにするときは、encodeSetに"+"(0x2B)を追加する必要がある
-   * デコード時、"+"を0x20に復号するか否か
+   * 復号時、"+"を0x20に復号するか否か
    */
   spaceAsPlus?: boolean,
 };
@@ -27,7 +27,9 @@ type DecodeOptions = Options & {
  * パーセント符号化の符号化オプション
  */
 type EncodeOptions = Options & {
-  /** 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトの配列 */
+  /**
+   * 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトの配列
+   */
   encodeSet?: Array<uint8>,
 };
 
@@ -35,12 +37,13 @@ type EncodeOptions = Options & {
  * 未設定を許可しないパーセント符号化の復号オプション
  */
 type ResolvedOptions = {
-  /** 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトのセット */
+  /**
+   * @see {@link EncodeOptions.encodeSet}
+   */
   encodeSet: Set<uint8>,
 
   /**
-   * エンコード時、encodeSetに0x20が含まれているときに、0x20を"+"に符号化するか否か
-   * デコード時、"+"を0x20に復号するか否か
+   * @see {@link Options.spaceAsPlus}
    */
   spaceAsPlus: boolean,
 };
@@ -262,8 +265,8 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
  * {@link https://url.spec.whatwg.org/ URL Standard}の仕様に従い、"%"に後続する16進数は大文字で固定。
  * （小文字にする必要性は無いと思われるので、小文字にするオプションは提供しない）
  * 
- * 0x20～0x7E(0x25を除く)は、オプションのencodeSetで指定されていなければ"%XX"形式にしないことに注意。
- * すなわち、URLエンコードとして使用するにはURLコンポーネントに応じた変換対象を追加する必要がある。
+ * デフォルトでは全バイトを"%XX"の形に符号化する。
+ * URLエンコードとして使用するには、URLコンポーネントに応じてoptions.encodeSetを設定すること。
  * 
  * @param toEncode バイト列
  * @param options パーセント符号化の符号化オプション

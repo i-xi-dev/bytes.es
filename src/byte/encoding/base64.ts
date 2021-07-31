@@ -19,13 +19,19 @@ type _63rdCharType = "/" | "_"; // XXX Base64_62ndCharと重複する文字を�
  * Base64符号化方式オプション
  */
 type Options = {
-  /** 変換テーブルの62番目の文字 */
+  /**
+   * 変換テーブルの62番目の文字
+   */
   _62ndChar?: _62ndCharType,
 
-  /** 変換テーブルの63番目の文字 */
+  /**
+   * 変換テーブルの63番目の文字
+   */
   _63rdChar?: _63rdCharType,
 
-  /** パディングを付加するか否か */
+  /**
+   * パディングを付加するか否か
+   */
   usePadding?: boolean,
 };
 
@@ -33,7 +39,12 @@ type Options = {
  * Base64符号化の復号オプション
  */
 type DecodeOptions = Options & {
-  /** https://infra.spec.whatwg.org/#forgiving-base64-decode の仕様でデコードするか否か */
+  /**
+   * 復号を寛容に行うか否か
+   * （https://infra.spec.whatwg.org/#forgiving-base64-decode の仕様で復号するか否か）
+   * 
+   * ※trueの場合、usePaddingは無視する
+   */
   forgiving?: boolean,
 };
 
@@ -47,16 +58,24 @@ type EncodeOptions = Options & {
  * 未設定を許可しないBase64符号化方式オプション
  */
 type ResolvedOptions = {
-  /** 変換テーブルの62番目の文字 */
+  /**
+   * @see {@link Options._62ndChar}
+   */
   _62ndChar: _62ndCharType,
 
-  /** 変換テーブルの63番目の文字 */
+  /**
+   * @see {@link Options._63rdChar}
+   */
   _63rdChar: _63rdCharType,
 
-  /** パディングを付加するか否か */
+  /**
+   * @see {@link Options.usePadding}
+   */
   usePadding: boolean,
 
-  /** https://infra.spec.whatwg.org/#forgiving-base64-decode の仕様でデコードするか否か */
+  /**
+   * @see {@link DecodeOptions.forgiving}
+   */
   forgiving: boolean,
 };
 
@@ -151,6 +170,11 @@ const DEFAULT_63RD_CHAR: _63rdCharType = "/";
 const DEFAULT_USE_PADDING = true;
 
 /**
+ * 復号を寛容に行うか否かのデフォルト
+ */
+const DEFAULT_FORGIVING = false;
+
+/**
  * Base64符号化方式オプションを補正したコピーを返却
  * 
  * @param options Base64符号化方式オプション
@@ -170,7 +194,7 @@ function resolveOptions(options: DecodeOptions | EncodeOptions = {}): ResolvedOp
   // }
   const usePadding: boolean = (typeof options.usePadding === "boolean") ? options.usePadding : DEFAULT_USE_PADDING;
 
-  let forgiving = false;
+  let forgiving = DEFAULT_FORGIVING;
   if ("forgiving" in options) {
     forgiving = (options.forgiving === true);
   }
