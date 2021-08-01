@@ -10,7 +10,7 @@ type DecodeOptions = {
    * 当該文字符号化方式では復号できないバイトが含まれていた場合にどうするか
    *     - exception: 例外とする
    *     - replacement: 置換する（置換文字は実装依存（U+FFFDなど））※情報は失われることに注意
-   * 省略時"replacement"
+   * 省略時"replacement" //TODO exceptionをデフォルトにする？
    */
   fallback?: "exception" | "replacement",
 
@@ -25,7 +25,7 @@ type DecodeOptions = {
  * 文字符号化の符号化オプション
  */
 type EncodeOptions = {
-  // XXX fallback 要る？
+  // TODO fallback 
 
   /**
    * 先頭がBOMではない場合に先頭にBOMを付加するか否か
@@ -34,6 +34,8 @@ type EncodeOptions = {
    */
   addBom?: boolean,
 };
+
+// TODO resolveOptions
 
 /**
  * BOM

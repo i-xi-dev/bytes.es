@@ -22,6 +22,7 @@ describe("Utf8.decode", () => {
     expect(() => {
       Utf8.decode(Uint8Array.of(0x31, 0x82, 0xA0, 0x33), {fallback:"exception"});
     }).toThrow("decode error");
+    expect(Utf8.decode(Uint8Array.of(0x31, 0x82, 0xA0, 0x33), {fallback:"replacement"})).toBe("1\u{FFFD}\u{FFFD}3");
 
     // removeBom
     expect(Utf8.decode(Uint8Array.of(0xEF,0xBB,0xBF,49,227,129,130,51,194,169), {removeBom:true})).toBe("1あ3\u{A9}");

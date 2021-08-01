@@ -139,7 +139,7 @@ export default {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  //testEnvironment: "node",//XXX Node.jsのglabalThis.EventがJestから使用できない
+  //testEnvironment: "node",// Node.jsのglabalThis.EventがJestから使用できないので"jsdom"にする
   testEnvironment: "jsdom",
 
   // Options that will be passed to the testEnvironment

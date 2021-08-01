@@ -1,7 +1,5 @@
 //
 
-// URI
-
 import { Exception } from "./_";
 import { ByteSequence } from "./byte_sequence";
 
@@ -80,7 +78,12 @@ class Uri {
     Object.freeze(this);
   }
 
-  // get origin(): string
+  /**
+   * オリジン
+   */
+  get origin(): string | null {
+    return this.#uri.origin === "null" ? null : this.#uri.origin;
+  }
 
   /**
    * スキーム

@@ -22,6 +22,10 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
   try {
     const decoder = new TextDecoder(NAME, {
       fatal: (options.fallback === "exception"),
+      // XXX エラーにしない場合、ブラウザーではU+FFFDに、Node.jsではU+001Aに置換される。
+      //     （元々0x1Aだったのか置換した結果U+001Aになったのか区別できないので注意）
+      //     他にも0x1AがU+001Cになったり、Node.jsのTextDecoder("shift_jis")は、
+      //     https://encoding.spec.whatwg.org/#shift_jis-decoder の仕様と異なるっぽい 要検証
     });
     return decoder.decode(encoded);
   }
@@ -68,7 +72,7 @@ function shiftJisBytes(char: string): [ uint8 ] | [ uint8, uint8 ] {
 
   // 8.
   if (typeof pointer !== "number") {
-    // XXX options.fallback未実装
+    // TODO options.fallback未実装
     throw new Exception("EncodingError", `U+${ codePoint.toString(16).toUpperCase().padStart(4, "0") }`);
   }
 

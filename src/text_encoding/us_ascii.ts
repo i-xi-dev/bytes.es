@@ -24,8 +24,10 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
   const decoded = decoder.decode(encoded);
 
   if (/^[\u{0}-\u{7F}]*$/u.test(decoded) !== true) {
-    throw new Exception("EncodingError", "decode error");
-    // XXX options.fallback未実装
+    if (options.fallback === "exception") {
+      throw new Exception("EncodingError", "decode error");
+    }
+    return decoded.replaceAll(/[^\u{0}-\u{7F}]/gu, "\u{FFFD}");
   }
   return decoded;
 }
@@ -42,7 +44,7 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
 function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
   if (/^[\u{0}-\u{7F}]*$/u.test(toEncode) !== true) {
     throw new Exception("EncodingError", "encode error");
-    // XXX options.fallback未実装
+    // TODO options.fallback未実装
   }
 
   const encoder = new TextEncoder();

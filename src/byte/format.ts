@@ -228,7 +228,7 @@ function isFormatted(formatted: string, radix: Radix, resolvedOptions: ResolvedO
   const suffixPattern = (resolvedOptions.suffix.length > 0) ? `.{${ resolvedOptions.suffix.length }}` : "";
   const bodyLength = minPaddedLengthOf(radix);
   const paddingLength = resolvedOptions.paddedLength - bodyLength;
-  const paddingPattern = (paddingLength > 0) ? `[${ PADDING_CHAR }]{${ paddingLength }}` : ""; // XXX PADDING_CHARが要エスケープの場合が未実装
+  const paddingPattern = (paddingLength > 0) ? `[${ PADDING_CHAR }]{${ paddingLength }}` : ""; // XXX padding文字を設定可能にした場合、エスケープが必要
   const regex = new RegExp(`^(${ prefixPattern }${ paddingPattern }${ charsPattern }{${ bodyLength }}${ suffixPattern })*$`, "s");
 
   return regex.test(formatted);

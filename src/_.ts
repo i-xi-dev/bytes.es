@@ -6,7 +6,7 @@
  * Cryptoオブジェクト
  */
 let _crypto: Crypto;
-if (globalThis.crypto?.subtle) { // XXX globalThis.cryptoがCrypto型かどうかでは判定できない（Node, Jest環境）Cryptoが値扱いの為
+if (globalThis.crypto?.subtle) { // globalThis.cryptoがCrypto型かどうかでは判定できない（Node, Jest環境）Cryptoが値扱いの為
   // ブラウザー, Deno
   _crypto = globalThis.crypto;
 }
