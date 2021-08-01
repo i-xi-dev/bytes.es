@@ -2,7 +2,14 @@
 
 import { Exception } from "../_";
 import { uint8 } from "../byte/type";
-import { TextDecodeOptions, TextEncodeOptions, TextEncodingImplementation } from "./_";
+import {
+  ResolvedEncodeOptions,
+  resolveDecodeOptions,
+  resolveEncodeOptions,
+  TextDecodeOptions,
+  TextEncodeOptions,
+  TextEncodingImplementation,
+} from "./_";
 
 /**
  * 符号化方式名
@@ -16,12 +23,15 @@ const NAME = "Shift_JIS";
  * 
  * @param encoded 符号化されたバイト列
  * @param options 復号オプション
+ *     ignoreBOMは無視する
  * @returns 復号した文字列
  */
 function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
+  const resolvedOptions = resolveDecodeOptions(options);
+
   try {
     const decoder = new TextDecoder(NAME, {
-      fatal: (options.fallback === "exception"),
+      fatal: (resolvedOptions.fallback === "exception"),
       // XXX エラーにしない場合、ブラウザーではU+FFFDに、Node.jsではU+001Aに置換される。
       //     （元々0x1Aだったのか置換した結果U+001Aになったのか区別できないので注意）
       //     他にも0x1AがU+001Cになったり、Node.jsのTextDecoder("shift_jis")は、
@@ -41,9 +51,11 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
  * {@link https://encoding.spec.whatwg.org/#shift_jis-encoder Shift_JIS encoder}の仕様に従った。
  * 
  * @param char 1文字
+ * @param options 符号化オプション
+ *     addBomは無視する
  * @returns バイト列
  */
-function shiftJisBytes(char: string): [ uint8 ] | [ uint8, uint8 ] {
+function charToBytes(char: string, resolvedOptions: ResolvedEncodeOptions): [ uint8 ] | [ uint8, uint8 ] {
   let codePoint = char.codePointAt(0) as number;
   if (codePoint <= 0x80) {
     // 2.
@@ -70,6 +82,7 @@ function shiftJisBytes(char: string): [ uint8 ] | [ uint8, uint8 ] {
   // 7.
   const pointer = TABLE.get(codePoint);
 
+  void resolvedOptions; // TODO
   // 8.
   if (typeof pointer !== "number") {
     // TODO options.fallback未実装
@@ -100,15 +113,16 @@ function shiftJisBytes(char: string): [ uint8 ] | [ uint8, uint8 ] {
  * 
  * @param toEncode 文字列
  * @param options 符号化オプション
+ *     addBomは無視する
  * @returns 符号化したバイト列
  */
 function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
-  void options;
+  const resolvedOptions = resolveEncodeOptions(options);
 
   const tmp = new Array(toEncode.length * 2);
   let i = 0;
   for (const c of toEncode) {
-    const bytes = shiftJisBytes(c);
+    const bytes = charToBytes(c, resolvedOptions);
     tmp[i] = bytes[0];
     i = i + 1;
     if (bytes.length > 1) {

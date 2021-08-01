@@ -5,8 +5,16 @@ describe("UsAscii.decode", () => {
     expect(UsAscii.decode(Uint8Array.of())).toBe("");
     expect(UsAscii.decode(Uint8Array.of(0x00,0x7F))).toBe("\u0000\u007F");
 
-    expect(UsAscii.decode(Uint8Array.of(0x80))).toBe("\u{FFFD}");
-    expect(UsAscii.decode(Uint8Array.of(0xFF))).toBe("\u{FFFD}");
+    expect(() => {
+      UsAscii.decode(Uint8Array.of(0x80));
+    }).toThrow("decode error");
+    expect(() => {
+      UsAscii.decode(Uint8Array.of(0xFF));
+    }).toThrow("decode error");
+
+    expect(() => {
+      UsAscii.decode(Uint8Array.of(0xEF,0xBB,0xBF,49));
+    }).toThrow("decode error");
 
   });
 
@@ -16,6 +24,7 @@ describe("UsAscii.decode", () => {
       UsAscii.decode(Uint8Array.of(0x80), {fallback:"exception"});
     }).toThrow("decode error");
     expect(UsAscii.decode(Uint8Array.of(0x80), {fallback:"replacement"})).toBe("\u{FFFD}");
+
   });
 
 });

@@ -1,7 +1,13 @@
 //
 
 import { Exception } from "../_";
-import { BOM, TextDecodeOptions, TextEncodeOptions, TextEncodingImplementation } from "./_";
+import {
+  resolveDecodeOptions,
+  resolveEncodeOptions,
+  TextDecodeOptions,
+  TextEncodeOptions,
+  TextEncodingImplementation,
+} from "./_";
 
 /**
  * 符号化方式名
@@ -15,16 +21,19 @@ const NAME = "US-ASCII";
  * 
  * @param encoded 符号化されたバイト列
  * @param options 復号オプション
+ *     removeBomは無視する
  * @returns 復号した文字列
  */
 function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
+  const resolvedOptions = resolveDecodeOptions(options);
+
   const decoder = new TextDecoder(NAME, {
-    fatal: (options.fallback === "exception"), // ISO-8859-1扱いになる為、エラーは起こりえない
+    fatal: false, // ISO-8859-1扱いになる為、エラーは起こりえない
   });
   const decoded = decoder.decode(encoded);
 
   if (/^[\u{0}-\u{7F}]*$/u.test(decoded) !== true) {
-    if (options.fallback === "exception") {
+    if (resolvedOptions.fallback === "exception") {
       throw new Exception("EncodingError", "decode error");
     }
     return decoded.replaceAll(/[^\u{0}-\u{7F}]/gu, "\u{FFFD}");
@@ -39,18 +48,20 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
  * 
  * @param toEncode 文字列
  * @param options 符号化オプション
+ *     addBomは無視する
  * @returns 符号化したバイト列
  */
 function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
+  const resolvedOptions = resolveEncodeOptions(options);
+
+  // TODO resolvedOptions.fallback未実装
+  void resolvedOptions;
+
   if (/^[\u{0}-\u{7F}]*$/u.test(toEncode) !== true) {
     throw new Exception("EncodingError", "encode error");
-    // TODO options.fallback未実装
   }
 
   const encoder = new TextEncoder();
-  if ((options.addBom === true) && (toEncode.startsWith(BOM) !== true)) {
-    return encoder.encode(BOM + toEncode);
-  }
   return encoder.encode(toEncode);
 }
 

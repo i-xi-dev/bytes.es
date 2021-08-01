@@ -3,16 +3,32 @@
 // 文字符号化
 
 /**
+ * フォールバックの型
+ */
+const Fallback = {
+  /**
+   * 例外にする
+   */
+  EXCEPTION: "exception",
+
+  /**
+   * 置換する
+   */
+  REPLACEMENT: "replacement",
+} as const;
+type Fallback = typeof Fallback[keyof typeof Fallback];
+
+/**
  * 文字符号化の復号オプション
  */
 type DecodeOptions = {
   /**
    * 当該文字符号化方式では復号できないバイトが含まれていた場合にどうするか
    *     - exception: 例外とする
-   *     - replacement: 置換する（置換文字は実装依存（U+FFFDなど））※情報は失われることに注意
-   * 省略時"replacement" //TODO exceptionをデフォルトにする？
+   *     - replacement: 置換する（置換文字は実装依存（Encoding Standard準拠の復号器の場合U+FFFD））※情報は失われることに注意
+   * 省略時"exception"
    */
-  fallback?: "exception" | "replacement",
+  fallback?: Fallback,
 
   /**
    * 先頭のBOMを除去するか否か
@@ -25,7 +41,13 @@ type DecodeOptions = {
  * 文字符号化の符号化オプション
  */
 type EncodeOptions = {
-  // TODO fallback 
+  /**
+   * 当該文字符号化方式では符号化できない文字が含まれていた場合にどうするか
+   *     - exception: 例外とする
+   *     - replacement: 置換する（置換文字は実装依存）※情報は失われることに注意
+   * 省略時"exception"
+   */
+  fallback?: Fallback,
 
   /**
    * 先頭がBOMではない場合に先頭にBOMを付加するか否か
@@ -35,7 +57,67 @@ type EncodeOptions = {
   addBom?: boolean,
 };
 
-// TODO resolveOptions
+/**
+ * 未設定を許可しない文字符号化の復号オプション
+ */
+type ResolvedDecodeOptions = {
+  /**
+   * @see {@link DecodeOptions.fallback}
+   */
+  fallback: Fallback,
+
+  /**
+   * @see {@link DecodeOptions.removeBom}
+   */
+  removeBom: boolean,
+};
+
+/**
+ * 未設定を許可しない文字符号化の符号化オプション
+ */
+type ResolvedEncodeOptions = {
+  /**
+   * @see {@link EncodeOptions.fallback}
+   */
+  fallback: Fallback,
+
+  /**
+   * @see {@link EncodeOptions.addBom}
+   */
+  addBom: boolean,
+};
+
+/**
+ * 文字符号化の復号オプションを補正したコピーを返却
+ * 
+ * @param oprions 文字符号化の復号オプション
+ * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めた文字符号化の復号オプション
+ */
+function resolveDecodeOptions(oprions: DecodeOptions = {}): ResolvedDecodeOptions {
+  const fallback = (oprions.fallback !== undefined) ? oprions.fallback : Fallback.EXCEPTION;
+  const removeBom = (typeof oprions.removeBom === "boolean") ? oprions.removeBom : false;
+
+  return  {
+    fallback,
+    removeBom,
+  };
+}
+
+/**
+ * 文字符号化の符号化オプションを補正したコピーを返却
+ * 
+ * @param oprions 文字符号化の符号化オプション
+ * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めた文字符号化の符号化オプション
+ */
+function resolveEncodeOptions(oprions: EncodeOptions = {}): ResolvedEncodeOptions {
+  const fallback = (oprions.fallback !== undefined) ? oprions.fallback : Fallback.EXCEPTION;
+  const addBom = (typeof oprions.addBom === "boolean") ? oprions.addBom : false;
+
+  return  {
+    fallback,
+    addBom,
+  };
+}
 
 /**
  * BOM
@@ -73,6 +155,10 @@ interface TextEncodingImplementation {
 export {
   DecodeOptions as TextDecodeOptions,
   EncodeOptions as TextEncodeOptions,
+  ResolvedDecodeOptions,
+  ResolvedEncodeOptions,
+  resolveDecodeOptions,
+  resolveEncodeOptions,
   BOM,
   TextEncodingImplementation,
 };

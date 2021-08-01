@@ -1,7 +1,14 @@
 //
 
 import { Exception } from "../_";
-import { BOM, TextDecodeOptions, TextEncodeOptions, TextEncodingImplementation } from "./_";
+import {
+  BOM,
+  resolveDecodeOptions,
+  resolveEncodeOptions,
+  TextDecodeOptions,
+  TextEncodeOptions,
+  TextEncodingImplementation,
+} from "./_";
 
 /**
  * 符号化方式名
@@ -18,10 +25,12 @@ const NAME = "UTF-8";
  * @returns 復号した文字列
  */
 function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
+  const resolvedOptions = resolveDecodeOptions(options);
+
   try {
     const decoder = new TextDecoder(NAME, {
-      fatal: (options.fallback === "exception"),
-      ignoreBOM: (options.removeBom === true) ? false : true,
+      fatal: (resolvedOptions.fallback === "exception"),
+      ignoreBOM: (resolvedOptions.removeBom === true) ? false : true,
     });
     return decoder.decode(encoded);
   }
@@ -41,8 +50,10 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
  * @returns 符号化したバイト列
  */
 function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
+  const resolvedOptions = resolveEncodeOptions(options);
+
   const encoder = new TextEncoder();
-  if ((options.addBom === true) && (toEncode.startsWith(BOM) !== true)) {
+  if ((resolvedOptions.addBom === true) && (toEncode.startsWith(BOM) !== true)) {
     return encoder.encode(BOM + toEncode);
   }
   return encoder.encode(toEncode);
