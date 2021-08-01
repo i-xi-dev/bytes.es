@@ -54,11 +54,12 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
 function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
   const resolvedOptions = resolveEncodeOptions(options);
 
-  // TODO resolvedOptions.fallback未実装
-  void resolvedOptions;
-
   if (/^[\u{0}-\u{7F}]*$/u.test(toEncode) !== true) {
-    throw new Exception("EncodingError", "encode error");
+    if (resolvedOptions.fallback === "exception") {
+      throw new Exception("EncodingError", "encode error");
+    }
+    const encoder = new TextEncoder();
+    return encoder.encode(toEncode.replaceAll(/[^\u{0}-\u{7F}]/gu, "\u{3F}"));
   }
 
   const encoder = new TextEncoder();

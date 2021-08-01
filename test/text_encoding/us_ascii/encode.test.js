@@ -13,7 +13,11 @@ describe("UsAscii.encode", () => {
 
   test("UsAscii(string, Object)", () => {
     // fallback
-    //TODO
+    expect(() => {
+      UsAscii.encode("\u0080", {fallback: "exception"});
+    }).toThrow("encode error");
+    expect([...UsAscii.encode("\u0080", {fallback: "replacement"})].join(",")).toBe("63");
+
   });
 
 });

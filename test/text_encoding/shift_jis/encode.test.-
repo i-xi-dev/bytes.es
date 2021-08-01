@@ -1,6 +1,15 @@
 import { ShiftJis } from "../../../dist/text_encoding/shift_jis.js";
 
 describe("ShiftJis.encode", () => {
+  test("encode(Uint8Array, Object)", () => {
+    // fallback
+    expect(() => {
+      ShiftJis.encode("\u0081", {fallback: "exception"});
+    }).toThrow("U+0081");
+    expect([...ShiftJis.encode("\u0081", {fallback: "replacement"})].join(",")).toBe("63");
+
+  });
+
   test("encode(Uint8Array)", () => {
 
     // [自動生成] ソースは別途管理

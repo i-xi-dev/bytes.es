@@ -82,11 +82,12 @@ function charToBytes(char: string, resolvedOptions: ResolvedEncodeOptions): [ ui
   // 7.
   const pointer = TABLE.get(codePoint);
 
-  void resolvedOptions; // TODO
   // 8.
   if (typeof pointer !== "number") {
-    // TODO options.fallback未実装
-    throw new Exception("EncodingError", `U+${ codePoint.toString(16).toUpperCase().padStart(4, "0") }`);
+    if (resolvedOptions.fallback === "exception") {
+      throw new Exception("EncodingError", `U+${ codePoint.toString(16).toUpperCase().padStart(4, "0") }`);
+    }
+    return [ 0x3F ];
   }
 
   // 9.
