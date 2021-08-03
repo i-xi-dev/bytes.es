@@ -74,7 +74,7 @@ class FileLike {
     }
     catch (exception) {
       // NotFoundError | SecurityError | NotReadableError
-      throw new Exception("Error", "reading failed", exception);
+      throw new Exception("Error", "reading failed", [ exception ]);
     }
   }
 
@@ -167,32 +167,24 @@ class FileLike {
     return new FileLike(mediaType, bodyWork);
   }
 
-  // TODO
   /**
    * 自身のメディアタイプとバイト列からData URLを生成し返却
    * 
-   * Base64符号化が必要か否かの判断は呼び出す側の責任において行うこと。
+   * FileReaderの仕様に倣い、テキストかどうかに関係なく常時base64エンコードする。
+   * //XXX %エンコードもできるようにする？
    * 
    * @experimental
-   * @param base64 バイト列をBase64符号化するか否か
    * @returns Data URL
    */
-  // toDataUrl(base64 = true): Uri {
-  //   let encoding = "";
-  //   let dataText = "";
-  //   if (base64 === true) {
-  //     encoding = ";base64";
-  //     dataText = this.toBase64();
-  //   }
-  //   else {
-  //     dataText = this.toPercent({ TODO });
-  //   }
+  toDataUrl(): Uri {
+    const encoding = ";base64";
+    const dataEncoded = this.#bytes.toBase64();
 
-  //   return "data:" + this.#mediaType.toString() + encoding + "," + dataText;
-  // }
+    return new Uri("data:" + this.#mediaType.toString() + encoding + "," + dataEncoded);
+  }
 
-  // fromRespomse
-  // toRequest
+  // fromWebRespomse
+  // toWebRequest
 }
 Object.freeze(FileLike);
 
