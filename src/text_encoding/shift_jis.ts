@@ -1,7 +1,7 @@
 //
 
-import { Exception } from "../_";
-import { uint8 } from "../byte/type";
+import { Exception } from "../_.js";
+import { uint8 } from "../byte/type.js";
 import {
   ResolvedEncodeOptions,
   resolveDecodeOptions,
@@ -9,7 +9,7 @@ import {
   TextDecodeOptions,
   TextEncodeOptions,
   TextEncodingImplementation,
-} from "./_";
+} from "./_.js";
 
 /**
  * 符号化方式名

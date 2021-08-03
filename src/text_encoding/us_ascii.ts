@@ -1,13 +1,13 @@
 //
 
-import { Exception } from "../_";
+import { Exception } from "../_.js";
 import {
   resolveDecodeOptions,
   resolveEncodeOptions,
   TextDecodeOptions,
   TextEncodeOptions,
   TextEncodingImplementation,
-} from "./_";
+} from "./_.js";
 
 /**
  * 符号化方式名

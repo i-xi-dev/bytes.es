@@ -1,9 +1,9 @@
 //
 
-import { TextEncodingImplementation } from "./_";
-import { Utf8 } from "./utf_8";
-import { ShiftJis } from "./shift_jis";
-import { UsAscii } from "./us_ascii";
+import { TextEncodingImplementation } from "./_.js";
+import { Utf8 } from "./utf_8.js";
+import { ShiftJis } from "./shift_jis.js";
+import { UsAscii } from "./us_ascii.js";
 
 const registry = new Map<string, TextEncodingImplementation>();
 
@@ -15,7 +15,7 @@ function getImpl(name: string): TextEncodingImplementation | undefined {
   return registry.get(name.toLowerCase());
 }
 
-export { TextDecodeOptions, TextEncodeOptions } from "./_";
+export { TextDecodeOptions, TextEncodeOptions } from "./_.js";
 
 export const TextEncoding = {
   for: getImpl,

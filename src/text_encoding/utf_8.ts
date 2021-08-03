@@ -1,6 +1,6 @@
 //
 
-import { Exception } from "../_";
+import { Exception } from "../_.js";
 import {
   BOM,
   resolveDecodeOptions,
@@ -8,7 +8,7 @@ import {
   TextDecodeOptions,
   TextEncodeOptions,
   TextEncodingImplementation,
-} from "./_";
+} from "./_.js";
 
 /**
  * 符号化方式名
