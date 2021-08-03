@@ -1,7 +1,7 @@
 //
 
-import { getCrypto } from "../../_";
-import { DigestAlgorithmImplementation } from "./_";
+import { getCrypto } from "../../_.js";
+import { DigestAlgorithmImplementation } from "./_.js";
 
 /**
  * Computes the SHA-512 digest for the byte sequence.

@@ -2,8 +2,8 @@
 
 // UUID
 
-import { ByteSequence } from "./byte_sequence";
-import { Uri } from "./uri";
+import { ByteSequence } from "./byte_sequence.js";
+import { Uri } from "./uri.js";
 
 /**
  * UUID（RFC 4122）

@@ -1,7 +1,7 @@
 //
 
-import { Exception } from "./_";
-import { ByteSequence } from "./byte_sequence";
+import { Exception } from "./_.js";
+import { ByteSequence } from "./byte_sequence.js";
 
 /**
  * 特別スキーム

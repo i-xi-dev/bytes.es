@@ -2,7 +2,7 @@
 
 // バイトストリーム読取
 
-import { Exception, ProgressEvent } from "../_";
+import { Exception, ProgressEvent } from "../_.js";
 
 /**
  * 可読ストリームの型

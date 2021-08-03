@@ -1,7 +1,7 @@
 //
 
-import { devideStringByLength, Exception } from "../_";
-import { isByte, uint8 } from "./type";
+import { devideStringByLength, Exception } from "../_.js";
+import { isByte, uint8 } from "./type.js";
 
 /**
  * フォーマッターで対応する基数

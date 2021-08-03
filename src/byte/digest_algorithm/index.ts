@@ -1,10 +1,10 @@
 //
 
-import { Exception } from "../../_";
-import { DigestAlgorithmImplementation } from "./_";
-import { Sha256 } from "./sha_256";
-import { Sha384 } from "./sha_384";
-import { Sha512 } from "./sha_512";
+import { Exception } from "../../_.js";
+import { DigestAlgorithmImplementation } from "./_.js";
+import { Sha256 } from "./sha_256.js";
+import { Sha384 } from "./sha_384.js";
+import { Sha512 } from "./sha_512.js";
 
 const registry = new Map<string, DigestAlgorithmImplementation>();
 

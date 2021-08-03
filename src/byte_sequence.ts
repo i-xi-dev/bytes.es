@@ -2,8 +2,8 @@
 
 // バイト列
 
-import { Exception, getCrypto } from "./_";
-import { uint8 } from "./byte/type";
+import { Exception, getCrypto } from "./_.js";
+import { uint8 } from "./byte/type.js";
 import {
   Base64,
   Base64DecodeOptions,
@@ -20,8 +20,8 @@ import {
   ReadableStreamType,
   StreamReader,
   StreamReadOptions,
-} from "./byte/index";
-import { TextDecodeOptions, TextEncodeOptions, TextEncoding } from "./text_encoding/index";
+} from "./byte/index.js";
+import { TextDecodeOptions, TextEncodeOptions, TextEncoding } from "./text_encoding/index.js";
 
 /**
  * バイト列を表す整数の配列

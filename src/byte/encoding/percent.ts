@@ -1,8 +1,8 @@
 //
 
-import { Exception } from "../../_";
-import { isByte, uint8 } from "../type";
-import { Format } from "../format";
+import { Exception } from "../../_.js";
+import { isByte, uint8 } from "../type.js";
+import { Format } from "../format.js";
 
 /**
  * パーセント符号化方式オプション

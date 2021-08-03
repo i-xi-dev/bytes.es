@@ -2,10 +2,10 @@
 
 // メディア
 
-import { Exception, getBlobConstructor, trimAsciiSpace } from "../_";
-import { ByteSequence } from "../byte_sequence";
-import { Uri } from "../uri";
-import { MediaType } from "./media_type";
+import { Exception, getBlobConstructor, trimAsciiSpace } from "../_.js";
+import { ByteSequence } from "../byte_sequence.js";
+import { Uri } from "../uri.js";
+import { MediaType } from "./media_type.js";
 
 /**
  * ファイル様オブジェクト

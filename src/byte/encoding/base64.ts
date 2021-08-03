@@ -1,7 +1,7 @@
 //
 
-import { Exception } from "../../_";
-import { uint8 } from "../type";
+import { Exception } from "../../_.js";
+import { uint8 } from "../type.js";
 
 /**
  * Base64変換テーブルの62番目の文字
