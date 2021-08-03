@@ -10,7 +10,7 @@ import {
   matchHttpToken,
   trimHttpSpace,
   trimHttpSpaceEnd,
-} from "../_";
+} from "../_.js";
 
 /**
  * IANAの登録簿に登録済のタイプ名
