@@ -1,9 +1,9 @@
 {
   "name": "@i-xi-dev/bytes",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "index.mjs",
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",
@@ -16,8 +16,10 @@
     "url": "git+https://github.com/i-xi-dev/bytes.es.git"
   },
   "keywords": [
+    "base64",
     "byte",
-    "bytes"
+    "bytes",
+    "dataurl"
   ],
   "author": "",
   "license": "MIT",

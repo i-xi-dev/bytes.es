@@ -202,7 +202,7 @@ class ByteSequence {
     if (/^[\u{0}-\u{FF}]*$/u.test(binaryString) !== true) {
       throw new TypeError("binaryString");
     }
-    
+
     const bytes = [ ...binaryString ].map((char) => {
       return char.charCodeAt(0) as uint8;
     });
