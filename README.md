@@ -6,7 +6,7 @@ A JavaScript byte array library for the browser and Node.js
 ## Description
 
 ### Conversion
-![Conversion](assets/overview.svg)
+![Conversion](assets/conversion.svg)
 
 
 ## Requirement

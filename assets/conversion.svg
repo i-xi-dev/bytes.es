@@ -132,7 +132,7 @@
   <g class="class" style="translate: 400px 40px;">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Byte stream</text>
-    <text class="class-desc" x="120" y="44">ReadableStream&#x3C;number></text>
+    <text class="class-desc" x="120" y="44">ReadableStream&#x3C;Uint8Array></text>
   </g>
 
   <path class="connecter" d="M 526 104 L 554 246"/>
