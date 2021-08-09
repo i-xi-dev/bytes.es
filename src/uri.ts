@@ -140,7 +140,16 @@ class Uri {
 
   // XXX withQuery(query: Array<[ string, string ]>): Uri {
 
-  // XXX withoutQuery(): Uri
+  /**
+   * 自身のURIからクエリを除いた新たなインスタンスを生成し返却
+   * 
+   * @returns 生成したインスタンス
+   */
+  withoutQuery(): Uri {
+    const work = new URL(this.#uri.toString());
+    work.search = "";
+    return new Uri(work.toString());
+  }
 
   /**
    * 自身のURIと指定した素片で新たなインスタンスを生成し返却
