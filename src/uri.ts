@@ -117,7 +117,28 @@ class Uri {
 
   // XXX get path(): PathSegmentList
 
-  // XXX get query(): Array<[ string, string ]>
+  /**
+   * クエリ
+   */
+  get query(): Array<[ string, string ]> | null {
+    if (this.#uri.search.length <= 0) {
+      const work = new URL(this.#uri.toString());
+      work.hash = "";
+      if (work.toString().endsWith("?")) {
+        return [];
+      }
+      return null;
+    }
+
+    const entries: Array<[ string, string ]> = [];
+    for (const entry of this.#uri.searchParams.entries()) {
+      entries.push([
+        entry[0],
+        entry[1],
+      ]);
+    }
+    return entries;
+  }
 
   /**
    * 素片
