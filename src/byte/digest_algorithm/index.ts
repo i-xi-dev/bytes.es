@@ -8,9 +8,13 @@ import { Sha512 } from "./sha_512.js";
 
 const registry = new Map<string, DigestAlgorithmImplementation>();
 
-registry.set("SHA-256".toLowerCase(), Sha256);
-registry.set("SHA-384".toLowerCase(), Sha384);
-registry.set("SHA-512".toLowerCase(), Sha512);
+function register(name: string, implementation: DigestAlgorithmImplementation): void {
+  registry.set(name.toLowerCase(), implementation);
+}
+
+register("SHA-256".toLowerCase(), Sha256);
+register("SHA-384".toLowerCase(), Sha384);
+register("SHA-512".toLowerCase(), Sha512);
 
 function getImplementation(name: string): DigestAlgorithmImplementation {
   const normalizedName = name.toLowerCase();
@@ -23,6 +27,7 @@ function getImplementation(name: string): DigestAlgorithmImplementation {
 export { DigestAlgorithmImplementation };
 
 export const DigestAlgorithm = {
+  register,
   /**
    * Returns the digest algorithm associated with the specified name.
    * @param name The algorithm name.

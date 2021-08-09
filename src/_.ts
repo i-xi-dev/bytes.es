@@ -100,13 +100,13 @@ export class Exception extends Error {
  */
 export function devideStringByLength(str: string, segmentLength: number, paddingUnit?: string): Array<string> {
   if (Number.isSafeInteger(segmentLength) !== true) {
-    throw new TypeError("TODO");
+    throw new TypeError("segmentLength must be integer");
   }
   if (segmentLength <= 0) {
-    throw new TypeError("TODO");
+    throw new TypeError("segmentLength must be non-negative");
   }
   if ((typeof paddingUnit === "string") && (paddingUnit.length !== 1)) {
-    throw new TypeError("TODO");
+    throw new TypeError("paddingUnit must be a code unit");
   }
 
   const segemntsCount = Math.ceil(str.length / segmentLength);

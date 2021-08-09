@@ -2,14 +2,13 @@
 
 // バイト列
 
-import { Exception, getCrypto } from "./_.js";
+import { getCrypto } from "./_.js";
 import { uint8 } from "./byte/type.js";
 import {
   Base64,
   Base64DecodeOptions,
   Base64EncodeOptions,
   DigestAlgorithm,
-  DigestAlgorithmImplementation,
   Format,
   FormatOptions,
   FormatRadix,
@@ -293,10 +292,11 @@ class ByteSequence {
   /**
    * 自身のバイト列のハッシュを生成し返却
    * 
-   * @param algorithm ハッシュアルゴリズム
+   * @param algorithmName ハッシュアルゴリズム名
    * @returns 生成したハッシュのバイト列で解決されるPromise
    */
-  async toDigest(algorithm: DigestAlgorithmImplementation): Promise<ByteSequence> {
+  async toDigest(algorithmName: string): Promise<ByteSequence> {
+    const algorithm = DigestAlgorithm.for(algorithmName);
     const digest = await algorithm.compute(this.#bytes);
     return new ByteSequence(digest.buffer);
   }
@@ -307,8 +307,7 @@ class ByteSequence {
    * @returns 生成したハッシュのバイト列で解決されるPromise
    */
   async toSha256(): Promise<ByteSequence> {
-    const algorithm = DigestAlgorithm.for("SHA-256");
-    return this.toDigest(algorithm);
+    return this.toDigest("SHA-256");
   }
 
   /**
@@ -495,9 +494,6 @@ class ByteSequence {
    */
   static fromText(text: string, encodingName = "UTF-8", options?: TextEncodeOptions): ByteSequence {
     const encoding = TextEncoding.for(encodingName);
-    if (encoding === undefined) {
-      throw new Exception("NotFoundException", "encodingName not found");
-    }
     const bytes = encoding.encode(text, options);
     return new ByteSequence(bytes.buffer);
   }
@@ -511,11 +507,9 @@ class ByteSequence {
    */
   asText(encodingName = "UTF-8", options?: TextDecodeOptions): string {
     const encoding = TextEncoding.for(encodingName);
-    if (encoding === undefined) {
-      throw new Exception("NotFoundException", "encodingName not found");
-    }
     return encoding.decode(this.view(), options);
   }
+
 }
 Object.freeze(ByteSequence);
 

@@ -67,7 +67,7 @@ function parseTypeName(str: string): ParseResult {
   return {
     component: typeName,
     progression: typeName.length,
-    parseEnd: true, // 次のsubtypeは必須なのでチェックはしない（subtypeが取得できなければエラー）
+    parseEnd: false, // 次のsubtypeは必須なのでチェックはしない（subtypeが取得できなければエラー）
   };
 }
 
@@ -198,6 +198,13 @@ class MediaType {
    */
   get subtypeName(): string {
     return this.#subtypeName;
+  }
+
+  /**
+   * The {@link https://mimesniff.spec.whatwg.org/#mime-type-essence essence} of this media type.
+   */
+  get essence(): string {
+    return this.#typeName + "/" + this.#subtypeName;
   }
 
   /**

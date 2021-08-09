@@ -19,7 +19,7 @@ describe("ByteSequence.prototype.asText", () => {
 
     expect(() => {
       bs0.asText("UTF-7");
-    }).toThrow("encodingName not found");
+    }).toThrow("name:UTF-7");
 
   });
 
