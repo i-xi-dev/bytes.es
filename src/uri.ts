@@ -34,7 +34,7 @@ const DefaultPortMap: Map<string, number> = new Map([
  * @param scheme スキーム
  * @returns URI文字列が絶対URIを表しているか否か
  */
-function isAbsolute(uriString: string, scheme: string): boolean {
+function isAbsoluteUrl(uriString: string, scheme: string): boolean {
   let separator = ":";
   if ((Object.values(SpecialScheme) as Array<string>).includes(scheme)) {
     separator = "://";
@@ -43,8 +43,11 @@ function isAbsolute(uriString: string, scheme: string): boolean {
 }
 
 /**
- * 絶対URI
- *     不変オブジェクト
+ * Absolute URL
+ * 
+ * Instances of this class are immutable.
+ * 
+ * @see {@link https://url.spec.whatwg.org/ URL Standard}
  */
 class Uri {
   /**
@@ -53,7 +56,7 @@ class Uri {
   #uri: URL;
 
   /**
-   * @param uri 絶対URIを表す文字列またはURLオブジェクト
+   * @param uri 絶対URLを表す文字列またはURLオブジェクト
    */
   constructor(uri: URL | string) {
     let uriString: string;
@@ -65,16 +68,16 @@ class Uri {
     }
 
     try {
-      // この時点ではuriStringが相対URIか判別できないので、一旦内部表現を生成
-      // （ブラウザーならhttp、Node.jsならfile、などのスキームで絶対URIが生成される）
+      // この時点ではuriStringが相対URLか判別できないので、一旦内部表現を生成
+      // （ブラウザーならhttp、Node.jsならfile、などのスキームで絶対URLが生成される）
       this.#uri = new URL(uriString);
     }
     catch (exception) {
       throw new URIError("uri");
     }
 
-    // 生成された内部表現のスキームで、uriStringが絶対URIか否か判定
-    if (isAbsolute(uriString, this.scheme) !== true) {
+    // 生成された内部表現のスキームで、uriStringが絶対URLか否か判定
+    if (isAbsoluteUrl(uriString, this.scheme) !== true) {
       throw new Exception("DataError", "uri must be absolute");
     }
 
@@ -82,25 +85,21 @@ class Uri {
   }
 
   /**
-   * オリジン
-   */
-  get origin(): string | null {
-    return this.#uri.origin === "null" ? null : this.#uri.origin;
-  }
-
-  /**
-   * スキーム
+   * Gets the scheme name for this instance.
    */
   get scheme(): string {
     return this.#uri.protocol.replace(/:$/, "");
   }
 
-  // XXX get host(): string
+  /**
+   * Gets the host for this instance.
+   */
+  get host(): string | null {
+    return (this.#uri.hostname.length <= 0) ? null : this.#uri.hostname;
+  }
 
   /**
-   * ポート
-   * 
-   * ※規定値であっても返す
+   * Gets the port number for this instance.
    */
   get port(): number | null {
     const specifiedString = this.#uri.port;
@@ -113,6 +112,13 @@ class Uri {
       return defaultPort;
     }
     return null;
+  }
+
+  /**
+   * オリジン
+   */
+  get origin(): string | null {
+    return (this.#uri.origin === "null") ? null : this.#uri.origin;
   }
 
   // XXX get path(): PathSegmentList

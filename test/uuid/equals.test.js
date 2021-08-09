@@ -22,6 +22,11 @@ describe("Uuid.prototype.equals", () => {
     const u2 = Uuid.parse("D071CF39-F061-4E34-A462-BC65A425CAFC");
     expect(u1c.equals(u2)).toBe(false);
 
+    const u3 = Uuid.nil();
+    expect(u3.equals(u3)).toBe(true);
+    expect(Uuid.nil().equals(u3)).toBe(true);
+    expect(u3.equals(Uuid.nil())).toBe(true);
+
   });
 
 });

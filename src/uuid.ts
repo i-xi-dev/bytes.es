@@ -1,18 +1,19 @@
 //
 
-// UUID
-
 import { ByteSequence } from "./byte_sequence.js";
 import { Uri } from "./uri.js";
 
 /**
- * UUID（RFC 4122）
- *     不変オブジェクト
- *     ※Nil UUIDと乱数形式（v4）のみ実装
+ * UUID
+ * 
+ * Implements version 4 UUID and Nil UUID.
+ * Instances of this class are immutable.
+ * 
+ * @see {@link https://datatracker.ietf.org/doc/html/rfc4122 RFC 4122}
  */
 class Uuid {
   /**
-   * バイト列
+   * 128-bit value as byte sequence.
    */
   #bytes: ByteSequence;
 
@@ -31,7 +32,7 @@ class Uuid {
   /**
    * Nil UUID（全ビットが0のUUID）を生成し返却
    * 
-   * @returns {Uuid}
+   * @returns A new instance that represents the nil UUID.
    */
   static nil(): Uuid {
     return new Uuid(ByteSequence.create(16));
@@ -40,21 +41,17 @@ class Uuid {
   /**
    * version4バリアント（乱数形式）のUUIDを生成し返却
    * 
-   * @returns {Uuid}
+   * @returns A new instance that represents the version 4 UUID.
    */
   static generateRandom(): Uuid {
     const randomBytes = ByteSequence.generateRandom(16);
 
-    // const field1 = randomBytes.view(0, 4);
-    // const field2 = randomBytes.view(4, 2);
-    const field3 = randomBytes.view(6, 2);
-    const field4 = randomBytes.view(8, 2);
-    // const field5 = randomBytes.view(10, 6);
-
     // フィールド3の先頭4ビット（7バイト目の上位4ビット）は0100₂固定（13桁目の文字列表現は"4"固定）
+    const field3 = randomBytes.view(6, 2);
     field3[0] = (field3[0] as number) & 0x0F | 0x40;
 
     // フィールド4の先頭2ビット（9バイト目の上位2ビット）は10₂固定（17桁目の文字列表現は"8","9","A","B"のどれか）
+    const field4 = randomBytes.view(8, 2);
     field4[0] = (field4[0] as number) & 0x3F | 0x80;
 
     return new Uuid(randomBytes);
@@ -106,30 +103,30 @@ class Uuid {
   }
 
   /**
-   * 自身のUUIDの文字列表現を返却
+   * Returns a string representation of the value of this instance.
    * 
    * @override
-   * @returns UUIDの文字列表現
+   * @returns The string representation of the value of this instance.
    */
   toString(): string {
     return this.format();
   }
 
   /**
-   * 自身のUUIDの文字列表現を返却
+   * Returns a string representation of the value of this instance.
    * 
-   * @returns UUIDの文字列表現
+   * @returns The string representation of the value of this instance.
    */
   toJSON(): string {
     return this.format();
   }
 
   /**
-   * 自身のUUIDのURNを返却
+   * Returns a URN of the value of this instance.
    * 
-   * @returns UUID URN
+   * @returns The URN of the value of this instance.
    */
-  toUrn(): Uri {
+  toUuidUrl(): Uri {
     return new Uri("urn:uuid:" + this.format());
   }
 }
