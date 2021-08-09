@@ -15,14 +15,17 @@ const SpecialScheme = {
   WSS: "wss",
 } as const;
 
-// const DefaultPortMap: Map<string, number> = new Map([
-//   [ SpecialScheme.FILE, Number.NaN ],
-//   [ SpecialScheme.FTP, 21 ],
-//   [ SpecialScheme.HTTP, 80 ],
-//   [ SpecialScheme.HTTPS, 443 ],
-//   [ SpecialScheme.WS, 80 ],
-//   [ SpecialScheme.WSS, 443 ],
-// ]);
+/**
+ * デフォルトポート
+ */
+const DefaultPortMap: Map<string, number> = new Map([
+  [ SpecialScheme.FILE, Number.NaN ],
+  [ SpecialScheme.FTP, 21 ],
+  [ SpecialScheme.HTTP, 80 ],
+  [ SpecialScheme.HTTPS, 443 ],
+  [ SpecialScheme.WS, 80 ],
+  [ SpecialScheme.WSS, 443 ],
+]);
 
 /**
  * URI文字列が絶対URIを表しているか否かを返却
@@ -94,7 +97,23 @@ class Uri {
 
   // XXX get host(): string
 
-  // XXX get port(): number
+  /**
+   * ポート
+   * 
+   * ※規定値であっても返す
+   */
+  get port(): number | null {
+    const specifiedString = this.#uri.port;
+    if (specifiedString.length > 0) {
+      return Number.parseInt(specifiedString, 10);
+    }
+
+    const defaultPort = DefaultPortMap.get(this.scheme);
+    if ((typeof defaultPort === "number") && Number.isSafeInteger(defaultPort) && (defaultPort >= 0)) {
+      return defaultPort;
+    }
+    return null;
+  }
 
   // XXX get path(): PathSegmentList
 
