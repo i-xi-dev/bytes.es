@@ -183,8 +183,48 @@ class FileLike {
     return new Uri("data:" + this.#mediaType.toString() + encoding + "," + dataEncoded);
   }
 
-  // fromWebRespomse
-  // toWebRequest
+  /**
+   * Computes the base64-encoded digest.
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity}
+   * @param algorithmName The name of the digest algorithm.
+   * @returns The {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promise} that
+   *     fulfills with a base64-encoded digest.
+   */
+  async integrity(algorithmName: string): Promise<string> {
+    let prefix = "";
+    switch (algorithmName.toLowerCase()) {
+    case "sha-256":
+      prefix = "sha256-";
+      break;
+    case "sha-384":
+      prefix = "sha384-";
+      break;
+    case "sha-512":
+      prefix = "sha512-";
+      break;
+    }
+    if (prefix.length <= 0) {
+      throw new Exception("NotSupportedError", "algorithmName:" + algorithmName);
+    }
+
+    const digestBytes = await this.#bytes.toDigest(algorithmName);
+    return prefix + digestBytes.toBase64();
+  }
+
+  // XXX
+  // static async fromWebMessage(message: Request | Response, options) {
+  //   let mediaType: MediaType;
+  //   if (message.headers.has("Content-Type")) {
+  //     const mediatypes = message.headers.get("Content-Type") as string;
+  //     // TODO mediatypesの分割 getAllが仕様からなくなったので自前で要パース
+  //     mediaType = MediaType.fromString(xxxx);
+  //   }
+  //   else if (options.allowXXX === true) {
+  //     mediaType = 
+  //   }
+  // }
+
+
 }
 Object.freeze(FileLike);
 
