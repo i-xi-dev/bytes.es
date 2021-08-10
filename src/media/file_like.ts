@@ -1,8 +1,7 @@
 //
 
-// メディア
-
-import { Exception, getBlobConstructor, trimAsciiSpace } from "../_.js";
+// import { collectStart, Exception, getBlobConstructor, httpQuotedString, trimAsciiSpace, trimHttpTabOrSpace } from "../_.js";
+import { Exception, getBlobConstructor,  trimAsciiSpace  } from "../_.js";
 import { ByteSequence } from "../byte_sequence.js";
 import { Uri } from "../uri.js";
 import { MediaType } from "./media_type.js";
@@ -184,11 +183,12 @@ class FileLike {
   }
 
   /**
-   * Computes the base64-encoded digest.
+   * Computes the SRI integrity (base64-encoded digest).
+   * 
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity}
    * @param algorithmName The name of the digest algorithm.
    * @returns The {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promise} that
-   *     fulfills with a base64-encoded digest.
+   *     fulfills with a SRI integrity (base64-encoded digest).
    */
   async integrity(algorithmName: string): Promise<string> {
     let prefix = "";
@@ -211,21 +211,95 @@ class FileLike {
     return prefix + digestBytes.toBase64();
   }
 
-  // XXX
+  // TODO
   // static async fromWebMessage(message: Request | Response, options) {
-  //   let mediaType: MediaType;
-  //   if (message.headers.has("Content-Type")) {
-  //     const mediatypes = message.headers.get("Content-Type") as string;
-  //     // TODO mediatypesの分割 getAllが仕様からなくなったので自前で要パース
-  //     mediaType = MediaType.fromString(xxxx);
-  //   }
-  //   else if (options.allowXXX === true) {
-  //     mediaType = 
-  //   }
+  //   // message.bodyで取得するので、ヘッダーからContent-TypeとContent-Lengthを抽出（blob()で取得するなら抽出する必要は無い TODO 選択可能にする？）
+  //   const mediaType = declaredContentType(message.headers);
+  //   const size = declaredContentLength(message.headers);
   // }
 
 
 }
 Object.freeze(FileLike);
+
+// // https://fetch.spec.whatwg.org/#content-type-header
+// function declaredContentType(headers: Headers): MediaType {
+//   // 5.
+//   if (headers.has("Content-Type") !== true) {
+//     throw new Exception("TODO", "TODO");
+//   }
+
+//   // 4, 5.
+//   const typesString = headers.get("Content-Type") as string;
+//   const typeStrings = splitWebHeaderValue(typesString);
+//   if (typeStrings.length <= 0) {
+//     throw new Exception("TODO", "TODO");
+//   }
+
+//   let textEncoding: string = "";
+//   let mediaTypeEssence: string = "";
+//   let mediaType: MediaType | null = null;
+//   // 6.
+//   for (const typeString of typeStrings) {
+//     try {
+//       // 6.1.
+//       const tempMediaType = MediaType.fromString(typeString);
+
+//       // 6.3.
+//       mediaType = tempMediaType;
+
+//       // 6.4.
+//       if (mediaTypeEssence !== mediaType.essence) {
+//         // 6.4.1.
+//         textEncoding = "";
+//         // 6.4.2.
+//         if (mediaType.hasParameter("charset")) {
+//           textEncoding = mediaType.getParameterValue("charset") as string;
+//         }
+//         // 6.4.3.
+//         mediaTypeEssence = mediaType.essence;
+//       }
+//       else {
+//         // 6.5.
+//         if ((mediaType.hasParameter("charset") !== true) && (textEncoding !== "")) {
+//           //TODO mediaType.withParameters()
+//         }
+//       }
+//     }
+//     catch (exception) {
+//       console.log(exception)//TODO 消す
+//       // 6.2. "*/*"はMediaType.fromStringでエラーにしている
+//       continue;
+//     }
+//   }
+
+//   // 7, 8.
+//   if (mediaType !== null) {
+//     return mediaType;
+//   }
+//   else {
+//     throw new Exception("TODO", "TODO");
+//   }
+// }
+
+// function splitWebHeaderValue(value: string): Array<string> {
+//   const notU0022OrU002C = /[^\u0022\u002C]/;
+//   const values: Array<string> = [];
+//   let work = value;
+//   while (work.length > 0) {
+//     let splitted = collectStart(work, notU0022OrU002C);
+//     work = work.substring(splitted.length);
+//     if (work.startsWith("\u0022")) {
+//       const result = httpQuotedString(work);
+//       splitted = splitted + result.value;
+//       work = work.substring(result.length);
+//     }
+//     else { // work.startsWith("\u002C")
+//       work = work.substring(1);
+//     }
+//     values.push(trimHttpTabOrSpace(splitted));
+//   }
+//   return values;
+// }
 
 export { FileLike };

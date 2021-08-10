@@ -189,14 +189,14 @@ class MediaType {
   /**
    * タイプ名
    */
-  get typeName(): string {
+  get type(): string {
     return this.#typeName;
   }
 
   /**
    * サブタイプ名
    */
-  get subtypeName(): string {
+  get subtype(): string {
     return this.#subtypeName;
   }
 
@@ -219,11 +219,22 @@ class MediaType {
   }
 
   /**
-   * パラメータ値を返却
+   * パラメーターを持っているか否かを返却
+   * 
+   * @param parameterName パラメーター名
+   * @returns パラメーターを持っているか否か
+   */
+  hasParameter(parameterName: string): boolean {
+    const normalizedName = parameterName.toLowerCase();
+    return this.#parameters.has(normalizedName);
+  }
+
+  /**
+   * パラメーター値を返却
    * パラメーター名から値を取得できなかった場合nullを返却
    * 
    * @param parameterName パラメーター名
-   * @returns パラメータ値
+   * @returns パラメーター値
    */
   getParameterValue(parameterName: string): string | null {
     const normalizedName = parameterName.toLowerCase();

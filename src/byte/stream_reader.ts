@@ -251,7 +251,7 @@ function addToBuffer(buffer: Uint8Array, loadedByteCount: number, chunkBytes: Ui
   work.set(chunkBytes, loadedByteCount);
   return work;
 }
-// TODO 最後に連結すべき
+// XXX 最後に連結すべき（おそらくそのうちArrayBufferの長さ可変がES仕様になる）
 
 export {
   Stream as ReadableStreamType,

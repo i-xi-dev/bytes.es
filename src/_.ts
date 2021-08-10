@@ -226,6 +226,16 @@ export function trimHttpSpace(str: string): string {
 }
 
 /**
+ * 文字列から先頭および末尾の{@link https://fetch.spec.whatwg.org/#http-tab-or-space HTTP tab or space}を削除した文字列を返却
+ * 
+ * @param str
+ * @returns 文字列
+ */
+export function trimHttpTabOrSpace(str: string): string {
+  return str.replace(/^[\u{9}\u{20}]+/u, "").replace(/[\u{9}\u{20}]+$/u, "");
+}
+
+/**
  * 文字列から末尾の{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}を削除した文字列を返却
  * 
  * @param str 文字列
@@ -236,22 +246,33 @@ export function trimHttpSpaceEnd(str: string): string {
 }
 
 /**
- * 文字列から先頭の{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}の連続を取得し返却
+ * 文字列先頭から{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}の連続を取得し返却
  *     存在しない場合、空文字列を返却
  * 
  * @param str 文字列
  * @returns 結果
  */
 export function collectHttpSpaceStart(str: string): string {
-  const regex = /[\u{9}\u{A}\u{D}\u{20}]/u;
-  let httpSpace = "";
+  return collectStart(str, /[\u{9}\u{A}\u{D}\u{20}]/u);
+}
+
+/**
+ * 文字列先頭から収集対象の連続を取得し返却
+ *     存在しない場合、空文字列を返却
+ * 
+ * @param str 文字列
+ * @param regex 収集対象の正規表現
+ * @returns 結果
+ */
+export function collectStart(str: string, regex: RegExp): string {
+  let collected = "";
   for (const c of str) {
     if (regex.test(c) !== true) {
       break;
     }
-    httpSpace = httpSpace + c;
+    collected = collected + c;
   }
-  return httpSpace;
+  return collected;
 }
 
 type ResultString = {

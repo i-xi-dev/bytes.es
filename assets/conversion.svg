@@ -97,13 +97,13 @@
 
   <rect class="background"/>
 
-  <g class="class" style="translate: 440px 250px;">
+  <g class="class" style="transform: translate(440px, 250px);">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Byte array</text>
     <text class="class-desc" x="120" y="44">Uint8Array</text>
   </g>
 
-  <g class="class" style="translate: 100px 100px;">
+  <g class="class" style="transform: translate(100px, 100px);">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Base64 encoded</text>
     <text class="class-desc" x="120" y="44">string</text>
@@ -111,7 +111,7 @@
 
   <path class="connecter bidi" d="M 324 162 L 466 246"/>
 
-  <g class="class" style="translate: 60px 200px;">
+  <g class="class" style="transform: translate(60px, 200px);">
     <rect class="class-frame" height="60" width="240"/>
     <a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary" rel="noopener noreferrer">
       <text class="class-label" x="120" y="22">Binary string</text>
@@ -121,7 +121,7 @@
 
   <path class="connecter bidi" d="M 304 244 L 436 266"/>
 
-  <g class="class" style="translate: 60px 300px;">
+  <g class="class" style="transform: translate(60px, 300px);">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Hexadecimal formatted</text>
     <text class="class-desc" x="120" y="44">string</text>
@@ -129,7 +129,7 @@
 
   <path class="connecter bidi" d="M 304 316 L 436 294"/>
 
-  <g class="class" style="translate: 400px 40px;">
+  <g class="class" style="transform: translate(400px, 40px);">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Byte stream</text>
     <text class="class-desc" x="120" y="44">ReadableStream&#x3C;Uint8Array></text>
@@ -137,7 +137,7 @@
 
   <path class="connecter" d="M 526 104 L 554 246"/>
 
-  <g class="class" style="translate: 800px 260px;">
+  <g class="class" style="transform: translate(800px, 260px);">
     <rect class="class-frame" height="60" width="240"/>
     <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob" rel="noopener noreferrer">
       <text class="class-label" x="120" y="30">Blob</text>
@@ -146,7 +146,7 @@
 
   <path class="connecter bidi" d="M 796 292 L 684 284"/>
 
-  <g class="class" style="translate: 780px 360px;">
+  <g class="class" style="transform: translate(780px, 360px);">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Data URL</text>
     <text class="class-desc" x="120" y="44">string</text>
@@ -154,7 +154,7 @@
 
   <path class="connecter bidi" d="M 780 360 L 678 310"/>
 
-  <g class="class" style="translate: 760px 120px;">
+  <g class="class" style="transform: translate(760px, 120px);">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Text</text>
     <text class="class-desc" x="120" y="44">string</text>
