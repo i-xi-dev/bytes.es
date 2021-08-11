@@ -3,7 +3,6 @@
 // メディアタイプ（いわゆるMIMEタイプ）
 
 import {
-  collectHttpSpaceStart,
   Exception,
   httpQuotedString,
   HTTP_QUOTED_STRING_TOKEN,
@@ -292,7 +291,7 @@ class MediaType {
       i = i + 1;
 
       // [mimesniff 4.4.]-11.2
-      const startHttpSpaces2 = collectHttpSpaceStart(work);
+      const startHttpSpaces2 = StringEx.collectStart(work, HTTP_SPACE);
       work = work.substring(startHttpSpaces2.length);
       i = i + startHttpSpaces2.length;
 

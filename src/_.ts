@@ -60,36 +60,6 @@ export const HTTP_SPACE = "\\u0009\\u000A\\u000D\\u0020";
  */
 export const HTTP_TAB_OR_SPACE = "\u0009\u0020";
 
-/**
- * 文字列先頭から{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}の連続を取得し返却
- *     存在しない場合、空文字列を返却
- * 
- * @param str 文字列
- * @returns 結果
- */
-export function collectHttpSpaceStart(str: string): string {
-  return collectStart(str, /[\u{9}\u{A}\u{D}\u{20}]/u);
-}
-
-/**
- * 文字列先頭から収集対象の連続を取得し返却
- *     存在しない場合、空文字列を返却
- * 
- * @param str 文字列
- * @param regex 収集対象の正規表現
- * @returns 結果
- */
-export function collectStart(str: string, regex: RegExp): string {
-  let collected = "";
-  for (const c of str) {
-    if (regex.test(c) !== true) {
-      break;
-    }
-    collected = collected + c;
-  }
-  return collected;
-}
-
 type ResultString = {
   value: string,
   length: number,

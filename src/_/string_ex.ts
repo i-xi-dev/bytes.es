@@ -75,7 +75,28 @@ function trimEnd(str: string, rangePattern: string): string {
   return str.replace(regex, "");
 }
 
+/**
+ * 文字列先頭から収集対象の連続を取得し返却
+ *     存在しない場合、空文字列を返却
+ * 
+ * @param str 文字列
+ * @param rangePattern 範囲パターン
+ * @returns 結果
+ */
+function collectStart(str: string, rangePattern: string): string {
+  const regex = new RegExp("[" + rangePattern + "]");
+  let collected = "";
+  for (const c of str) {
+    if (regex.test(c) !== true) {
+      break;
+    }
+    collected = collected + c;
+  }
+  return collected;
+}
+
 export const StringEx = Object.freeze({
+  collectStart,
   devideByLength,
   match,
   trim,
