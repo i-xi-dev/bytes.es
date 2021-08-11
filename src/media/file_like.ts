@@ -1,8 +1,9 @@
 //
 
-// import { collectStart, Exception, httpQuotedString, splitWebHeaderValue, trimAsciiSpace, trimHttpTabOrSpace } from "../_.js";
-import { Exception,  trimAsciiSpace  } from "../_.js";
+// import { collectStart, Exception, httpQuotedString, splitWebHeaderValue, trimHttpTabOrSpace } from "../_.js";
+import { ASCII_SPACE, Exception } from "../_.js";
 import { getBlobConstructor } from "../_/compat.js";
+import { StringEx } from "../_/string_ex.js";
 import { ByteSequence } from "../byte_sequence.js";
 import { Uri } from "../uri.js";
 import { MediaType } from "./media_type.js";
@@ -127,7 +128,7 @@ class FileLike {
     }
 
     const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
-    let mediaTypeWork = trimAsciiSpace(mediaTypeOriginal);
+    let mediaTypeWork = StringEx.trim(mediaTypeOriginal, ASCII_SPACE);
 
     // 8, 9
     bodyStringWork = bodyStringWork.substring(mediaTypeOriginal.length + 1);

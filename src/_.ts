@@ -46,14 +46,9 @@ export const HTTP_TOKEN = "\\u0021\\u0023-\\u0027\\u002A\\u002B\\u002D\\u002E0-9
 export const HTTP_QUOTED_STRING_TOKEN = "\\u0009\\u0020-\\u007E\\u0080-\\u00FF";
 
 /**
- * 文字列から先頭および末尾の{@link https://infra.spec.whatwg.org/#ascii-whitespace ASCII whitespace}を削除した文字列を返却
- * 
- * @param str 文字列
- * @returns 文字列
+ * {@link https://infra.spec.whatwg.org/#ascii-whitespace ASCII whitespace}の範囲パターン
  */
-export function trimAsciiSpace(str: string): string {
-  return str.replace(/^[\u{9}\u{A}\u{C}\u{D}\u{20}]+/u, "").replace(/[\u{9}\u{A}\u{C}\u{D}\u{20}]+$/u, "");
-}
+export const ASCII_SPACE = "\\u0009\\u000A\\u000C\\u000D\\u0020";
 
 /**
  * 文字列から先頭および末尾の{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}を削除した文字列を返却

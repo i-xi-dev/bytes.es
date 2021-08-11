@@ -51,7 +51,33 @@ function match(str: string, rangePattern: string): boolean {
   return regex.test(str);
 }
 
+/**
+ * 文字列から先頭および末尾のrangePatternの範囲の部分文字列を削除した文字列を返却
+ * 
+ * @param str 文字列
+ * @param rangePattern 範囲パターン
+ * @returns 文字列
+ */
+function trim(str: string, rangePattern: string): string {
+  const regex = new RegExp("(^[" + rangePattern + "]+|[" + rangePattern + "]+$)", "g");
+  return str.replaceAll(regex, "");
+}
+
+/**
+ * 文字列から末尾のrangePatternの範囲の部分文字列を削除した文字列を返却
+ * 
+ * @param str 文字列
+ * @param rangePattern 範囲パターン
+ * @returns 文字列
+ */
+function trimEnd(str: string, rangePattern: string): string {
+  const regex = new RegExp("[" + rangePattern + "]+$");
+  return str.replace(regex, "");
+}
+
 export const StringEx = Object.freeze({
   devideByLength,
   match,
+  trim,
+  trimEnd,
 });
