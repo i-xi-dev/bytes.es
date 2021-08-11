@@ -51,14 +51,9 @@ export const HTTP_QUOTED_STRING_TOKEN = "\\u0009\\u0020-\\u007E\\u0080-\\u00FF";
 export const ASCII_SPACE = "\\u0009\\u000A\\u000C\\u000D\\u0020";
 
 /**
- * 文字列から先頭および末尾の{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}を削除した文字列を返却
- * 
- * @param str 文字列
- * @returns 文字列
+ * {@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}の範囲パターン
  */
-export function trimHttpSpace(str: string): string {
-  return str.replace(/^[\u{9}\u{A}\u{D}\u{20}]+/u, "").replace(/[\u{9}\u{A}\u{D}\u{20}]+$/u, "");
-}
+export const HTTP_SPACE = "\\u0009\\u000A\\u000D\\u0020";
 
 /**
  * 文字列から先頭および末尾の{@link https://fetch.spec.whatwg.org/#http-tab-or-space HTTP tab or space}を削除した文字列を返却
@@ -68,16 +63,6 @@ export function trimHttpSpace(str: string): string {
  */
 export function trimHttpTabOrSpace(str: string): string {
   return str.replace(/^[\u{9}\u{20}]+/u, "").replace(/[\u{9}\u{20}]+$/u, "");
-}
-
-/**
- * 文字列から末尾の{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}を削除した文字列を返却
- * 
- * @param str 文字列
- * @returns 文字列
- */
-export function trimHttpSpaceEnd(str: string): string {
-  return str.replace(/[\u{9}\u{A}\u{D}\u{20}]+$/u, "");
 }
 
 /**

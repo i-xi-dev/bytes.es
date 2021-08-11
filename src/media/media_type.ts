@@ -7,9 +7,8 @@ import {
   Exception,
   httpQuotedString,
   HTTP_QUOTED_STRING_TOKEN,
+  HTTP_SPACE,
   HTTP_TOKEN,
-  trimHttpSpace,
-  trimHttpSpaceEnd,
 } from "../_.js";
 import { StringEx } from "../_/string_ex.js";
 
@@ -95,7 +94,7 @@ function parseSubtypeName(str: string): ParseResult {
     noParameters = true;
   }
 
-  subtypeName = trimHttpSpaceEnd(subtypeName);
+  subtypeName = StringEx.trimEnd(subtypeName, HTTP_SPACE);
 
   return {
     component: subtypeName,
@@ -253,7 +252,7 @@ class MediaType {
    * @returns 生成したインスタンス
    */
   static fromString(text: string): MediaType {
-    const trimmedText = trimHttpSpace(text);
+    const trimmedText = StringEx.trim(text, HTTP_SPACE);
 
     let work = trimmedText;
     let i = 0;
@@ -363,7 +362,7 @@ class MediaType {
         i = i + valueEndIndex;
 
         // [mimesniff 4.4.]-11.9.2
-        parameterValue = trimHttpSpaceEnd(parameterValue);
+        parameterValue = StringEx.trimEnd(parameterValue, HTTP_SPACE);
 
         // [mimesniff 4.4.]-11.9.3
         if (parameterValue.length <= 0) {
