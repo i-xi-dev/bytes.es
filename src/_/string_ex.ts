@@ -84,15 +84,12 @@ function trimEnd(str: string, rangePattern: string): string {
  * @returns 結果
  */
 function collectStart(str: string, rangePattern: string): string {
-  const regex = new RegExp("[" + rangePattern + "]");
-  let collected = "";
-  for (const c of str) {
-    if (regex.test(c) !== true) {
-      break;
-    }
-    collected = collected + c;
+  const regex = new RegExp("^[" + rangePattern + "]+");
+  const results = regex.exec(str);
+  if (results === null) {
+    return "";
   }
-  return collected;
+  return results[0] as string;
 }
 
 export const StringEx = Object.freeze({
