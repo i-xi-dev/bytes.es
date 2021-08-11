@@ -9,7 +9,7 @@
  * @param paddingUnit 分割結果の配列の最後の要素がunitGroupSizeに満たない場合、最後の要素の末尾を埋める文字列
  * @returns strをunitGroupSize UTF-16コードユニットごとに分割した文字列配列
  */
-function devideStringByLength(str: string, segmentLength: number, paddingUnit?: string): Array<string> {
+function devideByLength(str: string, segmentLength: number, paddingUnit?: string): Array<string> {
   if (Number.isSafeInteger(segmentLength) !== true) {
     throw new TypeError("segmentLength must be integer");
   }
@@ -38,6 +38,20 @@ function devideStringByLength(str: string, segmentLength: number, paddingUnit?: 
   return segments;
 }
 
+/**
+ * 文字列がrangePatternの範囲のみからなる文字列
+ * であるか否かを返却
+ * 
+ * @param str 文字列
+ * @param rangePattern 範囲パターン
+ * @returns 結果
+ */
+function match(str: string, rangePattern: string): boolean {
+  const regex = new RegExp("^[" + rangePattern + "]*$");
+  return regex.test(str);
+}
+
 export const StringEx = Object.freeze({
-  devideByLength: devideStringByLength,
+  devideByLength,
+  match,
 });

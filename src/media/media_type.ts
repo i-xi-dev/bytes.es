@@ -6,11 +6,12 @@ import {
   collectHttpSpaceStart,
   Exception,
   httpQuotedString,
-  matchHttpQuotedStringToken,
-  matchHttpToken,
+  HTTP_QUOTED_STRING_TOKEN,
+  HTTP_TOKEN,
   trimHttpSpace,
   trimHttpSpaceEnd,
 } from "../_.js";
+import { StringEx } from "../_/string_ex.js";
 
 /**
  * IANAの登録簿に登録済のタイプ名
@@ -164,7 +165,7 @@ class MediaType {
     if (isRegisteredTypeName(typeName) !== true) {
       throw new TypeError("typeName");
     }
-    if ((subtypeName.length <= 0) || (matchHttpToken(subtypeName) !== true)) {
+    if ((subtypeName.length <= 0) || (StringEx.match(subtypeName, HTTP_TOKEN) !== true)) {
       throw new TypeError("subtypeName");
     }
 
@@ -374,10 +375,10 @@ class MediaType {
       if (parameterName.length <= 0) {
         continue;
       }
-      if (matchHttpToken(parameterName) !== true) {
+      if (StringEx.match(parameterName, HTTP_TOKEN) !== true) {
         continue;
       }
-      if (matchHttpQuotedStringToken(parameterValue) !== true) {
+      if (StringEx.match(parameterValue, HTTP_QUOTED_STRING_TOKEN) !== true) {
         continue;
       }
       if (parameterEntries.some((param) => param[0] === parameterName)) {
@@ -405,7 +406,7 @@ class MediaType {
       parameters = parameters + ";" + parameterName + "=";
 
       const parameterValue = this.#parameters.get(parameterName) as string;
-      if (matchHttpToken(parameterValue) !== true) {
+      if (StringEx.match(parameterValue, HTTP_TOKEN) !== true) {
         parameters = parameters + '"' + parameterValue.replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"';
       }
       else {

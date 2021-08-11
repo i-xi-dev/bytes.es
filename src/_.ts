@@ -36,26 +36,14 @@ export class Exception extends Error {
 }
 
 /**
- * 文字列が{@link https://mimesniff.spec.whatwg.org/#http-token-code-point HTTP token code point}のみからなる文字列
- * であるか否かを返却
- * 
- * @param str 文字列
- * @returns 結果
+ * {@link https://mimesniff.spec.whatwg.org/#http-token-code-point HTTP token code point}の範囲パターン
  */
-export function matchHttpToken(str: string): boolean {
-  return /^[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}\u{2E}0-9A-Za-z\u{5E}\u{5F}\u{60}\u{7C}\u{7E}]*$/u.test(str);
-}
+export const HTTP_TOKEN = "\\u0021\\u0023-\\u0027\\u002A\\u002B\\u002D\\u002E0-9A-Za-z\\u005E\\u005F\\u0060\\u007C\\u007E";
 
 /**
- * 文字列が{@link https://mimesniff.spec.whatwg.org/#http-quoted-string-token-code-point HTTP quoted-string token code point}のみからなる文字列
- * であるか否かを返却
- * 
- * @param str 文字列
- * @returns 結果
+ * {@link https://mimesniff.spec.whatwg.org/#http-quoted-string-token-code-point HTTP quoted-string token code point}の範囲パターン
  */
-export function matchHttpQuotedStringToken(str: string): boolean {
-  return /^[\u{9}\u{20}-\u{7E}\u{80}-\u{FF}]*$/u.test(str);
-}
+export const HTTP_QUOTED_STRING_TOKEN = "\\u0009\\u0020-\\u007E\\u0080-\\u00FF";
 
 /**
  * 文字列から先頭および末尾の{@link https://infra.spec.whatwg.org/#ascii-whitespace ASCII whitespace}を削除した文字列を返却
