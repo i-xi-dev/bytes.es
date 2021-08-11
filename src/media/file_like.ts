@@ -1,7 +1,8 @@
 //
 
-// import { collectStart, Exception, getBlobConstructor, httpQuotedString, trimAsciiSpace, trimHttpTabOrSpace } from "../_.js";
-import { Exception, getBlobConstructor,  trimAsciiSpace  } from "../_.js";
+// import { collectStart, Exception, httpQuotedString, splitWebHeaderValue, trimAsciiSpace, trimHttpTabOrSpace } from "../_.js";
+import { Exception,  trimAsciiSpace  } from "../_.js";
+import { getBlobConstructor } from "../_/compat.js";
 import { ByteSequence } from "../byte_sequence.js";
 import { Uri } from "../uri.js";
 import { MediaType } from "./media_type.js";
@@ -216,11 +217,49 @@ class FileLike {
   //   // message.bodyで取得するので、ヘッダーからContent-TypeとContent-Lengthを抽出（blob()で取得するなら抽出する必要は無い TODO 選択可能にする？）
   //   const mediaType = declaredContentType(message.headers);
   //   const size = declaredContentLength(message.headers);
+  //   // Content-Encodingされてる場合にサイズが取れない
   // }
 
 
 }
 Object.freeze(FileLike);
+
+// // https://fetch.spec.whatwg.org/#content-length-header
+// function declaredContentLength(headers: Headers): number | null {
+//   // 2.
+//   if (headers.has("Content-Length") !== true) {
+//     return null;
+//   }
+
+//   // 1, 2.
+//   const sizesString = headers.get("Content-Length") as string;
+//   const sizeStrings = splitWebHeaderValue(sizesString);
+//   if (sizeStrings.length <= 0) {
+//     return null;
+//   }
+
+//   // 3.
+//   let candidateValue: string | null = null;
+//   // 4.
+//   for (const sizeString of sizeStrings) {
+//     // 4.1.
+//     if (candidateValue === null) {
+//       candidateValue = sizeString;
+//     }
+//     else {
+//       // 4.2.
+//       throw new Exception("TODO", "TODO");
+//     }
+//   }
+//   candidateValue = candidateValue as string;
+
+//   // 5.
+//   if (/^[0-9]+$/.test(candidateValue) !== true) {
+//     return null;
+//   }
+//   // 6.
+//   return Number.parseInt(candidateValue, 10);
+// }
 
 // // https://fetch.spec.whatwg.org/#content-type-header
 // function declaredContentType(headers: Headers): MediaType {
@@ -236,6 +275,7 @@ Object.freeze(FileLike);
 //     throw new Exception("TODO", "TODO");
 //   }
 
+//   // 1, 2, 3.
 //   let textEncoding: string = "";
 //   let mediaTypeEssence: string = "";
 //   let mediaType: MediaType | null = null;
@@ -280,26 +320,6 @@ Object.freeze(FileLike);
 //   else {
 //     throw new Exception("TODO", "TODO");
 //   }
-// }
-
-// function splitWebHeaderValue(value: string): Array<string> {
-//   const notU0022OrU002C = /[^\u0022\u002C]/;
-//   const values: Array<string> = [];
-//   let work = value;
-//   while (work.length > 0) {
-//     let splitted = collectStart(work, notU0022OrU002C);
-//     work = work.substring(splitted.length);
-//     if (work.startsWith("\u0022")) {
-//       const result = httpQuotedString(work);
-//       splitted = splitted + result.value;
-//       work = work.substring(result.length);
-//     }
-//     else { // work.startsWith("\u002C")
-//       work = work.substring(1);
-//     }
-//     values.push(trimHttpTabOrSpace(splitted));
-//   }
-//   return values;
 // }
 
 export { FileLike };

@@ -1,6 +1,6 @@
 //
 
-import { getCrypto } from "../../_.js";
+import { getCrypto } from "../../_/compat.js";
 import { DigestAlgorithmImplementation } from "./_.js";
 
 /**

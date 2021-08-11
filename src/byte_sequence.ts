@@ -2,7 +2,7 @@
 
 // バイト列
 
-import { getCrypto } from "./_.js";
+import { getCrypto } from "./_/compat.js";
 import { uint8 } from "./byte/type.js";
 import {
   Base64,

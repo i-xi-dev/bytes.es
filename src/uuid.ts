@@ -30,8 +30,6 @@ class Uuid {
   }
 
   /**
-   * Nil UUID（全ビットが0のUUID）を生成し返却
-   * 
    * @returns A new instance that represents the nil UUID.
    */
   static nil(): Uuid {
@@ -39,8 +37,6 @@ class Uuid {
   }
 
   /**
-   * version4バリアント（乱数形式）のUUIDを生成し返却
-   * 
    * @returns A new instance that represents the version 4 UUID.
    */
   static generateRandom(): Uuid {
@@ -103,8 +99,6 @@ class Uuid {
   }
 
   /**
-   * Returns a string representation of the value of this instance.
-   * 
    * @override
    * @returns The string representation of the value of this instance.
    */
@@ -113,8 +107,6 @@ class Uuid {
   }
 
   /**
-   * Returns a string representation of the value of this instance.
-   * 
    * @returns The string representation of the value of this instance.
    */
   toJSON(): string {
@@ -122,8 +114,6 @@ class Uuid {
   }
 
   /**
-   * Returns a URN of the value of this instance.
-   * 
    * @returns The URN of the value of this instance.
    */
   toUuidUrl(): Uri {

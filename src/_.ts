@@ -1,59 +1,5 @@
 //
 
-//
-
-/**
- * Cryptoオブジェクト
- */
-let _crypto: Crypto;
-if (globalThis.crypto?.subtle) { // globalThis.cryptoがCrypto型かどうかでは判定できない（Node, Jest環境）Cryptoが値扱いの為
-  // ブラウザー, Deno
-  _crypto = globalThis.crypto;
-}
-else if (globalThis.process) {
-  // Node.js 条件不十分？
-  _crypto = ((await import("crypto")).webcrypto as unknown) as Crypto;
-}
-
-/**
- * Cryptoオブジェクトを返却
- * 
- * @returns Cryptoオブジェクト
- */
-export function getCrypto(): Crypto {
-  if (_crypto) {
-    return _crypto;
-  }
-  throw new Exception("NotSupportedError", "Crypto unsupported");
-}
-
-/**
- * Blobコンストラクター
- */
-export type BlobConstructor = {
-  new (blobParts?: BlobPart[] | undefined, options?: BlobPropertyBag | undefined): Blob;
-  prototype: Blob;
-};
-let _BlobConstructor: BlobConstructor;
-if (globalThis.Blob) {
-  _BlobConstructor = Blob;
-}
-else if (globalThis.process) {
-  _BlobConstructor = (await import("buffer")).Blob as BlobConstructor;
-}
-
-/**
- * Blobコンストラクターを返却
- * 
- * @returns Blobコンストラクター
- */
-export function getBlobConstructor(): BlobConstructor {
-  if (_BlobConstructor) {
-    return _BlobConstructor;
-  }
-  throw new Exception("NotSupportedError", "Blob unsupported");
-}
-
 /**
  * 例外
  */
@@ -126,62 +72,6 @@ export function devideStringByLength(str: string, segmentLength: number, padding
 
   return segments;
 }
-
-/**
- * DOMのProgressEventと同じインターフェースのイベント
- * Node.js用
- */
-class _ProgressEvent extends Event implements ProgressEvent<EventTarget> {
-  /**
-   * 進捗状況を計測可能か否か
-   */
-  #lengthComputable: boolean;
-
-  /**
-   * 実行済の実行量
-   */
-  #loaded: number;
-
-  /**
-   * 合計の実行量
-   */
-  #total: number;
-
-  /**
-   * @param type イベント型名
-   * @param init EventInit
-   */
-  constructor(type: string, init?: ProgressEventInit) {
-    super(type, init);
-
-    this.#lengthComputable = (init && (typeof init.lengthComputable === "boolean")) ? init.lengthComputable : false;
-    this.#loaded = (init && (typeof init.loaded === "number") && Number.isSafeInteger(init.loaded) && (init.loaded >= 0)) ? init.loaded : 0;
-    this.#total = (init && (typeof init.total === "number") && Number.isSafeInteger(init.total) && (init.total >= 0)) ? init.total : 0;
-  }
-
-  /**
-   * 進捗状況を計測可能か否か
-   */
-  get lengthComputable(): boolean {
-    return this.#lengthComputable;
-  }
-
-  /**
-   * 実行済の実行量
-   */
-  get loaded(): number {
-    return this.#loaded;
-  }
-
-  /**
-   * 合計の実行量
-   */
-  get total(): number {
-    return this.#total;
-  }
-}
-const pe = (globalThis.ProgressEvent) ? globalThis.ProgressEvent : _ProgressEvent;
-export { pe as ProgressEvent };
 
 /**
  * 文字列が{@link https://mimesniff.spec.whatwg.org/#http-token-code-point HTTP token code point}のみからなる文字列
@@ -324,4 +214,24 @@ export function httpQuotedString(str: string): ResultString {
     value: work,
     length: (i + 1),
   };
+}
+
+export function splitWebHeaderValue(value: string): Array<string> {
+  const notU0022OrU002C = /[^\u0022\u002C]/;
+  const values: Array<string> = [];
+  let work = value;
+  while (work.length > 0) {
+    let splitted = collectStart(work, notU0022OrU002C);
+    work = work.substring(splitted.length);
+    if (work.startsWith("\u0022")) {
+      const result = httpQuotedString(work);
+      splitted = splitted + result.value;
+      work = work.substring(result.length);
+    }
+    else { // work.startsWith("\u002C")
+      work = work.substring(1);
+    }
+    values.push(trimHttpTabOrSpace(splitted));
+  }
+  return values;
 }
