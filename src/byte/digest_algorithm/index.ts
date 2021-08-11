@@ -26,7 +26,7 @@ function getImplementation(name: string): DigestAlgorithmImplementation {
 
 export { DigestAlgorithmImplementation };
 
-export const DigestAlgorithm = {
+export const DigestAlgorithm = Object.freeze({
   register,
   /**
    * Returns the digest algorithm associated with the specified name.
@@ -34,4 +34,4 @@ export const DigestAlgorithm = {
    * @returns The digest algorithm associated with the specified name.
    */
   for: getImplementation,
-};
+});

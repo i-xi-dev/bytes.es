@@ -27,7 +27,7 @@ function getImplementation(name: string): TextEncodingImplementation {
 export { TextEncodingImplementation };
 export { TextDecodeOptions, TextEncodeOptions } from "./_.js";
 
-export const TextEncoding = {
+export const TextEncoding = Object.freeze({
   register,
   for: getImplementation,
-};
+});

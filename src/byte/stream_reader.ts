@@ -259,6 +259,6 @@ export {
   Options as StreamReadOptions,
 };
 
-export const StreamReader = {
+export const StreamReader = Object.freeze({
   read,
-};
+});

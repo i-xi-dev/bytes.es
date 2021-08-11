@@ -7874,8 +7874,8 @@ const TABLE = new Map<number, number>([
  * 
  * Implements "Shift_JIS" of {@link https://encoding.spec.whatwg.org/ Encoding Standard}.
  */
-export const ShiftJis: TextEncodingImplementation = {
+export const ShiftJis: TextEncodingImplementation = Object.freeze({
   name: NAME,
   decode,
   encode,
-};
+});

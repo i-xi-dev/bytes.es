@@ -412,7 +412,7 @@ export {
 /**
  * Base64 encoding
  */
-export const Base64 = {
+export const Base64 = Object.freeze({
   decode,
   encode,
-};
+});

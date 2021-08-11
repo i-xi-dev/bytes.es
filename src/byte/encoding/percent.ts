@@ -315,7 +315,7 @@ export {
 /**
  * Percent encoding
  */
-export const Percent = {
+export const Percent = Object.freeze({
   decode,
   encode,
-};
+});

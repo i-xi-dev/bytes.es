@@ -16,6 +16,6 @@ async function compute(input: Uint8Array): Promise<Uint8Array> {
 /**
  * SHA-512 digest algorithm
  */
-export const Sha512: DigestAlgorithmImplementation = {
+export const Sha512: DigestAlgorithmImplementation = Object.freeze({
   compute,
-};
+});

@@ -69,8 +69,8 @@ function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
 /**
  * US-ASCII encoding of US-ASCII characters
  */
-export const UsAscii: TextEncodingImplementation = {
+export const UsAscii: TextEncodingImplementation = Object.freeze({
   name: NAME,
   decode,
   encode,
-};
+});

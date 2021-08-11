@@ -1,6 +1,7 @@
 //
 
-import { devideStringByLength, Exception } from "../_.js";
+import { Exception } from "../_.js";
+import { StringEx } from "../_/string_ex.js";
 import { isByte, uint8 } from "./type.js";
 
 /**
@@ -249,7 +250,7 @@ function parse(toParse: string, radix: Radix, options?: ParseOptions): Uint8Arra
   }
 
   const elementLength = resolvedOptions.paddedLength + resolvedOptions.prefix.length + resolvedOptions.suffix.length;
-  const byteStringArray = devideStringByLength(toParse, elementLength);
+  const byteStringArray = StringEx.devideByLength(toParse, elementLength);
 
   return Uint8Array.from(byteStringArray, (byteString) => {
     return parseByte(byteString, radix, resolvedOptions);
@@ -298,7 +299,7 @@ export {
 /**
  * Byte Formatting
  */
-export const Format = {
+export const Format = Object.freeze({
   parse,
   format,
-};
+});

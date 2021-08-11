@@ -62,8 +62,8 @@ function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
 /**
  * UTF-8 encoding of Unicode characters
  */
-export const Utf8: TextEncodingImplementation = {
+export const Utf8: TextEncodingImplementation = Object.freeze({
   name: NAME,
   decode,
   encode,
-};
+});
