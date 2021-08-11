@@ -56,14 +56,9 @@ export const ASCII_SPACE = "\\u0009\\u000A\\u000C\\u000D\\u0020";
 export const HTTP_SPACE = "\\u0009\\u000A\\u000D\\u0020";
 
 /**
- * 文字列から先頭および末尾の{@link https://fetch.spec.whatwg.org/#http-tab-or-space HTTP tab or space}を削除した文字列を返却
- * 
- * @param str
- * @returns 文字列
+ * {@link https://fetch.spec.whatwg.org/#http-tab-or-space HTTP tab or space}の範囲パターン
  */
-export function trimHttpTabOrSpace(str: string): string {
-  return str.replace(/^[\u{9}\u{20}]+/u, "").replace(/[\u{9}\u{20}]+$/u, "");
-}
+export const HTTP_TAB_OR_SPACE = "\u0009\u0020";
 
 /**
  * 文字列先頭から{@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}の連続を取得し返却
@@ -144,24 +139,4 @@ export function httpQuotedString(str: string): ResultString {
     value: work,
     length: (i + 1),
   };
-}
-
-export function splitWebHeaderValue(value: string): Array<string> {
-  const notU0022OrU002C = /[^\u0022\u002C]/;
-  const values: Array<string> = [];
-  let work = value;
-  while (work.length > 0) {
-    let splitted = collectStart(work, notU0022OrU002C);
-    work = work.substring(splitted.length);
-    if (work.startsWith("\u0022")) {
-      const result = httpQuotedString(work);
-      splitted = splitted + result.value;
-      work = work.substring(result.length);
-    }
-    else { // work.startsWith("\u002C")
-      work = work.substring(1);
-    }
-    values.push(trimHttpTabOrSpace(splitted));
-  }
-  return values;
 }

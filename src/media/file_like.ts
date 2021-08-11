@@ -1,6 +1,6 @@
 //
 
-// import { collectStart, Exception, httpQuotedString, splitWebHeaderValue, trimHttpTabOrSpace } from "../_.js";
+// import { collectStart, httpQuotedString, splitWebHeaderValue, HTTP_TAB_OR_SPACE } from "../_.js";
 import { ASCII_SPACE, Exception } from "../_.js";
 import { getBlobConstructor } from "../_/compat.js";
 import { StringEx } from "../_/string_ex.js";
@@ -321,6 +321,26 @@ Object.freeze(FileLike);
 //   else {
 //     throw new Exception("TODO", "TODO");
 //   }
+// }
+
+// export function splitWebHeaderValue(value: string): Array<string> {
+//   const notU0022OrU002C = /[^\u0022\u002C]/;
+//   const values: Array<string> = [];
+//   let work = value;
+//   while (work.length > 0) {
+//     let splitted = collectStart(work, notU0022OrU002C);
+//     work = work.substring(splitted.length);
+//     if (work.startsWith("\u0022")) {
+//       const result = httpQuotedString(work);
+//       splitted = splitted + result.value;
+//       work = work.substring(result.length);
+//     }
+//     else { // work.startsWith("\u002C")
+//       work = work.substring(1);
+//     }
+//     values.push(StringEx.trim(splitted, HTTP_TAB_OR_SPACE));
+//   }
+//   return values;
 // }
 
 export { FileLike };
