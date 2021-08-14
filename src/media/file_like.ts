@@ -1,7 +1,7 @@
 //
 
-// import { httpQuotedString, splitWebHeaderValue, HTTP_TAB_OR_SPACE } from "../_.js";
-import { ASCII_SPACE, Exception } from "../_.js";
+// import { httpQuotedString, splitWebHeaderValue } from "../_.js";
+import { Exception, RangePattern } from "../_.js";
 import { getBlobConstructor } from "../_/compat.js";
 import { StringEx } from "../_/string_ex.js";
 import { ByteSequence } from "../byte_sequence.js";
@@ -128,7 +128,7 @@ class FileLike {
     }
 
     const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
-    let mediaTypeWork = StringEx.trim(mediaTypeOriginal, ASCII_SPACE);
+    let mediaTypeWork = StringEx.trim(mediaTypeOriginal, RangePattern.ASCII_WHITESPACE);
 
     // 8, 9
     bodyStringWork = bodyStringWork.substring(mediaTypeOriginal.length + 1);
@@ -338,7 +338,7 @@ Object.freeze(FileLike);
 //     else { // work.startsWith("\u002C")
 //       work = work.substring(1);
 //     }
-//     values.push(StringEx.trim(splitted, HTTP_TAB_OR_SPACE));
+//     values.push(StringEx.trim(splitted, RangePattern.HTTP_TAB_OR_SPACE));
 //   }
 //   return values;
 // }

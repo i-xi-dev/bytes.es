@@ -36,29 +36,24 @@ export class Exception extends Error {
 }
 
 /**
- * {@link https://mimesniff.spec.whatwg.org/#http-token-code-point HTTP token code point}の範囲パターン
+ * 範囲パターン
  */
-export const HTTP_TOKEN = "\\u0021\\u0023-\\u0027\\u002A\\u002B\\u002D\\u002E0-9A-Za-z\\u005E\\u005F\\u0060\\u007C\\u007E";
+export const RangePattern = Object.freeze({
+  /** {@link https://infra.spec.whatwg.org/#ascii-whitespace ASCII whitespace} */
+  ASCII_WHITESPACE: "\\u0009\\u000A\\u000C\\u000D\\u0020",
 
-/**
- * {@link https://mimesniff.spec.whatwg.org/#http-quoted-string-token-code-point HTTP quoted-string token code point}の範囲パターン
- */
-export const HTTP_QUOTED_STRING_TOKEN = "\\u0009\\u0020-\\u007E\\u0080-\\u00FF";
+  /** {@link https://mimesniff.spec.whatwg.org/#http-quoted-string-token-code-point HTTP quoted-string token code point} */
+  HTTP_QUOTED_STRING_TOKEN: "\\u0009\\u0020-\\u007E\\u0080-\\u00FF",
 
-/**
- * {@link https://infra.spec.whatwg.org/#ascii-whitespace ASCII whitespace}の範囲パターン
- */
-export const ASCII_SPACE = "\\u0009\\u000A\\u000C\\u000D\\u0020";
+  /** {@link https://fetch.spec.whatwg.org/#http-tab-or-space HTTP tab or space} */
+  HTTP_TAB_OR_SPACE: "\\u0009\\u0020",
 
-/**
- * {@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace}の範囲パターン
- */
-export const HTTP_SPACE = "\\u0009\\u000A\\u000D\\u0020";
+  /** {@link https://mimesniff.spec.whatwg.org/#http-token-code-point HTTP token code point} */
+  HTTP_TOKEN: "\\u0021\\u0023-\\u0027\\u002A\\u002B\\u002D\\u002E0-9A-Za-z\\u005E\\u005F\\u0060\\u007C\\u007E",
 
-/**
- * {@link https://fetch.spec.whatwg.org/#http-tab-or-space HTTP tab or space}の範囲パターン
- */
-export const HTTP_TAB_OR_SPACE = "\u0009\u0020";
+  /** {@link https://fetch.spec.whatwg.org/#http-whitespace HTTP whitespace} */
+  HTTP_WHITESPACE: "\\u0009\\u000A\\u000D\\u0020",
+});
 
 type ResultString = {
   value: string,

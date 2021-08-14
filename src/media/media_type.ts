@@ -5,9 +5,7 @@
 import {
   Exception,
   httpQuotedString,
-  HTTP_QUOTED_STRING_TOKEN,
-  HTTP_SPACE,
-  HTTP_TOKEN,
+  RangePattern,
 } from "../_.js";
 import { StringEx } from "../_/string_ex.js";
 
@@ -93,7 +91,7 @@ function parseSubtypeName(str: string): ParseResult {
     noParameters = true;
   }
 
-  subtypeName = StringEx.trimEnd(subtypeName, HTTP_SPACE);
+  subtypeName = StringEx.trimEnd(subtypeName, RangePattern.HTTP_WHITESPACE);
 
   return {
     component: subtypeName,
@@ -163,7 +161,7 @@ class MediaType {
     if (isRegisteredTypeName(typeName) !== true) {
       throw new TypeError("typeName");
     }
-    if ((subtypeName.length <= 0) || (StringEx.match(subtypeName, HTTP_TOKEN) !== true)) {
+    if ((subtypeName.length <= 0) || (StringEx.match(subtypeName, RangePattern.HTTP_TOKEN) !== true)) {
       throw new TypeError("subtypeName");
     }
 
@@ -251,7 +249,7 @@ class MediaType {
    * @returns 生成したインスタンス
    */
   static fromString(text: string): MediaType {
-    const trimmedText = StringEx.trim(text, HTTP_SPACE);
+    const trimmedText = StringEx.trim(text, RangePattern.HTTP_WHITESPACE);
 
     let work = trimmedText;
     let i = 0;
@@ -291,7 +289,7 @@ class MediaType {
       i = i + 1;
 
       // [mimesniff 4.4.]-11.2
-      const startHttpSpaces2 = StringEx.collectStart(work, HTTP_SPACE);
+      const startHttpSpaces2 = StringEx.collectStart(work, RangePattern.HTTP_WHITESPACE);
       work = work.substring(startHttpSpaces2.length);
       i = i + startHttpSpaces2.length;
 
@@ -361,7 +359,7 @@ class MediaType {
         i = i + valueEndIndex;
 
         // [mimesniff 4.4.]-11.9.2
-        parameterValue = StringEx.trimEnd(parameterValue, HTTP_SPACE);
+        parameterValue = StringEx.trimEnd(parameterValue, RangePattern.HTTP_WHITESPACE);
 
         // [mimesniff 4.4.]-11.9.3
         if (parameterValue.length <= 0) {
@@ -373,10 +371,10 @@ class MediaType {
       if (parameterName.length <= 0) {
         continue;
       }
-      if (StringEx.match(parameterName, HTTP_TOKEN) !== true) {
+      if (StringEx.match(parameterName, RangePattern.HTTP_TOKEN) !== true) {
         continue;
       }
-      if (StringEx.match(parameterValue, HTTP_QUOTED_STRING_TOKEN) !== true) {
+      if (StringEx.match(parameterValue, RangePattern.HTTP_QUOTED_STRING_TOKEN) !== true) {
         continue;
       }
       if (parameterEntries.some((param) => param[0] === parameterName)) {
@@ -404,7 +402,7 @@ class MediaType {
       parameters = parameters + ";" + parameterName + "=";
 
       const parameterValue = this.#parameters.get(parameterName) as string;
-      if (StringEx.match(parameterValue, HTTP_TOKEN) !== true) {
+      if (StringEx.match(parameterValue, RangePattern.HTTP_TOKEN) !== true) {
         parameters = parameters + '"' + parameterValue.replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"';
       }
       else {
