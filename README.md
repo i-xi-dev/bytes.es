@@ -33,7 +33,24 @@ import { ByteSequence } from "https://unpkg.com/@i-xi-dev/bytes";
 ```
 
 
-## Usage
+## Example
+
+### Creating an instance of `ByteSequence` class
+
+#### Creating an instance that views the specified [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
+```javascript
+const arrayBufferView = new ByteSequence(arrayBuffer);
+```
+
+#### Creating an instance with a specific size
+```javascript
+const zeroFilledBytes = ByteSequence.create(size);
+```
+
+#### Creating an instance filled with random bytes
+```javascript
+const randomBytes = ByteSequence.generateRandom(size);
+```
 
 ...
 
