@@ -52,5 +52,12 @@ const zeroFilledBytes = ByteSequence.create(size);
 const randomBytes = ByteSequence.generateRandom(size);
 ```
 
+#### Creating an instance with a new underlying buffer
+```javascript
+const copiedBytes = ByteSequence.from(uint8Array);
+const copiedBytes2 = ByteSequence.from(copiedBytes);
+```
+
+
 ...
 
