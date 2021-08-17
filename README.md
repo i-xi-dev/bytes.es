@@ -58,6 +58,18 @@ const copiedBytes = ByteSequence.from(uint8Array);
 const copiedBytes2 = ByteSequence.from(copiedBytes);
 ```
 
+#### Creating an instance by [isomorphic encoding](https://infra.spec.whatwg.org/#isomorphic-encode) the [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
+```javascript
+const isomorphicEncoded = ByteSequence.fromBinaryString("hello");
+// [ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+```
+
+#### Creating an instance by parsing the hexadecimal formatted
+```javascript
+const parsed = ByteSequence.parse("68656c6c6f");
+// [ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+```
+
 
 ...
 
