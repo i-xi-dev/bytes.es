@@ -70,6 +70,12 @@ const parsed = ByteSequence.parse("68656c6c6f");
 // [ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
 
+#### Creating an instance by decoding the Base64 encoded
+```javascript
+const decoded = ByteSequence.fromBase64("aGVsbG8=");
+// [ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+```
+
 
 ...
 
