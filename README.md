@@ -23,13 +23,13 @@ $ npm i @i-xi-dev/bytes
 ```
 
 ```javascript
-import { ByteSequence } from "@i-xi-dev/bytes";
+import { ByteSequence, Resource } from "@i-xi-dev/bytes";
 ```
 
 ### CDN
 
 ```javascript
-import { ByteSequence } from "https://unpkg.com/@i-xi-dev/bytes";
+import { ByteSequence, Resource } from "https://unpkg.com/@i-xi-dev/bytes";
 ```
 
 
@@ -95,9 +95,17 @@ const encoded = ByteSequence.fromText("新幹線");
 // [ 0xE6, 0x96, 0xB0, 0xE5, 0xB9, 0xB9, 0xE7, 0xB7, 0x9A ]
 ```
 
+#### Creating an instance by reading the [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
+```javascript
+const resource = await Resource.fromBlob(blob);
+const loadedBytes = resource.bytes;
+```
 
-
-
+#### Creating an instance by reading the data URL
+```javascript
+const resource = await Resource.fromDataUrl("data:text/plain;charset=US-ASCII,hello");
+const loadedBytes = resource.bytes;
+```
 
 ...
 
