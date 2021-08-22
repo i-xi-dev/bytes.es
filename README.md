@@ -11,7 +11,11 @@ A JavaScript byte array library for the browser and Node.js
 
 ## Requirement
 
+### Browser
 ...
+
+### Node.js
+16.5.0+
 
 
 ## Installation
