@@ -1,44 +1,58 @@
+import assert from "node:assert";
+import { webcrypto as crypto } from "node:crypto";
 import { Base64 } from "../../../../dist/byte/index.js";
 
 describe("Base64.decode", () => {
-  test("decode(string)", () => {
+  it("decode(string)", () => {
     const decoded11 = Base64.decode("");
-    expect(JSON.stringify([...decoded11])).toBe("[]");
+    assert.strictEqual(JSON.stringify([...decoded11]), "[]");
     const decoded12 = Base64.decode("AwIBAP/+/fw=");
-    expect(JSON.stringify([...decoded12])).toBe("[3,2,1,0,255,254,253,252]");
+    assert.strictEqual(JSON.stringify([...decoded12]), "[3,2,1,0,255,254,253,252]");
 
-    expect(() => {
+    assert.throws(() => {
       Base64.decode("あ");
-    }).toThrow("decode error (1)");
-    expect(() => {
+    }, {
+      message: "decode error (1)",
+    });
+    assert.throws(() => {
       Base64.decode("AwIBAP_-_fw=");
-    }).toThrow("decode error (1)");
-    expect(() => {
+    }, {
+      message: "decode error (1)",
+    });
+    assert.throws(() => {
       Base64.decode("AwIBAP/+/fw");
-    }).toThrow("decode error (2)");
-    expect(() => {
+    }, {
+      message: "decode error (2)",
+    });
+    assert.throws(() => {
       Base64.decode("=AwIBAP/+/fw");
-    }).toThrow("decode error (1)");
-    expect(() => {
+    }, {
+      message: "decode error (1)",
+    });
+    assert.throws(() => {
       Base64.decode("=");
-    }).toThrow("decode error (1)");
-    expect(() => {
+    }, {
+      message: "decode error (1)",
+    });
+    assert.throws(() => {
       Base64.decode("AwIBAP/+/fw,");
-    }).toThrow("decode error (1)");
+    }, {
+      message: "decode error (1)",
+    });
 
   });
 
-  test("decode(string, Object)", () => {
+  it("decode(string, Object)", () => {
     const decoded22 = Base64.decode("AwIBAP_-_fw=", {_62ndChar:"-", _63rdChar:"_"});
-    expect(JSON.stringify([...decoded22])).toBe("[3,2,1,0,255,254,253,252]");
+    assert.strictEqual(JSON.stringify([...decoded22]), "[3,2,1,0,255,254,253,252]");
 
     const decoded32 = Base64.decode("AwIBAP/+/fw", {usePadding:false});
-    expect(JSON.stringify([...decoded32])).toBe("[3,2,1,0,255,254,253,252]");
+    assert.strictEqual(JSON.stringify([...decoded32]), "[3,2,1,0,255,254,253,252]");
 
     const decoded42 = Base64.decode("AwIBAP_-_fw", {_62ndChar:"-", _63rdChar:"_", usePadding:false});
-    expect(JSON.stringify([...decoded42])).toBe("[3,2,1,0,255,254,253,252]");
+    assert.strictEqual(JSON.stringify([...decoded42]), "[3,2,1,0,255,254,253,252]");
 
-    expect(Buffer.from("AwIBAP/+/fw=", "base64").toJSON().data.join(",")).toBe("3,2,1,0,255,254,253,252");
+    assert.strictEqual(Buffer.from("AwIBAP/+/fw=", "base64").toJSON().data.join(","), "3,2,1,0,255,254,253,252");
 
     const r1 = crypto.getRandomValues(new Uint8Array(256));
     const r2 = crypto.getRandomValues(new Uint8Array(255));
@@ -50,45 +64,51 @@ describe("Base64.decode", () => {
     const r8 = crypto.getRandomValues(new Uint8Array(249));
     const r9 = crypto.getRandomValues(new Uint8Array(248));
 
-    expect(Array.from(Base64.decode(Buffer.from(r1).toString('base64'))).join(",")).toBe(Array.from(r1).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r2).toString('base64'))).join(",")).toBe(Array.from(r2).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r3).toString('base64'))).join(",")).toBe(Array.from(r3).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r4).toString('base64'))).join(",")).toBe(Array.from(r4).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r5).toString('base64'))).join(",")).toBe(Array.from(r5).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r6).toString('base64'))).join(",")).toBe(Array.from(r6).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r7).toString('base64'))).join(",")).toBe(Array.from(r7).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r8).toString('base64'))).join(",")).toBe(Array.from(r8).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r9).toString('base64'))).join(",")).toBe(Array.from(r9).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r1).toString('base64'))).join(","), Array.from(r1).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r2).toString('base64'))).join(","), Array.from(r2).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r3).toString('base64'))).join(","), Array.from(r3).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r4).toString('base64'))).join(","), Array.from(r4).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r5).toString('base64'))).join(","), Array.from(r5).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r6).toString('base64'))).join(","), Array.from(r6).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r7).toString('base64'))).join(","), Array.from(r7).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r8).toString('base64'))).join(","), Array.from(r8).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r9).toString('base64'))).join(","), Array.from(r9).join(","));
 
-    expect(Array.from(Base64.decode(Buffer.from(r1).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r1).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r2).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r2).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r3).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r3).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r4).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r4).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r5).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r5).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r6).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r6).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r7).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r7).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r8).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r8).join(","));
-    expect(Array.from(Base64.decode(Buffer.from(r9).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(",")).toBe(Array.from(r9).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r1).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r1).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r2).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r2).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r3).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r3).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r4).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r4).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r5).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r5).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r6).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r6).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r7).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r7).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r8).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r8).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r9).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r9).join(","));
 
-    expect(() => {
+    assert.throws(() => {
       Base64.decode("AwIBAP/+/fw=", {usePadding:false});
-    }).toThrow("decode error (1)");
+    }, {
+      message: "decode error (1)",
+    });
 
     const decoded52 = Base64.decode("AwIBAP/+/fw=", { forgiving: true });
-    expect(JSON.stringify([...decoded52])).toBe("[3,2,1,0,255,254,253,252]");
+    assert.strictEqual(JSON.stringify([...decoded52]), "[3,2,1,0,255,254,253,252]");
     const decoded53 = Base64.decode("AwIBAP/+/fw=", { forgiving: false });
-    expect(JSON.stringify([...decoded53])).toBe("[3,2,1,0,255,254,253,252]");
+    assert.strictEqual(JSON.stringify([...decoded53]), "[3,2,1,0,255,254,253,252]");
     const decoded54 = Base64.decode(" AwIB AP/+/fw= ", { forgiving: true });
-    expect(JSON.stringify([...decoded54])).toBe("[3,2,1,0,255,254,253,252]");
+    assert.strictEqual(JSON.stringify([...decoded54]), "[3,2,1,0,255,254,253,252]");
     const decoded55 = Base64.decode("AwIBAP/+/fw", { forgiving: true });
-    expect(JSON.stringify([...decoded55])).toBe("[3,2,1,0,255,254,253,252]");
+    assert.strictEqual(JSON.stringify([...decoded55]), "[3,2,1,0,255,254,253,252]");
 
-    expect(() => {
+    assert.throws(() => {
       Base64.decode("AwIあAP/+/fw", { forgiving: true });
-    }).toThrow("decode error (1)");
-    expect(() => {
+    }, {
+      message: "decode error (1)",
+    });
+    assert.throws(() => {
       Base64.decode("AAAAA", { forgiving: true });
-    }).toThrow("forgiving decode error");
+    }, {
+      message: "forgiving decode error",
+    });
 
   });
 });

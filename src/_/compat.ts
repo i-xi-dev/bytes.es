@@ -12,7 +12,7 @@ if (globalThis.crypto?.subtle) { // globalThis.cryptoがCrypto型かどうかで
 }
 else if (globalThis.process) {
   // Node.js 条件不十分？
-  _crypto = ((await import("crypto")).webcrypto as unknown) as Crypto;
+  _crypto = ((await import("node:crypto")).webcrypto as unknown) as Crypto;
 }
 
 /**
@@ -37,7 +37,7 @@ if (globalThis.Blob) {
   _BlobConstructor = Blob;
 }
 else if (globalThis.process) {
-  _BlobConstructor = (await import("buffer")).Blob as BlobConstructor;
+  _BlobConstructor = (await import("node:buffer")).Blob as BlobConstructor;
 }
 
 /**
@@ -48,6 +48,25 @@ function getBlobConstructor(): BlobConstructor {
     return _BlobConstructor;
   }
   throw new Exception("NotSupportedError", "Blob unsupported");
+}
+
+type ReadableStreamConstructor = {
+  new <R = any>(underlyingSource?: UnderlyingSource<R> | undefined, strategy?: QueuingStrategy<R> | undefined): ReadableStream<R>;
+  prototype: ReadableStream;
+};
+declare module "node:stream/web" {
+  export var ReadableStream: ReadableStreamConstructor;
+}
+let _ReadableStreamConstructor: ReadableStreamConstructor;
+if (globalThis.ReadableStream) {
+  _ReadableStreamConstructor = ReadableStream;
+}
+else if (globalThis.process) {
+  _ReadableStreamConstructor = (await import("node:stream/web")).ReadableStream as ReadableStreamConstructor;
+}
+
+function isTypeOfReadableStream(v: unknown): v is ReadableStream {
+  return v instanceof _ReadableStreamConstructor;
 }
 
 /**
@@ -109,5 +128,6 @@ const pe = (globalThis.ProgressEvent) ? globalThis.ProgressEvent : _ProgressEven
 export {
   getBlobConstructor,
   getCrypto,
+  isTypeOfReadableStream,
   pe as ProgressEvent,
 };

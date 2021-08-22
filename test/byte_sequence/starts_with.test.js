@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import { ByteSequence } from "../../dist/byte_sequence.js";
 
 describe("ByteSequence.prototype.startsWith", () => {
@@ -7,43 +8,43 @@ describe("ByteSequence.prototype.startsWith", () => {
   const bs1 =  ByteSequence.from(Uint8Array.of(255, 0, 127, 1));
   const bs1b =  ByteSequence.of(255, 0, 127, 1);
 
-  test("startsWith(ByteSequence)", () => {
-    expect(bs0.startsWith(bs0)).toBe(true);
-    expect(bs0.startsWith(bs0b)).toBe(true);
+  it("startsWith(ByteSequence)", () => {
+    assert.strictEqual(bs0.startsWith(bs0), true);
+    assert.strictEqual(bs0.startsWith(bs0b), true);
 
-    expect(bs1.startsWith(bs1)).toBe(true);
-    expect(bs1.startsWith(bs1b)).toBe(true);
-    expect(bs1.startsWith(bs0)).toBe(true);
-    expect(bs0.startsWith(bs1)).toBe(false);
-
-  });
-
-  test("startsWith(Uint8Array)", () => {
-    expect(bs0.startsWith(new Uint8Array(0))).toBe(true);
-    expect(bs1.startsWith(bs1.toUint8Array())).toBe(true);
-    expect(bs1.startsWith(Uint8Array.of(255, 0, 127, 1))).toBe(true);
-
-    expect(bs1.startsWith(Uint8Array.of(255, 0, 123, 1))).toBe(false);
-    expect(bs1.startsWith(Uint8Array.of(255, 0, 127, 1, 5))).toBe(false);
-    expect(bs1.startsWith(Uint8Array.of(255, 0, 127))).toBe(true);
-
-    expect(bs1.startsWith([255, 0, 127, 2])).toBe(false);
-    expect(bs1.startsWith([255, 0, 127, 1, 2])).toBe(false);
-    expect(bs1.startsWith([255, 0, 127])).toBe(true);
-    expect(bs1.startsWith([255, 0])).toBe(true);
-    expect(bs1.startsWith([255])).toBe(true);
-    expect(bs1.startsWith([])).toBe(true);
+    assert.strictEqual(bs1.startsWith(bs1), true);
+    assert.strictEqual(bs1.startsWith(bs1b), true);
+    assert.strictEqual(bs1.startsWith(bs0), true);
+    assert.strictEqual(bs0.startsWith(bs1), false);
 
   });
 
-  test("startsWith(Array<number>)", () => {
-    expect(bs0.startsWith([])).toBe(true);
-    expect(bs1.startsWith(bs1.toArray())).toBe(true);
-    expect(bs1.startsWith([255, 0, 127, 1])).toBe(true);
+  it("startsWith(Uint8Array)", () => {
+    assert.strictEqual(bs0.startsWith(new Uint8Array(0)), true);
+    assert.strictEqual(bs1.startsWith(bs1.toUint8Array()), true);
+    assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 127, 1)), true);
 
-    expect(bs1.startsWith([255, 0, 127, 2])).toBe(false);
-    expect(bs1.startsWith([255, 0, 127, 1, 2])).toBe(false);
-    expect(bs1.startsWith([255, 0, 127])).toBe(true);
+    assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 123, 1)), false);
+    assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 127, 1, 5)), false);
+    assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 127)), true);
+
+    assert.strictEqual(bs1.startsWith([255, 0, 127, 2]), false);
+    assert.strictEqual(bs1.startsWith([255, 0, 127, 1, 2]), false);
+    assert.strictEqual(bs1.startsWith([255, 0, 127]), true);
+    assert.strictEqual(bs1.startsWith([255, 0]), true);
+    assert.strictEqual(bs1.startsWith([255]), true);
+    assert.strictEqual(bs1.startsWith([]), true);
+
+  });
+
+  it("startsWith(Array<number>)", () => {
+    assert.strictEqual(bs0.startsWith([]), true);
+    assert.strictEqual(bs1.startsWith(bs1.toArray()), true);
+    assert.strictEqual(bs1.startsWith([255, 0, 127, 1]), true);
+
+    assert.strictEqual(bs1.startsWith([255, 0, 127, 2]), false);
+    assert.strictEqual(bs1.startsWith([255, 0, 127, 1, 2]), false);
+    assert.strictEqual(bs1.startsWith([255, 0, 127]), true);
 
   });
 

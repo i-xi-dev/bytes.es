@@ -1,7 +1,8 @@
+import assert from "node:assert";
 import { Uri } from "../../dist/uri.js";
 
 describe("Uri.prototype.port", () => {
-  test("port", () => {
+  it("port", () => {
     const a0 = new Uri("http://example.com/");
     const u0 = new Uri("http://example.com:8080/");
     const u0b = new Uri("Http://example.COM:8080/");
@@ -12,20 +13,20 @@ describe("Uri.prototype.port", () => {
     const u5 = new Uri("urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
     const u6 = new Uri("data:,Hello%2C%20World!");
 
-    expect(a0.port).toBe(80);
-    expect(u0.port).toBe(8080);
-    expect(u0b.port).toBe(8080);
-    expect(u1.port).toBe(80);
-    expect(u2.port).toBe(80);
-    expect(u3.port).toBe(null);
-    expect(u4.port).toBe(null);
-    expect(u5.port).toBe(null);
-    expect(u6.port).toBe(null);
+    assert.strictEqual(a0.port, 80);
+    assert.strictEqual(u0.port, 8080);
+    assert.strictEqual(u0b.port, 8080);
+    assert.strictEqual(u1.port, 80);
+    assert.strictEqual(u2.port, 80);
+    assert.strictEqual(u3.port, null);
+    assert.strictEqual(u4.port, null);
+    assert.strictEqual(u5.port, null);
+    assert.strictEqual(u6.port, null);
 
-    expect((new Uri("chrome://hoge")).port).toBe(null);
-    expect((new Uri("tel:aaaa")).port).toBe(null);
-    expect((new Uri("urn:ietf:rfc:2648")).port).toBe(null);
-    expect((new Uri("geo:13.4125,103.8667")).port).toBe(null);
+    assert.strictEqual((new Uri("chrome://hoge")).port, null);
+    assert.strictEqual((new Uri("tel:aaaa")).port, null);
+    assert.strictEqual((new Uri("urn:ietf:rfc:2648")).port, null);
+    assert.strictEqual((new Uri("geo:13.4125,103.8667")).port, null);
 
   });
 

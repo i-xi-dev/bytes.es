@@ -1,34 +1,45 @@
+import assert from "node:assert";
 import { Uri } from "../../dist/uri.js";
 
 describe("Uri", () => {
   const u0 = "http://example.com/";
 
-  test("Uri(string)", () => {
-    expect((new Uri(u0)).toString()).toBe(u0);
-    expect((new Uri("http://example.com/?=")).toString()).toBe("http://example.com/?=");
+  it("Uri(string)", () => {
+    assert.strictEqual((new Uri(u0)).toString(), u0);
+    assert.strictEqual((new Uri("http://example.com/?=")).toString(), "http://example.com/?=");
 
-    expect(() => {
+    assert.throws(() => {
       new Uri("");
-    }).toThrow("uri");
-    expect(() => {
+    }, {
+      message: "uri",
+    });
+    assert.throws(() => {
       new Uri("1");
-    }).toThrow("uri");
-    expect(() => {
+    }, {
+      message: "uri",
+    });
+    assert.throws(() => {
       new Uri("1.text");
-    }).toThrow("uri");
-    expect(() => {
+    }, {
+      message: "uri",
+    });
+    assert.throws(() => {
       new Uri("./1.text");
-    }).toThrow("uri");
-    expect(() => {
+    }, {
+      message: "uri",
+    });
+    assert.throws(() => {
       new Uri("http://");
-    }).toThrow("uri");
+    }, {
+      message: "uri",
+    });
 
     // XXX Node.jsだとnew URL(相対URL)がエラーになるので、相対URLのテストができない
 
   });
 
-  test("Uri(URL)", () => {
-    expect((new Uri(new URL(u0))).toString()).toBe(u0);
+  it("Uri(URL)", () => {
+    assert.strictEqual((new Uri(new URL(u0))).toString(), u0);
 
   });
 

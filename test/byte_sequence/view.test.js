@@ -1,90 +1,107 @@
+import assert from "node:assert";
 import { ByteSequence } from "../../dist/byte_sequence.js";
 
 describe("ByteSequence.prototype.view", () => {
-  test("view()", () => {
+  it("view()", () => {
     const b0 = new Uint8Array(0);
     const bs0 = ByteSequence.from(b0);
     const bs1 = ByteSequence.create(1000);
 
-    expect(bs0.view().byteLength).toBe(0);
-    expect(bs1.view().byteLength).toBe(1000);
-    expect((bs1.view() instanceof Uint8Array)).toBe(true);
+    assert.strictEqual(bs0.view().byteLength, 0);
+    assert.strictEqual(bs1.view().byteLength, 1000);
+    assert.strictEqual((bs1.view() instanceof Uint8Array), true);
 
   });
 
-  test("view(number)", () => {
+  it("view(number)", () => {
     const bs1 = ByteSequence.create(1000);
 
-    expect(bs1.view(0).byteLength).toBe(1000);
-    expect(bs1.view(1).byteLength).toBe(999);
-    expect(bs1.view(999).byteLength).toBe(1);
-    expect(bs1.view(1000).byteLength).toBe(0);
+    assert.strictEqual(bs1.view(0).byteLength, 1000);
+    assert.strictEqual(bs1.view(1).byteLength, 999);
+    assert.strictEqual(bs1.view(999).byteLength, 1);
+    assert.strictEqual(bs1.view(1000).byteLength, 0);
 
-    expect(() => {
+    assert.throws(() => {
       bs1.view(-1)
-    }).toThrow("byteOffset");
+    }, {
+      message: "byteOffset"
+    });
 
-    expect(() => {
+    assert.throws(() => {
       bs1.view(1001)
-    }).toThrow("byteOffset");
+    }, {
+      message: "byteOffset"
+    });
 
-    expect(() => {
+    assert.throws(() => {
       bs1.view(Number.NaN)
-    }).toThrow("byteOffset");
+    }, {
+      message: "byteOffset"
+    });
 
-    expect(() => {
+    assert.throws(() => {
       bs1.view(1.5)
-    }).toThrow("byteOffset");
+    }, {
+      message: "byteOffset"
+    });
 
   });
 
-  test("view(number, number)", () => {
+  it("view(number, number)", () => {
     const bs1 = ByteSequence.create(1000);
 
-    expect(bs1.view(0, 1).byteLength).toBe(1);
-    expect(bs1.view(0, 1000).byteLength).toBe(1000);
-    expect(bs1.view(999, 1).byteLength).toBe(1);
-    expect(bs1.view(1000, 0).byteLength).toBe(0);
-    expect(bs1.view(0, 0).byteLength).toBe(0);
+    assert.strictEqual(bs1.view(0, 1).byteLength, 1);
+    assert.strictEqual(bs1.view(0, 1000).byteLength, 1000);
+    assert.strictEqual(bs1.view(999, 1).byteLength, 1);
+    assert.strictEqual(bs1.view(1000, 0).byteLength, 0);
+    assert.strictEqual(bs1.view(0, 0).byteLength, 0);
 
-    expect(() => {
+    assert.throws(() => {
       bs1.view(0, Number.NaN)
-    }).toThrow("byteCount");
+    }, {
+      message: "byteCount"
+    });
 
-    expect(() => {
+    assert.throws(() => {
       bs1.view(0, 1.5)
-    }).toThrow("byteCount");
+    }, {
+      message: "byteCount"
+    });
 
-    expect(() => {
+    assert.throws(() => {
       bs1.view(0, 1001)
-    }).toThrow("byteCount");
+    }, {
+      message: "byteCount"
+    });
 
-    expect(() => {
+    assert.throws(() => {
       bs1.view(999, 2)
-    }).toThrow("byteCount");
+    }, {
+      message: "byteCount"
+    });
 
   });
 
-  test("fromメソッドに渡したインスタンスとは異なるインスタンスが返る", () => {
+  it("fromメソッドに渡したインスタンスとは異なるインスタンスが返る", () => {
     const b0 = new Uint8Array(0);
     const bs0 = ByteSequence.from(b0);
-    expect(bs0.view()).not.toBe(b0);
+    assert.notStrictEqual(bs0.view(), b0);
 
   });
 
-  test("返却値への操作は自身に影響する", () => {
+  it("返却値への操作は自身に影響する", () => {
     const bs1 = new ByteSequence(new ArrayBuffer(100));
 
     const x = bs1.view();
-    expect(x[0]).toBe(0);
+    assert.strictEqual(x[0], 0);
 
     x[0] = 255;
-    expect(x[0]).toBe(255);
-    expect(new Uint8Array(bs1.buffer)[0]).toBe(255);
+    assert.strictEqual(x[0], 255);
+    assert.strictEqual(new Uint8Array(bs1.buffer)[0], 255);
 
     x[0] = 32;
-    expect(x[0]).toBe(32);
-    expect(new Uint8Array(bs1.buffer)[0]).toBe(32);
+    assert.strictEqual(x[0], 32);
+    assert.strictEqual(new Uint8Array(bs1.buffer)[0], 32);
 
   });
 

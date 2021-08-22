@@ -76,6 +76,16 @@ const decoded = ByteSequence.fromBase64("aGVsbG8=");
 // [ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
 
+#### Creating an instance by reading the [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of Uint8Array
+```javascript
+const loadedBytes = await ByteSequence.fromByteStream(byteStream);
+```
+
+[Node.js Readable stream](https://nodejs.org/api/stream.html#stream_readable_streams) of [Buffer](https://nodejs.org/api/buffer.html#buffer_class_buffer) is also available.
+```javascript
+const loadedBytes = await ByteSequence.fromByteStream(byteStream);
+```
+
 
 ...
 

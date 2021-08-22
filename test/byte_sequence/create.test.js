@@ -1,24 +1,31 @@
+import assert from "node:assert";
 import { ByteSequence } from "../../dist/byte_sequence.js";
 
 describe("ByteSequence.create", () => {
-  test("create(number)", () => {
+  it("create(number)", () => {
     const bs0 = ByteSequence.create(0);
     const bs1 = ByteSequence.create(1024 * 1024 * 1);
 
-    expect(bs0.buffer.byteLength).toBe(0);
-    expect(bs1.buffer.byteLength).toBe(1024 * 1024 * 1);
+    assert.strictEqual(bs0.buffer.byteLength, 0);
+    assert.strictEqual(bs1.buffer.byteLength, 1024 * 1024 * 1);
 
-    expect(() => {
+    assert.throws(() => {
       ByteSequence.create(-1);
-    }).toThrow("byteCount");
+    }, {
+      message: "byteCount"
+    });
 
-    expect(() => {
+    assert.throws(() => {
       ByteSequence.create(1.5);
-    }).toThrow("byteCount");
+    }, {
+      message: "byteCount"
+    });
 
-    expect(() => {
+    assert.throws(() => {
       ByteSequence.create(Number.NaN);
-    }).toThrow("byteCount");
+    }, {
+      message: "byteCount"
+    });
 
   });
 

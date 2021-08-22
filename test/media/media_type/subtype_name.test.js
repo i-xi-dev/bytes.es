@@ -1,12 +1,13 @@
+import assert from "node:assert";
 import { MediaType } from "../../../dist/media/media_type.js";
 
 describe("MediaType.prototype.subtype", () => {
-  test("subtype", () => {
+  it("subtype", () => {
     const i0 = MediaType.fromString("text/plain");
-    expect(i0.subtype).toBe("plain");
+    assert.strictEqual(i0.subtype, "plain");
 
     const i0b = MediaType.fromString("text/PLAIN");
-    expect(i0b.subtype).toBe("plain");
+    assert.strictEqual(i0b.subtype, "plain");
 
   });
 

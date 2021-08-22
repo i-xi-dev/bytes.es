@@ -1,9 +1,10 @@
+import assert from "node:assert";
 import { MediaType } from "../../../dist/media/media_type.js";
 
 describe("MediaType.prototype.toJSON", () => {
-  test("toJSON()", () => {
+  it("toJSON()", () => {
     const i0 = MediaType.fromString("text/plain");
-    expect(i0.toJSON()).toBe("text/plain");
+    assert.strictEqual(i0.toJSON(), "text/plain");
 
   });
 

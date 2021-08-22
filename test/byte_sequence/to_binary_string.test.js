@@ -1,11 +1,12 @@
+import assert from "node:assert";
 import { ByteSequence } from "../../dist/byte_sequence.js";
 
 describe("ByteSequence.prototype.toBinaryString", () => {
-  test("toBinaryString()", () => {
+  it("toBinaryString()", () => {
     const binStr = "ABCD";
     const bsbs = ByteSequence.fromBinaryString(binStr);
 
-    expect(bsbs.toBinaryString()).toBe(binStr);
+    assert.strictEqual(bsbs.toBinaryString(), binStr);
 
   });
 

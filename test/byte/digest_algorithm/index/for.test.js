@@ -1,11 +1,14 @@
+import assert from "node:assert";
 import { DigestAlgorithm } from "../../../../dist/byte/index.js";
 
 describe("DigestAlgorithm.for", () => {
 
-  test("for(string)", async () => {
-    expect(() => {
+  it("for(string)", async () => {
+    assert.throws(() => {
       DigestAlgorithm.for("SHA-25");
-    }).toThrow("name:SHA-25");
+    }, {
+      message: "name:SHA-25"
+    });
 
   });
 

@@ -1,7 +1,8 @@
+import assert from "node:assert";
 import { ByteSequence } from "../../dist/byte_sequence.js";
 
 describe("ByteSequence.prototype.buffer", () => {
-  test("buffer", () => {
+  it("buffer", () => {
     const a0 = new ArrayBuffer(0);
     const bs0 = new ByteSequence(a0);
     const bs0b = new ByteSequence(a0);
@@ -10,22 +11,22 @@ describe("ByteSequence.prototype.buffer", () => {
     const bs1 = ByteSequence.from(b1);
     const bs1b = ByteSequence.from(b1);
 
-    expect(bs0.buffer).toBe(a0);
-    expect(bs0.buffer).toBe(bs0b.buffer);
-    expect(bs1.buffer).not.toBe(a1);
-    expect(bs1.buffer).not.toBe(bs1b.buffer);
+    assert.strictEqual(bs0.buffer, a0);
+    assert.strictEqual(bs0.buffer, bs0b.buffer);
+    assert.notStrictEqual(bs1.buffer, a1);
+    assert.notStrictEqual(bs1.buffer, bs1b.buffer);
 
   });
 
-  test("返却値への操作は自身に影響する", () => {
+  it("返却値への操作は自身に影響する", () => {
     const bs1 = new ByteSequence(new ArrayBuffer(100));
 
     const x = new Uint8Array(bs1.buffer);
-    expect(x[0]).toBe(0);
+    assert.strictEqual(x[0], 0);
 
     x[0] = 255;
-    expect(x[0]).toBe(255);
-    expect(new Uint8Array(bs1.buffer)[0]).toBe(255);
+    assert.strictEqual(x[0], 255);
+    assert.strictEqual(new Uint8Array(bs1.buffer)[0], 255);
 
   });
 

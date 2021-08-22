@@ -1,26 +1,31 @@
+import assert from "node:assert";
 import { ByteSequence } from "../../dist/byte_sequence.js";
 
 describe("ByteSequence.fromBinaryString", () => {
-  test("fromBinaryString(string)", () => {
+  it("fromBinaryString(string)", () => {
     const binStr = "ABCD";
     const bsbs = ByteSequence.fromBinaryString(binStr);
 
     const bsa = bsbs.toArray();
 
-    expect(bsa[0]).toBe(65);
-    expect(bsa[1]).toBe(66);
-    expect(bsa[2]).toBe(67);
-    expect(bsa[3]).toBe(68);
+    assert.strictEqual(bsa[0], 65);
+    assert.strictEqual(bsa[1], 66);
+    assert.strictEqual(bsa[2], 67);
+    assert.strictEqual(bsa[3], 68);
 
-    expect(ByteSequence.fromBinaryString("").count).toBe(0);
+    assert.strictEqual(ByteSequence.fromBinaryString("").count, 0);
 
-    expect(() => {
+    assert.throws(() => {
       ByteSequence.fromBinaryString("あ");
-    }).toThrow("binaryString");
+    }, {
+      message: "binaryString"
+    });
 
-    expect(() => {
+    assert.throws(() => {
       ByteSequence.fromBinaryString("\u0100");
-    }).toThrow("binaryString");
+    }, {
+      message: "binaryString"
+    });
 
   });
 

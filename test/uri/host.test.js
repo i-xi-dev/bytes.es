@@ -1,7 +1,8 @@
+import assert from "node:assert";
 import { Uri } from "../../dist/uri.js";
 
 describe("Uri.prototype.host", () => {
-  test("host", () => {
+  it("host", () => {
     const u0 = new Uri("http://example.com:8080/");
     const u0b = new Uri("Http://example.COM:8080/");
     const u1 = new Uri("http://example.com:80/hoge");
@@ -11,31 +12,31 @@ describe("Uri.prototype.host", () => {
     const u5 = new Uri("urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
     const u6 = new Uri("data:,Hello%2C%20World!");
 
-    expect(u0.host).toBe("example.com");
-    expect(u0b.host).toBe("example.com");
-    expect(u1.host).toBe("example.com");
-    expect(u2.host).toBe("example.com");
-    expect(u3.host).toBe(null);
-    expect(u4.host).toBe(null);
-    expect(u5.host).toBe(null);
-    expect(u6.host).toBe(null);
-    expect((new Uri("http://127.0.0.1:8080/")).host).toBe("127.0.0.1");
-    expect((new Uri("http://127.0.0.1.:8080/")).host).toBe("127.0.0.1");
-    expect((new Uri("http://127:8080/")).host).toBe("0.0.0.127");
-    expect((new Uri("http://127.0.0:8080/")).host).toBe("127.0.0.0");
-    expect((new Uri("http://127.0:8080/")).host).toBe("127.0.0.0");
-    expect((new Uri("http://0x7F.0.0.1:8080/")).host).toBe("127.0.0.1");
-    expect((new Uri("http://0x7F000001:8080/")).host).toBe("127.0.0.1");
-    expect((new Uri("http://2130706433:8080/")).host).toBe("127.0.0.1");
-    expect((new Uri("http://0177.000.000.001:8080/")).host).toBe("127.0.0.1");
-    expect((new Uri("http://0177.0X.000.0x1:8080/")).host).toBe("127.0.0.1");
-    expect((new Uri("http://[::1]:8080/")).host).toBe("[::1]");
+    assert.strictEqual(u0.host, "example.com");
+    assert.strictEqual(u0b.host, "example.com");
+    assert.strictEqual(u1.host, "example.com");
+    assert.strictEqual(u2.host, "example.com");
+    assert.strictEqual(u3.host, null);
+    assert.strictEqual(u4.host, null);
+    assert.strictEqual(u5.host, null);
+    assert.strictEqual(u6.host, null);
+    assert.strictEqual((new Uri("http://127.0.0.1:8080/")).host, "127.0.0.1");
+    assert.strictEqual((new Uri("http://127.0.0.1.:8080/")).host, "127.0.0.1");
+    assert.strictEqual((new Uri("http://127:8080/")).host, "0.0.0.127");
+    assert.strictEqual((new Uri("http://127.0.0:8080/")).host, "127.0.0.0");
+    assert.strictEqual((new Uri("http://127.0:8080/")).host, "127.0.0.0");
+    assert.strictEqual((new Uri("http://0x7F.0.0.1:8080/")).host, "127.0.0.1");
+    assert.strictEqual((new Uri("http://0x7F000001:8080/")).host, "127.0.0.1");
+    assert.strictEqual((new Uri("http://2130706433:8080/")).host, "127.0.0.1");
+    assert.strictEqual((new Uri("http://0177.000.000.001:8080/")).host, "127.0.0.1");
+    assert.strictEqual((new Uri("http://0177.0X.000.0x1:8080/")).host, "127.0.0.1");
+    assert.strictEqual((new Uri("http://[::1]:8080/")).host, "[::1]");
 
-    expect((new Uri("chrome://hoge")).host).toBe("hoge");
-    expect((new Uri("tel:aaaa")).host).toBe(null);
-    expect((new Uri("urn:ietf:rfc:2648")).host).toBe(null);
-    expect((new Uri("geo:13.4125,103.8667")).host).toBe(null);
-    expect((new Uri("http://ドメイン名例.JP:8080/")).host).toBe("xn--eckwd4c7cu47r2wf.jp");
+    assert.strictEqual((new Uri("chrome://hoge")).host, "hoge");
+    assert.strictEqual((new Uri("tel:aaaa")).host, null);
+    assert.strictEqual((new Uri("urn:ietf:rfc:2648")).host, null);
+    assert.strictEqual((new Uri("geo:13.4125,103.8667")).host, null);
+    assert.strictEqual((new Uri("http://ドメイン名例.JP:8080/")).host, "xn--eckwd4c7cu47r2wf.jp");
 
   });
 

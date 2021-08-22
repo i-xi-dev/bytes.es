@@ -3,7 +3,7 @@
 // バイトストリーム読取
 
 import { Exception } from "../_.js";
-import { ProgressEvent } from "../_/compat.js";
+import { isTypeOfReadableStream, ProgressEvent } from "../_/compat.js";
 
 /**
  * 可読ストリームの型
@@ -17,7 +17,7 @@ type Options = {
   /**
    * 読取ProgressEventのターゲット
    */
-  listenerTarget?: EventTarget,
+  progressListener?: EventTarget,
 
   /**
    * 中断シグナル（絶え間なく読めるストリームの場合、すべて読み取るまで中断されない）
@@ -40,9 +40,9 @@ type Options = {
  */
 type ResolvedOptions = {
   /**
-   * @see {@link Options.listenerTarget}
+   * @see {@link Options.progressListener}
    */
-  listenerTarget: EventTarget | null,
+  progressListener: EventTarget | null,
 
   /**
    * @see {@link Options.signal}
@@ -62,12 +62,12 @@ type ResolvedOptions = {
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたストリーム読取オプション
  */
 function resolveOptions(options: Options = {}): ResolvedOptions {
-  const listenerTarget = (options.listenerTarget instanceof EventTarget) ? options.listenerTarget : null;
+  const progressListener = (options.progressListener instanceof EventTarget) ? options.progressListener : null;
   const signal = (options.signal instanceof AbortSignal) ? options.signal : null;
   const acceptSizeMismatch: boolean = (typeof options.acceptSizeMismatch === "boolean") ? options.acceptSizeMismatch : false;
 
   return {
-    listenerTarget,
+    progressListener,
     signal,
     acceptSizeMismatch,
   };
@@ -81,15 +81,13 @@ const DEFAULT_BUFFER_SIZE = 1_048_576;
 /**
  * 可読ストリームを読み取り、チャンクを返却する非同期ジェネレーターを返却
  * 
- * ブラウザーとDeno用
- * 
  * @experimental
  * @param reader 可読ストリームのリーダー
  * @returns チャンクを返却する非同期ジェネレーター
  */
-async function* createChunkGeneratorW(reader: ReadableStreamDefaultReader<Uint8Array>): AsyncGenerator<Uint8Array, void, void> {
-  // XXX ReadableStreamBYOBReaderにする？Chrome/Edgeでしか使えない2021-06
-  // XXX ReadableStream自体が[Symbol.asyncIterator]を持つ仕様になる。実装はまだ無い？2021-06
+async function* createChunkGenerator(reader: ReadableStreamDefaultReader<Uint8Array>): AsyncGenerator<Uint8Array, void, void> {
+  // XXX ReadableStreamBYOBReaderにする？ Deno,Safari,Firefoxが未実装 2021-08
+  // XXX ReadableStream自体が[Symbol.asyncIterator]を持つ。
   for (let i = await reader.read(); (i.done !== true); i = await reader.read()) {
     yield i.value;
   }
@@ -98,7 +96,7 @@ async function* createChunkGeneratorW(reader: ReadableStreamDefaultReader<Uint8A
 /**
  * 可読ストリームを読み取り、チャンクを返却する非同期ジェネレーターを返却
  * 
- * Node.js用
+ * NodeJS.ReadStream用
  * 
  * @param stream 可読ストリーム ※チャンクがBufferのストリーム
  * @returns チャンクを返却する非同期ジェネレーター
@@ -158,9 +156,9 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
 
   let reader: ReadableStreamDefaultReader<Uint8Array>;
   let chunkGenerator: AsyncGenerator<Uint8Array, void, void>;
-  if (globalThis.ReadableStream && (stream instanceof ReadableStream)) {
+  if (isTypeOfReadableStream(stream)) {
     reader = stream.getReader();
-    chunkGenerator = createChunkGeneratorW(reader);
+    chunkGenerator = createChunkGenerator(reader);
   }
   else {
     chunkGenerator = createChunkGeneratorN(stream as NodeJS.ReadStream);
@@ -171,7 +169,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
       throw new Exception("AbortError", "already aborted");
     }
 
-    if (globalThis.ReadableStream && (stream instanceof ReadableStream)) {
+    if (isTypeOfReadableStream(stream)) {
       resolvedOptions.signal.addEventListener("abort", (): void => {
         // stream.cancel()しても読取終了まで待ちになるので、reader.cancel()する
         void reader.cancel().catch(); // XXX closeで良い？
@@ -207,7 +205,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
     buffer = addToBuffer(buffer, loadedByteCount, chunkBytes);
     loadedByteCount = loadedByteCount + chunkBytes.byteLength;
 
-    notify(resolvedOptions.listenerTarget, "progress", loadedByteCount, totalByteCount);
+    notify(resolvedOptions.progressListener, "progress", loadedByteCount, totalByteCount);
   }
   if (resolvedOptions.signal?.aborted === true) {
     throw new Exception("AbortError", "aborted");

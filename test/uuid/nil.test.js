@@ -1,10 +1,11 @@
+import assert from "node:assert";
 import { Uuid } from "../../dist/uuid.js";
 
 describe("Uuid.nil", () => {
-  test("nil()", () => {
+  it("nil()", () => {
     const u0 = Uuid.nil();
 
-    expect(u0.toString()).toBe("00000000-0000-0000-0000-000000000000");
+    assert.strictEqual(u0.toString(), "00000000-0000-0000-0000-000000000000");
 
   });
 

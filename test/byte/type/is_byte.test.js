@@ -1,23 +1,24 @@
+import assert from "node:assert";
 import { isByte } from "../../../dist/byte/type.js";
 
 describe("Type.isByte", () => {
-  test("isByte(number)", () => {
-    expect(isByte(-1)).toBe(false);
-    expect(isByte(-0)).toBe(true);
-    expect(isByte(0)).toBe(true);
+  it("isByte(number)", () => {
+    assert.strictEqual(isByte(-1), false);
+    assert.strictEqual(isByte(-0), true);
+    assert.strictEqual(isByte(0), true);
 
-    expect(isByte(255)).toBe(true);
-    expect(isByte(256)).toBe(false);
+    assert.strictEqual(isByte(255), true);
+    assert.strictEqual(isByte(256), false);
 
-    expect(isByte(1.1)).toBe(false);
+    assert.strictEqual(isByte(1.1), false);
   });
 
-  test("isByte(*)", () => {
-    expect(isByte("")).toBe(false);
-    expect(isByte("0")).toBe(false);
-    expect(isByte([])).toBe(false);
-    expect(isByte({})).toBe(false);
-    expect(isByte(null)).toBe(false);
-    expect(isByte()).toBe(false);
+  it("isByte(*)", () => {
+    assert.strictEqual(isByte(""), false);
+    assert.strictEqual(isByte("0"), false);
+    assert.strictEqual(isByte([]), false);
+    assert.strictEqual(isByte({}), false);
+    assert.strictEqual(isByte(null), false);
+    assert.strictEqual(isByte(), false);
   });
 });

@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import { ByteSequence } from "../../dist/byte_sequence.js";
 
 describe("ByteSequence.prototype.equals", () => {
@@ -7,36 +8,36 @@ describe("ByteSequence.prototype.equals", () => {
   const bs1 =  ByteSequence.from(Uint8Array.of(255, 0, 127, 1));
   const bs1b =  ByteSequence.of(255, 0, 127, 1);
 
-  test("equals(ByteSequence)", () => {
-    expect(bs0.equals(bs0)).toBe(true);
-    expect(bs0.equals(bs0b)).toBe(true);
+  it("equals(ByteSequence)", () => {
+    assert.strictEqual(bs0.equals(bs0), true);
+    assert.strictEqual(bs0.equals(bs0b), true);
 
-    expect(bs1.equals(bs1)).toBe(true);
-    expect(bs1.equals(bs1b)).toBe(true);
-    expect(bs1.equals(bs0)).toBe(false);
-    expect(bs0.equals(bs1)).toBe(false);
-
-  });
-
-  test("equals(Uint8Array)", () => {
-    expect(bs0.equals(new Uint8Array(0))).toBe(true);
-    expect(bs1.equals(bs1.toUint8Array())).toBe(true);
-    expect(bs1.equals(Uint8Array.of(255, 0, 127, 1))).toBe(true);
-
-    expect(bs1.equals(Uint8Array.of(255, 0, 123, 1))).toBe(false);
-    expect(bs1.equals(Uint8Array.of(255, 0, 127, 1, 5))).toBe(false);
-    expect(bs1.equals(Uint8Array.of(255, 0, 127))).toBe(false);
+    assert.strictEqual(bs1.equals(bs1), true);
+    assert.strictEqual(bs1.equals(bs1b), true);
+    assert.strictEqual(bs1.equals(bs0), false);
+    assert.strictEqual(bs0.equals(bs1), false);
 
   });
 
-  test("equals(Array<number>)", () => {
-    expect(bs0.equals([])).toBe(true);
-    expect(bs1.equals(bs1.toArray())).toBe(true);
-    expect(bs1.equals([255, 0, 127, 1])).toBe(true);
+  it("equals(Uint8Array)", () => {
+    assert.strictEqual(bs0.equals(new Uint8Array(0)), true);
+    assert.strictEqual(bs1.equals(bs1.toUint8Array()), true);
+    assert.strictEqual(bs1.equals(Uint8Array.of(255, 0, 127, 1)), true);
 
-    expect(bs1.equals([255, 0, 127, 2])).toBe(false);
-    expect(bs1.equals([255, 0, 127, 1, 2])).toBe(false);
-    expect(bs1.equals([255, 0, 127])).toBe(false);
+    assert.strictEqual(bs1.equals(Uint8Array.of(255, 0, 123, 1)), false);
+    assert.strictEqual(bs1.equals(Uint8Array.of(255, 0, 127, 1, 5)), false);
+    assert.strictEqual(bs1.equals(Uint8Array.of(255, 0, 127)), false);
+
+  });
+
+  it("equals(Array<number>)", () => {
+    assert.strictEqual(bs0.equals([]), true);
+    assert.strictEqual(bs1.equals(bs1.toArray()), true);
+    assert.strictEqual(bs1.equals([255, 0, 127, 1]), true);
+
+    assert.strictEqual(bs1.equals([255, 0, 127, 2]), false);
+    assert.strictEqual(bs1.equals([255, 0, 127, 1, 2]), false);
+    assert.strictEqual(bs1.equals([255, 0, 127]), false);
 
   });
 

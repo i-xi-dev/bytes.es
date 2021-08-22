@@ -1,18 +1,19 @@
+import assert from "node:assert";
 import { MediaType } from "../../../dist/media/media_type.js";
 
 describe("MediaType.prototype.hasParameter", () => {
-  test("hasParameter(string)", () => {
+  it("hasParameter(string)", () => {
     const i0 = MediaType.fromString("text/plain");
-    expect(i0.hasParameter("charset")).toBe(false);
+    assert.strictEqual(i0.hasParameter("charset"), false);
 
     const i1 = MediaType.fromString("text/plain;charset=uTf-8");
-    expect(i1.hasParameter("charset")).toBe(true);
+    assert.strictEqual(i1.hasParameter("charset"), true);
 
     const i2 = MediaType.fromString("text/plain;CHARSET=uTf-8 ");
-    expect(i2.hasParameter("charset")).toBe(true);
+    assert.strictEqual(i2.hasParameter("charset"), true);
 
     const i5 = MediaType.fromString("text/plain;  charset=\"uTf-8 \"; x=9");
-    expect(i5.hasParameter("charset")).toBe(true);
+    assert.strictEqual(i5.hasParameter("charset"), true);
 
   });
 

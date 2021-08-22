@@ -475,7 +475,7 @@ class ByteSequence {
       }
     }
 
-    // 中断不可、で読取
+    // 読取
     const bytes = await StreamReader.read(stream, totalByteCount, options);
     return ByteSequence.from(bytes); // bytes.bufferには未使用領域がある可能性がある為、複製して未使用領域は切り捨てる
   }

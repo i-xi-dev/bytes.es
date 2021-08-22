@@ -1,62 +1,63 @@
+import assert from "node:assert";
 import { ByteSequence } from "../../dist/byte_sequence.js";
 
 describe("ByteSequence.from", () => {
-  test("from(Array<number>)", () => {
+  it("from(Array<number>)", () => {
     const a0 = [9,8,7,6,5,4,3,2,0,255];
     const bs0 = ByteSequence.from(a0);
 
-    expect(bs0.count).toBe(10);
+    assert.strictEqual(bs0.count, 10);
     const bs0a = bs0.view();
-    expect(bs0a[8]).toBe(0);
-    expect(bs0a[9]).toBe(255);
+    assert.strictEqual(bs0a[8], 0);
+    assert.strictEqual(bs0a[9], 255);
 
     const a1 = [];
     const bs1 = ByteSequence.from(a1);
 
-    expect(bs1.count).toBe(0);
+    assert.strictEqual(bs1.count, 0);
 
   });
 
-  test("from(Uint8Array)", () => {
+  it("from(Uint8Array)", () => {
     const a0 = Uint8Array.of(9,8,7,6,5,4,3,2,1,0);
     const bs0 = ByteSequence.from(a0);
 
-    expect(bs0.count).toBe(10);
+    assert.strictEqual(bs0.count, 10);
     const bs0a = bs0.view();
-    expect(bs0a[0]).toBe(9);
-    expect(bs0a[9]).toBe(0);
+    assert.strictEqual(bs0a[0], 9);
+    assert.strictEqual(bs0a[9], 0);
 
     const a1 = new Uint8Array(0);
     const bs1 = ByteSequence.from(a1);
 
-    expect(bs1.count).toBe(0);
+    assert.strictEqual(bs1.count, 0);
 
   });
 
-  test("from(ByteSequence)", () => {
+  it("from(ByteSequence)", () => {
     const bs1 = ByteSequence.generateRandom(256);
     const bs1c = ByteSequence.from(bs1);
 
-    expect(bs1).not.toBe(bs1c);
-    expect(JSON.stringify(bs1.toArray())).toBe(JSON.stringify(bs1c.toArray()));
+    assert.notStrictEqual(bs1, bs1c);
+    assert.strictEqual(JSON.stringify(bs1.toArray()), JSON.stringify(bs1c.toArray()));
 
   });
 
-  test("fromに渡したUint8Arrayへの操作は、自身に影響しない", () => {
+  it("fromに渡したUint8Arrayへの操作は、自身に影響しない", () => {
     const a0 = Uint8Array.of(255,254,253,252,251);
     const bs0 = ByteSequence.from(a0);
 
     const bs0v = bs0.view();
-    expect(bs0v[0]).toBe(255);
-    expect(bs0v[1]).toBe(254);
-    expect(bs0v[2]).toBe(253);
-    expect(bs0v[3]).toBe(252);
-    expect(bs0v[4]).toBe(251);
+    assert.strictEqual(bs0v[0], 255);
+    assert.strictEqual(bs0v[1], 254);
+    assert.strictEqual(bs0v[2], 253);
+    assert.strictEqual(bs0v[3], 252);
+    assert.strictEqual(bs0v[4], 251);
 
     a0[0] = 1;
 
     const bs0v2 = bs0.view();
-    expect(bs0v2[0]).toBe(255);
+    assert.strictEqual(bs0v2[0], 255);
 
   });
 

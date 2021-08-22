@@ -1,19 +1,20 @@
+import assert from "node:assert";
 import { ByteSequence } from "../../dist/byte_sequence.js";
 
 describe("ByteSequence.fromPercent", () => {
-  test("fromPercent(string)", () => {
+  it("fromPercent(string)", () => {
     const bs1 = ByteSequence.fromPercent("");
-    expect(bs1.count).toBe(0);
+    assert.strictEqual(bs1.count, 0);
 
     const bs2 = ByteSequence.fromPercent("%03");
-    expect(bs2.view()[0]).toBe(0x03);
+    assert.strictEqual(bs2.view()[0], 0x03);
 
     // 結果の妥当性はエンコーディングクラスのテストにて確認
   });
 
-  test("fromPercent(string, ByteEncodingOptions)", () => {
+  it("fromPercent(string, ByteEncodingOptions)", () => {
     const bs0 = ByteSequence.fromPercent("", {});
-    expect(bs0.count).toBe(0);
+    assert.strictEqual(bs0.count, 0);
 
     // 結果の妥当性はエンコーディングクラスのテストにて確認
   });
