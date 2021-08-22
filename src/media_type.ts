@@ -6,8 +6,8 @@ import {
   Exception,
   httpQuotedString,
   RangePattern,
-} from "../_.js";
-import { StringEx } from "../_/string_ex.js";
+} from "./_.js";
+import { StringEx } from "./_/string_ex.js";
 
 /**
  * IANAの登録簿に登録済のタイプ名

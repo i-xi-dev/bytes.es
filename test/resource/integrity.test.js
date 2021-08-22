@@ -1,12 +1,12 @@
 import assert from "node:assert";
 import { Blob } from "node:buffer";
-import { FileLike } from "../../dist/file_like.js";
+import { Resource } from "../../dist/resource.js";
 
-describe("FileLike.prototype.integrity", () => {
+describe("Resource.prototype.integrity", () => {
   it("integrity(string)", async () => {
     const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
 
-    const b11 = await FileLike.fromBlob(b1);
+    const b11 = await Resource.fromBlob(b1);
     const i11a = await b11.integrity("SHA-256");
     assert.strictEqual(i11a, "sha256-IIm8EKKH9DeP2uG3Kn/lD4bbs5lgbsIi/L8hAswrj/w=");
 

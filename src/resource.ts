@@ -2,15 +2,16 @@
 
 // import { httpQuotedString, splitWebHeaderValue } from "../_.js";
 import { Exception, RangePattern } from "./_.js";
+import { getBlobConstructor } from "./_/compat.js";
 import { StringEx } from "./_/string_ex.js";
 import { ByteSequence } from "./byte_sequence.js";
 import { Uri } from "./uri.js";
-import { MediaType } from "./media/media_type.js";
+import { MediaType } from "./media_type.js";
 
 /**
  * ファイル様オブジェクト
  */
-class FileLike {
+class Resource {
   /**
    * メディアタイプ
    */
@@ -58,9 +59,9 @@ class FileLike {
    * @param blob Blob
    * @returns 生成したインスタンス
    */
-  static async fromBlob(blob: Blob): Promise<FileLike> {
+  static async fromBlob(blob: Blob): Promise<Resource> {
     try {
-      const buffer = await blob.arrayBuffer();
+      const buffer = await blob.arrayBuffer(); // XXX Node.jsでもstream()を取得できるようになった
       let mediaType: MediaType;
       if (blob.type) {
         mediaType = MediaType.fromString(blob.type);
@@ -70,7 +71,7 @@ class FileLike {
       }
       const bytes = new ByteSequence(buffer);
 
-      return new FileLike(mediaType, bytes);
+      return new Resource(mediaType, bytes);
     }
     catch (exception) {
       // NotFoundError | SecurityError | NotReadableError
@@ -84,7 +85,10 @@ class FileLike {
    * @returns Blob
    */
   toBlob(): Blob {
-    return this.#bytes.toBlob(this.#mediaType);
+    const Blob = getBlobConstructor();
+    return new Blob([ this.#bytes.buffer ], {
+      type: this.#mediaType.toString(),
+    });
   }
 
   /**
@@ -98,7 +102,7 @@ class FileLike {
    * @param dataUrl Data URL
    * @returns 生成したインスタンス
    */
-  static fromDataUrl(dataUrl: Uri | string): FileLike {
+  static fromDataUrl(dataUrl: Uri | string): Resource {
     let uri: Uri;
     if (dataUrl instanceof Uri) {
       uri = dataUrl;
@@ -161,7 +165,7 @@ class FileLike {
       mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
     }
 
-    return new FileLike(mediaType, bodyWork);
+    return new Resource(mediaType, bodyWork);
   }
 
   /**
@@ -219,7 +223,7 @@ class FileLike {
 
 
 }
-Object.freeze(FileLike);
+Object.freeze(Resource);
 
 // // https://fetch.spec.whatwg.org/#content-length-header
 // function declaredContentLength(headers: Headers): number | null {
@@ -339,4 +343,4 @@ Object.freeze(FileLike);
 //   return values;
 // }
 
-export { FileLike };
+export { Resource };

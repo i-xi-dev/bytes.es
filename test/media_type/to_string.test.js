@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { MediaType } from "../../../dist/media/media_type.js";
+import { MediaType } from "../../dist/media_type.js";
 
 describe("MediaType.prototype.toString", () => {
   it("toString()", () => {

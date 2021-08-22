@@ -2,7 +2,7 @@
 
 // バイト列
 
-import { getBlobConstructor, getCrypto } from "./_/compat.js";
+import { getCrypto } from "./_/compat.js";
 import { uint8 } from "./byte/type.js";
 import {
   Base64,
@@ -21,7 +21,6 @@ import {
   StreamReadOptions,
 } from "./byte/index.js";
 import { TextDecodeOptions, TextEncodeOptions, TextEncoding } from "./text_encoding/index.js";
-import { MediaType } from "./media/media_type.js";
 
 /**
  * バイト列を表す整数の配列
@@ -510,25 +509,6 @@ class ByteSequence {
     const encoding = TextEncoding.for(encodingName);
     return encoding.decode(this.view(), options);
   }
-
-  // -----------------------------------------------------------------
-  // File-like
-  // -----------------------------------------------------------------
-
-
-  /**
-   * 指定したメディアタイプと自身のバイト列からBlobを生成し返却
-   * 
-   * @param mediaType メディアタイプ
-   * @returns Blob
-   */
-  toBlob(mediaType: MediaType): Blob {
-    const Blob = getBlobConstructor();
-    return new Blob([ this.buffer ], {
-      type: mediaType.toString(),
-    });
-  }
-
 
 }
 Object.freeze(ByteSequence);
