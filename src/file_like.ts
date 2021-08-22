@@ -1,12 +1,11 @@
 //
 
 // import { httpQuotedString, splitWebHeaderValue } from "../_.js";
-import { Exception, RangePattern } from "../_.js";
-import { getBlobConstructor } from "../_/compat.js";
-import { StringEx } from "../_/string_ex.js";
-import { ByteSequence } from "../byte_sequence.js";
-import { Uri } from "../uri.js";
-import { MediaType } from "./media_type.js";
+import { Exception, RangePattern } from "./_.js";
+import { StringEx } from "./_/string_ex.js";
+import { ByteSequence } from "./byte_sequence.js";
+import { Uri } from "./uri.js";
+import { MediaType } from "./media/media_type.js";
 
 /**
  * ファイル様オブジェクト
@@ -85,10 +84,7 @@ class FileLike {
    * @returns Blob
    */
   toBlob(): Blob {
-    const Blob = getBlobConstructor();
-    return new Blob([ this.#bytes.buffer ], {
-      type: this.#mediaType.toString(),
-    });
+    return this.#bytes.toBlob(this.#mediaType);
   }
 
   /**

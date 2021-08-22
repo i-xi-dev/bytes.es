@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { Blob } from "node:buffer";
-import { FileLike } from "../../../dist/media/file_like.js";
+import { FileLike } from "../../dist/file_like.js";
 
 describe("FileLike.prototype.toBlob", () => {
   it("toBlob()", async () => {
