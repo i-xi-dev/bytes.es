@@ -86,6 +86,18 @@ const loadedBytes = await ByteSequence.fromByteStream(byteStream);
 const loadedBytes = await ByteSequence.fromByteStream(byteStream);
 ```
 
+#### Creating an instance by encoding the text in UTF-8
+```javascript
+const encoded = ByteSequence.fromText("hello");
+// [ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+
+const encoded = ByteSequence.fromText("新幹線");
+// [ 0xE6, 0x96, 0xB0, 0xE5, 0xB9, 0xB9, 0xE7, 0xB7, 0x9A ]
+```
+
+
+
+
 
 ...
 

@@ -161,7 +161,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
     chunkGenerator = createChunkGenerator(reader);
   }
   else {
-    chunkGenerator = createChunkGeneratorN(stream as NodeJS.ReadStream);
+    chunkGenerator = createChunkGeneratorN(stream);
   }
 
   if (resolvedOptions.signal !== null) {
@@ -179,7 +179,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
     }
     else {
       resolvedOptions.signal.addEventListener("abort", () => {
-        (stream as NodeJS.ReadStream).destroy();
+        (stream).destroy();
       }, {
         once: true,
       });

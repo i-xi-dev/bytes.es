@@ -51,10 +51,12 @@ function getBlobConstructor(): BlobConstructor {
 }
 
 type ReadableStreamConstructor = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   new <R = any>(underlyingSource?: UnderlyingSource<R> | undefined, strategy?: QueuingStrategy<R> | undefined): ReadableStream<R>;
   prototype: ReadableStream;
 };
 declare module "node:stream/web" {
+  // eslint-disable-next-line no-var
   export var ReadableStream: ReadableStreamConstructor;
 }
 let _ReadableStreamConstructor: ReadableStreamConstructor;
@@ -62,7 +64,7 @@ if (globalThis.ReadableStream) {
   _ReadableStreamConstructor = ReadableStream;
 }
 else if (globalThis.process) {
-  _ReadableStreamConstructor = (await import("node:stream/web")).ReadableStream as ReadableStreamConstructor;
+  _ReadableStreamConstructor = (await import("node:stream/web")).ReadableStream;
 }
 
 function isTypeOfReadableStream(v: unknown): v is ReadableStream {
