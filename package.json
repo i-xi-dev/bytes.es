@@ -1,14 +1,15 @@
 {
   "name": "@i-xi-dev/bytes",
-  "version": "0.0.12",
+  "version": "0.0.18",
   "description": "A JavaScript byte array library for the browser, Deno and Node.js",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "import": "./dist/index.js",
-    "node": "./node.mjs",
-    "default": "./dist/index.js"
+    ".": {
+      "node": "./node.mjs",
+      "default": "./dist/index.js"
+    }
   },
   "scripts": {
     "build": "tsc --build",
@@ -27,7 +28,10 @@
     "byte",
     "bytes",
     "dataurl",
-    "utf8"
+    "utf8",
+    "browser",
+    "deno",
+    "nodejs"
   ],
   "author": "",
   "license": "MIT",
@@ -36,7 +40,8 @@
   },
   "homepage": "https://github.com/i-xi-dev/bytes.es#readme",
   "files": [
-    "dist"
+    "dist",
+    "node.mjs"
   ],
   "engines": {
     "node": ">=16.5.0"

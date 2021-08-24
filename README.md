@@ -27,13 +27,13 @@ $ npm i @i-xi-dev/bytes
 ```
 
 ```javascript
-import { ByteSequence, Resource } from "@i-xi-dev/bytes";
+import { ByteSequence, Resource } from "@i-xi-dev/bytes@0.0.18";
 ```
 
 ### CDN
 
 ```javascript
-import { ByteSequence, Resource } from "https://unpkg.com/@i-xi-dev/bytes";
+import { ByteSequence, Resource } from "https://unpkg.com/@i-xi-dev/bytes@0.0.18";
 ```
 
 
