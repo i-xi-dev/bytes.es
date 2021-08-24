@@ -115,7 +115,7 @@ class Uri {
   }
 
   /**
-   * オリジン
+   * Gets the origin for this instance.
    */
   get origin(): string | null {
     return (this.#uri.origin === "null") ? null : this.#uri.origin;
@@ -147,7 +147,7 @@ class Uri {
   }
 
   /**
-   * 素片
+   * Gets the fragment for this instance.
    */
   get fragment(): string | null {
     if (this.#uri.hash.length <= 0) {
@@ -164,19 +164,15 @@ class Uri {
   }
 
   /**
-   * URLを表す文字列を生成し返却
-   * 
    * @override
-   * @returns URLを表す文字列
+   * @returns The normalized string representation for this instance.
    */
   toString(): string {
     return this.#uri.toString();
   }
 
   /**
-   * URLを表す文字列を生成し返却
-   * 
-   * @returns URLを表す文字列
+   * @returns The normalized string representation for this instance.
    */
   toJSON(): string {
     return this.toString();

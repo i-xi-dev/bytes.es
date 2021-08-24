@@ -1,6 +1,6 @@
 # @i-xi-dev/bytes
 
-A JavaScript byte array library for the browser and Node.js
+A JavaScript byte array library for the browser, Deno and Node.js
 
 
 ## Description
@@ -105,11 +105,25 @@ const resource = await Resource.fromBlob(blob);
 const loadedBytes = resource.bytes;
 ```
 
-#### Creating an instance by reading the data URL
+#### Creating an instance by reading the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
 ```javascript
 const resource = await Resource.fromDataUrl("data:text/plain;charset=US-ASCII,hello");
 const loadedBytes = resource.bytes;
 ```
+
+
+### Converting the instance to a Base64 encoded string
+```javascript
+const bytes = ByteSequence.fromBinaryString("hello");
+const base64Encoded = bytes.toBase64();
+// "aGVsbG8="
+```
+
+
+
+
+
+
 
 ...
 
