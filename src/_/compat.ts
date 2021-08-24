@@ -1,75 +1,75 @@
 //
 
-import { Exception } from "../_.js";
+// import { Exception } from "../_.js";
 
-/**
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Crypto Crypto} object
- */
-let _crypto: Crypto;
-if (globalThis.crypto?.subtle) { // globalThis.cryptoがCrypto型かどうかでは判定できない（Node, Jest環境）Cryptoが値扱いの為
-  // ブラウザー, Deno
-  _crypto = globalThis.crypto;
-}
-else if (globalThis.process) {
-  // Node.js 条件不十分？
-  _crypto = ((await import("node:crypto")).webcrypto as unknown) as Crypto;
-}
+// /**
+//  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Crypto Crypto} object
+//  */
+// let _crypto: Crypto;
+// if (globalThis.crypto?.subtle) { // globalThis.cryptoがCrypto型かどうかでは判定できない（Node, Jest環境）Cryptoが値扱いの為
+//   // ブラウザー, Deno
+//   _crypto = globalThis.crypto;
+// }
+// else if (globalThis.process) {
+//   // Node.js 条件不十分？
+//   _crypto = ((await import("node:crypto")).webcrypto as unknown) as Crypto;
+// }
 
-/**
- * @returns The Crypto object.
- */
-function getCrypto(): Crypto {
-  if (_crypto) {
-    return _crypto;
-  }
-  throw new Exception("NotSupportedError", "Crypto unsupported");
-}
+// /**
+//  * @returns The Crypto object.
+//  */
+// function getCrypto(): Crypto {
+//   if (_crypto) {
+//     return _crypto;
+//   }
+//   throw new Exception("NotSupportedError", "Crypto unsupported");
+// }
 
-/**
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Blob Blob} constructor
- */
-type BlobConstructor = {
-  new (blobParts?: BlobPart[] | undefined, options?: BlobPropertyBag | undefined): Blob;
-  prototype: Blob;
-};
-let _BlobConstructor: BlobConstructor;
-if (globalThis.Blob) {
-  _BlobConstructor = Blob;
-}
-else if (globalThis.process) {
-  _BlobConstructor = (await import("node:buffer")).Blob as BlobConstructor;
-}
+// /**
+//  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Blob Blob} constructor
+//  */
+// type BlobConstructor = {
+//   new (blobParts?: BlobPart[] | undefined, options?: BlobPropertyBag | undefined): Blob;
+//   prototype: Blob;
+// };
+// let _BlobConstructor: BlobConstructor;
+// if (globalThis.Blob) {
+//   _BlobConstructor = Blob;
+// }
+// else if (globalThis.process) {
+//   _BlobConstructor = (await import("node:buffer")).Blob as BlobConstructor;
+// }
 
-/**
- * @returns The Blob constructor.
- */
-function getBlobConstructor(): BlobConstructor {
-  if (_BlobConstructor) {
-    return _BlobConstructor;
-  }
-  throw new Exception("NotSupportedError", "Blob unsupported");
-}
+// /**
+//  * @returns The Blob constructor.
+//  */
+// function getBlobConstructor(): BlobConstructor {
+//   if (_BlobConstructor) {
+//     return _BlobConstructor;
+//   }
+//   throw new Exception("NotSupportedError", "Blob unsupported");
+// }
 
-type ReadableStreamConstructor = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  new <R = any>(underlyingSource?: UnderlyingSource<R> | undefined, strategy?: QueuingStrategy<R> | undefined): ReadableStream<R>;
-  prototype: ReadableStream;
-};
-declare module "node:stream/web" {
-  // eslint-disable-next-line no-var
-  export var ReadableStream: ReadableStreamConstructor;
-}
-let _ReadableStreamConstructor: ReadableStreamConstructor;
-if (globalThis.ReadableStream) {
-  _ReadableStreamConstructor = ReadableStream;
-}
-else if (globalThis.process) {
-  _ReadableStreamConstructor = (await import("node:stream/web")).ReadableStream;
-}
+// type ReadableStreamConstructor = {
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   new <R = any>(underlyingSource?: UnderlyingSource<R> | undefined, strategy?: QueuingStrategy<R> | undefined): ReadableStream<R>;
+//   prototype: ReadableStream;
+// };
+// declare module "node:stream/web" {
+//   // eslint-disable-next-line no-var
+//   export var ReadableStream: ReadableStreamConstructor;
+// }
+// let _ReadableStreamConstructor: ReadableStreamConstructor;
+// if (globalThis.ReadableStream) {
+//   _ReadableStreamConstructor = ReadableStream;
+// }
+// else if (globalThis.process) {
+//   _ReadableStreamConstructor = (await import("node:stream/web")).ReadableStream;
+// }
 
-function isTypeOfReadableStream(v: unknown): v is ReadableStream {
-  return v instanceof _ReadableStreamConstructor;
-}
+// function isTypeOfReadableStream(v: unknown): v is ReadableStream {
+//   return v instanceof _ReadableStreamConstructor;
+// }
 
 /**
  * ProgressEvent for non-browser enviorments
@@ -128,8 +128,8 @@ class _ProgressEvent extends Event implements ProgressEvent<EventTarget> {
 const pe = (globalThis.ProgressEvent) ? globalThis.ProgressEvent : _ProgressEvent;
 
 export {
-  getBlobConstructor,
-  getCrypto,
-  isTypeOfReadableStream,
+//  getBlobConstructor,
+//  getCrypto,
+//  isTypeOfReadableStream,
   pe as ProgressEvent,
 };

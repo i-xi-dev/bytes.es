@@ -2,7 +2,6 @@
 
 // import { httpQuotedString, splitWebHeaderValue } from "../_.js";
 import { Exception, RangePattern } from "./_.js";
-import { getBlobConstructor } from "./_/compat.js";
 import { StringEx } from "./_/string_ex.js";
 import { ByteSequence } from "./byte_sequence.js";
 import { Uri } from "./uri.js";
@@ -85,7 +84,6 @@ class Resource {
    * @returns Blob
    */
   toBlob(): Blob {
-    const Blob = getBlobConstructor();
     return new Blob([ this.#bytes.buffer ], {
       type: this.#mediaType.toString(),
     });

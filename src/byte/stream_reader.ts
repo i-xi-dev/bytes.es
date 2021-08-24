@@ -3,7 +3,7 @@
 // バイトストリーム読取
 
 import { Exception } from "../_.js";
-import { isTypeOfReadableStream, ProgressEvent } from "../_/compat.js";
+import { ProgressEvent } from "../_/compat.js";
 
 /**
  * 可読ストリームの型
@@ -156,7 +156,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
 
   let reader: ReadableStreamDefaultReader<Uint8Array>;
   let chunkGenerator: AsyncGenerator<Uint8Array, void, void>;
-  if (isTypeOfReadableStream(stream)) {
+  if (stream instanceof ReadableStream) {
     reader = stream.getReader();
     chunkGenerator = createChunkGenerator(reader);
   }
@@ -169,7 +169,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
       throw new Exception("AbortError", "already aborted");
     }
 
-    if (isTypeOfReadableStream(stream)) {
+    if (stream instanceof ReadableStream) {
       resolvedOptions.signal.addEventListener("abort", (): void => {
         // stream.cancel()しても読取終了まで待ちになるので、reader.cancel()する
         void reader.cancel().catch(); // XXX closeで良い？

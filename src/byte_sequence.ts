@@ -2,7 +2,6 @@
 
 // バイト列
 
-import { getCrypto } from "./_/compat.js";
 import { uint8 } from "./byte/type.js";
 import {
   Base64,
@@ -140,7 +139,7 @@ class ByteSequence {
       throw new RangeError("byteCount");
     }
 
-    const randomBytes = getCrypto().getRandomValues(new Uint8Array(byteCount));
+    const randomBytes = globalThis.crypto.getRandomValues(new Uint8Array(byteCount));
     return new ByteSequence(randomBytes.buffer);
   }
 

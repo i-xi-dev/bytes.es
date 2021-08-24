@@ -1,6 +1,5 @@
 //
 
-import { getCrypto } from "../../_/compat.js";
 import { DigestAlgorithmImplementation } from "./_.js";
 
 /**
@@ -9,7 +8,7 @@ import { DigestAlgorithmImplementation } from "./_.js";
  * @see {@link DigestAlgorithmImplementation.compute}
  */
 async function compute(input: Uint8Array): Promise<Uint8Array> {
-  const digestBuffer = await getCrypto().subtle.digest("SHA-512", input);
+  const digestBuffer = await globalThis.crypto.subtle.digest("SHA-512", input);
   return new Uint8Array(digestBuffer);
 }
 
