@@ -121,7 +121,7 @@ class Uri {
     return (this.#uri.origin === "null") ? null : this.#uri.origin;
   }
 
-  // XXX get path(): PathSegmentList
+  // XXX get path(): Array<string> {
 
   /**
    * クエリ
@@ -237,7 +237,7 @@ Object.freeze(Uri);
 
 export { Uri };
 
-// TODO
+// XXX
 // const PercentEncodeSet = {
 //   //UriFragment: [ 0x20, 0x22, 0x3C, 0x3E, 0x60 ] as const,
 //   //UriQuery: [ 0x20, 0x22, 0x23, 0x3C, 0x3E ] as const,

@@ -20,14 +20,16 @@ type Options = {
   progressListener?: EventTarget,
 
   /**
-   * 中断シグナル（絶え間なく読めるストリームの場合、すべて読み取るまで中断されない）
+   * 中断シグナル
+   * （絶え間なく読めるストリームの場合、すべて読み取るまで中断されない）
    */
   signal?: AbortSignal,
 
-  // /**
-  //  * XXX 未実装（絶え間なく読めるストリームの場合、すべて読み取るまでタイムアウトされない）
-  //  */
-  // timeout?: number,
+  /**
+   * タイムアウト（ミリ秒）
+   * （絶え間なく読めるストリームの場合、すべて読み取るまでタイムアウトされない）
+   */
+  timeout?: number,
 
   /**
    * 見積サイズが明示されている場合に、見積サイズと実サイズの不一致を許容するか否か
@@ -39,19 +41,16 @@ type Options = {
  * 未設定を許可しないストリーム読取オプション
  */
 type ResolvedOptions = {
-  /**
-   * @see {@link Options.progressListener}
-   */
+  /** @see {@link Options.progressListener} */
   progressListener: EventTarget | null,
 
-  /**
-   * @see {@link Options.signal}
-   */
+  /** @see {@link Options.signal} */
   signal: AbortSignal | null,
 
-  /**
-   * @see {@link Options.acceptSizeMismatch}
-   */
+  /** @see {@link Options.timeout} */
+  timeout: number,
+
+  /** @see {@link Options.acceptSizeMismatch} */
   acceptSizeMismatch: boolean,
 };
 
@@ -64,11 +63,13 @@ type ResolvedOptions = {
 function resolveOptions(options: Options = {}): ResolvedOptions {
   const progressListener = (options.progressListener instanceof EventTarget) ? options.progressListener : null;
   const signal = (options.signal instanceof AbortSignal) ? options.signal : null;
+  const timeout = ((typeof options.timeout === "number") && Number.isSafeInteger(options.timeout) && (options.timeout > 0)) ? options.timeout : -1;
   const acceptSizeMismatch: boolean = (typeof options.acceptSizeMismatch === "boolean") ? options.acceptSizeMismatch : false;
 
   return {
     progressListener,
     signal,
+    timeout,
     acceptSizeMismatch,
   };
 }
@@ -186,6 +187,7 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
     }
   }
 
+  const startTime = performance.now();
   let buffer: Uint8Array;
   if (totalByteCount === undefined) {
     buffer = new Uint8Array(DEFAULT_BUFFER_SIZE);
@@ -199,6 +201,13 @@ async function read(stream: Stream, totalByteCount?: number, options: Options = 
       if ((typeof totalByteCount === "number") && ((loadedByteCount + chunkBytes.byteLength) > totalByteCount)) {
         // 見積サイズに対して超過
         throw new Exception("DataError", "Stream size too long");
+      }
+    }
+
+    if (resolvedOptions.timeout > 0) {
+      const elapsed = performance.now() - startTime;
+      if (elapsed >= resolvedOptions.timeout) {
+        throw new Exception("TimeoutError", "elapsed:" + elapsed.toString(10) + ", loaded:" + loadedByteCount.toString(10));
       }
     }
 

@@ -1,6 +1,6 @@
 //
 
-// import { httpQuotedString, splitWebHeaderValue } from "../_.js";
+// import { Exception, httpQuotedString, RangePattern } from "./_.js";
 import { Exception, RangePattern } from "./_.js";
 import { StringEx } from "./_/string_ex.js";
 import { ByteSequence } from "./byte_sequence.js";
@@ -211,67 +211,54 @@ class Resource {
     return prefix + digestBytes.toBase64();
   }
 
-  // TODO
-  // static async fromWebMessage(message: Request | Response, options) {
-  //   // message.bodyで取得するので、ヘッダーからContent-TypeとContent-Lengthを抽出（blob()で取得するなら抽出する必要は無い TODO 選択可能にする？）
-  //   const mediaType = declaredContentType(message.headers);
-  //   const size = declaredContentLength(message.headers);
-  //   // Content-Encodingされてる場合にサイズが取れない
-  // }
 
+  // static async fromWebMessage(message: Request | Response, options: WebMessageReadingOptions): Promise<Resource> {
+  //   if (message.body !== null) {
+  //     //XXX Responseの場合、status等は無視？
+
+  //     if (options.readAs === "blob") {
+  //       const blob = await message.blob();
+  //       return Resource.fromBlob(blob);
+  //     }
+
+  //     const mediaType = extractContentType(message.headers);
+  //     if (message.body !== null) {
+  //       //const size = extractContentLength(message.headers);
+  //       //XXX sizeがそのまま使える場合は限られる
+  //       const bytes = await ByteSequence.fromByteStream(message.body);
+  //       return new Resource(mediaType, bytes);
+  //     }
+  //   }
+  //   throw new Exception("DataError", "no message body");
+  // }
 
 }
 Object.freeze(Resource);
 
-// // https://fetch.spec.whatwg.org/#content-length-header
-// function declaredContentLength(headers: Headers): number | null {
-//   // 2.
-//   if (headers.has("Content-Length") !== true) {
-//     return null;
-//   }
 
-//   // 1, 2.
-//   const sizesString = headers.get("Content-Length") as string;
-//   const sizeStrings = splitWebHeaderValue(sizesString);
-//   if (sizeStrings.length <= 0) {
-//     return null;
-//   }
+// type WebMessageReadingOptions = {
+//   readAs: "blob" | "stream",
+// };
 
-//   // 3.
-//   let candidateValue: string | null = null;
-//   // 4.
-//   for (const sizeString of sizeStrings) {
-//     // 4.1.
-//     if (candidateValue === null) {
-//       candidateValue = sizeString;
-//     }
-//     else {
-//       // 4.2.
-//       throw new Exception("TODO", "TODO");
-//     }
-//   }
-//   candidateValue = candidateValue as string;
-
-//   // 5.
-//   if (/^[0-9]+$/.test(candidateValue) !== true) {
-//     return null;
-//   }
-//   // 6.
-//   return Number.parseInt(candidateValue, 10);
-// }
-
-// // https://fetch.spec.whatwg.org/#content-type-header
-// function declaredContentType(headers: Headers): MediaType {
+// /**
+//  * RequestまたはResponseのヘッダーからContent-Typeの値を取得し返却する
+//  * 
+//  * {@link https://fetch.spec.whatwg.org/#content-type-header Fetch standard}の仕様に合わせた
+//  * 
+//  * @param headers ヘッダー
+//  * @returns Content-Typeの値から生成したMediaTypeインスタンス
+//  */
+// function extractContentType(headers: Headers): MediaType {
 //   // 5.
 //   if (headers.has("Content-Type") !== true) {
-//     throw new Exception("TODO", "TODO");
+//     throw new Exception("NotFoundError", "Content-Type header");
 //   }
 
 //   // 4, 5.
 //   const typesString = headers.get("Content-Type") as string;
 //   const typeStrings = splitWebHeaderValue(typesString);
 //   if (typeStrings.length <= 0) {
-//     throw new Exception("TODO", "TODO");
+//     throw new Exception("NotFoundError", "Content-Type value");
 //   }
 
 //   // 1, 2, 3.
@@ -317,11 +304,21 @@ Object.freeze(Resource);
 //     return mediaType;
 //   }
 //   else {
-//     throw new Exception("TODO", "TODO");
+//     throw new Exception("Error", "extraction failure");
 //   }
 // }
 
-// export function splitWebHeaderValue(value: string): Array<string> {
+// /**
+//  * Headers#getで取得した値を分割する
+//  * （複数ヘッダーだった場合、","で連結されているので分割する）
+//  * 
+//  * かつてはHeaders#getAllすれば良かったが、それは廃止されたので
+//  * {@link https://fetch.spec.whatwg.org/#concept-header-list-get-decode-split} のsplitの部分の仕様で分割する
+//  * 
+//  * @param value Headers#getで取得した値
+//  * @returns 分割結果
+//  */
+// function splitWebHeaderValue(value: string): Array<string> {
 //   const notU0022OrU002C = "\\u0022\\u002C";
 //   const values: Array<string> = [];
 //   let work = value;
@@ -339,6 +336,50 @@ Object.freeze(Resource);
 //     values.push(StringEx.trim(splitted, RangePattern.HTTP_TAB_OR_SPACE));
 //   }
 //   return values;
+// }
+
+// /**
+//  * RequestまたはResponseのヘッダーからContent-Lengthの値を取得し返却する
+//  * 
+//  * {@link https://fetch.spec.whatwg.org/#content-length-header Fetch standard}の仕様に合わせた
+//  * 
+//  * @param headers ヘッダー
+//  * @returns Content-Lengthの値から生成した数値、取得できなかった場合はnull
+//  */
+// function extractContentLength(headers: Headers): number | null {
+//   // 2.
+//   if (headers.has("Content-Length") !== true) {
+//     return null;
+//   }
+
+//   // 1, 2.
+//   const sizesString = headers.get("Content-Length") as string;
+//   const sizeStrings = splitWebHeaderValue(sizesString);
+//   if (sizeStrings.length <= 0) {
+//     return null;
+//   }
+
+//   // 3.
+//   let candidateValue: string | null = null;
+//   // 4.
+//   for (const sizeString of sizeStrings) {
+//     // 4.1.
+//     if (candidateValue === null) {
+//       candidateValue = sizeString;
+//     }
+//     else {
+//       // 4.2.
+//       throw new Exception("DataError", "duplicate Content-Length");
+//     }
+//   }
+//   candidateValue = candidateValue as string;
+
+//   // 5.
+//   if (/^[0-9]+$/.test(candidateValue) !== true) {
+//     return null;
+//   }
+//   // 6.
+//   return Number.parseInt(candidateValue, 10);
 // }
 
 export { Resource };

@@ -129,6 +129,20 @@ describe("StreamReader.read", () => {
 
   });
 
+  it("read(NodeJS.ReadableStream, number, StreamReaderOptions) - timeout", async () => {
+    const stream5 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
+    const bytes5 = await StreamReader.read(stream5, 128, { timeout:1000, });
+    assert.strictEqual(bytes5.byteLength, 128);
+
+    const stream6 = fs.createReadStream("./test/_data/4096.txt", { highWaterMark: 64 });
+    await assert.rejects(async () => {
+      await StreamReader.read(stream6, 4096, { timeout:1, });
+    }, {
+      name: "TimeoutError"
+    });
+
+  });
+
   it("read(NodeJS.ReadableStream, number, StreamReaderOptions) - acceptSizeMismatch", async () => {
     const stream5 = fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 });
     const bytes5 = await StreamReader.read(stream5, 64, { acceptSizeMismatch:true, });
