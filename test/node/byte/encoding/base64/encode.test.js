@@ -8,18 +8,18 @@ describe("Base64.encode", () => {
     assert.strictEqual(Base64.encode(Uint8Array.of(255)), "/w==");
     assert.strictEqual(Base64.encode(Uint8Array.of(251)), "+w==");
 
-    assert.strictEqual(Base64.encode(Uint8Array.of(251), {_62ndChar:"-"}), "-w==");
+    assert.strictEqual(Base64.encode(Uint8Array.of(251), {table:"rfc4648-url"}), "-w==");
 
-    assert.strictEqual(Base64.encode(Uint8Array.of(255), {_63rdChar:"_"}), "_w==");
+    assert.strictEqual(Base64.encode(Uint8Array.of(255), {table:"rfc4648-url"}), "_w==");
 
-    assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {_62ndChar:"-", _63rdChar:"_"}), "AwIBAP_-_fw=");
+    assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {table:"rfc4648-url"}), "AwIBAP_-_fw=");
 
     assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {usePadding:false}), "AwIBAP/+/fw");
     assert.strictEqual(Base64.encode(Uint8Array.of(255), {usePadding:false}), "/w");
 
     assert.strictEqual(Base64.encode(Uint8Array.of(255), {usePadding:true}), "/w==");
 
-    assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {_62ndChar:"-", _63rdChar:"_", usePadding:false}), "AwIBAP_-_fw");
+    assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {table:"rfc4648-url", usePadding:false}), "AwIBAP_-_fw");
 
     const r1 = crypto.getRandomValues(new Uint8Array(256));
     const r2 = crypto.getRandomValues(new Uint8Array(255));

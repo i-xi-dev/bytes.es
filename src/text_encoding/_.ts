@@ -6,14 +6,10 @@
  * フォールバックの型
  */
 const Fallback = {
-  /**
-   * 例外にする
-   */
+  /** 例外にする */
   EXCEPTION: "exception",
 
-  /**
-   * 置換する
-   */
+  /** 置換する */
   REPLACEMENT: "replacement",
 } as const;
 type Fallback = typeof Fallback[keyof typeof Fallback];

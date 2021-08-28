@@ -16,18 +16,23 @@ type _62ndCharType = "+" | "-"; // XXX Base64_63rdCharと重複する文字を�
 type _63rdCharType = "/" | "_"; // XXX Base64_62ndCharと重複する文字を追加した場合、Base64Encodingコンストラクターで重複はエラーにする必要あり
 
 /**
+ * 変換テーブル
+ */
+const Base64Table = {
+  /** RFC 4648 Base64 (standard) */
+  RFC4648: "rfc4648",
+
+  /** RFC 4648 Base64url (URL- and filename-safe standard) */
+  RFC4648_URL: "rfc4648-url",
+} as const;
+type Base64Table = typeof Base64Table[keyof typeof Base64Table];
+
+/**
  * Base64符号化方式オプション
  */
 type Options = {
-  /**
-   * 変換テーブルの62番目の文字
-   */
-  _62ndChar?: _62ndCharType,
-
-  /**
-   * 変換テーブルの63番目の文字
-   */
-  _63rdChar?: _63rdCharType,
+  /** 変換テーブル */
+  table?: Base64Table,
 
   /**
    * パディングを付加するか否か
@@ -58,24 +63,16 @@ type EncodeOptions = Options & {
  * 未設定を許可しないBase64符号化方式オプション
  */
 type ResolvedOptions = {
-  /**
-   * @see {@link Options._62ndChar}
-   */
+  /** @see {@link Options._62ndChar} */
   _62ndChar: _62ndCharType,
 
-  /**
-   * @see {@link Options._63rdChar}
-   */
+  /** @see {@link Options._63rdChar} */
   _63rdChar: _63rdCharType,
 
-  /**
-   * @see {@link Options.usePadding}
-   */
+  /** @see {@link Options.usePadding} */
   usePadding: boolean,
 
-  /**
-   * @see {@link DecodeOptions.forgiving}
-   */
+  /** @see {@link DecodeOptions.forgiving} */
   forgiving: boolean,
 };
 
@@ -155,14 +152,9 @@ const BASE_TABLE: ReadonlyArray<string> = [
 const PADDING_CHAR = "=";
 
 /**
- * 変換テーブルの62番目の文字のデフォルト
+ * 変換テーブルのデフォルト
  */
-const DEFAULT_62ND_CHAR: _62ndCharType = "+";
-
-/**
- * 変換テーブルの63番目の文字のデフォルト
- */
-const DEFAULT_63RD_CHAR: _63rdCharType = "/";
+const DEFAULT_TABLE = Base64Table.RFC4648;
 
 /**
  * パディングが必要か否かのデフォルト
@@ -181,17 +173,21 @@ const DEFAULT_FORGIVING = false;
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたBase64符号化方式オプション
  */
 function resolveOptions(options: DecodeOptions | EncodeOptions = {}): ResolvedOptions {
-  const _62ndChar: _62ndCharType = (typeof options._62ndChar === "string") ? options._62ndChar : DEFAULT_62ND_CHAR;
-  // if (BASE_TABLE.includes(_62ndChar)) { Base64_62ndCharに不正な値を追加しない限り不要
-  //  throw new TypeError("_62ndChar");
-  // }
-  const _63rdChar: _63rdCharType = (typeof options._63rdChar === "string") ? options._63rdChar : DEFAULT_63RD_CHAR;
-  // if (BASE_TABLE.includes(_63rdChar)) { Base64_63rdCharに不正な値を追加しない限り不要
-  //  throw new TypeError("_63rdChar");
-  // }
-  // if (_62ndChar === _63rdChar) { XXX 今のところ不要
-  //  throw new TypeError("_62ndChar, _63rdChar");
-  // }
+  const table: Base64Table = (options.table) ? options.table : DEFAULT_TABLE;
+  let _62ndChar: _62ndCharType;
+  let _63rdChar: _63rdCharType;
+
+  switch (table) {
+  case Base64Table.RFC4648:
+    _62ndChar = "+";
+    _63rdChar = "/";
+    break;
+  case Base64Table.RFC4648_URL:
+    _62ndChar = "-";
+    _63rdChar = "_";
+    break;
+  }
+
   const usePadding: boolean = (typeof options.usePadding === "boolean") ? options.usePadding : DEFAULT_USE_PADDING;
 
   let forgiving = DEFAULT_FORGIVING;

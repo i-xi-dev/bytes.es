@@ -42,13 +42,13 @@ describe("Base64.decode", () => {
   });
 
   it("decode(string, Object)", () => {
-    const decoded22 = Base64.decode("AwIBAP_-_fw=", {_62ndChar:"-", _63rdChar:"_"});
+    const decoded22 = Base64.decode("AwIBAP_-_fw=", {table:"rfc4648-url"});
     assert.strictEqual(JSON.stringify([...decoded22]), "[3,2,1,0,255,254,253,252]");
 
     const decoded32 = Base64.decode("AwIBAP/+/fw", {usePadding:false});
     assert.strictEqual(JSON.stringify([...decoded32]), "[3,2,1,0,255,254,253,252]");
 
-    const decoded42 = Base64.decode("AwIBAP_-_fw", {_62ndChar:"-", _63rdChar:"_", usePadding:false});
+    const decoded42 = Base64.decode("AwIBAP_-_fw", {table:"rfc4648-url", usePadding:false});
     assert.strictEqual(JSON.stringify([...decoded42]), "[3,2,1,0,255,254,253,252]");
 
     assert.strictEqual(Buffer.from("AwIBAP/+/fw=", "base64").toJSON().data.join(","), "3,2,1,0,255,254,253,252");
