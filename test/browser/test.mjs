@@ -51,6 +51,13 @@ export default {
       throw new Error(`failed:strictEqual - expected:${ a }, actual:${ b }`);
     },
 
+    notStrictEqual(a, b) {
+      if (a !== b) {
+        return;
+      }
+      throw new Error(`failed:notStrictEqual - expected:${ a }, actual:${ b }`);
+    },
+
     throws(func, err) {
       try {
         func();

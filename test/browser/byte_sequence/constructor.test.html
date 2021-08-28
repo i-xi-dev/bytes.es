@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { ByteSequence } from "../../../dist/index.js";
+
+test.it("ByteSequence(ArrayBuffer)", () => {
+  const bytes0 = new Uint8Array(0);
+  const bytes1 = Uint8Array.of(255, 254, 1, 0, 100);
+
+  const bs0 = new ByteSequence(bytes0.buffer);
+  const bs1 = new ByteSequence(bytes1.buffer);  
+
+  test.assert.strictEqual(bs0 instanceof ByteSequence, true);
+  test.assert.strictEqual(bs0.count, 0);
+  test.assert.strictEqual(bs1.count, 5);
+});
+
+test.it("コンストラクターに渡したArrayBufferへの操作は、自身に影響する", () => {
+  const bytes1 = Uint8Array.of(255, 254, 1, 0, 100);
+
+  const bs1 = new ByteSequence(bytes1.buffer);
+  const a1 = bytes1.buffer;
+  const nb1 = new Uint8Array(a1);
+  nb1.set([1,2,3,4]);
+
+  const bs1v = bs1.view();
+  test.assert.strictEqual(bs1v[0], 1);
+  test.assert.strictEqual(bs1v[1], 2);
+  test.assert.strictEqual(bs1v[2], 3);
+  test.assert.strictEqual(bs1v[3], 4);
+  test.assert.strictEqual(bs1v[4], 100);
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
