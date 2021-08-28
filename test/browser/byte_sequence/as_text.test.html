@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { ByteSequence } from "../../../dist/index.js";
+
+test.it("asText()", () => {
+  const bs0 = ByteSequence.create(0);
+  const bs1 = ByteSequence.from(Uint8Array.of(49,227,129,130,51,194,169));
+
+  test.assert.strictEqual(bs0.asText(), "");
+  test.assert.strictEqual(bs1.asText(), "1あ3\u{A9}");
+
+});
+
+test.it("asText(string)", () => {
+  const bs0 = ByteSequence.create(0);
+  const bs1 = ByteSequence.from(Uint8Array.of(49,227,129,130,51,194,169));
+
+  test.assert.strictEqual(bs0.asText("UTF-8"), "");
+  test.assert.strictEqual(bs1.asText("utf-8"), "1あ3\u{A9}");
+
+  test.assert.throws(() => {
+    bs0.asText("UTF-7");
+  }, {
+    message: "name:UTF-7"
+  });
+
+});
+
+test.it("asText(string, Object)", () => {
+  const bs0 = ByteSequence.create(0);
+  const bs1 = ByteSequence.from(Uint8Array.of(49,227,129,130,51,194,169));
+  const bs2 = ByteSequence.from(Uint8Array.of(239,187,191,49,227,129,130,51,194,169));
+
+  test.assert.strictEqual(bs0.asText("utf-8", { removeBom: true }), "");
+  test.assert.strictEqual(bs1.asText("UTF-8", { removeBom: true }), "1あ3\u{A9}");
+  test.assert.strictEqual(bs2.asText("UTF-8", { removeBom: true }), "1あ3\u{A9}");
+
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
