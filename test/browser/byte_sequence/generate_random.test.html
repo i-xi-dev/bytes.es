@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { ByteSequence } from "../../../dist/index.js";
+
+test.it("generateRandom(number)", () => {
+  const bs0 = ByteSequence.generateRandom(0);
+  const bs1 = ByteSequence.generateRandom(65536);
+
+  test.assert.strictEqual(bs0.buffer.byteLength, 0);
+  test.assert.strictEqual(bs1.buffer.byteLength, 65536);
+
+  test.assert.throws(() => {
+    ByteSequence.generateRandom(-1);
+  }, {
+    message: "byteCount"
+  });
+
+  test.assert.throws(() => {
+    ByteSequence.generateRandom(1.5);
+  }, {
+    message: "byteCount"
+  });
+
+  test.assert.throws(() => {
+    ByteSequence.generateRandom(Number.NaN);
+  }, {
+    message: "byteCount"
+  });
+
+  test.assert.throws(() => {
+    ByteSequence.generateRandom(65537);
+  }, {
+    message: "byteCount"
+  });
+
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

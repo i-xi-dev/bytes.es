@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { ByteSequence } from "../../../dist/index.js";
+
+const bs0 = ByteSequence.create(0);
+const bs0b = ByteSequence.create(0);
+
+const bs1 =  ByteSequence.from(Uint8Array.of(255, 0, 127, 1));
+const bs1b =  ByteSequence.of(255, 0, 127, 1);
+
+test.it("startsWith(ByteSequence)", () => {
+  test.assert.strictEqual(bs0.startsWith(bs0), true);
+  test.assert.strictEqual(bs0.startsWith(bs0b), true);
+
+  test.assert.strictEqual(bs1.startsWith(bs1), true);
+  test.assert.strictEqual(bs1.startsWith(bs1b), true);
+  test.assert.strictEqual(bs1.startsWith(bs0), true);
+  test.assert.strictEqual(bs0.startsWith(bs1), false);
+
+});
+
+test.it("startsWith(Uint8Array)", () => {
+  test.assert.strictEqual(bs0.startsWith(new Uint8Array(0)), true);
+  test.assert.strictEqual(bs1.startsWith(bs1.toUint8Array()), true);
+  test.assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 127, 1)), true);
+
+  test.assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 123, 1)), false);
+  test.assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 127, 1, 5)), false);
+  test.assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 127)), true);
+
+  test.assert.strictEqual(bs1.startsWith([255, 0, 127, 2]), false);
+  test.assert.strictEqual(bs1.startsWith([255, 0, 127, 1, 2]), false);
+  test.assert.strictEqual(bs1.startsWith([255, 0, 127]), true);
+  test.assert.strictEqual(bs1.startsWith([255, 0]), true);
+  test.assert.strictEqual(bs1.startsWith([255]), true);
+  test.assert.strictEqual(bs1.startsWith([]), true);
+
+});
+
+test.it("startsWith(Array<number>)", () => {
+  test.assert.strictEqual(bs0.startsWith([]), true);
+  test.assert.strictEqual(bs1.startsWith(bs1.toArray()), true);
+  test.assert.strictEqual(bs1.startsWith([255, 0, 127, 1]), true);
+
+  test.assert.strictEqual(bs1.startsWith([255, 0, 127, 2]), false);
+  test.assert.strictEqual(bs1.startsWith([255, 0, 127, 1, 2]), false);
+  test.assert.strictEqual(bs1.startsWith([255, 0, 127]), true);
+
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

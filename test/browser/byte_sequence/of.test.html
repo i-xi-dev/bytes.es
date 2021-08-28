@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { ByteSequence } from "../../../dist/index.js";
+
+test.it("of(Array<number>)", () => {
+  const bs0 = ByteSequence.of(1,2,3,4,5);
+  test.assert.strictEqual(bs0.buffer.byteLength, 5);
+
+  const a1 = [1,2,3,4,5,6];
+  const bs1 = ByteSequence.of(...a1);
+  test.assert.strictEqual(bs1.buffer.byteLength, 6);
+
+  test.assert.strictEqual(bs1.view()[2], 3);
+
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
