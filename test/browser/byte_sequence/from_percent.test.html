@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { ByteSequence } from "../../../dist/index.js";
+
+test.it("fromPercent(string)", () => {
+  const bs1 = ByteSequence.fromPercent("");
+  test.assert.strictEqual(bs1.count, 0);
+
+  const bs2 = ByteSequence.fromPercent("%03");
+  test.assert.strictEqual(bs2.view()[0], 0x03);
+
+  // 結果の妥当性はエンコーディングクラスのテストにて確認
+});
+
+test.it("fromPercent(string, ByteEncodingOptions)", () => {
+  const bs0 = ByteSequence.fromPercent("", {});
+  test.assert.strictEqual(bs0.count, 0);
+
+  // 結果の妥当性はエンコーディングクラスのテストにて確認
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
