@@ -5,7 +5,8 @@
     <title>test</title>
     <script type="module">
 import test from "../../test.mjs";
-import { Utf8 } from "../../../../dist/text_encoding/utf_8.js";
+import { TextEncoding } from "../../../../dist/index.js";
+const Utf8 = TextEncoding.for("UTF-8");
 
 test.it("encode(string)", () => {
   test.assert.strictEqual([...Utf8.encode("")].join(","), "");

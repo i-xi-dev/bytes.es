@@ -5,7 +5,8 @@
     <title>test</title>
     <script type="module">
 import test from "../../test.mjs";
-import { UsAscii } from "../../../../dist/text_encoding/us_ascii.js";
+import { TextEncoding } from "../../../../dist/index.js";
+const UsAscii = TextEncoding.for("US-ASCII");
 
 test.it("decode(Uint8Array)", () => {
   test.assert.strictEqual(UsAscii.decode(Uint8Array.of()), "");

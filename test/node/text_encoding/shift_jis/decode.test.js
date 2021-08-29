@@ -1,5 +1,6 @@
 import assert from "node:assert";
-import { ShiftJis } from "../../../../dist/text_encoding/shift_jis.js";
+import { TextEncoding } from "../../../../dist/index.js";
+const ShiftJis = TextEncoding.for("Shift_JIS");
 
 describe("ShiftJis.decode", () => {
   it("decode(Uint8Array)", () => {

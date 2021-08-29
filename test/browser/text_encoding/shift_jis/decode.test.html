@@ -5,7 +5,8 @@
     <title>test</title>
     <script type="module">
 import test from "../../test.mjs";
-import { ShiftJis } from "../../../../dist/text_encoding/shift_jis.js";
+import { TextEncoding } from "../../../../dist/index.js";
+const ShiftJis = TextEncoding.for("Shift_JIS");
 
 test.it("decode(Uint8Array)", () => {
   test.assert.strictEqual(ShiftJis.decode(Uint8Array.of()), "");

@@ -97,6 +97,7 @@ class Uri {
   get host(): string | null {
     return (this.#uri.hostname.length <= 0) ? null : this.#uri.hostname;
   }
+  // XXX デコードする？ Punycode
 
   /**
    * Gets the port number for this instance.

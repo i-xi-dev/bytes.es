@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { Uri } from "../../../dist/index.js";
+
+const u0 = "http://example.com/";
+
+test.it("Uri(string)", () => {
+  test.assert.strictEqual((new Uri(u0)).toString(), u0);
+  test.assert.strictEqual((new Uri("http://example.com/?=")).toString(), "http://example.com/?=");
+
+  test.assert.throws(() => {
+    new Uri("");
+  }, {
+    message: "uri",
+  });
+  test.assert.throws(() => {
+    new Uri("1");
+  }, {
+    message: "uri",
+  });
+  test.assert.throws(() => {
+    new Uri("1.text");
+  }, {
+    message: "uri",
+  });
+  test.assert.throws(() => {
+    new Uri("./1.text");
+  }, {
+    message: "uri",
+  });
+  test.assert.throws(() => {
+    new Uri("http://");
+  }, {
+    message: "uri",
+  });
+
+  // XXX Node.jsだとnew URL(相対URL)がエラーになるので、相対URLのテストができない
+
+});
+
+test.it("Uri(URL)", () => {
+  test.assert.strictEqual((new Uri(new URL(u0))).toString(), u0);
+
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

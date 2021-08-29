@@ -1,5 +1,6 @@
 import assert from "node:assert";
-import { Utf8 } from "../../../../dist/text_encoding/utf_8.js";
+import { TextEncoding } from "../../../../dist/index.js";
+const Utf8 = TextEncoding.for("UTF-8");
 
 describe("Utf8.encode", () => {
   it("encode(string)", () => {

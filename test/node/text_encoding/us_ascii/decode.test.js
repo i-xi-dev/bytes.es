@@ -1,5 +1,6 @@
 import assert from "node:assert";
-import { UsAscii } from "../../../../dist/text_encoding/us_ascii.js";
+import { TextEncoding } from "../../../../dist/index.js";
+const UsAscii = TextEncoding.for("US-ASCII");
 
 describe("UsAscii.decode", () => {
   it("decode(Uint8Array)", () => {
