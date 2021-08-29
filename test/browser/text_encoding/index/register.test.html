@@ -3,11 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <title>test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/1.0.30/encoding.min.js"></script>
     <script type="module">
 import test from "../../test.mjs";
 import { TextEncoding } from "../../../../dist/index.js";
 
-alert("TODO");
+test.it("register(string, Object)", async () => {
+
+  TextEncoding.register("EUC-JP", {
+    name: "EUC-JP",
+    decode(encoded) {
+      const ary2 = Encoding.convert([...encoded], {
+        from: "EUCJP",
+        to: "UNICODE",
+      });
+      return ary2.map(uc => String.fromCodePoint(uc)).join("");
+    },
+    encode(toEncode) {
+      const ary1 = Array.from([...toEncode], (c) => {
+        return c.codePointAt(0);
+      });
+      const ary2 = Encoding.convert(ary1, {
+        from: "UNICODE",
+        to: "EUCJP",
+      });
+      return Uint8Array.from(ary2);
+    },
+  });
+  const eucJp = TextEncoding.for("EUC-JP");
+
+  test.assert.strictEqual(eucJp.decode(Uint8Array.of()), "");
+
+  const e1 = eucJp.encode("あいうえお");
+  test.assert.strictEqual([...e1].join(","), "164,162,164,164,164,166,164,168,164,170");
+  test.assert.strictEqual(eucJp.decode(e1), "あいうえお");
+  //test.assert.strictEqual(eucJp.decode(Uint8Array.of(164,162,164,164,164,166,164,168,164,170)), "あいうえお");
+
+});
 
 test.exec();
     </script>
