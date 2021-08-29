@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { ByteSequence } from "../../../dist/index.js";
+
+const bs0 = ByteSequence.create(0);
+
+test.it("toSha256()", async () => {
+  const s1 = await bs0.toSha256();
+  test.assert.strictEqual(s1.format(), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+
+  // 結果の妥当性はエンコーディングクラスのテストにて確認
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
