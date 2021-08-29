@@ -7,9 +7,9 @@
 import test from "../test.mjs";
 import { Uuid } from "../../../dist/index.js";
 
-test.it("toUuidUrl()", () => {
+test.it("toUrn()", () => {
   const u1c = Uuid.parse("D071CF39-F061-4E34-A462-BC65A425CAFB");
-  test.assert.strictEqual(u1c.toUuidUrl().toString(), "urn:uuid:d071cf39-f061-4e34-a462-bc65a425cafb");
+  test.assert.strictEqual(u1c.toUrn().toString(), "urn:uuid:d071cf39-f061-4e34-a462-bc65a425cafb");
 
 });
 

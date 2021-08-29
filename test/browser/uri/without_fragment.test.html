@@ -5,7 +5,7 @@
     <title>test</title>
     <script type="module">
 import test from "../test.mjs";
-import { Uri } from "../../../dist/index.js";
+import { Uri } from "../../../dist/uri.js";
 
 test.it("withoutFragment()", () => {
   const u1 = (new Uri("http://example.com:80/hoge?a=1#")).withoutFragment();

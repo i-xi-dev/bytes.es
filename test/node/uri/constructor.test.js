@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { Uri } from "../../../node.mjs";
+import { Uri } from "../../../dist/uri.js";
 
 describe("Uri", () => {
   const u0 = "http://example.com/";

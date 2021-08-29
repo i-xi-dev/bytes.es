@@ -100,14 +100,8 @@ class Resource {
    * @param dataUrl Data URL
    * @returns 生成したインスタンス
    */
-  static fromDataUrl(dataUrl: Uri | string): Resource {
-    let uri: Uri;
-    if (dataUrl instanceof Uri) {
-      uri = dataUrl;
-    }
-    else {
-      uri = new Uri(dataUrl);
-    }
+  static fromDataUrl(dataUrl: URL | string): Resource {
+    let uri: Uri = new Uri(dataUrl);
 
     // 1
     if (uri.scheme !== "data") {
@@ -175,11 +169,11 @@ class Resource {
    * @experimental
    * @returns Data URL
    */
-  toDataUrl(): Uri {
+  toDataUrl(): URL {
     const encoding = ";base64";
     const dataEncoded = this.#bytes.toBase64();
 
-    return new Uri("data:" + this.#mediaType.toString() + encoding + "," + dataEncoded);
+    return new URL("data:" + this.#mediaType.toString() + encoding + "," + dataEncoded);
   }
 
   /**

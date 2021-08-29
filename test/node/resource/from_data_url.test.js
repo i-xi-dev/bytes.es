@@ -87,4 +87,14 @@ describe("Resource.fromDataUrl", () => {
 
   });
 
+  it("fromDataUrl(URL)", async () => {
+    const b11 = Resource.fromDataUrl(new URL("data:text/plain,a1"));
+    const b11v = b11.bytes.view();
+    assert.strictEqual(b11v[0], 97);
+    assert.strictEqual(b11v[1], 49);
+    assert.strictEqual(b11.size, 2);
+    assert.strictEqual(b11.mediaType.toString(), "text/plain");
+
+  });
+
 });

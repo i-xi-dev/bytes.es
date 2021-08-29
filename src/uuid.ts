@@ -1,7 +1,6 @@
 //
 
 import { ByteSequence } from "./byte_sequence.js";
-import { Uri } from "./uri.js";
 
 /**
  * UUID
@@ -116,8 +115,8 @@ class Uuid {
   /**
    * @returns The URN of the value of this instance.
    */
-  toUuidUrl(): Uri {
-    return new Uri("urn:uuid:" + this.format());
+  toUrn(): URL {
+    return new URL("urn:uuid:" + this.format());
   }
 }
 Object.freeze(Uuid);
