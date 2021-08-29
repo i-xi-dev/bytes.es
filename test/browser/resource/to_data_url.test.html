@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { Resource } from "../../../dist/index.js";
+
+test.it("toDataUrl()", async () => {
+  const fr = new FileReader();
+
+  const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
+  const b11 = await Resource.fromBlob(b1);
+  const b11b = b11.toDataUrl();
+
+  const b11t = await ((blob) => {
+    return new Promise((resolve) => {
+      fr.onload = () => {
+        resolve(String(fr.result));
+      };
+      fr.readAsDataURL(blob);
+    });
+  })(b1);
+
+  test.assert.strictEqual(b11b.toString(), b11t);
+  test.assert.strictEqual(b11b.toString(), "data:text/plain;base64,QQABfw==");
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
