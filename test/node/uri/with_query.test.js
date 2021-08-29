@@ -2,7 +2,7 @@ import assert from "node:assert";
 import { Uri } from "../../../node.mjs";
 
 describe("Uri.prototype.withQuery", () => {
-  it("withFragment(Array)", () => {
+  it("withQuery(Array)", () => {
     const u0 = (new Uri("http://example.com:80/hoge?a=1")).withQuery([]);
     assert.strictEqual(JSON.stringify(u0.query), '[]');
     assert.strictEqual(u0.toString(), "http://example.com/hoge?");

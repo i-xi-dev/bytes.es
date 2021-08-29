@@ -196,6 +196,7 @@ class Uri {
     const queryParams = new URLSearchParams(query);
     const work = new URL(this.#uri.toString());
     work.search = "?" + queryParams.toString();
+    // XXX Chromeが"?"のみの場合""にしてしまう
     return new Uri(work.toString());
   }
 

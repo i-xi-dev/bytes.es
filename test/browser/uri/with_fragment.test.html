@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { Uri } from "../../../dist/index.js";
+
+test.it("withFragment(string)", () => {
+  const u1 = (new Uri("http://example.com:80/hoge#foo")).withFragment("a");
+  test.assert.strictEqual(u1.fragment, "a");
+  test.assert.strictEqual(u1.toString(), "http://example.com/hoge#a");
+
+  const u2 = (new Uri("http://example.com:80/hoge#foo")).withFragment("#a");
+  test.assert.strictEqual(u2.fragment, "#a");
+  test.assert.strictEqual(u2.toString(), "http://example.com/hoge##a");
+
+  const u3 = (new Uri("http://example.com:80/hoge#foo")).withFragment("a<2");
+  test.assert.strictEqual(u3.fragment, "a<2");
+  test.assert.strictEqual(u3.toString(), "http://example.com/hoge#a%3C2");
+
+  const u4 = (new Uri("http://example.com:80/hoge#foo")).withFragment("");
+  test.assert.strictEqual(u4.fragment, "");
+  test.assert.strictEqual(u4.toString(), "http://example.com/hoge#");
+
+  const u5 = (new Uri("http://example.com:80/hoge#foo")).withFragment("#h#o#g#e");
+  test.assert.strictEqual(u5.fragment, "#h#o#g#e");
+  test.assert.strictEqual(u5.toString(), "http://example.com/hoge##h#o#g#e");
+
+  const u6 = (new Uri("http://example.com:80/hoge#foo")).withFragment("# h\"#<o>#g#`e");
+  test.assert.strictEqual(u6.fragment, "# h\"#<o>#g#`e");
+  test.assert.strictEqual(u6.toString(), "http://example.com/hoge##%20h%22#%3Co%3E#g#%60e");
+
+  const u7 = (new Uri("http://example.com:80/hoge#foo")).withFragment("あ");
+  test.assert.strictEqual(u7.fragment, "あ");
+  test.assert.strictEqual(u7.toString(), "http://example.com/hoge#%E3%81%82");
+
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
