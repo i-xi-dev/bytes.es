@@ -119,6 +119,45 @@ const base64Encoded = bytes.toBase64();
 // "aGVsbG8="
 ```
 
+#### Base64 Options
+Default
+```javascript
+const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
+const base64Encoded = bytes.toBase64(); // equivalents to bytes.toBase64({ table: "rfc4648", usePadding: true });
+// "AwIBAP/+/fw="
+
+const bytes2 = ByteSequence.fromBase64(base64Encoded); // equivalents to ByteSequence.fromBase64({ table: "rfc4648", usePadding: true });
+// [ 3, 2, 1, 0, 255, 254, 253, 252 ]
+```
+
+Using RFC 4648 Base64url Table
+```javascript
+const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
+const base64Encoded = bytes.toBase64({ table: "rfc4648-url" });
+// "AwIBAP_-_fw="
+
+const bytes2 = ByteSequence.fromBase64(base64Encoded, { table: "rfc4648-url" });
+// [ 3, 2, 1, 0, 255, 254, 253, 252 ]
+```
+
+No padding
+```javascript
+const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
+const base64Encoded = bytes.toBase64({ usePadding: false });
+// "AwIBAP/+/fw"
+
+const bytes2 = ByteSequence.fromBase64(base64Encoded, { usePadding: false });
+// [ 3, 2, 1, 0, 255, 254, 253, 252 ]
+```
+
+[Forgiving base64](https://infra.spec.whatwg.org/#forgiving-base64) decoding
+```javascript
+const bytes1 = ByteSequence.fromBase64("AwIBAP/+/fw=", { forgiving: true });
+// [ 3, 2, 1, 0, 255, 254, 253, 252 ]
+
+const bytes2 = ByteSequence.fromBase64("AwIBA P/+/fw", { forgiving: true });
+// [ 3, 2, 1, 0, 255, 254, 253, 252 ]
+```
 
 
 

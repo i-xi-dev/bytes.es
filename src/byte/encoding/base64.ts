@@ -22,7 +22,7 @@ const Base64Table = {
   /** RFC 4648 Base64 (standard) */
   RFC4648: "rfc4648",
 
-  /** RFC 4648 Base64url (URL- and filename-safe standard) */
+  /** RFC 4648 Base64url (URL and Filename Safe standard) */
   RFC4648_URL: "rfc4648-url",
 } as const;
 type Base64Table = typeof Base64Table[keyof typeof Base64Table];

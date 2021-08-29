@@ -41,7 +41,11 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
   }
   catch (exception) {
     // encodedのバイトの並びがおかしい場合
-    throw new Exception("EncodingError", "decode error", [ exception ]);
+    const causes = [];
+    if (exception instanceof Error) {
+      causes.push(exception);
+    }
+    throw new Exception("EncodingError", "decode error", causes);
   }
 }
 

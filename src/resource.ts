@@ -74,7 +74,11 @@ class Resource {
     }
     catch (exception) {
       // NotFoundError | SecurityError | NotReadableError
-      throw new Exception("Error", "reading failed", [ exception ]);
+      const causes = [];
+      if (exception instanceof Error) {
+        causes.push(exception);
+      }
+      throw new Exception("Error", "reading failed", causes);
     }
   }
 
