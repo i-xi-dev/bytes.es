@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { Uuid } from "../../../dist/index.js";
+
+test.it("toJSON()", () => {
+  const u1c = Uuid.parse("D071CF39-F061-4E34-A462-BC65A425CAFB");
+  test.assert.strictEqual(u1c.toJSON(), "d071cf39-f061-4e34-a462-bc65a425cafb");
+
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

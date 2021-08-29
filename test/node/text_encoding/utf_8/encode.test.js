@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { TextEncoding } from "../../../../dist/index.js";
+import { TextEncoding } from "../../../../node.mjs";
 const Utf8 = TextEncoding.for("UTF-8");
 
 describe("Utf8.encode", () => {

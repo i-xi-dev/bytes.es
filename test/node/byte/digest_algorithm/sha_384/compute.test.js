@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { DigestAlgorithm } from "../../../../../dist/index.js";
+import { DigestAlgorithm } from "../../../../../node.mjs";
 import { Format } from "../../../../../dist/byte/index.js";
 
 describe("Sha384.compute", () => {

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { Uuid } from "../../../dist/index.js";
+
+test.it("nil()", () => {
+  const u0 = Uuid.nil();
+
+  test.assert.strictEqual(u0.toString(), "00000000-0000-0000-0000-000000000000");
+
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

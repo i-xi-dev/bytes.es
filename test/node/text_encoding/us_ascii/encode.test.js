@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { TextEncoding } from "../../../../dist/index.js";
+import { TextEncoding } from "../../../../node.mjs";
 const UsAscii = TextEncoding.for("US-ASCII");
 
 describe("UsAscii.encode", () => {
