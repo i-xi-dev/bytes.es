@@ -48,14 +48,14 @@ export default {
       if (a === b) {
         return;
       }
-      throw new Error(`failed:strictEqual - expected:${ a }, actual:${ b }`);
+      throw new Error(`failed:strictEqual - actual:${ val(a) }, expected:${ val(b) }`);
     },
 
     notStrictEqual(a, b) {
       if (a !== b) {
         return;
       }
-      throw new Error(`failed:notStrictEqual - expected:${ a }, actual:${ b }`);
+      throw new Error(`failed:notStrictEqual - actual:${ val(a) }, expected:${ val(b) }`);
     },
 
     throws(func, err) {
@@ -67,7 +67,7 @@ export default {
           if (exception[i] === err[i]) {
             continue;
           }
-          throw new Error(`failed:throws - expected[${ i }]:${ err[i] }, actual[${ i }]:${ exception[i] }`);
+          throw new Error(`failed:throws - actual[${ val(i) }]:${ val(err[i]) }, expected[${ val(i) }]:${ val(exception[i]) }`);
         }
         return;
       }
@@ -81,4 +81,25 @@ function e(s) {
     return s.replaceAll("&", "&#x26;").replaceAll("<", "&#x3C;");
   }
   return "";
+}
+
+function val(v) {
+  if (typeof v === "string") {
+    return '"' + e(v) + '"';
+  }
+  else if (typeof v === "number") {
+    return e(v.toString());
+  }
+  else if (typeof v === "boolean") {
+    return e(v.toString());
+  }
+  else if (typeof v === "undefined") {
+    return "undefined";
+  }
+  else if (v === null) {
+    return "null";
+  }
+  else {
+    alert("");
+  }
 }

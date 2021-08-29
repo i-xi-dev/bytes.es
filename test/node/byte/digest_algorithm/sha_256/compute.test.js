@@ -1,5 +1,6 @@
 import assert from "node:assert";
-import { Format, DigestAlgorithm } from "../../../../../dist/byte/index.js";
+import { DigestAlgorithm } from "../../../../../dist/index.js";
+import { Format } from "../../../../../dist/byte/index.js";
 
 describe("Sha256.compute", () => {
   const sha256 = DigestAlgorithm.for("SHA-256");

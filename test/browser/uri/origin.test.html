@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <script type="module">
+import test from "../test.mjs";
+import { Uri } from "../../../dist/index.js";
+
+test.it("origin", () => {
+  const u0 = new Uri("http://example.com:8080/");
+  const u0b = new Uri("Http://example.COM:8080/");
+  const u1 = new Uri("http://example.com:80/hoge");
+  const u2 = new Uri("https://example.com:80/hoge");
+  const u3 = new Uri("file:///D:/hoge/index.txt");
+  const u4 = new Uri("blob:https://whatwg.org/d0360e2f-caee-469f-9a2f-87d5b0456f6f");
+  const u5 = new Uri("urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
+  const u6 = new Uri("data:,Hello%2C%20World!");
+
+  test.assert.strictEqual(u0.origin, "http://example.com:8080");
+  test.assert.strictEqual(u0b.origin, "http://example.com:8080");
+  test.assert.strictEqual(u1.origin, "http://example.com");
+  test.assert.strictEqual(u2.origin, "https://example.com:80");
+  test.assert.strictEqual(u3.origin, null);
+  test.assert.strictEqual(u4.origin, "https://whatwg.org");
+  test.assert.strictEqual(u5.origin, null);
+  test.assert.strictEqual(u6.origin, null);
+
+  //test.assert.strictEqual((new Uri("chrome://hoge")).origin, null);
+  test.assert.strictEqual((new Uri("tel:aaaa")).origin, null);
+  test.assert.strictEqual((new Uri("urn:ietf:rfc:2648")).origin, null);
+  test.assert.strictEqual((new Uri("geo:13.4125,103.8667")).origin, null);
+
+});
+
+test.exec();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

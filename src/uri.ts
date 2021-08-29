@@ -73,6 +73,7 @@ class Uri {
       this.#uri = new URL(uriString);
     }
     catch (exception) {
+      // WONTFIX: Firefoxがchromeスキームをエラーにする
       throw new URIError("uri");
     }
 
@@ -91,12 +92,12 @@ class Uri {
     return this.#uri.protocol.replace(/:$/, "");
   }
 
-  /**
-   * Gets the host for this instance.
-   */
-  get host(): string | null {
-    return (this.#uri.hostname.length <= 0) ? null : this.#uri.hostname;
-  }
+  // /**
+  //  * Gets the host for this instance.
+  //  */
+  // get host(): string | null {
+  //   return (this.#uri.hostname.length <= 0) ? null : this.#uri.hostname;
+  // }
   // XXX デコードする？ Punycode
 
   /**
@@ -121,6 +122,7 @@ class Uri {
   get origin(): string | null {
     return (this.#uri.origin === "null") ? null : this.#uri.origin;
   }
+  // XXX Chromeがfileスキームの場合nullを返さない
 
   // XXX get path(): Array<string> {
 
