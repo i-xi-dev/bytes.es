@@ -195,6 +195,7 @@ const str = bytes.asText(); // equivalents to bytes.asText("UTF-8");
 
 BOM
 
+...
 
 
 
@@ -211,7 +212,7 @@ In this context "Shift_JIS" means **MS932**.
 // text decode
 const str = bytes.asText("Shift_JIS");
 // → "あいうえお"
-//   This is exactly match to the result of TextDecoder("Shift_JIS").decode(bytes.toUint8Array());
+//   This is exactly match to the result of (new TextDecoder("Shift_JIS")).decode(bytes.toUint8Array());
 ```
 
 #### Other text encodings
