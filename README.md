@@ -174,11 +174,11 @@ const bytes2 = ByteSequence.fromBase64("AwIBA P/+/fw", { forgiving: true });
 
 ### Converting the instance to a string
 ```javascript
-// text encode
+// UTF-8 encode
 const bytes = ByteSequence.fromText("あいうえお");
 // → Uint8Array[ 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
 
-// text decode
+// UTF-8 decode
 const str = bytes.asText();
 // → "あいうえお"
 ```
@@ -195,29 +195,26 @@ const str = bytes.asText(); // equivalents to bytes.asText("UTF-8", { removeBom:
 
 BOM handling
 ```javascript
-// text encode
+// If the string does not start with a U+FEFF, prepend a BOM
 const bytes1 = ByteSequence.fromText("あいうえお", "UTF-8", { addBom: true });
 // → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
-
 const bytes2 = ByteSequence.fromText("\uFEFFあいうえお", "UTF-8", { addBom: true });
 // → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
 
-// text decode 
+// If the byte sequence starts with a BOM, remove the BOM
 const str1 = bytes1.asText("UTF-8", { removeBom: true });
 // → "あいうえお"
 ```
 
 MS932 decode / encode
 ```javascript
-// text encode
+// MS932 encode
 const bytes = ByteSequence.fromText("あいうえお", "Shift_JIS");
 // → Uint8Array[ 0x82, 0xA0, 0x82, 0xA2, 0x82, 0xA4, 0x82, 0xA6, 0x82, 0xA8 ]
-```
-It is implementation of [https://encoding.spec.whatwg.org/#shift_jis-encoder](https://encoding.spec.whatwg.org/#shift_jis-encoder).
-In this context "Shift_JIS" means **MS932**.
+//   It is implementation of https://encoding.spec.whatwg.org/#shift_jis-encoder
+//   In this context "Shift_JIS" means **MS932**.
 
-```javascript
-// text decode
+// MS932 decode
 const str = bytes.asText("Shift_JIS");
 // → "あいうえお"
 //   This is exactly match to the result of (new TextDecoder("Shift_JIS")).decode(bytes.toUint8Array());
