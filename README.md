@@ -187,17 +187,25 @@ const str = bytes.asText();
 Default
 ```javascript
 // text encode
-const bytes = ByteSequence.fromText("あいうえお"); // equivalents to ByteSequence.fromText("あいうえお", "UTF-8");
+const bytes = ByteSequence.fromText("あいうえお"); // equivalents to ByteSequence.fromText("あいうえお", "UTF-8", { addBom: false });
 
 // text decode
-const str = bytes.asText(); // equivalents to bytes.asText("UTF-8");
+const str = bytes.asText(); // equivalents to bytes.asText("UTF-8", { removeBom: false });
 ```
 
-BOM
+BOM handling
+```javascript
+// text encode
+const bytes1 = ByteSequence.fromText("あいうえお", "UTF-8", { addBom: true });
+// → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
 
-...
+const bytes2 = ByteSequence.fromText("\uFEFFあいうえお", "UTF-8", { addBom: true });
+// → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
 
-
+// text decode 
+const str1 = bytes1.asText("UTF-8", { removeBom: true });
+// → "あいうえお"
+```
 
 MS932 decode / encode
 ```javascript
