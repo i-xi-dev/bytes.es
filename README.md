@@ -211,7 +211,7 @@ MS932 decode / encode
 // MS932 encode
 const bytes = ByteSequence.fromText("あいうえお", "Shift_JIS");
 // → Uint8Array[ 0x82, 0xA0, 0x82, 0xA2, 0x82, 0xA4, 0x82, 0xA6, 0x82, 0xA8 ]
-//   It is implementation of https://encoding.spec.whatwg.org/#shift_jis-encoder
+//   It is an implementation of https://encoding.spec.whatwg.org/#shift_jis-encoder
 //   In this context "Shift_JIS" means **MS932**.
 
 // MS932 decode
@@ -249,6 +249,12 @@ const str = bytes.asText();
 // → "あいうえお"
 ```
 
+
+### Converting the instance to a [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
+```javascript
+const resource = new Resource("application/octet-stream", ByteSequence.from(uint8Array));
+const blob = resource.toBlob();
+```
 
 
 ...
