@@ -172,7 +172,7 @@ const bytes2 = ByteSequence.fromBase64("AwIBA P/+/fw", { forgiving: true });
 ```
 
 
-### Converting the instance to a string
+### Converting the instance to a text
 ```javascript
 // UTF-8 encode
 const bytes = ByteSequence.fromText("あいうえお");
@@ -255,6 +255,21 @@ const str = bytes.asText();
 const resource = new Resource("application/octet-stream", ByteSequence.from(uint8Array));
 const blob = resource.toBlob();
 ```
+
+
+#### Converting the instance to a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
+```javascript
+const resource = await Resource.fromDataUrl("data:text/plain;charset=US-ASCII,hello");
+// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+const dataUrl = resource.toDataUrl().toString();
+// → "data:text/plain;charset=US-ASCII;base64,aGVsbG8="
+const resource2 = await Resource.fromDataUrl(dataUrl);
+// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+```
+
+
+
+
 
 
 ...
