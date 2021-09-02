@@ -221,8 +221,7 @@ const str = bytes.asText("Shift_JIS");
 ```
 
 #### Other text encodings
-Any other encoding is not implemented.
-However, you can register the text encoding.
+You can register the text encoding.
 
 Example in Node.js
 ```javascript
@@ -245,7 +244,8 @@ TextEncoding.register("EUC-JP", {
 
 const bytes = ByteSequence.fromText("あいうえお", "EUC-JP");
 // → Uint8Array[ 0xA4, 0xA2, 0xA4, 0xA4, 0xA4, 0xA6, 0xA4, 0xA8, 0xA4, 0xAA ]
-const str = bytes.asText();
+
+const str = bytes.asText("EUC-JP");
 // → "あいうえお"
 ```
 
@@ -261,8 +261,10 @@ const blob = resource.toBlob();
 ```javascript
 const resource = await Resource.fromDataUrl("data:text/plain;charset=US-ASCII,hello");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+
 const dataUrl = resource.toDataUrl().toString();
 // → "data:text/plain;charset=US-ASCII;base64,aGVsbG8="
+
 const resource2 = await Resource.fromDataUrl(dataUrl);
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
