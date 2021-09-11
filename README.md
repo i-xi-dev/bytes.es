@@ -316,6 +316,16 @@ const str = (await bytes.toDigest("MD5")).toString();
 ```
 
 
+### Generating a [subresource integrity](https://www.w3.org/TR/SRI/) value of the instance
+```javascript
+const resource = await Resource.fromDataUrl("data:text/plain;charset=US-ASCII,hello");
+const integrity = await resource.integrity("SHA-256");
+// → "sha256-LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ="
+
+// also supports SHA-384 and SHA-512
+const integrity2 = await resource.integrity("SHA-384");
+const integrity3 = await resource.integrity("SHA-512");
+```
 
 
 
