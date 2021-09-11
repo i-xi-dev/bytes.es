@@ -112,6 +112,10 @@ const loadedBytes = resource.bytes;
 ```
 
 
+### Format
+...
+
+
 ### Converting the instance to a Base64 encoded string
 ```javascript
 // Base64 decode
@@ -217,7 +221,8 @@ const bytes = ByteSequence.fromText("あいうえお", "Shift_JIS");
 // MS932 decode
 const str = bytes.asText("Shift_JIS");
 // → "あいうえお"
-//   This is exactly match to the result of (new TextDecoder("Shift_JIS")).decode(bytes.toUint8Array());
+//   It uses TextDecoder object.
+//   This result is exactly match to the result of (new TextDecoder("Shift_JIS")).decode(bytes.toUint8Array())
 ```
 
 #### Other text encodings
@@ -256,7 +261,6 @@ const resource = new Resource("application/octet-stream", ByteSequence.from(uint
 const blob = resource.toBlob();
 ```
 
-
 #### Converting the instance to a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
 ```javascript
 const resource = await Resource.fromDataUrl("data:text/plain;charset=US-ASCII,hello");
@@ -268,6 +272,57 @@ const dataUrl = resource.toDataUrl().toString();
 const resource2 = await Resource.fromDataUrl(dataUrl);
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
+
+
+### Generating a digest of the instance
+```javascript
+const bytes = ByteSequence.create(0);
+// SHA-256 digest
+const digestBytes = await bytes.toDigest("SHA-256");
+// It uses Web Crypto API.
+// This result is exactly match to the result of crypto.subtle.digest("SHA-256", bytes.toUint8Array())
+const digestStr = digestBytes.toString();
+// → "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+// also supports SHA-384 and SHA-512
+const digestBytes2 = await bytes.toDigest("SHA-384");
+const digestBytes3 = await bytes.toDigest("SHA-512");
+```
+
+#### Other digest algorithm
+You can register the digest algorithm.
+
+Example in Node.js
+```javascript
+import { createHash } from "node:crypto";
+import { DigestAlgorithm } from "@i-xi-dev/bytes";
+DigestAlgorithm.register({
+  "MD5",
+  {
+    // compute: (input: Uint8Array) => Promise<Uint8Array>
+    async compute(input) {
+      const md5 = createHash("md5");
+      md5.update(input);
+      return md5.digest();
+    }
+  }
+});
+
+const bytes = ByteSequence.create(0);
+// → Uint8Array[]
+
+const str = (await bytes.toDigest("MD5")).toString();
+// → "d41d8cd98f00b204e9800998ecf8427e"
+```
+
+
+
+
+
+
+
+
+
 
 
 
