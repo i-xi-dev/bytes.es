@@ -112,8 +112,60 @@ const loadedBytes = resource.bytes;
 ```
 
 
-### Format
-...
+### Converting the instance to a string based on the specified format
+```javascript
+const bytes = ByteSequence.parse("68656c6c6f"); // equivalents to ByteSequence.parse("68656c6c6f", 16, { paddedLength: 2, upperCase: false, prefix: "", suffix: "", caseInsensitive: false, });
+const formatted = bytes.toString(); // equivalents to bytes.format(16, { paddedLength: 2, upperCase: false, prefix: "", suffix: "", });
+// → "68656c6c6f"
+```
+
+#### Format options
+Radix (16, 10, 8, 2)
+```javascript
+const bytes = ByteSequence.parse("68656c6c6f", 16);
+
+// 10
+const formatted2 = bytes.format(10);
+// → "104101108108111"
+
+// 8
+const formatted3 = bytes.format(8);
+// → "150145154154157"
+
+// 2
+const formatted4 = bytes.format(2);
+// → "0110100001100101011011000110110001101111"
+```
+
+Using upper case
+```javascript
+const bytes = ByteSequence.parse("68656c6c6f", 16);
+const formatted = bytes.format(16, { upperCase: true });
+// → "68656C6C6F"
+```
+
+Zero padding
+```javascript
+const bytes = ByteSequence.parse("68656c6c6f", 16);
+const formatted = bytes.format(16, { paddedLength: 4 });
+// → "00680065006C006C006F"
+
+// Minimum paddedLength
+// - radix 16 → 2
+// - radix 10 → 3
+// - radix 8 → 3
+// - radix 2 → 8
+// If the specified paddedLength is less than the minimum, the specified paddedLength will be ignored.
+```
+
+Prefix & Suffix
+```javascript
+const bytes = ByteSequence.parse("68656c6c6f", 16);
+const formatted = bytes.format(16, { prefix: " " });
+// → " 68 65 6C 6C 6F"
+const formatted2 = bytes.format(16, { suffix: "  " });
+// → "68  65  6C  6C  6F  "
+```
 
 
 ### Converting the instance to a Base64 encoded string
