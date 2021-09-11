@@ -148,7 +148,7 @@ Zero padding
 ```javascript
 const bytes = ByteSequence.parse("68656c6c6f", 16);
 const formatted = bytes.format(16, { paddedLength: 4 });
-// → "00680065006C006C006F"
+// → "00680065006c006c006f"
 
 // Minimum paddedLength
 // - radix 16 → 2
@@ -162,9 +162,9 @@ Prefix & Suffix
 ```javascript
 const bytes = ByteSequence.parse("68656c6c6f", 16);
 const formatted = bytes.format(16, { prefix: " " });
-// → " 68 65 6C 6C 6F"
+// → " 68 65 6c 6c 6f"
 const formatted2 = bytes.format(16, { suffix: "  " });
-// → "68  65  6C  6C  6F  "
+// → "68  65  6c  6c  6f  "
 ```
 
 
