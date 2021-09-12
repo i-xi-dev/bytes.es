@@ -37,14 +37,10 @@ type EncodeOptions = Options & {
  * 未設定を許可しないパーセント符号化の復号オプション
  */
 type ResolvedOptions = {
-  /**
-   * @see {@link EncodeOptions.encodeSet}
-   */
+  /** @see {@link EncodeOptions.encodeSet} */
   encodeSet: Set<uint8>,
 
-  /**
-   * @see {@link Options.spaceAsPlus}
-   */
+  /** @see {@link Options.spaceAsPlus} */
   spaceAsPlus: boolean,
 };
 

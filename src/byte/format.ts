@@ -13,24 +13,16 @@ type Radix = 2 | 8 | 10 | 16;
  * フォーマッターのオプション
  */
 type Options = {
-  /**
-   * 前方埋め結果の文字列長
-   */
+  /** 前方埋め結果の文字列長 */
   paddedLength?: number,
 
-  /**
-   * 16進数のa-fを大文字にするか否か
-   */
+  /** 16進数のa-fを大文字にするか否か */
   upperCase?: boolean,
 
-  /**
-   * プレフィックス
-   */
+  /** プレフィックス */
   prefix?: string,
 
-  /**
-   * サフィックス
-   */
+  /** サフィックス */
   suffix?: string,
 };
 
@@ -54,29 +46,19 @@ type FormatOptions = Options & {
  * 未設定を許可しないフォーマッターのオプション
  */
 type ResolvedOptions = {
-  /**
-   * @see {@link Options.paddedLength}
-   */
+  /** @see {@link Options.paddedLength} */
   paddedLength: number,
 
-  /**
-   * @see {@link Options.upperCase}
-   */
+  /** @see {@link Options.upperCase} */
   upperCase: boolean,
 
-  /**
-   * @see {@link Options.prefix}
-   */
+  /** @see {@link Options.prefix} */
   prefix: string,
 
-  /**
-   * @see {@link Options.suffix}
-   */
+  /** @see {@link Options.suffix} */
   suffix: string,
 
-  /**
-   * @see {@link ParseOptions.caseInsensitive}
-   */
+  /** @see {@link ParseOptions.caseInsensitive} */
   caseInsensitive: boolean,
 };
 
@@ -229,7 +211,7 @@ function isFormatted(formatted: string, radix: Radix, resolvedOptions: ResolvedO
   const suffixPattern = (resolvedOptions.suffix.length > 0) ? `.{${ resolvedOptions.suffix.length }}` : "";
   const bodyLength = minPaddedLengthOf(radix);
   const paddingLength = resolvedOptions.paddedLength - bodyLength;
-  const paddingPattern = (paddingLength > 0) ? `[${ PADDING_CHAR }]{${ paddingLength }}` : ""; // XXX padding文字を設定可能にした場合、エスケープが必要
+  const paddingPattern = (paddingLength > 0) ? `[${ PADDING_CHAR }]{${ paddingLength }}` : ""; // padding文字を設定可能にした場合、エスケープが必要
   const regex = new RegExp(`^(${ prefixPattern }${ paddingPattern }${ charsPattern }{${ bodyLength }}${ suffixPattern })*$`, "s");
 
   return regex.test(formatted);

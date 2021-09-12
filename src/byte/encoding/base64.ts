@@ -22,9 +22,7 @@ type Options = {
   /** 変換テーブル種別 */
   table?: Base64TableType,
 
-  /**
-   * パディングを付加するか否か
-   */
+  /** パディングを付加するか否か */
   usePadding?: boolean,
 };
 
