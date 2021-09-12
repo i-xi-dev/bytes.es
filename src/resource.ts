@@ -4,7 +4,6 @@
 import { Exception, RangePattern } from "./_.js";
 import { StringEx } from "./_/string_ex.js";
 import { ByteSequence } from "./byte_sequence.js";
-import { Uri } from "./uri.js";
 import { MediaType } from "./media_type.js";
 
 /**
@@ -105,15 +104,15 @@ class Resource {
    * @returns 生成したインスタンス
    */
   static fromDataUrl(dataUrl: URL | string): Resource {
-    let uri: Uri = new Uri(dataUrl);
+    const uri: URL = new URL(dataUrl);
 
-    // 1
-    if (uri.scheme !== "data") {
+    // 1 
+    if (uri.protocol !== "data:") {
       throw new TypeError("dataUrl");
     }
 
     // 2
-    uri = uri.withoutFragment();
+    uri.hash = "";
 
     // 3, 4
     let bodyStringWork = uri.toString().substring(5);
