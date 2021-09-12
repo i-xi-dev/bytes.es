@@ -4,35 +4,23 @@ import { Exception } from "../../_.js";
 import { uint8 } from "../type.js";
 
 /**
- * Base64変換テーブルの62番目の文字
- * ※追加する場合、追加可能な文字はコードポイント255以下かつ、非制御文字かつ、変換テーブルおよびパディングと重複しない文字
+ * 変換テーブル種別
  */
-type _62ndCharType = "+" | "-"; // XXX Base64_63rdCharと重複する文字を追加した場合、Base64Encodingコンストラクターで重複はエラーにする必要あり
-
-/**
- * Base64変換テーブルの63番目の文字
- * ※追加する場合、追加可能な文字はコードポイント255以下かつ、非制御文字かつ、変換テーブルおよびパディングと重複しない文字
- */
-type _63rdCharType = "/" | "_"; // XXX Base64_62ndCharと重複する文字を追加した場合、Base64Encodingコンストラクターで重複はエラーにする必要あり
-
-/**
- * 変換テーブル
- */
-const Base64Table = {
+const Base64TableType = {
   /** RFC 4648 Base64 (standard) */
   RFC4648: "rfc4648",
 
   /** RFC 4648 Base64url (URL and Filename Safe standard) */
   RFC4648_URL: "rfc4648-url",
 } as const;
-type Base64Table = typeof Base64Table[keyof typeof Base64Table];
+type Base64TableType = typeof Base64TableType[keyof typeof Base64TableType];
 
 /**
  * Base64符号化方式オプション
  */
 type Options = {
-  /** 変換テーブル */
-  table?: Base64Table,
+  /** 変換テーブル種別 */
+  table?: Base64TableType,
 
   /**
    * パディングを付加するか否か
@@ -63,11 +51,14 @@ type EncodeOptions = Options & {
  * 未設定を許可しないBase64符号化方式オプション
  */
 type ResolvedOptions = {
-  /** @see {@link Options._62ndChar} */
-  _62ndChar: _62ndCharType,
+  /** 変換テーブルの62番目の文字 */
+  _62ndChar: string,
 
-  /** @see {@link Options._63rdChar} */
-  _63rdChar: _63rdCharType,
+  /** 変換テーブルの63番目の文字 */
+  _63rdChar: string,
+
+  /** 変換テーブル */
+  table: ReadonlyArray<string>,
 
   /** @see {@link Options.usePadding} */
   usePadding: boolean,
@@ -154,7 +145,7 @@ const PADDING_CHAR = "=";
 /**
  * 変換テーブルのデフォルト
  */
-const DEFAULT_TABLE = Base64Table.RFC4648;
+const DEFAULT_TABLE = Base64TableType.RFC4648;
 
 /**
  * パディングが必要か否かのデフォルト
@@ -173,22 +164,33 @@ const DEFAULT_FORGIVING = false;
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたBase64符号化方式オプション
  */
 function resolveOptions(options: DecodeOptions | EncodeOptions = {}): ResolvedOptions {
-  const table: Base64Table = (options.table) ? options.table : DEFAULT_TABLE;
-  let _62ndChar: _62ndCharType;
-  let _63rdChar: _63rdCharType;
+  const tableType: Base64TableType = (options.table) ? options.table : DEFAULT_TABLE;
+  let _62ndChar: string;
+  let _63rdChar: string;
 
-  switch (table) {
-  case Base64Table.RFC4648:
+  switch (tableType) {
+  case Base64TableType.RFC4648:
     _62ndChar = "+";
     _63rdChar = "/";
     break;
-  case Base64Table.RFC4648_URL:
+  case Base64TableType.RFC4648_URL:
     _62ndChar = "-";
     _63rdChar = "_";
     break;
   }
 
+  const table = [ ...BASE_TABLE ];
+  table.push(_62ndChar);
+  table.push(_63rdChar);
+  // if ((new Set(table)).size !== table.length) {
+  //   // 62,63を自由に指定できるようにはしていないうちは不要
+  // }
+  Object.freeze(table);
+
   const usePadding: boolean = (typeof options.usePadding === "boolean") ? options.usePadding : DEFAULT_USE_PADDING;
+  // if (table.includes(PADDING_CHAR)) {
+  //   // 62,63を自由に指定できるようにはしていないうちは不要
+  // }
 
   let forgiving = DEFAULT_FORGIVING;
   if ("forgiving" in options) {
@@ -198,23 +200,10 @@ function resolveOptions(options: DecodeOptions | EncodeOptions = {}): ResolvedOp
   return {
     _62ndChar,
     _63rdChar,
+    table,
     usePadding,
     forgiving,
   };
-}
-
-/**
- * 変換テーブルを生成し返却
- * 
- * @param _62ndChar 変換テーブルの62番目の文字
- * @param _63rdChar 変換テーブルの63番目の文字
- * @returns 0～63番目の文字までの変換テーブル
- */
-function createTable(_62ndChar: string, _63rdChar: string): ReadonlyArray<string> {
-  const table = [ ...BASE_TABLE ];
-  table.push(_62ndChar);
-  table.push(_63rdChar);
-  return Object.freeze(table);
 }
 
 /**
@@ -283,8 +272,6 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
     throw new Exception("EncodingError", "decode error (1)");
   }
 
-  const table: ReadonlyArray<string> = createTable(resolvedOptions._62ndChar, resolvedOptions._63rdChar);
-
   const paddingStart = work.indexOf(PADDING_CHAR);
   let paddingCount: number;
   let encodedBody: string;
@@ -322,8 +309,8 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
   if (encodedBody.length >= 4) {
     for (i = 0; i < encodedBody.length; i = i + 4) {
       // 8-bit (1)
-      _6bit1 = table.indexOf(encodedBody[i] as string);
-      _6bit2 = table.indexOf(encodedBody[i + 1] as string);
+      _6bit1 = resolvedOptions.table.indexOf(encodedBody[i] as string);
+      _6bit2 = resolvedOptions.table.indexOf(encodedBody[i + 1] as string);
       decodedBytes[_8bitI++] = (_6bit1 << 2) | (_6bit2 >> 4);
 
       // 8-bit (2)
@@ -331,7 +318,7 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
         decodedBytes[_8bitI++] = ((_6bit2 & 0b001111) << 4);
         break;
       }
-      _6bit3 = table.indexOf(encodedBody[i + 2] as string);
+      _6bit3 = resolvedOptions.table.indexOf(encodedBody[i + 2] as string);
       decodedBytes[_8bitI++] = ((_6bit2 & 0b001111) << 4) | (_6bit3 >> 2);
 
       // 8-bit (3)
@@ -339,7 +326,7 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
         decodedBytes[_8bitI++] = ((_6bit3 & 0b000011) << 6);
         break;
       }
-      _6bit4 = table.indexOf(encodedBody[i + 3] as string);
+      _6bit4 = resolvedOptions.table.indexOf(encodedBody[i + 3] as string);
       decodedBytes[_8bitI++] = ((_6bit3 & 0b000011) << 6) | _6bit4;
     }
   }
@@ -359,7 +346,6 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
  */
 function encode(toEncode: Uint8Array, options?: EncodeOptions): string {
   const resolvedOptions: ResolvedOptions = resolveOptions(options);
-  const table: ReadonlyArray<string> = createTable(resolvedOptions._62ndChar, resolvedOptions._63rdChar);
 
   let _6bit1e: string;
   let _6bit2e: string;
@@ -372,20 +358,20 @@ function encode(toEncode: Uint8Array, options?: EncodeOptions): string {
     const _8bit2: uint8 = (_n8bit2 !== undefined) ? (_n8bit2 as uint8) : 0;
 
     // 6-bit (1)
-    _6bit1e = table[_8bit1 >> 2] as string;
+    _6bit1e = resolvedOptions.table[_8bit1 >> 2] as string;
 
     // 6-bit (2)
-    _6bit2e = table[((_8bit1 & 0b00000011) << 4) | (_8bit2 >> 4)] as string;
+    _6bit2e = resolvedOptions.table[((_8bit1 & 0b00000011) << 4) | (_8bit2 >> 4)] as string;
 
     if (_n8bit2 !== undefined) {
       const _8bit3: uint8 = (_n8bit3 !== undefined) ? (_n8bit3 as uint8) : 0;
 
       // 6-bit (3)
-      _6bit3e = table[((_8bit2 & 0b00001111) << 2) | (_8bit3 >> 6)] as string;
+      _6bit3e = resolvedOptions.table[((_8bit2 & 0b00001111) << 2) | (_8bit3 >> 6)] as string;
 
       if (_n8bit3 !== undefined) {
         // 6-bit (4)
-        _6bit4e = table[_8bit3 & 0b00111111] as string;
+        _6bit4e = resolvedOptions.table[_8bit3 & 0b00111111] as string;
       }
       else {
         _6bit4e = (resolvedOptions.usePadding === true) ? PADDING_CHAR : "";
