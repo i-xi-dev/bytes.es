@@ -101,12 +101,27 @@ function parseSubtypeName(str: string): ParseResult {
 }
 
 /**
+ * パラメーター値終端位置
+ */
+type PrameterValueEnd = {
+  /**
+   * パラメーター値終端位置のインデックス
+   */
+  valueEndIndex: number,
+
+  /**
+   * 後続がパース不可能（または不要）であるか否か
+   */
+  parseEnd: boolean,
+};
+
+/**
  * 文字列の先頭からメディアタイプのパラメーター値終端位置を抽出し返却
  * 
  * @param str 文字列
  * @returns パラメーター値終端位置
  */
-function detectPrameterValueEnd(str: string) {
+function detectPrameterValueEnd(str: string): PrameterValueEnd {
   let valueEndIndex = -1;
   let parseEnd = false;
   const u003BIndex = str.indexOf(";");

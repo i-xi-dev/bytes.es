@@ -32,6 +32,7 @@
     "indent": ["error", 2],
     "key-spacing": "error",
     "no-duplicate-imports": "error",
+    "no-unused-vars": "off",
     "no-var": "error",
     "rest-spread-spacing": "error",
     "semi": "error",
@@ -44,6 +45,8 @@
     "space-unary-ops": "error",
     "spaced-comment": "error",
     "symbol-description": "error",
-    "unicode-bom": "error"
+    "unicode-bom": "error",
+    "@typescript-eslint/explicit-function-return-type": ["error"],
+    "@typescript-eslint/no-unused-vars": ["error"]
   }
 }
