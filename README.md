@@ -112,6 +112,14 @@ const loadedBytes = resource.bytes;
 ```
 
 
+#### Converting the instance to a [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
+```javascript
+const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
+const binaryString = bytes.toBinaryString();
+// → "\u{3}\u{2}\u{1}\u{0}\u{FF}\u{FE}\u{FD}\u{FC}"
+```
+
+
 ### Converting the instance to a string based on the specified format
 ```javascript
 const bytes = ByteSequence.parse("68656c6c6f"); // equivalents to ByteSequence.parse("68656c6c6f", 16, { paddedLength: 2, upperCase: false, prefix: "", suffix: "", caseInsensitive: false, });
@@ -378,7 +386,6 @@ const integrity = await resource.integrity("SHA-256");
 const integrity2 = await resource.integrity("SHA-384");
 const integrity3 = await resource.integrity("SHA-512");
 ```
-
 
 
 
