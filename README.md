@@ -80,6 +80,12 @@ const decoded = ByteSequence.fromBase64("aGVsbG8=");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
 
+#### Creating an instance by decoding the percent encoded
+```javascript
+const decoded = ByteSequence.fromPercent("%68%65%6C%6C%6F");
+// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+```
+
 #### Creating an instance by reading the [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of Uint8Array
 ```javascript
 const loadedBytes = await ByteSequence.fromByteStream(byteStream);
@@ -178,7 +184,6 @@ const formatted2 = bytes.format(16, { suffix: "  " });
 
 ### Converting the instance to a Base64 encoded string
 ```javascript
-// Base64 decode
 const bytes = ByteSequence.fromBinaryString("hello");
 
 // Base64 encode
@@ -315,6 +320,34 @@ const str = bytes.asText("EUC-JP");
 ```
 
 
+### Converting the instance to a percent encoded string
+```javascript
+const utf8Bytes = ByteSequence.fromText("hello");
+
+// Percent encode (every bytes)
+const utf8PercentEncoded = utf8Bytes.toPercent(); // equivalents to utf8Bytes.toPercent({ encodeSet:"all" });
+// → "%68%65%6C%6C%6F"
+```
+
+#### Percent encode for URL component
+```javascript
+const encoded = ByteSequence.fromText("hello world").toPercent({ encodeSet: "uri-component" });
+// → "hello%20world"
+//   This result is match to the result of (globalThis.encodeURIComponent("hello world"))
+
+const encoded2 = ByteSequence.fromText("§1").toPercent({ encodeSet: "uri-component" });
+// → "%C2%A71"
+```
+
+#### Percent encode for the value of application/x-www-form-urlencoded
+```javascript
+const encoded = ByteSequence.fromText("hello world").toPercent({ encodeSet: "form-urlencoded", spaceAsPlus: true });
+// → "hello+world"
+//   This result is match to the result of (globalThis.encodeURIComponent("hello world").replaceAll(/[!'()~]/g, (c) => `%${ c.charCodeAt(0).toString(16).toUpperCase() }`))
+//   And also, this result is match to the result of (const url = new URL("http://example.com/"); url.searchParams.set("p1", "hello world"); url.search.replace("?p1=", ""));
+```
+
+
 ### Converting the instance to a [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
 ```javascript
 const resource = new Resource("application/octet-stream", ByteSequence.from(uint8Array));
@@ -386,12 +419,6 @@ const integrity = await resource.integrity("SHA-256");
 const integrity2 = await resource.integrity("SHA-384");
 const integrity3 = await resource.integrity("SHA-512");
 ```
-
-
-
-
-
-
 
 
 

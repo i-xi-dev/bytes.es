@@ -1,8 +1,46 @@
 //
 
 import { Exception } from "../../_.js";
-import { isByte, uint8 } from "../type.js";
+import { uint8 } from "../type.js";
 import { Format } from "../format.js";
+
+/**
+ * 符号化集合の種別
+ * ※C0 control符号化集合はデフォルトで必ず符号化する
+ *   ここで表すものは0x00-0x1F,0x25,0x7F-0xFF への追加の符号化集合
+ * ※URL Standardの定義と異なり、0x25("%")は必ず含むこととする
+ *   （例えばfragment percent-encode setが%を含んでいないのは、URLの仕様上は（%復号された）fragmentに%が出現することがないからである
+ *     ここでは、URLそのものの仕様には踏み込まないので、%は含める）
+ */
+const EncodeSetType = {
+  /** Code points of the C0 control percent-encode set */
+  NONE: "none",
+
+  /** Code points of the URL fragment percent-encode set */
+  URI_FRAGMENT: "uri-fragment",
+
+  /** Code points of the URL query percent-encode set */
+  URI_QUERY: "uri-query",
+
+  /** Code points of the URL special-query percent-encode set */
+  URI_SPECIAL_QUERY: "uri-special-query",
+
+  /** Code points of the URL path percent-encode set */
+  URI_PATH: "uri-path",
+
+  /** Code points of the URL userinfo percent-encode set */
+  URI_USERINFO: "uri-userinfo",
+
+  /** Code points of the URL component percent-encode set (except 0x25) */
+  URI_COMPONENT: "uri-component",
+
+  /** Code points of the application/x-www-form-urlencoded percent-encode set (except 0x25) */
+  FORM_URLENCODED: "form-urlencoded",
+
+  /** All code points except 0x25 */
+  ALL: "all",
+} as const;
+type EncodeSetType = typeof EncodeSetType[keyof typeof EncodeSetType];
 
 /**
  * パーセント符号化方式オプション
@@ -11,7 +49,7 @@ type Options = {
   /**
    * 符号化時、encodeSetに0x20が含まれているときに、0x20を"+"に符号化するか否か
    *     encodeSetに0x20が含まれていなければ無視する
-   *     trueにするときは、encodeSetに"+"(0x2B)を追加する必要がある
+   *     trueにするときは、encodeSetに"+"(0x2B)が含まれている必要がある
    * 復号時、"+"を0x20に復号するか否か
    */
   spaceAsPlus?: boolean,
@@ -30,7 +68,7 @@ type EncodeOptions = Options & {
   /**
    * 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトの配列
    */
-  encodeSet?: Array<uint8>,
+  encodeSet?: EncodeSetType,
 };
 
 /**
@@ -45,129 +83,136 @@ type ResolvedOptions = {
 };
 
 /**
- * 0x00-0x1F,0x25,0x7F-0xFF以外に"%XX"への変換対象とするバイトの配列のデフォルト
- */
-const DEFAULT_ENCODE_SET: ReadonlyArray<uint8> = [
-  0x20,
-  0x21,
-  0x22,
-  0x23,
-  0x24,
-  0x26,
-  0x27,
-  0x28,
-  0x29,
-  0x2A,
-  0x2B,
-  0x2C,
-  0x2D,
-  0x2E,
-  0x2F,
-  0x30,
-  0x31,
-  0x32,
-  0x33,
-  0x34,
-  0x35,
-  0x36,
-  0x37,
-  0x38,
-  0x39,
-  0x3A,
-  0x3B,
-  0x3C,
-  0x3D,
-  0x3E,
-  0x3F,
-  0x40,
-  0x41,
-  0x42,
-  0x43,
-  0x44,
-  0x45,
-  0x46,
-  0x47,
-  0x48,
-  0x49,
-  0x4A,
-  0x4B,
-  0x4C,
-  0x4D,
-  0x4E,
-  0x4F,
-  0x50,
-  0x51,
-  0x52,
-  0x53,
-  0x54,
-  0x55,
-  0x56,
-  0x57,
-  0x58,
-  0x59,
-  0x5A,
-  0x5B,
-  0x5C,
-  0x5D,
-  0x5E,
-  0x5F,
-  0x60,
-  0x61,
-  0x62,
-  0x63,
-  0x64,
-  0x65,
-  0x66,
-  0x67,
-  0x68,
-  0x69,
-  0x6A,
-  0x6B,
-  0x6C,
-  0x6D,
-  0x6E,
-  0x6F,
-  0x70,
-  0x71,
-  0x72,
-  0x73,
-  0x74,
-  0x75,
-  0x76,
-  0x77,
-  0x78,
-  0x79,
-  0x7A,
-  0x7B,
-  0x7C,
-  0x7D,
-  0x7E,
-];
-
-/**
  * 0x20を"+"に符号化するか否かのデフォルト
  */
 const DEFAULT_SPACE_AS_PLUS = false;
 
 /**
- * 変換対象とするバイトの配列を正規化し返却
- *     ・変換対象とするバイトの配列を重複排除しソートして返却
- *     ・配列ではない場合はDEFAULT_ENCODE_SETを返却
- * 
- * @param encodeSet 変換対象とするバイトの配列
- * @returns 変換対象バイトのセット
+ * 符号化集合
  */
-function normalizeEncodeSet(encodeSet?: Array<uint8>): Set<uint8> {
-  if (Array.isArray(encodeSet)) {
-    if (encodeSet.every((byte) => isByte(byte) && ((byte < 0x20 || byte > 0x7E || byte === 0x25) !== true))) {
-      return new Set(encodeSet.sort());
-    }
-    else {
-      throw new TypeError("encodeSet");
-    }
-  }
-  return new Set(DEFAULT_ENCODE_SET);
-}
+const EncodeSetMap: Record<EncodeSetType, Set<uint8>> = {
+  /** Code points of the C0 control percent-encode set */
+  [EncodeSetType.NONE]: new Set([]),
+
+  /** Code points of the URL fragment percent-encode set */
+  [EncodeSetType.URI_FRAGMENT]: new Set([ 0x20, 0x22, 0x3C, 0x3E, 0x60 ]),
+
+  /** Code points of the URL query percent-encode set */
+  [EncodeSetType.URI_QUERY]: new Set([ 0x20, 0x22, 0x23, 0x3C, 0x3E ]),
+
+  /** Code points of the URL special-query percent-encode set */
+  [EncodeSetType.URI_SPECIAL_QUERY]: new Set([ 0x20, 0x22, 0x23, 0x27, 0x3C, 0x3E ]),
+
+  /** Code points of the URL path percent-encode set */
+  [EncodeSetType.URI_PATH]: new Set([ 0x20, 0x22, 0x23, 0x3C, 0x3E, 0x3F, 0x60, 0x7B, 0x7D ]),
+
+  /** Code points of the URL userinfo percent-encode set */
+  [EncodeSetType.URI_USERINFO]: new Set([ 0x20, 0x22, 0x23, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ]),
+
+  /** Code points of the URL component percent-encode set */
+  [EncodeSetType.URI_COMPONENT]: new Set([ 0x20, 0x22, 0x23, 0x24, 0x26, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ]),
+
+  /** Code points of the application/x-www-form-urlencoded percent-encode set */
+  [EncodeSetType.FORM_URLENCODED]: new Set([ 0x20, 0x21, 0x22, 0x23, 0x24, 0x26, 0x27, 0x28, 0x29, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D, 0x7E ]),
+
+  /** All code points except 0x25 */
+  [EncodeSetType.ALL]: new Set([
+    0x20,
+    0x21,
+    0x22,
+    0x23,
+    0x24,
+    0x26,
+    0x27,
+    0x28,
+    0x29,
+    0x2A,
+    0x2B,
+    0x2C,
+    0x2D,
+    0x2E,
+    0x2F,
+    0x30,
+    0x31,
+    0x32,
+    0x33,
+    0x34,
+    0x35,
+    0x36,
+    0x37,
+    0x38,
+    0x39,
+    0x3A,
+    0x3B,
+    0x3C,
+    0x3D,
+    0x3E,
+    0x3F,
+    0x40,
+    0x41,
+    0x42,
+    0x43,
+    0x44,
+    0x45,
+    0x46,
+    0x47,
+    0x48,
+    0x49,
+    0x4A,
+    0x4B,
+    0x4C,
+    0x4D,
+    0x4E,
+    0x4F,
+    0x50,
+    0x51,
+    0x52,
+    0x53,
+    0x54,
+    0x55,
+    0x56,
+    0x57,
+    0x58,
+    0x59,
+    0x5A,
+    0x5B,
+    0x5C,
+    0x5D,
+    0x5E,
+    0x5F,
+    0x60,
+    0x61,
+    0x62,
+    0x63,
+    0x64,
+    0x65,
+    0x66,
+    0x67,
+    0x68,
+    0x69,
+    0x6A,
+    0x6B,
+    0x6C,
+    0x6D,
+    0x6E,
+    0x6F,
+    0x70,
+    0x71,
+    0x72,
+    0x73,
+    0x74,
+    0x75,
+    0x76,
+    0x77,
+    0x78,
+    0x79,
+    0x7A,
+    0x7B,
+    0x7C,
+    0x7D,
+    0x7E,
+  ]),
+};
 
 /**
  * パーセント符号化の復号オプションを補正したコピーを返却
@@ -176,7 +221,13 @@ function normalizeEncodeSet(encodeSet?: Array<uint8>): Set<uint8> {
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたパーセント符号化のオプション
  */
 function resolveOptions(options: DecodeOptions | EncodeOptions = {}): ResolvedOptions {
-  const encodeSet = normalizeEncodeSet(("encodeSet" in options) ? options.encodeSet : undefined);
+  let encodeTypeSet: EncodeSetType = EncodeSetType.ALL;
+  if (("encodeSet" in options) && options.encodeSet) {
+    if (Object.values(EncodeSetType).includes(options.encodeSet)) {
+      encodeTypeSet = options.encodeSet;
+    }
+  }
+  const encodeSet = EncodeSetMap[encodeTypeSet];
   const spaceAsPlus: boolean = (typeof options.spaceAsPlus === "boolean") ? options.spaceAsPlus : DEFAULT_SPACE_AS_PLUS;
 
   return {

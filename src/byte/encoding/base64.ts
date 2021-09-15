@@ -6,21 +6,21 @@ import { uint8 } from "../type.js";
 /**
  * 変換テーブル種別
  */
-const Base64TableType = {
+const TableVariant = {
   /** RFC 4648 Base64 (standard) */
   RFC4648: "rfc4648",
 
   /** RFC 4648 Base64url (URL and Filename Safe standard) */
   RFC4648_URL: "rfc4648-url",
 } as const;
-type Base64TableType = typeof Base64TableType[keyof typeof Base64TableType];
+type TableVariant = typeof TableVariant[keyof typeof TableVariant];
 
 /**
  * Base64符号化方式オプション
  */
 type Options = {
   /** 変換テーブル種別 */
-  table?: Base64TableType,
+  table?: TableVariant,
 
   /** パディングを付加するか否か */
   usePadding?: boolean,
@@ -143,7 +143,7 @@ const PADDING_CHAR = "=";
 /**
  * 変換テーブルのデフォルト
  */
-const DEFAULT_TABLE = Base64TableType.RFC4648;
+const DEFAULT_TABLE = TableVariant.RFC4648;
 
 /**
  * パディングが必要か否かのデフォルト
@@ -162,16 +162,16 @@ const DEFAULT_FORGIVING = false;
  * @returns 未設定の項目や不正値が設定された項目をデフォルト値で埋めたBase64符号化方式オプション
  */
 function resolveOptions(options: DecodeOptions | EncodeOptions = {}): ResolvedOptions {
-  const tableType: Base64TableType = (options.table) ? options.table : DEFAULT_TABLE;
+  const tableType: TableVariant = (options.table) ? options.table : DEFAULT_TABLE;
   let _62ndChar: string;
   let _63rdChar: string;
 
   switch (tableType) {
-  case Base64TableType.RFC4648:
+  case TableVariant.RFC4648:
     _62ndChar = "+";
     _63rdChar = "/";
     break;
-  case Base64TableType.RFC4648_URL:
+  case TableVariant.RFC4648_URL:
     _62ndChar = "-";
     _63rdChar = "_";
     break;
