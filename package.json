@@ -33,7 +33,6 @@
     "sha256",
     "sha384",
     "sha512",
-    "shift_jis",
     "utf-8",
     "browser",
     "deno",
