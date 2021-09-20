@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { Resource } from "../../../node.mjs";
+import { Resource } from "../../../node/index.mjs";
 
 describe("Resource.prototype.mediaType", () => {
   it("mediaType", async () => {

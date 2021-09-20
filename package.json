@@ -1,13 +1,13 @@
 {
   "name": "@i-xi-dev/bytes",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "A JavaScript byte array library for the browser, Deno and Node.js",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "node": "./node.mjs",
+      "node": "./node/index.mjs",
       "default": "./dist/index.js"
     }
   },
@@ -46,7 +46,7 @@
   "homepage": "https://github.com/i-xi-dev/bytes.es#readme",
   "files": [
     "dist",
-    "node.mjs"
+    "node"
   ],
   "engines": {
     "node": ">=16.5.0"

@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { ByteSequence } from "../../../node.mjs";
+import { ByteSequence } from "../../../node/index.mjs";
 
 describe("ByteSequence.prototype.clone", () => {
   it("clone()", () => {

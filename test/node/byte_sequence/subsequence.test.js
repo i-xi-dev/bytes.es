@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { ByteSequence } from "../../../node.mjs";
+import { ByteSequence } from "../../../node/index.mjs";
 
 describe("ByteSequence.prototype.subsequence", () => {
   const bs0 = ByteSequence.create(0);

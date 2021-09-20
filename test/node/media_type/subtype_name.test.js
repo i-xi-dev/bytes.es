@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { MediaType } from "../../../node.mjs";
+import { MediaType } from "../../../node/index.mjs";
 
 describe("MediaType.prototype.subtype", () => {
   it("subtype", () => {

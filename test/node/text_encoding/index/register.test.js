@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import iconv from "iconv-lite";
-import { TextEncoding } from "../../../../node.mjs";
+import { TextEncoding } from "../../../../node/index.mjs";
 
 describe("TextEncoding.register", () => {
   it("register(string, Object)", async () => {

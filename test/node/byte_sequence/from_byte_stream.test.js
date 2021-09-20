@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import fs from "node:fs";
-import { ByteSequence } from "../../../node.mjs";
+import { ByteSequence } from "../../../node/index.mjs";
 
 describe("ByteSequence.fromByteStream", () => {
   it("fromByteStream(NodeJS.ReadStream)", async () => {

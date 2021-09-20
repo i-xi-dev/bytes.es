@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { DigestAlgorithm } from "../../../../../node.mjs";
+import { DigestAlgorithm } from "../../../../../node/index.mjs";
 
 describe("DigestAlgorithm.for", () => {
 
