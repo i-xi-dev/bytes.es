@@ -344,7 +344,7 @@ const blob = resource.toBlob();
 const resource = await Resource.fromDataURL("data:text/plain;charset=US-ASCII,hello");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 
-const dataUrl = resource.toDataUrl().toString();
+const dataUrl = resource.toDataURL().toString();
 // → "data:text/plain;charset=US-ASCII;base64,aGVsbG8="
 
 const resource2 = await Resource.fromDataURL(dataUrl);

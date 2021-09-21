@@ -7,12 +7,12 @@
 import test from "../test.mjs";
 import { Resource } from "../../../dist/index.js";
 
-test.it("toDataUrl()", async () => {
+test.it("toDataURL()", async () => {
   const fr = new FileReader();
 
   const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
   const b11 = await Resource.fromBlob(b1);
-  const b11b = b11.toDataUrl();
+  const b11b = b11.toDataURL();
 
   const b11t = await ((blob) => {
     return new Promise((resolve) => {

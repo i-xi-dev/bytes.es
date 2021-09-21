@@ -172,7 +172,7 @@ class Resource {
    * @experimental
    * @returns Data URL
    */
-  toDataUrl(): URL {
+  toDataURL(): URL {
     const encoding = ";base64";
     const dataEncoded = this.#bytes.toBase64();
 
