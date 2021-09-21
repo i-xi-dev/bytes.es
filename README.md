@@ -113,7 +113,7 @@ const loadedBytes = resource.bytes;
 
 #### Creating an instance by reading the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
 ```javascript
-const resource = await Resource.fromDataUrl("data:text/plain;charset=US-ASCII,hello");
+const resource = await Resource.fromDataURL("data:text/plain;charset=US-ASCII,hello");
 const loadedBytes = resource.bytes;
 ```
 
@@ -341,13 +341,13 @@ const blob = resource.toBlob();
 
 #### Converting the instance to a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
 ```javascript
-const resource = await Resource.fromDataUrl("data:text/plain;charset=US-ASCII,hello");
+const resource = await Resource.fromDataURL("data:text/plain;charset=US-ASCII,hello");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 
 const dataUrl = resource.toDataUrl().toString();
 // → "data:text/plain;charset=US-ASCII;base64,aGVsbG8="
 
-const resource2 = await Resource.fromDataUrl(dataUrl);
+const resource2 = await Resource.fromDataURL(dataUrl);
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
 
@@ -396,7 +396,7 @@ const str = (await bytes.toDigest("MD5")).toString();
 
 ### Generating a [subresource integrity](https://www.w3.org/TR/SRI/) value of the instance
 ```javascript
-const resource = await Resource.fromDataUrl("data:text/plain;charset=US-ASCII,hello");
+const resource = await Resource.fromDataURL("data:text/plain;charset=US-ASCII,hello");
 const integrity = await resource.integrity("SHA-256");
 // → "sha256-LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ="
 

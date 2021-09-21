@@ -103,7 +103,7 @@ class Resource {
    * @param dataUrl Data URL
    * @returns 生成したインスタンス
    */
-  static fromDataUrl(dataUrl: URL | string): Resource {
+  static fromDataURL(dataUrl: URL | string): Resource {
     const uri: URL = new URL(dataUrl);
 
     // 1 
