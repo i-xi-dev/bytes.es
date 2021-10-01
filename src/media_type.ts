@@ -418,7 +418,8 @@ class MediaType {
 
       const parameterValue = this.#parameters.get(parameterName) as string;
       if (StringEx.match(parameterValue, RangePattern.HTTP_TOKEN) !== true) {
-        parameters = parameters + '"' + parameterValue.replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"';
+        // parameters = parameters + '"' + parameterValue.replaceAll("\\", "\\\\").replaceAll('"', '\\"') + '"';
+        parameters = parameters + '"' + parameterValue.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"';
       }
       else {
         parameters = parameters + parameterValue;

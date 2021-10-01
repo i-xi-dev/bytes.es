@@ -5,7 +5,7 @@ describe("Resource.prototype.toDataURL", () => {
   it("toDataURL()", async () => {
     const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
     const b11 = await Resource.fromBlob(b1);
-    const b11b = b11.toDataURLtoDataURLtoDataURLtoDataURLtoDataURL();
+    const b11b = b11.toDataURL();
 
     assert.strictEqual(b11b.toString(), "data:text/plain;base64,QQABfw==");
   });

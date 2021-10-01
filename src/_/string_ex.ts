@@ -60,7 +60,8 @@ function match(str: string, rangePattern: string): boolean {
  */
 function trim(str: string, rangePattern: string): string {
   const regex = new RegExp("(^[" + rangePattern + "]+|[" + rangePattern + "]+$)", "g");
-  return str.replaceAll(regex, "");
+  // return str.replaceAll(regex, "");
+  return str.replace(regex, "");
 }
 
 /**

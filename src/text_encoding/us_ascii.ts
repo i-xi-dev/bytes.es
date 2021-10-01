@@ -36,7 +36,8 @@ function decode(encoded: Uint8Array, options: TextDecodeOptions = {}): string {
     if (resolvedOptions.fallback === "exception") {
       throw new Exception("EncodingError", "decode error");
     }
-    return decoded.replaceAll(/[^\u{0}-\u{7F}]/gu, "\u{FFFD}");
+    // return decoded.replaceAll(/[^\u{0}-\u{7F}]/gu, "\u{FFFD}");
+    return decoded.replace(/[^\u{0}-\u{7F}]/gu, "\u{FFFD}");
   }
   return decoded;
 }
@@ -59,7 +60,8 @@ function encode(toEncode: string, options: TextEncodeOptions = {}): Uint8Array {
       throw new Exception("EncodingError", "encode error");
     }
     const encoder = new TextEncoder();
-    return encoder.encode(toEncode.replaceAll(/[^\u{0}-\u{7F}]/gu, "\u{3F}"));
+    // return encoder.encode(toEncode.replaceAll(/[^\u{0}-\u{7F}]/gu, "\u{3F}"));
+    return encoder.encode(toEncode.replace(/[^\u{0}-\u{7F}]/gu, "\u{3F}"));
   }
 
   const encoder = new TextEncoder();

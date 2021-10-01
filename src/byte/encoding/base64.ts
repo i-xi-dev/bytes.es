@@ -243,7 +243,8 @@ function decode(encoded: string, options?: DecodeOptions): Uint8Array {
 
   let work: string = encoded;
   if (resolvedOptions.forgiving === true) {
-    work = work.replaceAll(/[\u{9}\u{A}\u{C}\u{D}\u{20}]/gu, "");
+    // work = work.replaceAll(/[\u{9}\u{A}\u{C}\u{D}\u{20}]/gu, "");
+    work = work.replace(/[\u{9}\u{A}\u{C}\u{D}\u{20}]/gu, "");
   }
 
   if (resolvedOptions.forgiving === true) {
