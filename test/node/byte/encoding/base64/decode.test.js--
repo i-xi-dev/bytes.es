@@ -45,10 +45,10 @@ describe("Base64.decode", () => {
     const decoded22 = Base64.decode("AwIBAP_-_fw=", {table:"rfc4648-url"});
     assert.strictEqual(JSON.stringify([...decoded22]), "[3,2,1,0,255,254,253,252]");
 
-    const decoded32 = Base64.decode("AwIBAP/+/fw", {usePadding:false});
+    const decoded32 = Base64.decode("AwIBAP/+/fw", {padEnd:false});
     assert.strictEqual(JSON.stringify([...decoded32]), "[3,2,1,0,255,254,253,252]");
 
-    const decoded42 = Base64.decode("AwIBAP_-_fw", {table:"rfc4648-url", usePadding:false});
+    const decoded42 = Base64.decode("AwIBAP_-_fw", {table:"rfc4648-url", padEnd:false});
     assert.strictEqual(JSON.stringify([...decoded42]), "[3,2,1,0,255,254,253,252]");
 
     assert.strictEqual(Buffer.from("AwIBAP/+/fw=", "base64").toJSON().data.join(","), "3,2,1,0,255,254,253,252");
@@ -73,18 +73,18 @@ describe("Base64.decode", () => {
     assert.strictEqual(Array.from(Base64.decode(Buffer.from(r8).toString('base64'))).join(","), Array.from(r8).join(","));
     assert.strictEqual(Array.from(Base64.decode(Buffer.from(r9).toString('base64'))).join(","), Array.from(r9).join(","));
 
-    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r1).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r1).join(","));
-    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r2).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r2).join(","));
-    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r3).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r3).join(","));
-    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r4).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r4).join(","));
-    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r5).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r5).join(","));
-    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r6).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r6).join(","));
-    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r7).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r7).join(","));
-    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r8).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r8).join(","));
-    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r9).toString('base64').replace(/=*$/, ""), {usePadding:false})).join(","), Array.from(r9).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r1).toString('base64').replace(/=*$/, ""), {padEnd:false})).join(","), Array.from(r1).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r2).toString('base64').replace(/=*$/, ""), {padEnd:false})).join(","), Array.from(r2).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r3).toString('base64').replace(/=*$/, ""), {padEnd:false})).join(","), Array.from(r3).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r4).toString('base64').replace(/=*$/, ""), {padEnd:false})).join(","), Array.from(r4).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r5).toString('base64').replace(/=*$/, ""), {padEnd:false})).join(","), Array.from(r5).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r6).toString('base64').replace(/=*$/, ""), {padEnd:false})).join(","), Array.from(r6).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r7).toString('base64').replace(/=*$/, ""), {padEnd:false})).join(","), Array.from(r7).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r8).toString('base64').replace(/=*$/, ""), {padEnd:false})).join(","), Array.from(r8).join(","));
+    assert.strictEqual(Array.from(Base64.decode(Buffer.from(r9).toString('base64').replace(/=*$/, ""), {padEnd:false})).join(","), Array.from(r9).join(","));
 
     assert.throws(() => {
-      Base64.decode("AwIBAP/+/fw=", {usePadding:false});
+      Base64.decode("AwIBAP/+/fw=", {padEnd:false});
     }, {
       message: "decode error (1)",
     });

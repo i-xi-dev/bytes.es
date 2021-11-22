@@ -5,7 +5,7 @@ export default {
   entry: "./src/index.ts",
   output: {
     filename: "index.js",
-    path: path.join(process.cwd(), "dist2"),
+    path: path.join(process.cwd(), "dist"),
     library: {
       type: "module",
     }

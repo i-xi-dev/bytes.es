@@ -197,11 +197,11 @@ Default
 const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
 
 // Base64 encode
-const base64Encoded = bytes.toBase64(); // equivalents to bytes.toBase64({ table: "rfc4648", usePadding: true });
+const base64Encoded = bytes.toBase64(); // equivalents to bytes.toBase64({ table: "rfc4648", padEnd: true });
 // → "AwIBAP/+/fw="
 
 // Base64 decode
-const bytes2 = ByteSequence.fromBase64(base64Encoded); // equivalents to ByteSequence.fromBase64({ table: "rfc4648", usePadding: true });
+const bytes2 = ByteSequence.fromBase64(base64Encoded); // equivalents to ByteSequence.fromBase64({ table: "rfc4648", padEnd: true });
 // → Uint8Array[ 3, 2, 1, 0, 255, 254, 253, 252 ]
 ```
 
@@ -221,11 +221,11 @@ const bytes2 = ByteSequence.fromBase64(base64Encoded, { table: "rfc4648-url" });
 No padding
 ```javascript
 const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
-const base64Encoded = bytes.toBase64({ usePadding: false });
+const base64Encoded = bytes.toBase64({ padEnd: false });
 // → "AwIBAP/+/fw"
 
 // Base64 decode
-const bytes2 = ByteSequence.fromBase64(base64Encoded, { usePadding: false });
+const bytes2 = ByteSequence.fromBase64(base64Encoded, { padEnd: false });
 // → Uint8Array[ 3, 2, 1, 0, 255, 254, 253, 252 ]
 ```
 

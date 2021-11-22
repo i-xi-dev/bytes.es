@@ -19,12 +19,12 @@ test.it("encode(Uint8Array)", () => {
 
   test.assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {table:"rfc4648-url"}), "AwIBAP_-_fw=");
 
-  test.assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {usePadding:false}), "AwIBAP/+/fw");
-  test.assert.strictEqual(Base64.encode(Uint8Array.of(255), {usePadding:false}), "/w");
+  test.assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {padEnd:false}), "AwIBAP/+/fw");
+  test.assert.strictEqual(Base64.encode(Uint8Array.of(255), {padEnd:false}), "/w");
 
-  test.assert.strictEqual(Base64.encode(Uint8Array.of(255), {usePadding:true}), "/w==");
+  test.assert.strictEqual(Base64.encode(Uint8Array.of(255), {padEnd:true}), "/w==");
 
-  test.assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {table:"rfc4648-url", usePadding:false}), "AwIBAP_-_fw");
+  test.assert.strictEqual(Base64.encode(Uint8Array.of(3,2,1,0,255,254,253,252), {table:"rfc4648-url", padEnd:false}), "AwIBAP_-_fw");
 
   // const r1 = crypto.getRandomValues(new Uint8Array(256));
   // const r2 = crypto.getRandomValues(new Uint8Array(255));
@@ -46,15 +46,15 @@ test.it("encode(Uint8Array)", () => {
   // test.assert.strictEqual(Base64.encode(r8), Buffer.from(r8.buffer).toString("base64"));
   // test.assert.strictEqual(Base64.encode(r9), Buffer.from(r9.buffer).toString("base64"));
 
-  // test.assert.strictEqual(Base64.encode(r1, {usePadding:false}), Buffer.from(r1.buffer).toString("base64").replace(/=*$/, ""));
-  // test.assert.strictEqual(Base64.encode(r2, {usePadding:false}), Buffer.from(r2.buffer).toString("base64").replace(/=*$/, ""));
-  // test.assert.strictEqual(Base64.encode(r3, {usePadding:false}), Buffer.from(r3.buffer).toString("base64").replace(/=*$/, ""));
-  // test.assert.strictEqual(Base64.encode(r4, {usePadding:false}), Buffer.from(r4.buffer).toString("base64").replace(/=*$/, ""));
-  // test.assert.strictEqual(Base64.encode(r5, {usePadding:false}), Buffer.from(r5.buffer).toString("base64").replace(/=*$/, ""));
-  // test.assert.strictEqual(Base64.encode(r6, {usePadding:false}), Buffer.from(r6.buffer).toString("base64").replace(/=*$/, ""));
-  // test.assert.strictEqual(Base64.encode(r7, {usePadding:false}), Buffer.from(r7.buffer).toString("base64").replace(/=*$/, ""));
-  // test.assert.strictEqual(Base64.encode(r8, {usePadding:false}), Buffer.from(r8.buffer).toString("base64").replace(/=*$/, ""));
-  // test.assert.strictEqual(Base64.encode(r9, {usePadding:false}), Buffer.from(r9.buffer).toString("base64").replace(/=*$/, ""));
+  // test.assert.strictEqual(Base64.encode(r1, {padEnd:false}), Buffer.from(r1.buffer).toString("base64").replace(/=*$/, ""));
+  // test.assert.strictEqual(Base64.encode(r2, {padEnd:false}), Buffer.from(r2.buffer).toString("base64").replace(/=*$/, ""));
+  // test.assert.strictEqual(Base64.encode(r3, {padEnd:false}), Buffer.from(r3.buffer).toString("base64").replace(/=*$/, ""));
+  // test.assert.strictEqual(Base64.encode(r4, {padEnd:false}), Buffer.from(r4.buffer).toString("base64").replace(/=*$/, ""));
+  // test.assert.strictEqual(Base64.encode(r5, {padEnd:false}), Buffer.from(r5.buffer).toString("base64").replace(/=*$/, ""));
+  // test.assert.strictEqual(Base64.encode(r6, {padEnd:false}), Buffer.from(r6.buffer).toString("base64").replace(/=*$/, ""));
+  // test.assert.strictEqual(Base64.encode(r7, {padEnd:false}), Buffer.from(r7.buffer).toString("base64").replace(/=*$/, ""));
+  // test.assert.strictEqual(Base64.encode(r8, {padEnd:false}), Buffer.from(r8.buffer).toString("base64").replace(/=*$/, ""));
+  // test.assert.strictEqual(Base64.encode(r9, {padEnd:false}), Buffer.from(r9.buffer).toString("base64").replace(/=*$/, ""));
 
 });
 
