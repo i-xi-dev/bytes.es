@@ -1,9 +1,9 @@
 //
 
-import { Exception } from "../_.js";
-import { TextEncodingImplementation } from "./_.js";
-import { Utf8 } from "./utf_8.js";
-import { UsAscii } from "./us_ascii.js";
+import { Exception } from "../_";
+import { TextEncodingImplementation } from "./_";
+import { Utf8 } from "./utf_8";
+import { UsAscii } from "./us_ascii";
 
 const registry = new Map<string, TextEncodingImplementation>();
 

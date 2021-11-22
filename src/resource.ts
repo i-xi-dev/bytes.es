@@ -1,10 +1,10 @@
 //
 
-// import { Exception, httpQuotedString, RangePattern } from "./_.js";
-import { Exception, RangePattern } from "./_.js";
-import { StringEx } from "./_/string_ex.js";
-import { ByteSequence } from "./byte_sequence.js";
-import { MediaType } from "./media_type.js";
+// import { Exception, httpQuotedString, RangePattern } from "./_";
+import { Exception, RangePattern } from "./_";
+import { StringEx } from "./_/string_ex";
+import { ByteSequence } from "./byte_sequence";
+import { MediaType } from "./media_type";
 
 /**
  * ファイル様オブジェクト
@@ -139,7 +139,7 @@ class Resource {
       bodyStringWork = bodyWork.toBinaryString();
 
       // 11.2, 11.3
-      bodyWork = ByteSequence.fromBase64(bodyStringWork, { forgiving: true });
+      bodyWork = ByteSequence.fromBase64(bodyStringWork);
 
       // 11.4, 11.5, 11.6
       mediaTypeWork = mediaTypeWork.replace(base64Indicator, "");

@@ -2,11 +2,13 @@
 
 // バイト列
 
-import { uint8 } from "./byte/type.js";
 import {
-  Base64,
-  Base64DecodeOptions,
-  Base64EncodeOptions,
+  Base64Decoder,
+  Base64Encoder,
+  Base64Options,
+} from "@i-xi-dev/base64";
+import { uint8 } from "./byte/type";
+import {
   DigestAlgorithm,
   Format,
   FormatOptions,
@@ -18,8 +20,8 @@ import {
   ReadableStreamType,
   StreamReader,
   StreamReadOptions,
-} from "./byte/index.js";
-import { TextDecodeOptions, TextEncodeOptions, TextEncoding } from "./text_encoding/index.js";
+} from "./byte/index";
+import { TextDecodeOptions, TextEncodeOptions, TextEncoding } from "./text_encoding/index";
 
 /**
  * バイト列を表す整数の配列
@@ -251,8 +253,9 @@ class ByteSequence {
    * @param options 符号化方式のオプション
    * @returns 生成したインスタンス
    */
-  static fromBase64(base64Encoded: string, options?: Base64DecodeOptions): ByteSequence {
-    const decoded = Base64.decode(base64Encoded, options);
+  static fromBase64(base64Encoded: string, options?: Base64Options): ByteSequence {
+    const decoder = new Base64Decoder(options);
+    const decoded = decoder.decode(base64Encoded);
     return new ByteSequence(decoded.buffer);
   }
 
@@ -262,8 +265,9 @@ class ByteSequence {
    * @param options 符号化方式のオプション
    * @returns Base64符号化した文字列
    */
-  toBase64(options?: Base64EncodeOptions): string {
-    return Base64.encode(this.view(), options);
+  toBase64(options?: Base64Options): string {
+    const encoder = new Base64Encoder(options);
+    return encoder.encode(this.view());
   }
 
   /**

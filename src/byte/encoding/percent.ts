@@ -1,8 +1,8 @@
 //
 
-import { Exception } from "../../_.js";
-import { uint8 } from "../type.js";
-import { Format } from "../format.js";
+import { Exception } from "../../_";
+import { uint8 } from "../type";
+import { Format } from "../format";
 
 /**
  * 符号化集合の種別

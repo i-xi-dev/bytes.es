@@ -1,8 +1,8 @@
 //
 
-import { Exception } from "../_.js";
-import { StringEx } from "../_/string_ex.js";
-import { isByte, uint8 } from "./type.js";
+import { Exception } from "../_";
+import { StringEx } from "../_/string_ex";
+import { isByte, uint8 } from "./type";
 
 /**
  * フォーマッターで対応する基数

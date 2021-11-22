@@ -1,6 +1,6 @@
 //
 
-import { DigestAlgorithmImplementation } from "./_.js";
+import { DigestAlgorithmImplementation } from "./_";
 
 /**
  * Computes the SHA-384 digest for the byte sequence.
