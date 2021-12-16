@@ -13,9 +13,8 @@ const Sha256: DigestAlgorithm = Object.freeze({
    * 
    * @see {@link DigestAlgorithm.compute}
    */
-  async compute(input: Uint8Array): Promise<Uint8Array> {
-    const digestBuffer = await globalThis.crypto.subtle.digest("SHA-256", input);
-    return new Uint8Array(digestBuffer);
+  async compute(input: BufferSource): Promise<ArrayBuffer> {
+    return await crypto.subtle.digest("SHA-256", input);
   },
 });
 
@@ -28,9 +27,8 @@ const Sha384: DigestAlgorithm = Object.freeze({
    * 
    * @see {@link DigestAlgorithm.compute}
    */
-  async compute(input: Uint8Array): Promise<Uint8Array> {
-    const digestBuffer = await globalThis.crypto.subtle.digest("SHA-384", input);
-    return new Uint8Array(digestBuffer);
+  async compute(input: BufferSource): Promise<ArrayBuffer> {
+    return await crypto.subtle.digest("SHA-384", input);
   },
 });
 
@@ -43,9 +41,8 @@ const Sha512: DigestAlgorithm = Object.freeze({
    * 
    * @see {@link DigestAlgorithm.compute}
    */
-  async compute(input: Uint8Array): Promise<Uint8Array> {
-    const digestBuffer = await globalThis.crypto.subtle.digest("SHA-512", input);
-    return new Uint8Array(digestBuffer);
+  async compute(input: BufferSource): Promise<ArrayBuffer> {
+    return await crypto.subtle.digest("SHA-512", input);
   },
 });
 

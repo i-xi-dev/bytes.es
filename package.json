@@ -1,6 +1,6 @@
 {
   "name": "@i-xi-dev/bytes",
-  "version": "0.0.23",
+  "version": "0.1.0",
   "description": "A JavaScript byte array library for the browser, Deno and Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -53,8 +53,8 @@
   },
   "devDependencies": {
     "@i-xi-dev/base64": "^1.0.4",
-    "@i-xi-dev/fundamental": "^0.0.17",
-    "@i-xi-dev/percent": "^0.0.4",
+    "@i-xi-dev/fundamental": "^0.0.21",
+    "@i-xi-dev/percent": "^0.0.5",
     "@types/node": "^16.11.12",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
     "@typescript-eslint/parser": "^5.7.0",
