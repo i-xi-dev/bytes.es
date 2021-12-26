@@ -16,6 +16,13 @@ describe("ByteSequence.from", () => {
 
     assert.strictEqual(bs1.count, 0);
 
+    const a2 = ["a"];
+    assert.throws(() => {
+      ByteSequence.from(a2);
+    }, {
+      message: "bytes"
+    });
+
   });
 
   it("from(Uint8Array)", () => {
@@ -28,6 +35,22 @@ describe("ByteSequence.from", () => {
     assert.strictEqual(bs0a[9], 0);
 
     const a1 = new Uint8Array(0);
+    const bs1 = ByteSequence.from(a1);
+
+    assert.strictEqual(bs1.count, 0);
+
+  });
+
+  it("from(ArrayBuffer)", () => {
+    const a0 = Uint8Array.of(9,8,7,6,5,4,3,2,1,0);
+    const bs0 = ByteSequence.from(a0.buffer);
+
+    assert.strictEqual(bs0.count, 10);
+    const bs0a = bs0.view();
+    assert.strictEqual(bs0a[0], 9);
+    assert.strictEqual(bs0a[9], 0);
+
+    const a1 = new ArrayBuffer(0);
     const bs1 = ByteSequence.from(a1);
 
     assert.strictEqual(bs1.count, 0);

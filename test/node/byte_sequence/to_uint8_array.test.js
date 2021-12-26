@@ -3,8 +3,8 @@ import { ByteSequence } from "../../../node/index.mjs";
 
 describe("ByteSequence.prototype.toUint8Array", () => {
   it("toUint8Array()", () => {
-    const bs0 = ByteSequence.create(0);
-    const bs1 = ByteSequence.create(1000);
+    const bs0 = ByteSequence.allocate(0);
+    const bs1 = ByteSequence.allocate(1000);
 
     assert.strictEqual(bs0.toUint8Array().length, 0);
     assert.strictEqual(bs1.toUint8Array().length, 1000);

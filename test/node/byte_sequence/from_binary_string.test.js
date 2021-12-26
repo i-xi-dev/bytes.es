@@ -18,13 +18,13 @@ describe("ByteSequence.fromBinaryString", () => {
     assert.throws(() => {
       ByteSequence.fromBinaryString("あ");
     }, {
-      message: "binaryString"
+      message: "input"
     });
 
     assert.throws(() => {
       ByteSequence.fromBinaryString("\u0100");
     }, {
-      message: "binaryString"
+      message: "input"
     });
 
   });
