@@ -9,10 +9,9 @@ describe("ByteSequence.fromBase64", () => {
     const bs1 = ByteSequence.fromBase64("AwIBAP/+/fw=");
     assert.strictEqual(bs1.toArray().join(","), "3,2,1,0,255,254,253,252");
 
-    // 結果の妥当性はエンコーディングクラスのテストにて確認
   });
 
-  it("fromBase64(string, ByteEncodingOptions)", () => {
+  it("fromBase64(string, Object)", () => {
     const bs0 = ByteSequence.fromBase64("", {});
     assert.strictEqual(bs0.count, 0);
 
@@ -36,7 +35,6 @@ describe("ByteSequence.fromBase64", () => {
     const bs2c = ByteSequence.fromBase64("AwIBAP_-_fw", {table:rfc4648urlTable,padEnd:false});
     assert.strictEqual(bs2c.toArray().join(","), "3,2,1,0,255,254,253,252");
 
-    // 結果の妥当性はエンコーディングクラスのテストにて確認
   });
 
 });
