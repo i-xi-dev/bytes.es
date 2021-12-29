@@ -483,3 +483,21 @@ describe("ByteSequence.prototype.toBase64", () => {
   });
 
 });
+
+describe("ByteSequence.fromPercent", () => {
+  it("fromPercent(string)", () => {
+    const bs1 = ByteSequence.fromPercent("");
+    expect(bs1.count).toBe(0);
+
+    const bs2 = ByteSequence.fromPercent("%03");
+    expect(bs2.view()[0]).toBe(0x03);
+
+  });
+
+  it("fromPercent(string, ByteEncodingOptions)", () => {
+    const bs0 = ByteSequence.fromPercent("", {});
+    expect(bs0.count).toBe(0);
+
+  });
+
+});
