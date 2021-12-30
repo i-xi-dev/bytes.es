@@ -532,3 +532,33 @@ describe("ByteSequence.prototype.toPercent", () => {
   });
 
 });
+
+describe("ByteSequence.prototype.toString", () => {
+  const bs0 = ByteSequence.allocate(0);
+  const bs1 = ByteSequence.of(0x41, 0x3C, 0xA, 0x20, 0xA9);
+
+  it("toString()", () => {
+    expect(bs0.toString()).toBe("");
+    expect(bs1.toString()).toBe("413C0A20A9");
+
+  });
+
+});
+
+describe("ByteSequence.prototype.toJSON", () => {
+  it("toJSON()", () => {
+    const bs0 = ByteSequence.allocate(0);
+    const bs1 = ByteSequence.allocate(1000);
+
+    expect(bs0.toJSON().length).toBe(0);
+    expect(bs1.toJSON().length).toBe(1000);
+
+    const a2: uint8[] = [1,2,3,4,5];
+    const bs2 = ByteSequence.from(a2);
+    expect(JSON.stringify(a2)).toBe(JSON.stringify(bs2.toJSON()));
+
+  });
+
+});
+
+//expect(xxx).toBe(xxx);
