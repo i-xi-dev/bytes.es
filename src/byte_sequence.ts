@@ -43,7 +43,6 @@ const utf8TextEncoder = new TextEncoder();
 
 const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true });
 
-
 /**
  * バイト列
  */
@@ -541,6 +540,8 @@ class ByteSequence {
   textDecodeTo(decoder: { decode: (input?: BufferSource) => string } = utf8TextDecoder): string {
     return decoder.decode(this.view);
   }
+
+//TODO
 
 
 
