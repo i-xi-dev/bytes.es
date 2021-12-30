@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { ByteSequence } from "./byte_sequence";
 import { uint8 } from "./index";
 
@@ -610,6 +611,25 @@ describe("ByteSequence.prototype.toSha512", () => {
   it("toSha512()", async () => {
     const s1 = await bs0.toSha512();
     expect(s1.format()).toBe("CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E");
+
+  });
+
+});
+
+describe("ByteSequence.prototype.toDigest", () => {
+  const bs0 = ByteSequence.allocate(0);
+
+  const MD5 = {
+    async compute(input: Uint8Array): Promise<Uint8Array> {
+      const md5 = createHash("md5");
+      md5.update(input);
+      return md5.digest();
+    }
+  };
+
+  it("toDigest(string)", async () => {
+    const s1 = await bs0.toDigest(MD5);
+    expect(s1.format()).toBe("D41D8CD98F00B204E9800998ECF8427E");
 
   });
 
