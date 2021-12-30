@@ -15,8 +15,7 @@
     "build": "tsc --emitDeclarationOnly && webpack",
     "clean": "node -e \"fs.rmSync(`dist`, { recursive:true, force:true })\"",
     "lint": "eslint --ext ts --fix ./src/",
-    "test": "jest",
-    "test2": "mocha test/node/ --recursive",
+    "test": "jest && mocha test/node/ --recursive",
     "prepublish": "npm run clean && npm run build"
   },
   "repository": {
@@ -55,10 +54,10 @@
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.16.5",
     "@babel/preset-env": "^7.16.5",
-    "@i-xi-dev/base64": "^1.1.0",
-    "@i-xi-dev/fundamental": "^1.1.0",
-    "@i-xi-dev/mimetype": "^1.0.0",
-    "@i-xi-dev/percent": "^1.0.0",
+    "@i-xi-dev/base64": "^1.1.2",
+    "@i-xi-dev/fundamental": "^1.4.0",
+    "@i-xi-dev/mimetype": "^1.0.1",
+    "@i-xi-dev/percent": "^1.0.1",
     "@types/jest": "^27.0.3",
     "@types/node": "^17.0.5",
     "@typescript-eslint/eslint-plugin": "^5.8.1",

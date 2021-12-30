@@ -1,10 +1,19 @@
-//
+// //
 
+import { StringUtils } from "@i-xi-dev/fundamental";
+import { MediaType } from "@i-xi-dev/mimetype";
 // import { Exception, httpQuotedString, RangePattern } from "./_";
-import { Exception, RangePattern } from "./_";
-import { StringEx } from "./_/string_ex";
+import {
+  DigestAlgorithm,
+  Sha256,
+  Sha384,
+  Sha512,
+} from "./digest_algorithm";
 import { ByteSequence } from "./byte_sequence";
-import { MediaType } from "./media_type";
+
+const {
+  ASCII_WHITESPACE,
+} = StringUtils.RangePattern;
 
 /**
  * ファイル様オブジェクト
@@ -95,7 +104,7 @@ class Resource {
   /**
    * Data URLからインスタンスを生成し返却
    * 
-   * {@link https://fetch.spec.whatwg.org/#data-urls Fetch Standard}の仕様に従った。
+   * {@link [Fetch Standard](https://fetch.spec.whatwg.org/#data-urls)}の仕様に従った。
    * 最初に出現した","をメディアタイプとデータの区切りとみなす。（メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする）
    * クエリはデータの一部とみなす。
    * 
@@ -123,13 +132,13 @@ class Resource {
     }
 
     const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
-    let mediaTypeWork = StringEx.trim(mediaTypeOriginal, RangePattern.ASCII_WHITESPACE);
+    let mediaTypeWork = StringUtils.trim(mediaTypeOriginal, ASCII_WHITESPACE);
 
     // 8, 9
     bodyStringWork = bodyStringWork.substring(mediaTypeOriginal.length + 1);
 
     // 10
-    let bodyWork = ByteSequence.fromPercent(bodyStringWork);
+    let bodyWork = ByteSequence.fromPercentEncoded(bodyStringWork);
 
     // 11
     const base64Indicator = /;[\u0020]*base64$/i;
@@ -139,7 +148,7 @@ class Resource {
       bodyStringWork = bodyWork.toBinaryString();
 
       // 11.2, 11.3
-      bodyWork = ByteSequence.fromBase64(bodyStringWork);
+      bodyWork = ByteSequence.fromBase64Encoded(bodyStringWork);
 
       // 11.4, 11.5, 11.6
       mediaTypeWork = mediaTypeWork.replace(base64Indicator, "");
@@ -174,7 +183,7 @@ class Resource {
    */
   toDataURL(): URL {
     const encoding = ";base64";
-    const dataEncoded = this.#bytes.toBase64();
+    const dataEncoded = this.#bytes.toBase64Encoded();
 
     return new URL("data:" + this.#mediaType.toString() + encoding + "," + dataEncoded);
   }
@@ -182,30 +191,29 @@ class Resource {
   /**
    * Computes the SRI integrity (base64-encoded digest).
    * 
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity}
-   * @param algorithmName The name of the digest algorithm.
-   * @returns The {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promise} that
+   * @see {@link [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)}
+   * @param algorithm The digest algorithm.
+   * @returns The {@link [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)} that
    *     fulfills with a SRI integrity (base64-encoded digest).
    */
-  async integrity(algorithmName: string): Promise<string> {
+  async integrity(algorithm: DigestAlgorithm): Promise<string> {
     let prefix = "";
-    switch (algorithmName.toLowerCase()) {
-    case "sha-256":
+    if (algorithm === Sha256) {
       prefix = "sha256-";
-      break;
-    case "sha-384":
-      prefix = "sha384-";
-      break;
-    case "sha-512":
-      prefix = "sha512-";
-      break;
     }
-    if (prefix.length <= 0) {
-      throw new Exception("NotSupportedError", "algorithmName:" + algorithmName);
+    else if (algorithm === Sha384) {
+      prefix = "sha384-";
+    }
+    else if (algorithm === Sha512) {
+      prefix = "sha512-";
     }
 
-    const digestBytes = await this.#bytes.toDigest(algorithmName);
-    return prefix + digestBytes.toBase64();
+    if (prefix.length <= 0) {
+      throw new TypeError("algorithm");
+    }
+
+    const digestBytes = await this.#bytes.toDigest(algorithm);
+    return prefix + digestBytes.toBase64Encoded();
   }
 
 
@@ -320,7 +328,7 @@ Object.freeze(Resource);
 //   const values: Array<string> = [];
 //   let work = value;
 //   while (work.length > 0) {
-//     let splitted = StringEx.collectStart(work, notU0022OrU002C);
+//     let splitted = StringUtils.collectStart(work, notU0022OrU002C);
 //     work = work.substring(splitted.length);
 //     if (work.startsWith("\u0022")) {
 //       const result = httpQuotedString(work);
@@ -330,7 +338,7 @@ Object.freeze(Resource);
 //     else { // work.startsWith("\u002C")
 //       work = work.substring(1);
 //     }
-//     values.push(StringEx.trim(splitted, RangePattern.HTTP_TAB_OR_SPACE));
+//     values.push(StringUtils.trim(splitted, RangePattern.HTTP_TAB_OR_SPACE));
 //   }
 //   return values;
 // }

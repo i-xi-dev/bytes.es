@@ -3,35 +3,46 @@
 // バイト列
 
 import {
-  Base64Decoder,
-  Base64Encoder,
-  Base64Options,
-} from "@i-xi-dev/base64";
-import { uint8 } from "./byte/type";
+  type uint8,
+  type ByteFormatOptions,
+  type DigestAlgorithm,
+  type TransferOptions,
+  ByteBuffer,
+  ByteFormat,
+  IsomorphicEncoding,
+  NumberUtils,
+  Sha256,
+  Sha384,
+  Sha512,
+  StreamUtils,
+  TransferProgress,
+  Uint8,
+} from "@i-xi-dev/fundamental";
+
 import {
-  DigestAlgorithm,
-  Format,
-  FormatOptions,
-  FormatRadix,
-  ParseOptions,
+  type Base64Options,
+  Base64,
+} from "@i-xi-dev/base64";
+
+import {
+  type PercentOptions,
   Percent,
-  PercentDecodeOptions,
-  PercentEncodeOptions,
-  ReadableStreamType,
-  StreamReader,
-  StreamReadOptions,
-} from "./byte/index";
-import { TextDecodeOptions, TextEncodeOptions, TextEncoding } from "./text_encoding/index";
+} from "@i-xi-dev/percent";
 
 /**
  * バイト列を表す整数の配列
  */
-type ByteArray = Array<uint8> | Uint8Array | Uint8ClampedArray;
+type ByteArray = Array<uint8> | BufferSource;
 
 /**
  * バイト列を表すオブジェクト
  */
 type Bytes = ByteSequence | ByteArray;
+
+const utf8TextEncoder = new TextEncoder();
+
+const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true });
+
 
 /**
  * バイト列
@@ -40,14 +51,17 @@ class ByteSequence {
   /**
    * 内部表現
    */
-  #bytes: Uint8Array;
+  #buffer: ArrayBuffer;
 
   /**
    * ArrayBufferをラップするインスタンスを生成
    *     ※外部からのArrayBufferの変更は当インスタンスに影響する
    */
-  constructor(buffer: ArrayBuffer) {
-    this.#bytes = new Uint8Array(buffer);
+  private constructor(bytes: ArrayBuffer) {
+    if ((bytes instanceof ArrayBuffer) !== true) {
+      throw new TypeError("bytes");
+    }
+    this.#buffer = bytes;
     Object.freeze(this);
   }
 
@@ -55,7 +69,7 @@ class ByteSequence {
    * バイト数
    */
   get count(): number {
-    return this.#bytes.byteLength;
+    return this.#buffer.byteLength;
   }
 
   /**
@@ -63,86 +77,51 @@ class ByteSequence {
    *     ※返却値に変更をくわえた場合、当インスタンスに影響する
    */
   get buffer(): ArrayBuffer {
-    return this.#bytes.buffer;
+    return this.#buffer;
   }
 
   /**
    * 自身のArrayBufferのビューを返却
-   * 
-   * @param byteOffset ビューのオフセット
-   * @param byteCount ビューのバイト数
-   * @returns 自身のArrayBufferのビュー
    */
-  view(byteOffset = 0, byteCount: number = (this.count - byteOffset)): Uint8Array {
-    if (Number.isSafeInteger(byteOffset) !== true) {
-      throw new TypeError("byteOffset");
-    }
-    if ((byteOffset < 0) || (byteOffset > this.count)) {
-      throw new RangeError("byteOffset");
-    }
-
-    if (Number.isSafeInteger(byteCount) !== true) {
-      throw new TypeError("byteCount");
-    }
-    if ((byteCount < 0) || (byteCount > (this.count - byteOffset))) {
-      throw new RangeError("byteCount");
-    }
-
-    return new Uint8Array(this.#bytes.buffer, byteOffset, byteCount);
+  get view(): Uint8Array {
+    return new Uint8Array(this.#buffer);
   }
-
-  // viewで取得すればいい
-  // at(index: number): uint8;
-
-  // viewで取得すればいい
-  // [Symbol.iterator](): IterableIterator<uint8>;
-
-  // viewで取得すればいい
-  // async *[Symbol.asyncIterator](): AsyncIterableIterator<uint8>;
-
-  // viewで取得すればいい
-  // get(byteOffset: number, byteCount: number = 1): Uint8Array;
-
-  // viewで取得すればいい
-  // set(byteOffset: number, bytes: Bytes): void;
 
   /**
    * 指定したバイト数でインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
    *     ※各バイトは0
    * 
-   * @param byteCount 生成するバイト列のバイト数
+   * @param byteCount - 生成するバイト列のバイト数
    * @returns 生成したインスタンス
    */
-  static create(byteCount: number): ByteSequence {
-    if (Number.isSafeInteger(byteCount) !== true) {
+  static allocate(byteCount: number): ByteSequence {
+    if (NumberUtils.isNonNegativeInteger(byteCount) !== true) {
       throw new TypeError("byteCount");
     }
-    if (byteCount < 0) {
-      throw new RangeError("byteCount");
-    }
-
     return new ByteSequence(new ArrayBuffer(byteCount));
   }
 
   /**
-   * ランダムなバイトからなるインスタンスを生成し返却
-   *     ※ArrayBufferは新たに生成する
+   * バイト列をもとにインスタンスを生成し返却
+   *     ※ArrayBufferは新たに生成しない
+   *     ※bytesがArrayBufferViewの場合、ビューのbyteOffset,byteLengthは無視する（ビュー.bufferを使用するのみ）
    * 
-   * @param {number} byteCount - 生成するバイト列のバイト数
-   *     RandomSource.getRandomValuesの制約により、最大値は65536
+   * @param bytes バイト列
    * @returns 生成したインスタンス
    */
-  static generateRandom(byteCount: number): ByteSequence {
-    if (Number.isSafeInteger(byteCount) !== true) {
-      throw new TypeError("byteCount");
+  static wrap(bytes: BufferSource): ByteSequence {
+    let bytesSrc: ArrayBuffer;
+    if (ArrayBuffer.isView(bytes)) {
+      bytesSrc = bytes.buffer;
     }
-    if ((byteCount < 0) || (byteCount > 65536)) {
-      throw new RangeError("byteCount");
+    else if (bytes instanceof ArrayBuffer) {
+      bytesSrc = bytes;
     }
-
-    const randomBytes = globalThis.crypto.getRandomValues(new Uint8Array(byteCount));
-    return new ByteSequence(randomBytes.buffer);
+    else {
+      throw new TypeError("bytes");
+    }
+    return new ByteSequence(bytesSrc);
   }
 
   /**
@@ -154,31 +133,23 @@ class ByteSequence {
    * @returns 生成したインスタンス
    */
   static from(bytes: Bytes): ByteSequence {
+    let bytesSrc: ArrayBuffer;
     if (bytes instanceof ByteSequence) {
-      return bytes.clone();
+      bytesSrc = bytes.buffer.slice(0);
     }
-
-    return new ByteSequence(Uint8Array.from(bytes).buffer);
-  }
-
-  /**
-   * バイト列を表す整数の配列をもとにインスタンスを生成し返却
-   *     ※ArrayBufferは新たに生成する
-   * 
-   * @param bytes バイト列を表す整数の配列
-   * @returns 生成したインスタンス
-   */
-  static of(...bytes: Array<uint8>): ByteSequence {
-    return ByteSequence.from(bytes);
-  }
-
-  /**
-   * 自身のバイト列を表す整数の配列を生成し返却
-   * 
-   * @returns バイト列を表す整数の配列
-   */
-  toArray(): Array<uint8> {
-    return Array.from(this.#bytes) as Array<uint8>;
+    else if (ArrayBuffer.isView(bytes)) {
+      bytesSrc = bytes.buffer.slice(bytes.byteOffset, (bytes.byteOffset + bytes.byteLength));
+    }
+    else if (bytes instanceof ArrayBuffer) {
+      bytesSrc = bytes.slice(0);
+    }
+    else if (Array.isArray(bytes) && bytes.every((byte) => Uint8.isUint8(byte))) {
+      bytesSrc = Uint8Array.from(bytes).buffer;
+    }
+    else {
+      throw new TypeError("bytes");
+    }
+    return new ByteSequence(bytesSrc);
   }
 
   /**
@@ -188,25 +159,59 @@ class ByteSequence {
    * @returns バイト列を表す整数の配列
    */
   toUint8Array(): Uint8Array {
-    return new Uint8Array(this.#bytes.buffer.slice(0));
+    return new Uint8Array(this.#buffer.slice(0));
+  }
+
+  /**
+   * 自身のバイト列を表す整数の配列を生成し返却
+   * 
+   * @returns バイト列を表す整数の配列
+   */
+  toArray(): Array<uint8> {
+    return Array.from(this.toUint8Array()) as Array<uint8>;
+  }
+
+  /**
+   * バイト列を表す整数の配列をもとにインスタンスを生成し返却
+   *     ※ArrayBufferは新たに生成する
+   * 
+   * @param bytes - バイト列を表す整数の配列
+   * @returns 生成したインスタンス
+   */
+  static of(...bytes: Array<uint8>): ByteSequence {
+    return ByteSequence.from(bytes);
+  }
+
+  /**
+   * ランダムなバイトからなるインスタンスを生成し返却
+   *     ※ArrayBufferは新たに生成する
+   * 
+   * @param {number} byteCount - 生成するバイト列のバイト数
+   *     RandomSource.getRandomValuesの制約により、最大値は65536
+   * @returns 生成したインスタンス
+   */
+  static generateRandom(byteCount: number): ByteSequence {
+    if (NumberUtils.isNonNegativeInteger(byteCount) !== true) {
+      throw new TypeError("byteCount");
+    }
+    if (byteCount > 65536) {
+      throw new RangeError("byteCount");
+    }
+
+    const randomBytes = crypto.getRandomValues(new Uint8Array(byteCount));
+    return new ByteSequence(randomBytes.buffer);
   }
 
   /**
    * バイト列を表すBinary stringを同型符号化し、インスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
    * 
-   * @param binaryString バイト列を表すBinary string
+   * @param binaryString - バイト列を表すBinary string
    * @returns 生成したインスタンス
    */
   static fromBinaryString(binaryString: string): ByteSequence {
-    if (/^[\u{0}-\u{FF}]*$/u.test(binaryString) !== true) {
-      throw new TypeError("binaryString");
-    }
-
-    const bytes = [ ...binaryString ].map((char) => {
-      return char.charCodeAt(0) as uint8;
-    });
-    return ByteSequence.from(bytes);
+    const bytes = IsomorphicEncoding.encode(binaryString);
+    return new ByteSequence(bytes.buffer);
   }
 
   /**
@@ -215,59 +220,51 @@ class ByteSequence {
    * @returns Binary string
    */
   toBinaryString(): string {
-    const chars = Array.from(this.#bytes, (byte) => {
-      return String.fromCharCode(byte);
-    });
-    return chars.join("");
+    return IsomorphicEncoding.decode(this.#buffer);
   }
 
   /**
    * バイト列をフォーマットした文字列からインスタンスを生成し返却
    *     ※ArrayBufferは新たに生成する
    * 
-   * @param toParse バイト列をフォーマットした文字列
-   * @param radix フォーマット結果の基数
-   * @param options パースオプション
+   * @param format - フォーマッター
    * @returns 生成したインスタンス
    */
-  static parse(toParse: string, radix: FormatRadix = 16, options?: ParseOptions): ByteSequence {
-    const parsed = Format.parse(toParse, radix, options);
+  static parse(toParse: string, options?: ByteFormatOptions): ByteSequence {
+    const parsed = ByteFormat.parse(toParse, options);
     return new ByteSequence(parsed.buffer);
   }
 
   /**
    * 自身のバイト列をフォーマットした文字列を生成し返却
    * 
-   * @param radix フォーマット結果の基数
-   * @param options フォーマットオプション
+   * @param format - フォーマッター
    * @returns バイト列をフォーマットした文字列
    */
-  format(radix: FormatRadix = 16, options?: FormatOptions): string {
-    return Format.format(this.#bytes, radix, options);
+  format(options?: ByteFormatOptions): string {
+    return ByteFormat.format(this.view, options);
   }
 
   /**
    * Base64符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
    * 
-   * @param base64Encoded Base64符号化された文字列
-   * @param options 符号化方式のオプション
+   * @param base64Encoded - Base64符号化された文字列
+   * @param options - 符号化方式のオプション
    * @returns 生成したインスタンス
    */
-  static fromBase64(base64Encoded: string, options?: Base64Options): ByteSequence {
-    const decoder = new Base64Decoder(options);
-    const decoded = decoder.decode(base64Encoded);
+  static fromBase64Encoded(base64Encoded: string, options?: Base64Options): ByteSequence {
+    const decoded = Base64.decode(base64Encoded, Base64.resolveOptions(options));
     return new ByteSequence(decoded.buffer);
   }
 
   /**
    * 自身のバイト列をBase64符号化した文字列を返却
    * 
-   * @param options 符号化方式のオプション
+   * @param options - 符号化方式のオプション
    * @returns Base64符号化した文字列
    */
-  toBase64(options?: Base64Options): string {
-    const encoder = new Base64Encoder(options);
-    return encoder.encode(this.view());
+  toBase64Encoded(options?: Base64Options): string {
+    return Base64.encode(this.view, Base64.resolveOptions(options));
   }
 
   /**
@@ -277,40 +274,19 @@ class ByteSequence {
    * @param options 符号化方式オプション
    * @returns 生成したインスタンス
    */
-  static fromPercent(percentEncoded: string, options?: PercentDecodeOptions): ByteSequence {
-    const decoded = Percent.decode(percentEncoded, options);
-    return ByteSequence.from(decoded); // decoded.bufferには未使用領域がある可能性がある為、複製して未使用領域は切り捨てる
+  static fromPercentEncoded(percentEncoded: string, options?: PercentOptions): ByteSequence {
+    const decoded = Percent.decode(percentEncoded, Percent.resolveOptions(options));
+    return new ByteSequence(decoded.buffer);
   }
 
   /**
    * 自身のバイト列をパーセント符号化した文字列を返却
    * 
-   * @param options 符号化方式のオプション
+   * @param options - 符号化方式のオプション
    * @returns パーセント符号化した文字列
    */
-  toPercent(options?: PercentEncodeOptions): string {
-    return Percent.encode(this.view(), options);
-  }
-
-  /**
-   * 自身のバイト列のハッシュを生成し返却
-   * 
-   * @param algorithmName ハッシュアルゴリズム名
-   * @returns 生成したハッシュのバイト列で解決されるPromise
-   */
-  async toDigest(algorithmName: string): Promise<ByteSequence> {
-    const algorithm = DigestAlgorithm.for(algorithmName);
-    const digest = await algorithm.compute(this.#bytes);
-    return new ByteSequence(digest.buffer);
-  }
-
-  /**
-   * 自身のバイト列のSHA-256ハッシュを生成し返却
-   * 
-   * @returns 生成したハッシュのバイト列で解決されるPromise
-   */
-  async toSha256(): Promise<ByteSequence> {
-    return this.toDigest("SHA-256");
+  toPercentEncoded(options?: PercentOptions): string {
+    return Percent.encode(this.view, Percent.resolveOptions(options));
   }
 
   /**
@@ -333,18 +309,132 @@ class ByteSequence {
   }
 
   /**
+   * 自身のバイト列のSHA-256ハッシュを生成し返却
+   * 
+   * @returns 生成したハッシュのバイト列で解決されるPromise
+   */
+  async toSha256Digest(): Promise<ByteSequence> {
+    return this.toDigest(Sha256);
+  }
+
+  /**
+   * 自身のバイト列のSHA-384ハッシュを生成し返却
+   * 
+   * @returns 生成したハッシュのバイト列で解決されるPromise
+   */
+  async toSha384Digest(): Promise<ByteSequence> {
+    return this.toDigest(Sha384);
+  }
+
+  /**
+   * 自身のバイト列のSHA-512ハッシュを生成し返却
+   * 
+   * @returns 生成したハッシュのバイト列で解決されるPromise
+   */
+  async toSha512Digest(): Promise<ByteSequence> {
+    return this.toDigest(Sha512);
+  }
+
+  /**
+   * 自身のバイト列のハッシュを生成し返却
+   * 
+   * @param algorithmName - ハッシュアルゴリズム
+   * @returns 生成したハッシュのバイト列で解決されるPromise
+   */
+  async toDigest(algorithm: DigestAlgorithm): Promise<ByteSequence> {
+    const digest = await algorithm.compute(this.view);
+    return new ByteSequence(digest.buffer);
+  }
+
+  /**
+   * 自身のバイト列の部分複製を生成し返却
+   *     ※参照するArrayBufferも複製する
+   * 
+   * @param start 開始インデックス
+   * @param end 終了インデックス
+   * @returns 自身のバイト列の部分複製
+   */
+  subsequence(start: number, end?: number): ByteSequence {
+    if (NumberUtils.isNonNegativeInteger(start) !== true) {
+      throw new TypeError("start");
+    }
+    if (start > this.count) {
+      throw new RangeError("start");
+    }
+
+    if (typeof end === "number") {
+      if (NumberUtils.isNonNegativeInteger(end) !== true) {
+        throw new TypeError("end");
+      }
+      if (end < start) {
+        throw new RangeError("end");
+      }
+    }
+
+    return new ByteSequence(this.#buffer.slice(start, end));
+  }
+
+  /**
+   * 自身のバイト列の複製を生成し返却
+   *     ※参照するArrayBufferも複製する
+   * 
+   * @returns 自身のバイト列の複製
+   */
+  duplicate(): ByteSequence {
+    return new ByteSequence(this.#buffer.slice(0));
+  }
+
+  /**
+   * 自身のArrayBufferのビューを返却
+   * 
+   * @param byteOffset - ビューのオフセット
+   * @param byteCount - ビューのバイト数
+   * @returns 自身のArrayBufferのビュー
+   */
+  viewScope(byteOffset: number, byteCount: number): Uint8Array {
+    if (NumberUtils.isNonNegativeInteger(byteOffset) !== true) {
+      throw new TypeError("byteOffset");
+    }
+    if (byteOffset > this.count) {
+      throw new RangeError("byteOffset");
+    }
+
+    if (NumberUtils.isNonNegativeInteger(byteCount) !== true) {
+      throw new TypeError("byteCount");
+    }
+    if (byteCount > (this.count - byteOffset)) {
+      throw new RangeError("byteCount");
+    }
+
+    return new Uint8Array(this.#buffer, byteOffset, byteCount);
+  }
+
+  /**
    * 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否かを返却
    * 
    * @param otherBytes バイト列
    * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
    */
   #startsWith(otherBytes: ByteArray): boolean {
-    for (let i = 0; i < otherBytes.length; i++) {
-      if (otherBytes[i] !== this.#bytes[i]) {
-        return false;
+    const thisView = this.view;
+    if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
+      const otherView = new Uint8Array((otherBytes instanceof ArrayBuffer) ? otherBytes : otherBytes.buffer);
+      for (let i = 0; i < otherView.byteLength; i++) {
+        if (otherView[i] !== thisView[i]) {
+          return false;
+        }
       }
+      return true;
     }
-    return true;
+    else if (Array.isArray(otherBytes)) {
+      for (let i = 0; i < otherBytes.length; i++) {
+        if (otherBytes[i] !== thisView[i]) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -354,19 +444,19 @@ class ByteSequence {
    * @returns 自身のバイト列と、他のオブジェクトの表すバイト列が等しいか否か
    */
   equals(bytes: Bytes): boolean {
-    let otherBytes: ByteArray;
     if (bytes instanceof ByteSequence) {
-      otherBytes = bytes.#bytes;
+      if (bytes.count !== this.count) {
+        return false;
+      }
+      return this.#startsWith(bytes.buffer);
     }
     else {
-      otherBytes = bytes;
+      const bytesCount = ((bytes instanceof ArrayBuffer) || ArrayBuffer.isView(bytes)) ? bytes.byteLength : bytes.length;
+      if (bytesCount !== this.count) {
+        return false;
+      }
+      return this.#startsWith(bytes);
     }
-
-    if (otherBytes.length !== this.count) {
-      return false;
-    }
-
-    return this.#startsWith(otherBytes);
   }
 
   /**
@@ -376,60 +466,12 @@ class ByteSequence {
    * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
    */
   startsWith(bytes: Bytes): boolean {
-    let otherBytes: ByteArray;
     if (bytes instanceof ByteSequence) {
-      otherBytes = bytes.#bytes;
+      return this.#startsWith(bytes.buffer);
     }
     else {
-      otherBytes = bytes;
+      return this.#startsWith(bytes);
     }
-
-    if (otherBytes.length > this.count) {
-      return false;
-    }
-
-    return this.#startsWith(otherBytes);
-  }
-
-  /**
-   * 自身のバイト列の複製を生成し返却
-   *     ※参照するArrayBufferも複製する
-   * 
-   * @returns 自身のバイト列の複製
-   */
-  clone(): ByteSequence {
-    const clonedBuffer = this.#bytes.buffer.slice(0);
-    return new ByteSequence(clonedBuffer);
-  }
-
-  /**
-   * 自身のバイト列の部分複製を生成し返却
-   *     ※参照するArrayBufferも複製する
-   *     ※コピーではなくビューが欲しい場合は、bufferプロパティでArrayBufferを取得してビューを作ればよい（new Uint8Array(xf0ByteSequence.buffer, 24, 128)など）
-   * 
-   * @param start 開始インデックス
-   * @param end 終了インデックス
-   * @returns 自身のバイト列の部分複製
-   */
-  subsequence(start = 0, end?: number): ByteSequence {
-    if (Number.isSafeInteger(start) !== true) {
-      throw new TypeError("start");
-    }
-    if ((start < 0) || (start > this.count)) {
-      throw new RangeError("start");
-    }
-
-    if (typeof end === "number") {
-      if (Number.isSafeInteger(end) !== true) {
-        throw new TypeError("end");
-      }
-      if (end < start) {
-        throw new RangeError("end");
-      }
-    }
-
-    const slicedBuffer = this.#bytes.buffer.slice(start, end);
-    return new ByteSequence(slicedBuffer);
   }
 
   /**
@@ -439,12 +481,9 @@ class ByteSequence {
    * @param segmentByteCount 分割するバイト数
    * @returns 自身のバイト列の部分複製を返却するジェネレーター
    */
-  *segmentedSequences(segmentByteCount: number): Generator<ByteSequence, void, void> {
-    if (Number.isSafeInteger(segmentByteCount) !== true) {
+  *segments(segmentByteCount: number): Generator<ByteSequence, void, void> {
+    if (NumberUtils.isPositiveInteger(segmentByteCount) !== true) {
       throw new TypeError("segmentByteCount");
-    }
-    if (segmentByteCount <= 0) {
-      throw new RangeError("segmentByteCount");
     }
 
     let i = 0;
@@ -459,61 +498,118 @@ class ByteSequence {
   }
 
   /**
+   * 文字列をUTF-8で符号化したバイト列からインスタンスを生成し返却
+   * 
+   * @param text 文字列
+   * @returns 生成したインスタンス
+   */
+  static utf8EncodeFrom(text: string): ByteSequence {
+    const encoded = utf8TextEncoder.encode(text);
+    return new ByteSequence(encoded.buffer);
+  }
+
+  /**
+   * バイト列をUTF-8で復号し、文字列を返却
+   * 
+   * @param encodingName 文字符号化方式名
+   * @returns 文字列
+   */
+  utf8DecodeTo(): string {
+    return utf8TextDecoder.decode(this.view);
+  }
+
+  /**
+   * 文字列を指定した符号化器で符号化したバイト列からインスタンスを生成し返却
+   * 
+   * @param text 文字列
+   * @param encoder 符号化器
+   * @returns 生成したインスタンス
+   */
+  static textEncodeFrom(text: string, encoder: { encode: (input?: string) => Uint8Array } = utf8TextEncoder): ByteSequence {
+    const encoded = encoder.encode(text);
+    //return new ByteSequence(encoded.buffer);// Node.jsのBufferを返すエンコーダーだとプールが余計
+    return ByteSequence.from(encoded);
+  }
+
+  /**
+   * バイト列を指定した復号器で復号し、文字列を返却
+   * 
+   * @param encodingName 文字符号化方式名
+   * @param decoder 復号器
+   * @returns 文字列
+   */
+  textDecodeTo(decoder: { decode: (input?: BufferSource) => string } = utf8TextDecoder): string {
+    return decoder.decode(this.view);
+  }
+
+
+
+
+
+
+
+
+  static createStreamReadingProgress(stream: ReadableStream<Uint8Array>, options?: TransferOptions): TransferProgress<ByteSequence> {
+    const reader: ReadableStreamDefaultReader<Uint8Array> = stream.getReader();
+    const totalUnitCount: number | undefined = ((typeof options?.total === "number") && NumberUtils.isNonNegativeInteger(options.total)) ? options.total : undefined;
+    const buffer: ByteBuffer = new ByteBuffer(totalUnitCount);
+
+    return new TransferProgress<Uint8Array, ByteSequence>({
+      chunkGenerator: StreamUtils.streamToAsyncGenerator<Uint8Array>(reader),
+
+      transferChunk(chunkBytes: Uint8Array): number {
+        buffer.put(chunkBytes);
+        return buffer.position;
+      },
+
+      terminate(): void {
+        // this.#stream.cancel()しても読取終了まで待ちになるので、reader.cancel()する
+        void reader.cancel().catch(); // XXX closeで良い？
+      },
+
+      transferredResult(): ByteSequence {
+        let bytes: Uint8Array;
+        if (buffer.capacity !== buffer.position) {
+          bytes = buffer.slice();
+        }
+        else {
+          bytes = buffer.subarray();
+        }
+        return new ByteSequence(bytes.buffer);
+      },
+    }, options);
+  }
+
+  /**
    * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
    * 
    * @experimental
-   * @param stream 可読ストリーム
-   *     ※NodeJS.ReadStreamの場合、チャンクがBufferのストリーム
-   * @param totalByteCount ストリームから読み取るバイト数
-   * @param options 読み取りオプション
+   * @param stream - Uint8Arrayの可読ストリーム
+   * @param totalByteCount - ストリームから読み取るバイト数
    * @returns 生成したインスタンス
    */
-  static async fromByteStream(stream: ReadableStreamType, totalByteCount?: number, options?: StreamReadOptions): Promise<ByteSequence> {
-    if (typeof totalByteCount === "number") {
-      if (Number.isSafeInteger(totalByteCount) !== true) {
-        throw new TypeError("totalByteCount");
-      }
-      if (totalByteCount < 0) {
-        throw new RangeError("totalByteCount");
-      }
-    }
-
-    // 読取
-    const bytes = await StreamReader.read(stream, totalByteCount, options);
-    return ByteSequence.from(bytes); // bytes.bufferには未使用領域がある可能性がある為、複製して未使用領域は切り捨てる
-  }
-
-  // -----------------------------------------------------------------
-  // Text
-  // -----------------------------------------------------------------
-
-  /**
-   * 文字列を指定した符号化方式で符号化したバイト列からインスタンスを生成し返却
-   * 
-   * @param text 文字列
-   * @param encodingName 文字符号化方式名
-   * @param options 文字符号化方式オプション
-   * @returns 生成したインスタンス
-   */
-  static fromText(text: string, encodingName = "UTF-8", options?: TextEncodeOptions): ByteSequence {
-    const encoding = TextEncoding.for(encodingName);
-    const bytes = encoding.encode(text, options);
+  static async fromStream(stream: ReadableStream<Uint8Array>, totalByteCount?: number): Promise<ByteSequence> {
+    const progress = ByteSequence.createStreamReadingProgress(stream, { total: totalByteCount });
+    const bytes = await progress.initiate();
     return new ByteSequence(bytes.buffer);
   }
 
-  /**
-   * 文字列として復号し、結果の文字列を返却
-   * 
-   * @param encodingName 文字符号化方式名
-   * @param options 文字符号化方式オプション
-   * @returns 文字列
-   */
-  asText(encodingName = "UTF-8", options?: TextDecodeOptions): string {
-    const encoding = TextEncoding.for(encodingName);
-    return encoding.decode(this.view(), options);
-  }
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 Object.freeze(ByteSequence);
+
+
 
 export { ByteSequence };
