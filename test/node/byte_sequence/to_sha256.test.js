@@ -2,13 +2,12 @@ import assert from "node:assert";
 import { ByteSequence } from "../../../node/index.mjs";
 
 describe("ByteSequence.prototype.toSha256", () => {
-  const bs0 = ByteSequence.create(0);
+  const bs0 = ByteSequence.allocate(0);
 
   it("toSha256()", async () => {
     const s1 = await bs0.toSha256();
-    assert.strictEqual(s1.format(), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+    assert.strictEqual(s1.format(), "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855");
 
-    // 結果の妥当性はエンコーディングクラスのテストにて確認
   });
 
 });

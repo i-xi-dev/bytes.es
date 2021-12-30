@@ -91,6 +91,27 @@ describe("ByteSequence.wrap", () => {
 
   });
 
+  it("wrap(Uint8Array)", () => {
+    const bytes0 = new Uint8Array(0);
+    const bytes1 = Uint8Array.of(255, 254, 1, 0, 100);
+
+    const bs0 = ByteSequence.wrap(bytes0);
+    const bs1 = ByteSequence.wrap(bytes1);
+
+    expect(bs0 instanceof ByteSequence).toBe(true);
+    expect(bs0.count).toBe(0);
+    expect(bs1.count).toBe(5);
+  });
+
+  it("wrap(*)", () => {
+    expect(() => {
+      ByteSequence.wrap([] as unknown as Uint8Array);
+    }).toThrowError({
+      name: "TypeError",
+      message: "bytes"
+    });
+  });
+
   it("コンストラクターに渡したArrayBufferへの操作は、自身に影響する", () => {
     const bytes1 = Uint8Array.of(255, 254, 1, 0, 100);
 
@@ -556,6 +577,17 @@ describe("ByteSequence.prototype.toJSON", () => {
     const a2: uint8[] = [1,2,3,4,5];
     const bs2 = ByteSequence.from(a2);
     expect(JSON.stringify(a2)).toBe(JSON.stringify(bs2.toJSON()));
+
+  });
+
+});
+
+describe("ByteSequence.prototype.toSha256", () => {
+  const bs0 = ByteSequence.allocate(0);
+
+  it("toSha256()", async () => {
+    const s1 = await bs0.toSha256();
+    expect(s1.format()).toBe("E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855");
 
   });
 

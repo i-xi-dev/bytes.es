@@ -7,11 +7,32 @@ describe("ByteSequence.wrap", () => {
     const bytes1 = Uint8Array.of(255, 254, 1, 0, 100);
 
     const bs0 = ByteSequence.wrap(bytes0.buffer);
-    const bs1 = ByteSequence.wrap(bytes1.buffer);  
+    const bs1 = ByteSequence.wrap(bytes1.buffer);
 
     assert.strictEqual(bs0 instanceof ByteSequence, true);
     assert.strictEqual(bs0.count, 0);
     assert.strictEqual(bs1.count, 5);
+  });
+
+  it("wrap(Uint8Array)", () => {
+    const bytes0 = new Uint8Array(0);
+    const bytes1 = Uint8Array.of(255, 254, 1, 0, 100);
+
+    const bs0 = ByteSequence.wrap(bytes0);
+    const bs1 = ByteSequence.wrap(bytes1);
+
+    assert.strictEqual(bs0 instanceof ByteSequence, true);
+    assert.strictEqual(bs0.count, 0);
+    assert.strictEqual(bs1.count, 5);
+  });
+
+  it("wrap(*)", () => {
+    assert.throws(() => {
+      ByteSequence.wrap([]);
+    }, {
+      message: "bytes"
+    });
+
   });
 
   it("コンストラクターに渡したArrayBufferへの操作は、自身に影響する", () => {
