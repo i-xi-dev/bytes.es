@@ -1,5 +1,8 @@
 import assert from "node:assert";
 import { createHash } from "node:crypto";
+import fs from "node:fs";
+import { Readable } from "node:stream";
+import { ReadableStream } from "node:stream/web";
 import iconv from "iconv-lite";
 import { ByteSequence } from "./byte_sequence";
 import { uint8 } from "./index";
@@ -1029,4 +1032,135 @@ describe("ByteSequence.prototype.textDecodeTo", () => {
 
 });
 
-//TODO
+declare interface Temp1 {
+  toWeb(s: fs.ReadStream): ReadableStream<Uint8Array>;
+}
+
+describe("ByteSequence.createStreamReadingProgress", () => {
+  it("createStreamReadingProgress(ReadableStream)", async () => {
+    const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
+    const p = ByteSequence.createStreamReadingProgress(stream);
+    assert.strictEqual(p.total, undefined);
+    assert.strictEqual(p.loaded, 0);
+    assert.strictEqual(p.indeterminate, true);
+    assert.strictEqual(p.percentage, 0);
+    const r = await p.initiate();
+    assert.strictEqual(p.total, undefined);
+    assert.strictEqual(p.loaded, 128);
+    assert.strictEqual(p.indeterminate, true);
+    assert.strictEqual(p.percentage, 0);
+    assert.strictEqual(r.count, 128);
+
+  });
+
+  it("createStreamReadingProgress(ReadableStream, {total:number})", async () => {
+    const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
+    const p = ByteSequence.createStreamReadingProgress(stream, {total:128});
+    assert.strictEqual(p.total, 128);
+    assert.strictEqual(p.loaded, 0);
+    assert.strictEqual(p.indeterminate, false);
+    assert.strictEqual(p.percentage, 0);
+    const r = await p.initiate();
+    assert.strictEqual(p.total, 128);
+    assert.strictEqual(p.loaded, 128);
+    assert.strictEqual(p.indeterminate, false);
+    assert.strictEqual(p.percentage, 100);
+    assert.strictEqual(r.count, 128);
+
+  });
+
+  it("createStreamReadingProgress(ReadableStream, {timeout:number})", async () => {
+    let ti: NodeJS.Timeout;
+    const s = new ReadableStream<Uint8Array>({
+      start(controller: ReadableStreamDefaultController) {
+        let c = 0;
+        ti = setInterval(() => {
+          if (c >= 10) {
+            clearInterval(ti);
+            controller.close();
+            return;
+          }
+          c = c + 1;
+          try {
+            controller.enqueue(Uint8Array.of(1,2));
+          }
+          catch (ex) {
+            clearInterval(ti);
+            return;
+          }
+
+        }, 100);
+      },
+    });
+
+    const p = ByteSequence.createStreamReadingProgress(s, {timeout:250});
+    assert.strictEqual(p.total, undefined);
+    assert.strictEqual(p.loaded, 0);
+    assert.strictEqual(p.indeterminate, true);
+    assert.strictEqual(p.percentage, 0);
+    let r;
+    try {
+      r = await p.initiate();
+      assert.strictEqual(true, false);
+    }
+    catch (exception) {
+      assert.strictEqual((exception as Error).name, "TimeoutError");
+    }
+    assert.strictEqual(p.total, undefined);
+    assert.strictEqual(p.loaded, 4);
+    assert.strictEqual(p.indeterminate, true);
+    assert.strictEqual(p.percentage, 0);
+    //assert.strictEqual(r.count, 4);
+
+  });
+
+  it("createStreamReadingProgress(ReadableStream, {timeout:number}) - 2", async () => {
+    const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/4096.txt", { highWaterMark: 64 }));
+    const p = ByteSequence.createStreamReadingProgress(stream, {timeout:4});
+    assert.strictEqual(p.total, undefined);
+    assert.strictEqual(p.loaded, 0);
+    assert.strictEqual(p.indeterminate, true);
+    assert.strictEqual(p.percentage, 0);
+    let r;
+    try {
+      r = await p.initiate();
+      assert.strictEqual(true, false);
+    }
+    catch (exception) {
+      assert.strictEqual((exception as Error).name, "TimeoutError");
+    }
+    assert.strictEqual(p.total, undefined);
+    assert.strictEqual(p.loaded > 0, true);
+    console.log(p.loaded)
+    assert.strictEqual(p.indeterminate, true);
+    assert.strictEqual(p.percentage, 0);
+    //assert.strictEqual(r.count, 4);
+
+  });
+
+});
+
+describe("ByteSequence.fromStream", () => {
+  it("fromStream(ReadableStream)", async () => {
+    const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
+    const r = await ByteSequence.fromStream(stream);
+    assert.strictEqual(r.count, 128);
+
+  });
+
+  it("fromStream(ReadableStream)", async () => {
+    const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
+    const r = await ByteSequence.fromStream(stream, 128);
+    assert.strictEqual(r.count, 128);
+
+    const stream2 = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
+    const r2 = await ByteSequence.fromStream(stream2, 64);
+    assert.strictEqual(r2.count, 128);
+
+    const stream3 = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
+    const r3 = await ByteSequence.fromStream(stream3, 512);
+    assert.strictEqual(r3.count, 128);
+
+  });
+
+});

@@ -541,15 +541,6 @@ class ByteSequence {
     return decoder.decode(this.view);
   }
 
-//TODO
-
-
-
-
-
-
-
-
   static createStreamReadingProgress(stream: ReadableStream<Uint8Array>, options?: TransferOptions): TransferProgress<ByteSequence> {
     const reader: ReadableStreamDefaultReader<Uint8Array> = stream.getReader();
     const totalUnitCount: number | undefined = ((typeof options?.total === "number") && NumberUtils.isNonNegativeInteger(options.total)) ? options.total : undefined;
@@ -594,23 +585,7 @@ class ByteSequence {
     const bytes = await progress.initiate();
     return new ByteSequence(bytes.buffer);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 Object.freeze(ByteSequence);
-
-
 
 export { ByteSequence };
