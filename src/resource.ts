@@ -25,7 +25,7 @@ const {
  * @param value Headers#getで取得した値
  * @returns 分割結果
  */
- function splitWebHeaderValue(value: string): Array<string> {
+function splitWebHeaderValue(value: string): Array<string> {
   const notU0022OrU002C = "\\u0022\\u002C";
   const values: Array<string> = [];
   let work = value;
@@ -53,7 +53,7 @@ const {
  * @param headers ヘッダー
  * @returns Content-Typeの値から生成したMediaTypeインスタンス
  */
- function extractContentType(headers: Headers): MediaType {
+function extractContentType(headers: Headers): MediaType {
   // 5.
   if (headers.has("Content-Type") !== true) {
     throw new Error("Content-Type field not found");
@@ -67,8 +67,8 @@ const {
   }
 
   // 1, 2, 3.
-  let textEncoding: string = "";
-  let mediaTypeEssence: string = "";
+  let textEncoding = "";
+  let mediaTypeEssence = "";
   let mediaType: MediaType | null = null;
   // 6.
   for (const typeString of typeStrings) {
@@ -93,12 +93,12 @@ const {
       else {
         // 6.5.
         if ((mediaType.hasParameter("charset") !== true) && (textEncoding !== "")) {
-          //TODO mediaType.withParameters()
+          // TODO mediaType.withParameters()
         }
       }
     }
     catch (exception) {
-      console.log(exception)//TODO 消す
+      console.log(exception);// TODO 消す
       // 6.2. "*/*"はMediaType.fromStringでエラーにしている
       continue;
     }
@@ -178,7 +178,7 @@ type HttpMessage = Request | Response;
 type HttpMessageReadingOptions = {
   ignoreHttpStatus: boolean,
   readAs: "blob" | "stream",
-};//TODO default options
+};// TODO default options
 
 /**
  * ファイル様オブジェクト
@@ -247,7 +247,7 @@ class Resource {
     }
     catch (exception) {
       // NotFoundError | SecurityError | NotReadableError
-      //TODO throw new Error("reading failed", { cause: exception });
+      // TODO throw new Error("reading failed", { cause: exception });
       throw new Error("reading failed");
     }
   }
@@ -383,7 +383,7 @@ class Resource {
     if (message.body) {
       if (message instanceof Response) {
         if ((message.ok !== true) && (options.ignoreHttpStatus !== true)) {
-          throw new Error(`HTTP status: ${ message.status }`)
+          throw new Error(`HTTP status: ${ message.status }`);
         }
       }
 

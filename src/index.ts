@@ -21,4 +21,4 @@ export {
 } from "@i-xi-dev/percent";
 
 export { ByteSequence } from "./byte_sequence";
-// export { Resource } from "./resource";
+export { Resource } from "./resource";

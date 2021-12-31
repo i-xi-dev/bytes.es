@@ -526,7 +526,7 @@ class ByteSequence {
    */
   static textEncodeFrom(text: string, encoder: { encode: (input?: string) => Uint8Array } = utf8TextEncoder): ByteSequence {
     const encoded = encoder.encode(text);
-    //return new ByteSequence(encoded.buffer);// Node.jsのBufferを返すエンコーダーだとプールが余計
+    // return new ByteSequence(encoded.buffer);// Node.jsのBufferを返すエンコーダーだとプールが余計
     return ByteSequence.from(encoded);
   }
 
