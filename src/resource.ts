@@ -1,14 +1,13 @@
 // //
 
-import { StringUtils } from "@i-xi-dev/fundamental";
-import { MediaType } from "@i-xi-dev/mimetype";
-// import { Exception, httpQuotedString, RangePattern } from "./_";
 import {
-  DigestAlgorithm,
+  type DigestAlgorithm,
   Sha256,
   Sha384,
   Sha512,
-} from "./digest_algorithm";
+  StringUtils,
+} from "@i-xi-dev/fundamental";
+import { MediaType } from "@i-xi-dev/mimetype";
 import { ByteSequence } from "./byte_sequence";
 
 const {
@@ -27,7 +26,7 @@ class Resource {
   /**
    * バイト列
    */
-  #bytes: ByteSequence;
+  #data: ByteSequence;
 
   /**
    * @param mediaType メディアタイプ
@@ -35,7 +34,7 @@ class Resource {
    */
   protected constructor(mediaType: MediaType, bytes: ByteSequence) {
     this.#mediaType = mediaType;
-    this.#bytes = bytes;
+    this.#data = bytes;
     // Object.freeze(this);
   }
 
@@ -50,14 +49,14 @@ class Resource {
    * バイト列
    */
   get bytes(): ByteSequence {
-    return this.#bytes;
+    return this.#data;
   }
 
   /**
    * サイズ（バイト列のバイト数）
    */
   get size(): number {
-    return this.#bytes.count;
+    return this.#data.count;
   }
 
   /**
@@ -76,17 +75,13 @@ class Resource {
       else {
         mediaType = MediaType.fromString("application/octet-stream");
       }
-      const bytes = new ByteSequence(buffer);
+      const bytes = ByteSequence.wrap(buffer);
 
       return new Resource(mediaType, bytes);
     }
     catch (exception) {
       // NotFoundError | SecurityError | NotReadableError
-      const causes = [];
-      if (exception instanceof Error) {
-        causes.push(exception);
-      }
-      throw new Exception("Error", "reading failed", causes);
+      throw new Error("reading failed", { cause: exception });
     }
   }
 
@@ -96,7 +91,7 @@ class Resource {
    * @returns Blob
    */
   toBlob(): Blob {
-    return new Blob([ this.#bytes.buffer ], {
+    return new Blob([ this.#data.buffer ], {
       type: this.#mediaType.toString(),
     });
   }
@@ -128,7 +123,7 @@ class Resource {
 
     // 5, 6, 7
     if (bodyStringWork.includes(",") !== true) {
-      throw new Exception("DataError", "U+002C not found");
+      throw new TypeError("U+002C not found");
     }
 
     const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
@@ -183,9 +178,21 @@ class Resource {
    */
   toDataURL(): URL {
     const encoding = ";base64";
-    const dataEncoded = this.#bytes.toBase64Encoded();
+    const dataEncoded = this.#data.toBase64Encoded();
 
     return new URL("data:" + this.#mediaType.toString() + encoding + "," + dataEncoded);
+  }
+
+  async toSha256Integrity(): Promise<string> {
+    return this.#toIntegrity(Sha256, "sha256-");
+  }
+
+  async toSha384Integrity(): Promise<string> {
+    return this.#toIntegrity(Sha384, "sha384-");
+  }
+
+  async toSha512Integrity(): Promise<string> {
+    return this.#toIntegrity(Sha512, "sha512-");
   }
 
   /**
@@ -196,23 +203,9 @@ class Resource {
    * @returns The {@link [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)} that
    *     fulfills with a SRI integrity (base64-encoded digest).
    */
-  async integrity(algorithm: DigestAlgorithm): Promise<string> {
-    let prefix = "";
-    if (algorithm === Sha256) {
-      prefix = "sha256-";
-    }
-    else if (algorithm === Sha384) {
-      prefix = "sha384-";
-    }
-    else if (algorithm === Sha512) {
-      prefix = "sha512-";
-    }
-
-    if (prefix.length <= 0) {
-      throw new TypeError("algorithm");
-    }
-
-    const digestBytes = await this.#bytes.toDigest(algorithm);
+  async #toIntegrity(algorithm: DigestAlgorithm, prefix: string): Promise<string> {
+    // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
+    const digestBytes = await this.#data.toDigest(algorithm);
     return prefix + digestBytes.toBase64Encoded();
   }
 
