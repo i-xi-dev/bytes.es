@@ -122,6 +122,22 @@ const {
  * @returns Content-Lengthの値から生成した数値、取得できなかった場合はnull
  */
 function extractContentLength(headers: Headers): number | null {
+  // 当ファイルの処理において、圧縮や分割されている場合はContent-Lengthの値は必要ない為nullを返す
+  // ヘッダーフィールドの値がコンマ区切りリストの場合は内容にかかわらず圧縮か分割がされているとみなす
+  if (headers.has("Content-Encoding")) {
+    const contentEncoding = headers.get("Content-Encoding") as string;
+    if (contentEncoding.toLowerCase() !== "identity") {
+      return null;
+    }
+  }
+  if (headers.has("Transfer-Encoding")) {
+    const transferEncoding = headers.get("Transfer-Encoding") as string;
+    if (transferEncoding.toLowerCase() !== "identity") {
+      return null;
+    }
+  }
+  // 以降はFetch standardの仕様通りに取得
+
   // 2.
   if (headers.has("Content-Length") !== true) {
     return null;
@@ -155,10 +171,6 @@ function extractContentLength(headers: Headers): number | null {
   }
   // 6.
   return Number.parseInt(candidateValue, 10);
-}
-
-function isCompressed(message: Request | Response): boolean {
-  //
 }
 
 type HttpMessage = Request | Response;
@@ -235,7 +247,8 @@ class Resource {
     }
     catch (exception) {
       // NotFoundError | SecurityError | NotReadableError
-      throw new Error("reading failed", { cause: exception });
+      //TODO throw new Error("reading failed", { cause: exception });
+      throw new Error("reading failed");
     }
   }
 
@@ -381,10 +394,12 @@ class Resource {
 
       const mediaType = extractContentType(message.headers);
       if (message.body !== null) {
-        let size: number | null = null;
-        if (isCompressed(message) !== true) {
-          size = extractContentLength(message.headers);
-        }
+        // メモ
+        // ・Transfer-Encodingがchunkedであってもfetch API側でまとめてくれるので、考慮不要
+        // ・Content-Encodingで圧縮されていてもfetch API側で展開してくれるので、展開は考慮不要
+        //    ただしその場合、Content-Lengthは展開結果のバイト数ではない
+
+        const size = extractContentLength(message.headers);
         const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
         return new Resource(mediaType, bytes);
       }
