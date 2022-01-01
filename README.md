@@ -109,15 +109,9 @@ const decoded = ByteSequence.fromBase64Encoded("aGVsbG8=");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
 
-###### Base64 options
-```javascript
-const decoded = ByteSequence.fromBase64Encoded("aGVsbG8=", options);
-```
-The `options` object is same interface as [@i-xi-dev/base64 encoding options](https://www.npmjs.com/package/@i-xi-dev/base64#encoding-options).
-
 ##### Creating an instance by decoding the percent encoded
 ```javascript
-const decoded = ByteSequence.fromPercent("%68%65%6C%6C%6F");
+const decoded = ByteSequence.fromPercentEncoded("%68%65%6C%6C%6F");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
 
@@ -239,13 +233,14 @@ const formatted8 = bytes.format({ separator: "   " });
 const bytes = ByteSequence.fromBinaryString("hello");
 
 // Base64 encode
-const base64Encoded = bytes.toBase64();
+const base64Encoded = bytes.toBase64Encoded();
 // → "aGVsbG8="
 ```
 
 ##### Base64 options
 ```javascript
-const base64Encoded = bytes.toBase64(options);
+const decoded = ByteSequence.fromBase64Encoded("aGVsbG8=", options);
+const base64Encoded = bytes.toBase64Encoded(options);
 ```
 The `options` object is same interface as [@i-xi-dev/base64 encoding options](https://www.npmjs.com/package/@i-xi-dev/base64#encoding-options).
 
