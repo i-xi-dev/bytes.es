@@ -378,6 +378,7 @@ class Resource {
 
   /**
    * @experimental
+   * TODO signal,timeout
    */
   static async fromHttpMessage(message: HttpMessage, options: HttpMessageReadingOptions): Promise<Resource | null> {
     if (message.body) {
