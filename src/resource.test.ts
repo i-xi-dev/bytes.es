@@ -51,6 +51,17 @@ describe("Resource.fromBlob", () => {
     assert.strictEqual(b11.size, 4);
     assert.strictEqual(b11.mediaType.toString(), "text/plain");
 
+    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
+
+    const b21 = await Resource.fromBlob(b2);
+    const b21v = b21.data.view;
+    assert.strictEqual(b21v[0], 255);
+    assert.strictEqual(b21v[1], 0);
+    assert.strictEqual(b21v[2], 1);
+    assert.strictEqual(b21v[3], 127);
+    assert.strictEqual(b21.size, 4);
+    assert.strictEqual(b21.mediaType.toString(), "application/octet-stream");
+
   });
 
 });
@@ -230,3 +241,5 @@ describe("Resource.prototype.toSha512Integrity", () => {
   });
 
 });
+
+//TODO fromHttpMessage
