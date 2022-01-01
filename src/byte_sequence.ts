@@ -15,6 +15,7 @@ import {
   Sha384,
   Sha512,
   StreamUtils,
+  StringUtils,
   TransferProgress,
   Uint8,
 } from "@i-xi-dev/fundamental";
@@ -30,6 +31,11 @@ import {
 } from "@i-xi-dev/percent";
 
 import { MediaType } from "@i-xi-dev/mimetype";
+
+const {
+  ASCII_WHITESPACE,
+  HTTP_TAB_OR_SPACE,
+} = StringUtils.RangePattern;
 
 /**
  * バイト列を表す整数の配列
@@ -50,6 +56,13 @@ type Metadata = {
   // ...
 }
 
+const metadataRegistry = new WeakMap<ByteSequence, Metadata>();
+
+function mediaTypeOf(bytes: ByteSequence): MediaType | null {
+  const mediaType = metadataRegistry.get(bytes)?.mediaType;
+  return mediaType ? mediaType : null;
+}
+
 /**
  * バイト列
  */
@@ -60,11 +73,6 @@ class ByteSequence {
   #buffer: ArrayBuffer;
 
   /**
-   * メタデータ
-   */
-  #metadata: Metadata;
-  
-  /**
    * ArrayBufferをラップするインスタンスを生成
    *     ※外部からのArrayBufferの変更は当インスタンスに影響する
    */
@@ -74,9 +82,6 @@ class ByteSequence {
     // }
     console.assert(bytes instanceof ArrayBuffer);
     this.#buffer = bytes;
-    this.#metadata = {
-      mediaType: null,
-    };
     Object.freeze(this);
   }
 
@@ -614,12 +619,17 @@ class ByteSequence {
     try {
       const buffer = await blob.arrayBuffer(); // XXX Node.jsでもstream()を取得できるようになった
       const bytes = ByteSequence.wrap(buffer);
-      bytes.mediaType = blob.type;
+      if (blob.type) {
+        const mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
+        metadataRegistry.set(bytes, { mediaType });
+      }
 
       return bytes;
     }
     catch (exception) {
-      // NotFoundError | SecurityError | NotReadableError
+      // Blob#arrayBufferでの NotFoundError | SecurityError | NotReadableError
+      // またはMediaTypeのパース失敗
+
       // TODO throw new Error("reading failed", { cause: exception });
       throw new Error("reading failed");
     }
@@ -630,34 +640,135 @@ class ByteSequence {
    * 
    * @returns Blob
    */
-  toBlob(): Blob {
-    const type: string = this.mediaType;
+  toBlob(preferredType?: MediaType | string): Blob {
+    const resolvedType: MediaType | null = this.#resolveMediaType(preferredType);
     let options: BlobPropertyBag | undefined;
-    if (type) {
-      options = { type, };
+    if (resolvedType) {
+      options = { type: resolvedType.toString() };
     }
     return new Blob([ this.#buffer ], options);
   }
 
-
-
-
-
-  //TODO 
-  get mediaType(): string {
-    if (this.#metadata.mediaType instanceof MediaType) {
-      return this.#metadata.mediaType.toString();
+  #resolveMediaType(preferredType?: MediaType | string): MediaType | null {
+    if (typeof preferredType === "string") {
+      return MediaType.fromString(preferredType);
     }
-    return "";
-  }
-
-  set mediaType(value: string) {
-    if (value) {
-      this.#metadata.mediaType = MediaType.fromString(value);
+    else if (preferredType instanceof MediaType) {
+      return preferredType;
     }
     else {
-      this.#metadata.mediaType = null;
+      return mediaTypeOf(this);
     }
+  }
+
+  /**
+   * Data URLからインスタンスを生成し返却
+   * 
+   * {@link [Fetch Standard](https://fetch.spec.whatwg.org/#data-urls)}の仕様に従った。
+   * 最初に出現した","をメディアタイプとデータの区切りとみなす。（メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする）
+   * クエリはデータの一部とみなす。
+   * 
+   * @param dataUrl Data URL
+   * @returns 生成したインスタンス
+   */
+  static fromDataURL(dataUrl: URL | string): ByteSequence {
+    let parsed: URL;
+    try {
+      parsed = new URL(dataUrl);
+    }
+    catch (exception) {
+      throw new TypeError("dataUrl parse error");
+    }
+
+    // 1 
+    if (parsed.protocol !== "data:") {
+      throw new TypeError(`URL scheme is not "data"`);
+    }
+
+    // 2
+    parsed.hash = "";
+
+    // 3, 4
+    let bodyStringWork = parsed.toString().substring(5);
+
+    // 5, 6, 7
+    if (bodyStringWork.includes(",") !== true) {
+      throw new TypeError("U+002C not found");
+    }
+
+    const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
+    let mediaTypeWork = StringUtils.trim(mediaTypeOriginal, ASCII_WHITESPACE);
+
+    // 8, 9
+    bodyStringWork = bodyStringWork.substring(mediaTypeOriginal.length + 1);
+
+    // 10
+    let bytes = ByteSequence.fromPercentEncoded(bodyStringWork);
+
+    // 11
+    const base64Indicator = /;[\u0020]*base64$/i;
+    const base64: boolean = base64Indicator.test(mediaTypeWork);
+    if (base64 === true) {
+      // 11.1
+      bodyStringWork = bytes.toBinaryString();
+
+      // 11.2, 11.3
+      bytes = ByteSequence.fromBase64Encoded(bodyStringWork);
+
+      // 11.4, 11.5, 11.6
+      mediaTypeWork = mediaTypeWork.replace(base64Indicator, "");
+    }
+
+    // 12
+    if (mediaTypeWork.startsWith(";")) {
+      mediaTypeWork = "text/plain" + mediaTypeWork;
+    }
+
+    // 13, 14
+    let mediaType: MediaType;
+    try {
+      mediaType = MediaType.fromString(mediaTypeWork);
+    }
+    catch (exception) {
+      void exception;
+      mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
+    }
+    metadataRegistry.set(bytes, { mediaType });
+
+    return bytes;
+  }
+
+  /**
+   * 自身のメディアタイプとバイト列からData URLを生成し返却
+   * 
+   * FileReaderの仕様に倣い、テキストかどうかに関係なく常時Base64エンコードする。
+   * //XXX Base64なしもできるようにする？
+   * 
+   * @returns Data URL
+   */
+  toDataURL(preferredType?: string | MediaType): URL {
+    const resolvedType: MediaType | null = this.#resolveMediaType(preferredType);
+    if (resolvedType) {
+      // let encoding = "";
+      // let dataEncoded: string;
+      // if (base64) {
+      const encoding = ";base64";
+      const dataEncoded = this.toBase64Encoded();
+      // }
+
+      return new URL("data:" + resolvedType.toString() + encoding + "," + dataEncoded);
+    }
+    throw new TypeError("MIME type not resolved");
+  }
+
+
+
+
+  //TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
+
+  get mediaType(): string {
+    const mediaType = mediaTypeOf(this);
+    return mediaType ? mediaType.toString() : "";
   }
 
 }
