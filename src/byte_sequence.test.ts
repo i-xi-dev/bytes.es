@@ -1203,3 +1203,31 @@ describe("ByteSequence.fromStream", () => {
   });
 
 });
+
+describe("ByteSequence.fromBlob", () => {
+  it("fromBlob(blob)", async () => {
+    const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11v = b11.view;
+    assert.strictEqual(b11v[0], 255);
+    assert.strictEqual(b11v[1], 0);
+    assert.strictEqual(b11v[2], 1);
+    assert.strictEqual(b11v[3], 127);
+    assert.strictEqual(b11.count, 4);
+    assert.strictEqual(b11.mediaType, "text/plain");
+
+    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
+
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21v = b21.view;
+    assert.strictEqual(b21v[0], 255);
+    assert.strictEqual(b21v[1], 0);
+    assert.strictEqual(b21v[2], 1);
+    assert.strictEqual(b21v[3], 127);
+    assert.strictEqual(b21.count, 4);
+    assert.strictEqual(b21.mediaType, "");
+
+  });
+
+});

@@ -29,6 +29,8 @@ import {
   Percent,
 } from "@i-xi-dev/percent";
 
+import { MediaType } from "@i-xi-dev/mimetype";
+
 /**
  * バイト列を表す整数の配列
  */
@@ -43,6 +45,11 @@ const utf8TextEncoder = new TextEncoder();
 
 const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true });
 
+type Metadata = {
+  mediaType: MediaType | null,
+  // ...
+}
+
 /**
  * バイト列
  */
@@ -53,6 +60,11 @@ class ByteSequence {
   #buffer: ArrayBuffer;
 
   /**
+   * メタデータ
+   */
+  #metadata: Metadata;
+  
+  /**
    * ArrayBufferをラップするインスタンスを生成
    *     ※外部からのArrayBufferの変更は当インスタンスに影響する
    */
@@ -62,6 +74,9 @@ class ByteSequence {
     // }
     console.assert(bytes instanceof ArrayBuffer);
     this.#buffer = bytes;
+    this.#metadata = {
+      mediaType: null,
+    };
     Object.freeze(this);
   }
 
@@ -588,6 +603,63 @@ class ByteSequence {
     const bytes = await progress.initiate();
     return new ByteSequence(bytes.buffer);
   }
+
+  /**
+   * Blobからインスタンスを生成し返却
+   * 
+   * @param blob Blob
+   * @returns 生成したインスタンス
+   */
+   static async fromBlob(blob: Blob): Promise<ByteSequence> {
+    try {
+      const buffer = await blob.arrayBuffer(); // XXX Node.jsでもstream()を取得できるようになった
+      const bytes = ByteSequence.wrap(buffer);
+      bytes.mediaType = blob.type;
+
+      return bytes;
+    }
+    catch (exception) {
+      // NotFoundError | SecurityError | NotReadableError
+      // TODO throw new Error("reading failed", { cause: exception });
+      throw new Error("reading failed");
+    }
+  }
+
+  /**
+   * 自身のメディアタイプとバイト列からBlobを生成し返却
+   * 
+   * @returns Blob
+   */
+  toBlob(): Blob {
+    const type: string = this.mediaType;
+    let options: BlobPropertyBag | undefined;
+    if (type) {
+      options = { type, };
+    }
+    return new Blob([ this.#buffer ], options);
+  }
+
+
+
+
+
+  //TODO 
+  get mediaType(): string {
+    if (this.#metadata.mediaType instanceof MediaType) {
+      return this.#metadata.mediaType.toString();
+    }
+    return "";
+  }
+
+  set mediaType(value: string) {
+    if (value) {
+      this.#metadata.mediaType = MediaType.fromString(value);
+    }
+    else {
+      this.#metadata.mediaType = null;
+    }
+  }
+
 }
 Object.freeze(ByteSequence);
 
