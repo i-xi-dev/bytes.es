@@ -3,6 +3,9 @@
 const { webcrypto } = require("node:crypto");
 globalThis.crypto = webcrypto;
 
+const { Blob } = require("node:buffer");
+globalThis.Blob = Blob;
+
 // globalThisがNodeのと違うのでimportしないと使えないもの
 const { performance } = require("node:perf_hooks");
 globalThis.performance = performance;
