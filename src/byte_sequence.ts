@@ -32,6 +32,8 @@ import {
 
 import { MediaType } from "@i-xi-dev/mimetype";
 
+import { WebMessageUtils } from "./web_message_utils";
+
 const {
   ASCII_WHITESPACE,
   HTTP_TAB_OR_SPACE,
@@ -53,7 +55,7 @@ const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true });
 
 type Metadata = {
   mediaType: MediaType | null,
-  // ...
+  // fileName, ...
 }
 
 const metadataRegistry = new WeakMap<ByteSequence, Metadata>();
@@ -62,6 +64,13 @@ function mediaTypeOf(bytes: ByteSequence): MediaType | null {
   const mediaType = metadataRegistry.get(bytes)?.mediaType;
   return mediaType ? mediaType : null;
 }
+
+type WebMessage = Request | Response;
+
+type WebMessageReadingOptions = {
+  ignoreHttpStatus: boolean,
+  readAs: "blob" | "stream",
+};// TODO default options
 
 /**
  * バイト列
@@ -785,6 +794,47 @@ class ByteSequence {
 
   async toSha512Integrity(): Promise<string> {
     return this.#toIntegrity(Sha512, "sha512-");
+  }
+
+  /**
+   * 想定用途
+   * ・ブラウザのfetchでのResponseのcontent取得
+   * ・DenoのfetchでのResponseのcontent取得
+   * ・Denoのstd/httpでのRequestのcontent取得
+   * など
+   * 
+   * @experimental
+   * TODO options を任意に
+   * TODO signal,timeout
+   * TODO createReadingProgress
+   */
+  static async fromWebMessage(message: WebMessage, options: WebMessageReadingOptions): Promise<ByteSequence | null> {
+    if (message.body) {
+      if (message instanceof Response) {
+        if ((message.ok !== true) && (options.ignoreHttpStatus !== true)) {
+          throw new Error(`HTTP status: ${ message.status }`);
+        }
+      }
+
+      if (options.readAs === "blob") {
+        const blob = await message.blob();
+        return ByteSequence.fromBlob(blob);
+      }
+
+      const mediaType = WebMessageUtils.extractContentType(message.headers);
+      if (message.body !== null) {
+        // メモ
+        // ・Transfer-Encodingがchunkedであってもfetch API側でまとめてくれるので、考慮不要
+        // ・Content-Encodingで圧縮されていてもfetch API側で展開してくれるので、展開は考慮不要
+        //    ただしその場合、Content-Lengthは展開結果のバイト数ではない
+
+        const size = WebMessageUtils.extractContentLength(message.headers);
+        const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
+        metadataRegistry.set(bytes, { mediaType });
+        return bytes;
+      }
+    }
+    return null;
   }
 
 
