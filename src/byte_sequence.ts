@@ -426,7 +426,7 @@ class ByteSequence {
       }
       return true;
     }
-    else if (Array.isArray(otherBytes)) {
+    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => Uint8.isUint8(byte))) {
       for (let i = 0; i < otherBytes.length; i++) {
         if (otherBytes[i] !== thisView[i]) {
           return false;
@@ -481,20 +481,22 @@ class ByteSequence {
    * @param segmentByteCount 分割するバイト数
    * @returns 自身のバイト列の部分複製を返却するジェネレーター
    */
-  *segments(segmentByteCount: number): Generator<ByteSequence, void, void> {
+  segments(segmentByteCount: number): Generator<ByteSequence, void, void> {
     if (NumberUtils.isPositiveInteger(segmentByteCount) !== true) {
       throw new TypeError("segmentByteCount");
     }
 
-    let i = 0;
-    let itemLength = segmentByteCount;
-    while (i < this.count) {
-      if ((i + segmentByteCount) > this.count) {
-        itemLength = this.count - i;
+    return (function*(bytes: ByteSequence): Generator<ByteSequence, void, void> {
+      let i = 0;
+      let itemLength = segmentByteCount;
+      while (i < bytes.count) {
+        if ((i + segmentByteCount) > bytes.count) {
+          itemLength = bytes.count - i;
+        }
+        yield bytes.subsequence(i, i + itemLength);
+        i = i + segmentByteCount;
       }
-      yield this.subsequence(i, i + itemLength);
-      i = i + segmentByteCount;
-    }
+    })(this);
   }
 
   /**

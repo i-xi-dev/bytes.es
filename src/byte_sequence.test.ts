@@ -944,11 +944,35 @@ describe("ByteSequence.prototype.startsWith", () => {
 
   });
 
+  it("startsWith(*)", () => {
+    assert.strictEqual(bs0.startsWith("" as unknown as Uint8Array), false);
+    assert.strictEqual(bs1.startsWith(["255"] as unknown as Uint8Array), false);
+
+  });
+
 });
 
 describe("ByteSequence.prototype.segments", () => {
   it("segments(number)", () => {
     const bs1 = ByteSequence.generateRandom(1000);
+
+    assert.throws(() => {
+      bs1.segments(0);
+    }, {
+      message: "segmentByteCount"
+    });
+
+    assert.throws(() => {
+      bs1.segments(-1);
+    }, {
+      message: "segmentByteCount"
+    });
+
+    assert.throws(() => {
+      bs1.segments(undefined as unknown as number);
+    }, {
+      message: "segmentByteCount"
+    });
 
     const i1 = bs1.segments(100);
     let i = 0;
