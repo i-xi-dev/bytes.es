@@ -57,9 +57,10 @@ class ByteSequence {
    *     ※外部からのArrayBufferの変更は当インスタンスに影響する
    */
   private constructor(bytes: ArrayBuffer) {
-    if ((bytes instanceof ArrayBuffer) !== true) {
-      throw new TypeError("bytes");
-    }
+    // if ((bytes instanceof ArrayBuffer) !== true) {
+    //   throw new TypeError("bytes");
+    // }
+    console.assert(bytes instanceof ArrayBuffer);
     this.#buffer = bytes;
     Object.freeze(this);
   }

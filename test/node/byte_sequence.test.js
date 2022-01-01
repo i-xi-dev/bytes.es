@@ -718,6 +718,18 @@ describe("ByteSequence.prototype.subsequence", () => {
 
     assert.strictEqual(bs1.subsequence(100, 200).toString(), ByteSequence.from(bs1.viewScope(100, 100)).toString());
 
+    assert.throws(() => {
+      bs1.subsequence(1, -1);
+    }, {
+      message: "end"
+    });
+
+    assert.throws(() => {
+      bs1.subsequence(2, 1);
+    }, {
+      message: "end"
+    });
+
   });
 
 });
