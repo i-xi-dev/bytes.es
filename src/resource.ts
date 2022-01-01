@@ -383,6 +383,12 @@ class Resource {
   }
 
   /**
+   * 想定用途
+   * ・ブラウザのfetchでのResponseのcontent取得
+   * ・DenoのfetchでのResponseのcontent取得
+   * ・Denoのstd/httpでのRequestのcontent取得
+   * など
+   * 
    * @experimental
    * TODO signal,timeout
    */

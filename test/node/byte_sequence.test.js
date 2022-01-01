@@ -397,9 +397,12 @@ describe("ByteSequence.prototype.toBinaryString", () => {
 
 describe("ByteSequence.parse", () => {
   it("parse(string)", () => {
-    const bs0 = ByteSequence.parse("41424344");
-    assert.strictEqual(bs0.toString(), "41424344");
+    const bs0 = ByteSequence.parse("41a24344");
+    assert.strictEqual(bs0.toString(), "41A24344");
     assert.strictEqual(ByteSequence.parse("").toString(), "");
+
+    const bs1 = ByteSequence.parse("41a24344");
+    assert.strictEqual(bs1.toString(), "41A24344");
 
     assert.throws(() => {
       ByteSequence.parse("あ");

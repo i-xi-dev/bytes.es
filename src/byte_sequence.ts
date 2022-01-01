@@ -32,7 +32,7 @@ import {
 /**
  * バイト列を表す整数の配列
  */
-type ByteArray = Array<uint8> | BufferSource;
+type ByteArray = Array<number> | BufferSource;
 
 /**
  * バイト列を表すオブジェクト
@@ -178,7 +178,7 @@ class ByteSequence {
    * @param bytes - バイト列を表す整数の配列
    * @returns 生成したインスタンス
    */
-  static of(...bytes: Array<uint8>): ByteSequence {
+  static of(...bytes: Array<number>): ByteSequence {
     return ByteSequence.from(bytes);
   }
 

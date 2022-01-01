@@ -41,14 +41,22 @@ import { ByteSequence, Resource } from "https://unpkg.com/@i-xi-dev/bytes";
 
 ### Creating an instance of `ByteSequence` class
 
-#### Creating an instance that views the specified [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
+#### Creating an instance as a wrapper object for [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
 ```javascript
-const arrayBufferView = new ByteSequence(arrayBuffer);
+// wraps a ArrayBuffer
+const bytes = ByteSequence(arrayBuffer);
+// → arrayBuffer === bytes.buffer → true
+```
+
+```javascript
+// wraps a ArrayBufferView.buffer, ignores byteOffset and byteLength of ArrayBufferView
+const bytes = ByteSequence(uint8Array);
+// → uint8Array.buffer === bytes.buffer → true
 ```
 
 #### Creating an instance with a specific size
 ```javascript
-const zeroFilledBytes = ByteSequence.create(size);
+const zeroFilledBytes = ByteSequence.allocate(size);
 ```
 
 #### Creating an instance filled with random bytes
@@ -58,8 +66,21 @@ const randomBytes = ByteSequence.generateRandom(size);
 
 #### Creating an instance with a new underlying buffer
 ```javascript
-const copiedBytes = ByteSequence.from(uint8Array);
-const copiedBytes2 = ByteSequence.from(copiedBytes);
+// from a Array<number>
+const bytes = ByteSequence.from([1,2,3,4,5,6,7,8]);
+const copiedBytes = ByteSequence.from(bytes);
+// → bytes.buffer !== copiedBytes.buffer
+
+const bytes2 = ByteSequence.of(...[1,2,3,4,5,6,7,8]);
+const copiedBytes2 = ByteSequence.from(bytes2);
+// → bytes2.buffer !== copiedBytes2.buffer
+```
+
+```javascript
+// from a ArrayBufferView
+const bytes = ByteSequence.from(uint8Array);
+const copiedBytes = ByteSequence.from(bytes);
+// → bytes.buffer !== copiedBytes.buffer && uint8Array.buffer !== bytes.buffer
 ```
 
 #### Creating an instance by [isomorphic encoding](https://infra.spec.whatwg.org/#isomorphic-encode) the [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
@@ -67,6 +88,16 @@ const copiedBytes2 = ByteSequence.from(copiedBytes);
 const isomorphicEncoded = ByteSequence.fromBinaryString("hello");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
+
+TODO
+
+
+
+
+
+
+
+
 
 #### Creating an instance by parsing the hexadecimal formatted
 ```javascript
