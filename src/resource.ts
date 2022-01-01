@@ -275,18 +275,24 @@ class Resource {
    * @returns 生成したインスタンス
    */
   static fromDataURL(dataUrl: URL | string): Resource {
-    const uri: URL = new URL(dataUrl);
+    let parsed: URL;
+    try {
+      parsed = new URL(dataUrl);
+    }
+    catch (exception) {
+      throw new TypeError("dataUrl parse error");
+    }
 
     // 1 
-    if (uri.protocol !== "data:") {
-      throw new TypeError("dataUrl");
+    if (parsed.protocol !== "data:") {
+      throw new TypeError(`URL scheme is not "data"`);
     }
 
     // 2
-    uri.hash = "";
+    parsed.hash = "";
 
     // 3, 4
-    let bodyStringWork = uri.toString().substring(5);
+    let bodyStringWork = parsed.toString().substring(5);
 
     // 5, 6, 7
     if (bodyStringWork.includes(",") !== true) {

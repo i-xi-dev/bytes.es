@@ -152,6 +152,24 @@ describe("Resource.fromDataURL", () => {
     assert.strictEqual(b33.size, 5);
     assert.strictEqual(b33.mediaType.toString(), "text/plain");
 
+    assert.throws(() => {
+      Resource.fromDataURL("data:text/plain");
+    }, {
+      message: "U+002C not found"
+    });
+
+    assert.throws(() => {
+      Resource.fromDataURL("data2:text/plain");
+    }, {
+      message: `URL scheme is not "data"`
+    });
+
+    assert.throws(() => {
+      Resource.fromDataURL("");
+    }, {
+      message: "dataUrl parse error"
+    });
+
   });
 
   it("fromDataURL(URL)", async () => {
