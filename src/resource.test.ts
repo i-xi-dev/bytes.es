@@ -176,3 +176,39 @@ describe("Resource.prototype.toDataURL", () => {
   });
 
 });
+
+describe("Resource.prototype.toSha256Integrity", () => {
+  it("toSha256Integrity()", async () => {
+    const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
+
+    const b11 = await Resource.fromBlob(b1);
+    const i11a = await b11.toSha256Integrity();
+    assert.strictEqual(i11a, "sha256-IIm8EKKH9DeP2uG3Kn/lD4bbs5lgbsIi/L8hAswrj/w=");
+
+  });
+
+});
+
+describe("Resource.prototype.toSha384Integrity", () => {
+  it("toSha384Integrity()", async () => {
+    const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
+
+    const b11 = await Resource.fromBlob(b1);
+    const i11b = await b11.toSha384Integrity();
+    assert.strictEqual(i11b, "sha384-0uhOVMndkWKKHtfDkQSsXCcT4r7Xr5Q2bcQ/uczTl2WivQ5094ZFIZZut1y32IsF");
+
+  });
+
+});
+
+describe("Resource.prototype.toSha512Integrity", () => {
+  it("toSha512Integrity()", async () => {
+    const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
+
+    const b11 = await Resource.fromBlob(b1);
+    const i11c = await b11.toSha512Integrity();
+    assert.strictEqual(i11c, "sha512-lphfU9I644pv1b+t8yZp7b+kg+lFD+WcIeTqhWieCTRZJ4wWOxTAJxSk9rWrOmVb+TFJ2HfaKIBRFqQ0OOxyAw==");
+
+  });
+
+});
