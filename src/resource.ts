@@ -184,51 +184,7 @@ type HttpMessageReadingOptions = {
  * ファイル様オブジェクト
  */
 class Resource {
-  /**
-   * メディアタイプ
-   */
-  #mediaType: MediaType;
 
-  /**
-   * バイト列
-   */
-  #data: ByteSequence;
-
-  /**
-   * @param mediaType メディアタイプ
-   * @param bytes バイト列
-   */
-  protected constructor(mediaType: MediaType, bytes: ByteSequence) {
-    this.#mediaType = mediaType;
-    this.#data = bytes;
-    // Object.freeze(this);
-  }
-
-  async toSha256Integrity(): Promise<string> {
-    return this.#toIntegrity(Sha256, "sha256-");
-  }
-
-  async toSha384Integrity(): Promise<string> {
-    return this.#toIntegrity(Sha384, "sha384-");
-  }
-
-  async toSha512Integrity(): Promise<string> {
-    return this.#toIntegrity(Sha512, "sha512-");
-  }
-
-  /**
-   * Computes the SRI integrity (base64-encoded digest).
-   * 
-   * @see {@link [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)}
-   * @param algorithm The digest algorithm.
-   * @returns The {@link [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)} that
-   *     fulfills with a SRI integrity (base64-encoded digest).
-   */
-  async #toIntegrity(algorithm: DigestAlgorithm, prefix: string): Promise<string> {
-    // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
-    const digestBytes = await this.#data.toDigest(algorithm);
-    return prefix + digestBytes.toBase64Encoded();
-  }
 
   /**
    * 想定用途
@@ -262,7 +218,7 @@ class Resource {
 
         const size = extractContentLength(message.headers);
         const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
-        return new Resource(mediaType, bytes);
+        //return new Resource(mediaType, bytes);
       }
     }
     return null;

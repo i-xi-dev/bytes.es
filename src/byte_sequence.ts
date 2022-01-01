@@ -761,6 +761,32 @@ class ByteSequence {
     throw new TypeError("MIME type not resolved");
   }
 
+  /**
+   * Computes the SRI integrity (Base64-encoded digest).
+   * 
+   * @see {@link [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)}
+   * @param algorithm The digest algorithm.
+   * @returns The {@link [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)} that
+   *     fulfills with a SRI integrity (base64-encoded digest).
+   */
+  async #toIntegrity(algorithm: DigestAlgorithm, prefix: string): Promise<string> {
+    // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
+    const digestBytes = await this.toDigest(algorithm);
+    return prefix + digestBytes.toBase64Encoded();
+  }
+
+  async toSha256Integrity(): Promise<string> {
+    return this.#toIntegrity(Sha256, "sha256-");
+  }
+
+  async toSha384Integrity(): Promise<string> {
+    return this.#toIntegrity(Sha384, "sha384-");
+  }
+
+  async toSha512Integrity(): Promise<string> {
+    return this.#toIntegrity(Sha512, "sha512-");
+  }
+
 
 
 
