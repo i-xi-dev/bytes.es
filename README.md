@@ -109,6 +109,12 @@ const decoded = ByteSequence.fromBase64Encoded("aGVsbG8=");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
 
+###### Base64 options
+```javascript
+const decoded = ByteSequence.fromBase64Encoded("aGVsbG8=", options);
+```
+The `options` object is same interface as [@i-xi-dev/base64 encoding options](https://www.npmjs.com/package/@i-xi-dev/base64#encoding-options).
+
 ##### Creating an instance by decoding the percent encoded
 ```javascript
 const decoded = ByteSequence.fromPercent("%68%65%6C%6C%6F");
@@ -139,7 +145,7 @@ const encoded = ByteSequence.utf8EncodeFrom("新幹線");
 // → Uint8Array[ 0xE6, 0x96, 0xB0, 0xE5, 0xB9, 0xB9, 0xE7, 0xB7, 0x9A ]
 ```
 
-##### Creating an instance by reading the [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
+##### Creating an instance by reading the [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
 ```javascript
 const loadedBytes = await ByteSequence.fromBlob(blob);
 ```
@@ -228,6 +234,22 @@ const formatted8 = bytes.format({ separator: "   " });
 ```
 
 
+#### Converting the instance to a Base64 encoded string
+```javascript
+const bytes = ByteSequence.fromBinaryString("hello");
+
+// Base64 encode
+const base64Encoded = bytes.toBase64();
+// → "aGVsbG8="
+```
+
+##### Base64 options
+```javascript
+const base64Encoded = bytes.toBase64(options);
+```
+The `options` object is same interface as [@i-xi-dev/base64 encoding options](https://www.npmjs.com/package/@i-xi-dev/base64#encoding-options).
+
+
 TODO getter, ...
 TODO edit bytes
 
@@ -243,63 +265,9 @@ TODO edit bytes
 
 
 
-### Converting the instance to a Base64 encoded string
-```javascript
-const bytes = ByteSequence.fromBinaryString("hello");
 
-// Base64 encode
-const base64Encoded = bytes.toBase64();
-// → "aGVsbG8="
-```
 
-#### Base64 options
-Default
-```javascript
-const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
 
-// Base64 encode
-const base64Encoded = bytes.toBase64(); // equivalents to bytes.toBase64({ table: "rfc4648", padEnd: true });
-// → "AwIBAP/+/fw="
-
-// Base64 decode
-const bytes2 = ByteSequence.fromBase64(base64Encoded); // equivalents to ByteSequence.fromBase64({ table: "rfc4648", padEnd: true });
-// → Uint8Array[ 3, 2, 1, 0, 255, 254, 253, 252 ]
-```
-
-Using RFC 4648 Base64url Table
-```javascript
-const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
-
-// Base64 encode
-const base64Encoded = bytes.toBase64({ table: "rfc4648-url" });
-// → "AwIBAP_-_fw="
-
-// Base64 decode
-const bytes2 = ByteSequence.fromBase64(base64Encoded, { table: "rfc4648-url" });
-// → Uint8Array[ 3, 2, 1, 0, 255, 254, 253, 252 ]
-```
-
-No padding
-```javascript
-const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
-const base64Encoded = bytes.toBase64({ padEnd: false });
-// → "AwIBAP/+/fw"
-
-// Base64 decode
-const bytes2 = ByteSequence.fromBase64(base64Encoded, { padEnd: false });
-// → Uint8Array[ 3, 2, 1, 0, 255, 254, 253, 252 ]
-```
-
-[Forgiving base64](https://infra.spec.whatwg.org/#forgiving-base64) decoding
-```javascript
-// Forgiving base64 decode
-const bytes1 = ByteSequence.fromBase64("AwIBAP/+/fw=", { forgiving: true });
-// → Uint8Array[ 3, 2, 1, 0, 255, 254, 253, 252 ]
-
-// Forgiving base64 decode
-const bytes2 = ByteSequence.fromBase64("AwIBA P/+/fw", { forgiving: true });
-// → Uint8Array[ 3, 2, 1, 0, 255, 254, 253, 252 ]
-```
 
 
 ### Converting the instance to a text
@@ -394,7 +362,7 @@ const encoded = ByteSequence.fromText("hello world").toPercent({ encodeSet: "for
 ```
 
 
-### Converting the instance to a [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
+### Converting the instance to a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
 ```javascript
 const resource = new Resource("application/octet-stream", ByteSequence.from(uint8Array));
 const blob = resource.toBlob();
