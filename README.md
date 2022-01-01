@@ -139,26 +139,31 @@ const encoded = ByteSequence.utf8EncodeFrom("新幹線");
 // → Uint8Array[ 0xE6, 0x96, 0xB0, 0xE5, 0xB9, 0xB9, 0xE7, 0xB7, 0x9A ]
 ```
 
-#### Creating an instance by reading the [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
+##### Creating an instance by reading the [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
 ```javascript
 const loadedBytes = await ByteSequence.fromBlob(blob);
 ```
 
-#### Creating an instance by reading the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
+##### Creating an instance by reading the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
 ```javascript
 const loadedBytes = await ByteSequence.fromDataURL("data:text/plain;charset=US-ASCII,hello");
 ```
 
-TODO
+
+#### Converting the instance to a number array
+```javascript
+const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
+const binaryString = bytes.toArray();
+// → [ 3, 2, 1, 0, 255, 254, 253, 252 ]
+```
 
 
-
-
-
-
-
-
-
+#### Converting the instance to an Uint8Array
+```javascript
+const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
+const binaryString = bytes.toUint8Array();
+// → Uint8Array[ 3, 2, 1, 0, 255, 254, 253, 252 ]
+```
 
 
 #### Converting the instance to a [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
@@ -169,43 +174,41 @@ const binaryString = bytes.toBinaryString();
 ```
 
 
-### Converting the instance to a string based on the specified format
+#### Converting the instance to a string based on the specified format
 ```javascript
-const bytes = ByteSequence.parse("68656c6c6f"); // equivalents to ByteSequence.parse("68656c6c6f", 16, { paddedLength: 2, upperCase: false, prefix: "", suffix: "", caseInsensitive: false, });
-const formatted = bytes.toString(); // equivalents to bytes.format(16, { paddedLength: 2, upperCase: false, prefix: "", suffix: "", });
-// → "68656c6c6f"
-```
-
-#### Format options
-Radix (16, 10, 8, 2)
-```javascript
-const bytes = ByteSequence.parse("68656c6c6f", 16);
-
-// 10
-const formatted2 = bytes.format(10);
-// → "104101108108111"
-
-// 8
-const formatted3 = bytes.format(8);
-// → "150145154154157"
-
-// 2
-const formatted4 = bytes.format(2);
-// → "0110100001100101011011000110110001101111"
-```
-
-Using upper case
-```javascript
-const bytes = ByteSequence.parse("68656c6c6f", 16);
-const formatted = bytes.format(16, { upperCase: true });
+const bytes = ByteSequence.parse("68656c6c6f");
+const formatted = bytes.toString();
 // → "68656C6C6F"
 ```
 
-Zero padding
+##### Format options
+
+| parameter | type | default | notes |
+| :--- | :--- | :--- | :--- |
+| `radix` | number | `16` | only 16, 10, 8, 2 are available |
+| `upperCase` | boolean | `true` | parsing is case-insensitive |
+| `paddedLength` | number | see below | |
+| `prefix` | string | `""` | |
+| `suffix` | string | `""` | |
+| `separator` | string | `""` | |
+
 ```javascript
-const bytes = ByteSequence.parse("68656c6c6f", 16);
-const formatted = bytes.format(16, { paddedLength: 4 });
-// → "00680065006c006c006f"
+const bytes = ByteSequence.parse("68656c6c6f", { radix: 16 });
+
+const formatted2 = bytes.format({ radix: 10 });
+// → "104101108108111"
+
+const formatted3 = bytes.format({ radix: 8 });
+// → "150145154154157"
+
+const formatted4 = bytes.format({ radix: 2 });
+// → "0110100001100101011011000110110001101111"
+
+const formatted5 = bytes.format({ upperCase: false });
+// → "68656c6c6f"
+
+const formatted6 = bytes.format({ paddedLength: 4 });
+// → "00680065006C006C006F"
 
 // Minimum paddedLength
 // - radix 16 → 2
@@ -213,16 +216,31 @@ const formatted = bytes.format(16, { paddedLength: 4 });
 // - radix 8 → 3
 // - radix 2 → 8
 // If the specified paddedLength is less than the minimum, the specified paddedLength will be ignored.
+
+const formatted7 = bytes.format({ prefix: " " });
+// → " 68 65 6C 6C 6F"
+
+const formatted8 = bytes.format({ suffix: "  " });
+// → "68  65  6C  6C  6F  "
+
+const formatted8 = bytes.format({ separator: "   " });
+// → "68   65   6C   6C   6F"
 ```
 
-Prefix & Suffix
-```javascript
-const bytes = ByteSequence.parse("68656c6c6f", 16);
-const formatted = bytes.format(16, { prefix: " " });
-// → " 68 65 6c 6c 6f"
-const formatted2 = bytes.format(16, { suffix: "  " });
-// → "68  65  6c  6c  6f  "
-```
+
+TODO getter, ...
+TODO edit bytes
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### Converting the instance to a Base64 encoded string
