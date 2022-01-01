@@ -5,6 +5,7 @@ import { Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
 import iconv from "iconv-lite";
 import { ByteSequence } from "../../node/index.mjs";
+import { MediaType } from "../../node/index.mjs";
 
 describe("ByteSequence.allocate", () => {
   it("allocate(number)", () => {
@@ -397,7 +398,7 @@ describe("ByteSequence.prototype.toBinaryString", () => {
 
 describe("ByteSequence.parse", () => {
   it("parse(string)", () => {
-    const bs0 = ByteSequence.parse("41a24344");
+    const bs0 = ByteSequence.parse("41A24344");
     assert.strictEqual(bs0.toString(), "41A24344");
     assert.strictEqual(ByteSequence.parse("").toString(), "");
 
@@ -1199,4 +1200,292 @@ describe("ByteSequence.fromStream", () => {
 
 });
 
-//TODO
+describe("ByteSequence.fromBlob", () => {
+  it("fromBlob(blob)", async () => {
+    const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11v = b11.view;
+    assert.strictEqual(b11v[0], 255);
+    assert.strictEqual(b11v[1], 0);
+    assert.strictEqual(b11v[2], 1);
+    assert.strictEqual(b11v[3], 127);
+    assert.strictEqual(b11.count, 4);
+    assert.strictEqual(b11.mediaType, "text/plain");
+
+    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
+
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21v = b21.view;
+    assert.strictEqual(b21v[0], 255);
+    assert.strictEqual(b21v[1], 0);
+    assert.strictEqual(b21v[2], 1);
+    assert.strictEqual(b21v[3], 127);
+    assert.strictEqual(b21.count, 4);
+    assert.strictEqual(b21.mediaType, "");
+
+  });
+
+});
+
+describe("ByteSequence.prototype.toBlob", () => {
+  it("toBlob()", async () => {
+    const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toBlob();
+    const b11r = await b11b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b11b.type, "text/plain");
+
+    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
+
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21b = b21.toBlob();
+    const b21r = await b21b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b21b.type, "");
+
+  });
+
+  it("toBlob(string)", async () => {
+    const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toBlob("application/pdf");
+    const b11r = await b11b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b11b.type, "application/pdf");
+
+    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
+
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21b = b21.toBlob("text/html; charset=utf-8");
+    const b21r = await b21b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b21b.type, "text/html;charset=utf-8");
+
+  });
+
+  it("toBlob(MediaType)", async () => {
+    const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toBlob(MediaType.fromString("application/pdf"));
+    const b11r = await b11b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b11b.type, "application/pdf");
+
+    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
+
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21b = b21.toBlob(MediaType.fromString("text/html; charset=utf-8"));
+    const b21r = await b21b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b21b.type, "text/html;charset=utf-8");
+
+  });
+
+});
+
+describe("ByteSequence.fromDataURL", () => {
+  it("fromDataURL(string)", async () => {
+
+    const b0 = ByteSequence.fromDataURL("data:text/plain,");
+    assert.strictEqual(b0.count, 0);
+    assert.strictEqual(b0.mediaType, "text/plain");
+
+    const b0b = ByteSequence.fromDataURL("data:text/plain;base64,");
+    assert.strictEqual(b0b.count, 0);
+    assert.strictEqual(b0b.mediaType, "text/plain");
+
+    const b0c = ByteSequence.fromDataURL("data: ,");
+    assert.strictEqual(b0c.count, 0);
+    assert.strictEqual(b0c.mediaType, "text/plain;charset=US-ASCII");
+
+    const b0d = ByteSequence.fromDataURL("data: ; ,");
+    assert.strictEqual(b0d.count, 0);
+    assert.strictEqual(b0d.mediaType, "text/plain");
+
+    const b0e = ByteSequence.fromDataURL("data: ; x=y ,");
+    assert.strictEqual(b0e.count, 0);
+    assert.strictEqual(b0e.mediaType, "text/plain;x=y");
+
+    const b11 = ByteSequence.fromDataURL("data:text/plain,a1");
+    const b11v = b11.view;
+    assert.strictEqual(b11v[0], 97);
+    assert.strictEqual(b11v[1], 49);
+    assert.strictEqual(b11.count, 2);
+    assert.strictEqual(b11.mediaType, "text/plain");
+
+    const b12 = ByteSequence.fromDataURL("data:application/octet-stream;base64,AwIBAP/+/fw=");
+    const b12v = b12.view;
+    assert.strictEqual(b12v[0], 3);
+    assert.strictEqual(b12v[1], 2);
+    assert.strictEqual(b12v[2], 1);
+    assert.strictEqual(b12v[3], 0);
+    assert.strictEqual(b12v[4], 255);
+    assert.strictEqual(b12v[5], 254);
+    assert.strictEqual(b12v[6], 253);
+    assert.strictEqual(b12v[7], 252);
+    assert.strictEqual(b12.count, 8);
+    assert.strictEqual(b12.mediaType, "application/octet-stream");
+
+    const b21 = ByteSequence.fromDataURL("data:text/plain; p1=a,a1");
+    const b21v = b21.view;
+    assert.strictEqual(b21v[0], 97);
+    assert.strictEqual(b21v[1], 49);
+    assert.strictEqual(b21.count, 2);
+    assert.strictEqual(b21.mediaType, "text/plain;p1=a");
+
+    const b22 = ByteSequence.fromDataURL("data:text/plain; p1=a;p2=\"b,c\",a1");
+    const b22v = b22.view;
+    assert.strictEqual(b22v[0], 99);
+    assert.strictEqual(b22v[1], 34);
+    assert.strictEqual(b22v[2], 44);
+    assert.strictEqual(b22v[3], 97);
+    assert.strictEqual(b22v[4], 49);
+    assert.strictEqual(b22.count, 5);
+    assert.strictEqual(b22.mediaType, "text/plain;p1=a;p2=b");
+
+    const b31 = ByteSequence.fromDataURL("data:text/plain,%FF%");
+    const b31v = b31.view;
+    assert.strictEqual(b31v[0], 255);
+    assert.strictEqual(b31v[1], 0x25);
+    assert.strictEqual(b31.count, 2);
+    assert.strictEqual(b31.mediaType, "text/plain");
+
+    const b32 = ByteSequence.fromDataURL("data:text/plain,%fff");
+    const b32v = b32.view;
+    assert.strictEqual(b32v[0], 255);
+    assert.strictEqual(b32v[1], 0x66);
+    assert.strictEqual(b32.count, 2);
+    assert.strictEqual(b32.mediaType, "text/plain");
+
+    const b33 = ByteSequence.fromDataURL("data:text/plain,a?a=2");
+    const b33v = b33.view;
+    assert.strictEqual(b33v[0], 0x61);
+    assert.strictEqual(b33v[1], 0x3F);
+    assert.strictEqual(b33v[2], 0x61);
+    assert.strictEqual(b33v[3], 0x3D);
+    assert.strictEqual(b33v[4], 0x32);
+    assert.strictEqual(b33.count, 5);
+    assert.strictEqual(b33.mediaType, "text/plain");
+
+    assert.throws(() => {
+      ByteSequence.fromDataURL("data:text/plain");
+    }, {
+      message: "U+002C not found"
+    });
+
+    assert.throws(() => {
+      ByteSequence.fromDataURL("data2:text/plain");
+    }, {
+      message: `URL scheme is not "data"`
+    });
+
+    assert.throws(() => {
+      ByteSequence.fromDataURL("");
+    }, {
+      message: "dataUrl parse error"
+    });
+
+  });
+
+  it("fromDataURL(URL)", async () => {
+    const b11 = ByteSequence.fromDataURL(new URL("data:text/plain,a1"));
+    const b11v = b11.view;
+    assert.strictEqual(b11v[0], 97);
+    assert.strictEqual(b11v[1], 49);
+    assert.strictEqual(b11.count, 2);
+    assert.strictEqual(b11.mediaType, "text/plain");
+
+  });
+
+});
+
+describe("Resource.prototype.toDataURL", () => {
+  it("toDataURL()", async () => {
+    const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toDataURL();
+
+    assert.strictEqual(b11b.toString(), "data:text/plain;base64,QQABfw==");
+
+    const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
+    const b21 = await ByteSequence.fromBlob(b2);
+    assert.throws(() => {
+      b21.toDataURL();
+    }, {
+      message: "MIME type not resolved"
+    });
+
+  });
+
+  it("toDataURL(string)", async () => {
+    const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toDataURL("application/pdf");
+
+    assert.strictEqual(b11b.toString(), "data:application/pdf;base64,QQABfw==");
+
+    const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21b = b21.toDataURL("application/pdf");
+    assert.strictEqual(b21b.toString(), "data:application/pdf;base64,QQABfw==");
+
+  });
+
+  it("toDataURL(MediaType)", async () => {
+    const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toDataURL(MediaType.fromString("application/pdf"));
+
+    assert.strictEqual(b11b.toString(), "data:application/pdf;base64,QQABfw==");
+
+    const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21b = b21.toDataURL(MediaType.fromString("application/pdf"));
+    assert.strictEqual(b21b.toString(), "data:application/pdf;base64,QQABfw==");
+
+  });
+
+});
+
+describe("ByteSequence.prototype.toSha256Integrity", () => {
+  it("toSha256Integrity()", async () => {
+    const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const i11a = await b11.toSha256Integrity();
+    assert.strictEqual(i11a, "sha256-IIm8EKKH9DeP2uG3Kn/lD4bbs5lgbsIi/L8hAswrj/w=");
+
+  });
+
+});
+
+describe("ByteSequence.prototype.toSha384Integrity", () => {
+  it("toSha384Integrity()", async () => {
+    const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const i11b = await b11.toSha384Integrity();
+    assert.strictEqual(i11b, "sha384-0uhOVMndkWKKHtfDkQSsXCcT4r7Xr5Q2bcQ/uczTl2WivQ5094ZFIZZut1y32IsF");
+
+  });
+
+});
+
+describe("ByteSequence.prototype.toSha512Integrity", () => {
+  it("toSha512Integrity()", async () => {
+    const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const i11c = await b11.toSha512Integrity();
+    assert.strictEqual(i11c, "sha512-lphfU9I644pv1b+t8yZp7b+kg+lFD+WcIeTqhWieCTRZJ4wWOxTAJxSk9rWrOmVb+TFJ2HfaKIBRFqQ0OOxyAw==");
+
+  });
+
+});
+
+//TODO fromWebMessage

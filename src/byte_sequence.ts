@@ -36,7 +36,6 @@ import { WebMessageUtils } from "./web_message_utils";
 
 const {
   ASCII_WHITESPACE,
-  HTTP_TAB_OR_SPACE,
 } = StringUtils.RangePattern;
 
 /**
@@ -58,6 +57,7 @@ type Metadata = {
   // fileName, ...
 }
 
+// TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
 const metadataRegistry = new WeakMap<ByteSequence, Metadata>();
 
 function mediaTypeOf(bytes: ByteSequence): MediaType | null {
@@ -114,6 +114,11 @@ class ByteSequence {
    */
   get view(): Uint8Array {
     return new Uint8Array(this.#buffer);
+  }
+
+  get mediaType(): string {
+    const mediaType = mediaTypeOf(this);
+    return mediaType ? mediaType.toString() : "";
   }
 
   /**
@@ -624,7 +629,7 @@ class ByteSequence {
    * @param blob Blob
    * @returns 生成したインスタンス
    */
-   static async fromBlob(blob: Blob): Promise<ByteSequence> {
+  static async fromBlob(blob: Blob): Promise<ByteSequence> {
     try {
       const buffer = await blob.arrayBuffer(); // XXX Node.jsでもstream()を取得できるようになった
       const bytes = ByteSequence.wrap(buffer);
@@ -836,17 +841,6 @@ class ByteSequence {
     }
     return null;
   }
-
-
-
-
-  //TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
-
-  get mediaType(): string {
-    const mediaType = mediaTypeOf(this);
-    return mediaType ? mediaType.toString() : "";
-  }
-
 }
 Object.freeze(ByteSequence);
 

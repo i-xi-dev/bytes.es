@@ -6,6 +6,7 @@ import { ReadableStream } from "node:stream/web";
 import iconv from "iconv-lite";
 import { ByteSequence } from "./byte_sequence";
 import { uint8 } from "./index";
+import { MediaType } from "@i-xi-dev/mimetype";
 
 describe("ByteSequence.allocate", () => {
   it("allocate(number)", () => {
@@ -1253,7 +1254,41 @@ describe("ByteSequence.prototype.toBlob", () => {
   });
 
   it("toBlob(string)", async () => {
-//TODO
+    const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toBlob("application/pdf");
+    const b11r = await b11b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b11b.type, "application/pdf");
+
+    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
+
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21b = b21.toBlob("text/html; charset=utf-8");
+    const b21r = await b21b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b21b.type, "text/html;charset=utf-8");
+
+  });
+
+  it("toBlob(MediaType)", async () => {
+    const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
+
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toBlob(MediaType.fromString("application/pdf"));
+    const b11r = await b11b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b11b.type, "application/pdf");
+
+    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
+
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21b = b21.toBlob(MediaType.fromString("text/html; charset=utf-8"));
+    const b21r = await b21b.arrayBuffer();
+    assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
+    assert.strictEqual(b21b.type, "text/html;charset=utf-8");
+
   });
 
 });
@@ -1393,7 +1428,31 @@ describe("Resource.prototype.toDataURL", () => {
   });
 
   it("toDataURL(string)", async () => {
-    //TODO
+    const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toDataURL("application/pdf");
+
+    assert.strictEqual(b11b.toString(), "data:application/pdf;base64,QQABfw==");
+
+    const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21b = b21.toDataURL("application/pdf");
+    assert.strictEqual(b21b.toString(), "data:application/pdf;base64,QQABfw==");
+
+  });
+
+  it("toDataURL(MediaType)", async () => {
+    const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toDataURL(MediaType.fromString("application/pdf"));
+
+    assert.strictEqual(b11b.toString(), "data:application/pdf;base64,QQABfw==");
+
+    const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21b = b21.toDataURL(MediaType.fromString("application/pdf"));
+    assert.strictEqual(b21b.toString(), "data:application/pdf;base64,QQABfw==");
+
   });
 
 });

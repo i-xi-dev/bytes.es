@@ -20,4 +20,6 @@ export {
   Percent,
 } from "@i-xi-dev/percent";
 
+export { MediaType } from "@i-xi-dev/mimetype";
+
 export { ByteSequence } from "./byte_sequence";

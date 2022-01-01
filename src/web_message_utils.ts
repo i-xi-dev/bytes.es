@@ -170,6 +170,6 @@ function extractContentLength(headers: Headers): number | null {
 const WebMessageUtils = Object.freeze({
   extractContentType,
   extractContentLength,
-})
+});
 
 export { WebMessageUtils };
