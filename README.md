@@ -2,25 +2,25 @@
 
 A JavaScript byte array library for the browser, Deno and Node.js
 
-
-## Description
-
-### Conversion
 ![Conversion](assets/conversion.svg)
 
 
-## Requirement
+## `ByteSequence` class
 
-### Browser
-...
+### Requirement
+`ByteSequence` requires [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) and [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
 
-### Node.js
-16.5.0+
+- Chrome
+- Edge
+- Firefox
+- Safari
+- Deno
+- Node.js 16.5.0+
 
 
-## Installation
+### Installation
 
-### npm
+#### npm
 
 ```console
 $ npm i @i-xi-dev/bytes
@@ -30,18 +30,26 @@ $ npm i @i-xi-dev/bytes
 import { ByteSequence, Resource } from "@i-xi-dev/bytes";
 ```
 
-### CDN
+#### CDN
 
 ```javascript
-import { ByteSequence, Resource } from "https://unpkg.com/@i-xi-dev/bytes";
+import { Ms932EncoderStream } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
+```
+
+```javascript
+import { Ms932EncoderStream } from "https://unpkg.com/@i-xi-dev/bytes/dist/index.js";
+```
+
+```javascript
+import { Ms932EncoderStream } from "https://cdn.jsdelivr.net/npm/@i-xi-dev/bytes/dist/index.js";
 ```
 
 
-## Example
+### Usage
 
-### Creating an instance of `ByteSequence` class
+#### Creating an instance of `ByteSequence` class
 
-#### Creating an instance as a wrapper object for [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
+##### Creating an instance as a wrapper object for [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
 ```javascript
 // wraps a ArrayBuffer
 const bytes = ByteSequence(arrayBuffer);
@@ -54,17 +62,17 @@ const bytes = ByteSequence(uint8Array);
 // → uint8Array.buffer === bytes.buffer → true
 ```
 
-#### Creating an instance with a specific size
+##### Creating an instance with a specific size
 ```javascript
 const zeroFilledBytes = ByteSequence.allocate(size);
 ```
 
-#### Creating an instance filled with random bytes
+##### Creating an instance filled with random bytes
 ```javascript
 const randomBytes = ByteSequence.generateRandom(size);
 ```
 
-#### Creating an instance with a new underlying buffer
+##### Creating an instance with a new underlying buffer
 ```javascript
 // from a Array<number>
 const bytes = ByteSequence.from([1,2,3,4,5,6,7,8]);
@@ -83,10 +91,52 @@ const copiedBytes = ByteSequence.from(bytes);
 // → bytes.buffer !== copiedBytes.buffer && uint8Array.buffer !== bytes.buffer
 ```
 
-#### Creating an instance by [isomorphic encoding](https://infra.spec.whatwg.org/#isomorphic-encode) the [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
+##### Creating an instance by [isomorphic encoding](https://infra.spec.whatwg.org/#isomorphic-encode) the [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
 ```javascript
 const isomorphicEncoded = ByteSequence.fromBinaryString("hello");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+```
+
+##### Creating an instance by parsing the hexadecimal formatted
+```javascript
+const parsed = ByteSequence.parse("68656c6c6f");
+// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+```
+
+##### Creating an instance by decoding the Base64 encoded
+```javascript
+const decoded = ByteSequence.fromBase64Encoded("aGVsbG8=");
+// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+```
+
+##### Creating an instance by decoding the percent encoded
+```javascript
+const decoded = ByteSequence.fromPercent("%68%65%6C%6C%6F");
+// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+```
+
+##### Creating an instance by reading the [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of Uint8Array
+```javascript
+// stream: ReadableStream<Uint8Array>
+const loadedBytes = await ByteSequence.fromStream(stream);
+```
+
+If you want to read [Node.js Readable stream](https://nodejs.org/api/stream.html#stream_readable_streams) of [`Buffer`](https://nodejs.org/api/buffer.html#buffer_class_buffer), you can use [`stream.Readable.toWeb`](https://nodejs.org/dist/latest-v17.x/docs/api/stream.html#streamreadabletowebstreamreadable) method
+```javascript
+import { Readable } from "node:stream";
+
+const loadedBytes = await ByteSequence.fromStream(Readable.toWeb(nodeJsStream));
+```
+
+TODO createStreamReadingProgress
+
+##### Creating an instance by encoding the text in UTF-8
+```javascript
+const encoded = ByteSequence.utf8EncodeFrom("hello");
+// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
+
+const encoded = ByteSequence.utf8EncodeFrom("新幹線");
+// → Uint8Array[ 0xE6, 0x96, 0xB0, 0xE5, 0xB9, 0xB9, 0xE7, 0xB7, 0x9A ]
 ```
 
 TODO
@@ -99,42 +149,6 @@ TODO
 
 
 
-#### Creating an instance by parsing the hexadecimal formatted
-```javascript
-const parsed = ByteSequence.parse("68656c6c6f");
-// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
-```
-
-#### Creating an instance by decoding the Base64 encoded
-```javascript
-const decoded = ByteSequence.fromBase64("aGVsbG8=");
-// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
-```
-
-#### Creating an instance by decoding the percent encoded
-```javascript
-const decoded = ByteSequence.fromPercent("%68%65%6C%6C%6F");
-// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
-```
-
-#### Creating an instance by reading the [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of Uint8Array
-```javascript
-const loadedBytes = await ByteSequence.fromByteStream(byteStream);
-```
-
-[Node.js Readable stream](https://nodejs.org/api/stream.html#stream_readable_streams) of [Buffer](https://nodejs.org/api/buffer.html#buffer_class_buffer) is also available.
-```javascript
-const loadedBytes = await ByteSequence.fromByteStream(byteStream);
-```
-
-#### Creating an instance by encoding the text in UTF-8
-```javascript
-const encoded = ByteSequence.fromText("hello");
-// → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
-
-const encoded = ByteSequence.fromText("新幹線");
-// → Uint8Array[ 0xE6, 0x96, 0xB0, 0xE5, 0xB9, 0xB9, 0xE7, 0xB7, 0x9A ]
-```
 
 #### Creating an instance by reading the [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
 ```javascript
