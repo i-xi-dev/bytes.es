@@ -214,7 +214,7 @@ class Resource {
   /**
    * バイト列
    */
-  get bytes(): ByteSequence {
+  get data(): ByteSequence {
     return this.#data;
   }
 
