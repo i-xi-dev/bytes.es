@@ -1409,7 +1409,7 @@ describe("ByteSequence.fromDataURL", () => {
 
 });
 
-describe("Resource.prototype.toDataURL", () => {
+describe("ByteSequence.prototype.toDataURL", () => {
   it("toDataURL()", async () => {
     const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
     const b11 = await ByteSequence.fromBlob(b1);

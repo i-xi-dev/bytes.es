@@ -27,21 +27,21 @@ $ npm i @i-xi-dev/bytes
 ```
 
 ```javascript
-import { ByteSequence, Resource } from "@i-xi-dev/bytes";
+import { ByteSequence } from "@i-xi-dev/bytes";
 ```
 
 #### CDN
 
 ```javascript
-import { Ms932EncoderStream } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
+import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
 ```
 
 ```javascript
-import { Ms932EncoderStream } from "https://unpkg.com/@i-xi-dev/bytes/dist/index.js";
+import { ByteSequence } from "https://unpkg.com/@i-xi-dev/bytes/dist/index.js";
 ```
 
 ```javascript
-import { Ms932EncoderStream } from "https://cdn.jsdelivr.net/npm/@i-xi-dev/bytes/dist/index.js";
+import { ByteSequence } from "https://cdn.jsdelivr.net/npm/@i-xi-dev/bytes/dist/index.js";
 ```
 
 
@@ -139,6 +139,16 @@ const encoded = ByteSequence.utf8EncodeFrom("新幹線");
 // → Uint8Array[ 0xE6, 0x96, 0xB0, 0xE5, 0xB9, 0xB9, 0xE7, 0xB7, 0x9A ]
 ```
 
+#### Creating an instance by reading the [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
+```javascript
+const loadedBytes = await ByteSequence.fromBlob(blob);
+```
+
+#### Creating an instance by reading the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
+```javascript
+const loadedBytes = await ByteSequence.fromDataURL("data:text/plain;charset=US-ASCII,hello");
+```
+
 TODO
 
 
@@ -149,18 +159,6 @@ TODO
 
 
 
-
-#### Creating an instance by reading the [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
-```javascript
-const resource = await Resource.fromBlob(blob);
-const loadedBytes = resource.bytes;
-```
-
-#### Creating an instance by reading the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
-```javascript
-const resource = await Resource.fromDataURL("data:text/plain;charset=US-ASCII,hello");
-const loadedBytes = resource.bytes;
-```
 
 
 #### Converting the instance to a [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
