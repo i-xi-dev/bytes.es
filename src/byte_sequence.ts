@@ -553,6 +553,7 @@ class ByteSequence {
   utf8DecodeTo(): string {
     return utf8TextDecoder.decode(this.view);
   }
+  //TODO BOM
 
   /**
    * 文字列を指定した符号化器で符号化したバイト列からインスタンスを生成し返却

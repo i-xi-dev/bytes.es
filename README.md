@@ -245,6 +245,20 @@ const base64Encoded = bytes.toBase64Encoded(options);
 The `options` object is same interface as [@i-xi-dev/base64 encoding options](https://www.npmjs.com/package/@i-xi-dev/base64#encoding-options).
 
 
+TODO toPercentEncoded
+
+
+#### Converting the instance to a text
+```javascript
+// UTF-8 encode
+const bytes = ByteSequence.utf8EncodeFrom("あいうえお");
+// → Uint8Array[ 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
+
+// UTF-8 decode
+const str = bytes.utf8DecodeTo();
+// → "あいうえお"
+```
+
 TODO getter, ...
 TODO edit bytes
 
@@ -263,28 +277,8 @@ TODO edit bytes
 
 
 
-
-
-### Converting the instance to a text
-```javascript
-// UTF-8 encode
-const bytes = ByteSequence.fromText("あいうえお");
-// → Uint8Array[ 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
-
-// UTF-8 decode
-const str = bytes.asText();
-// → "あいうえお"
-```
-
 #### Text encoding options
-Default
-```javascript
-// text encode
-const bytes = ByteSequence.fromText("あいうえお"); // equivalents to ByteSequence.fromText("あいうえお", "UTF-8", { addBom: false });
 
-// text decode
-const str = bytes.asText(); // equivalents to bytes.asText("UTF-8", { removeBom: false });
-```
 
 BOM handling
 ```javascript
