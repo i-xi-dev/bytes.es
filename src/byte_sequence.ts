@@ -50,7 +50,7 @@ type Bytes = ByteSequence | ByteArray;
 
 const utf8TextEncoder = new TextEncoder();
 
-const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true });
+const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 
 type Metadata = {
   mediaType: MediaType | null,
@@ -553,7 +553,7 @@ class ByteSequence {
   utf8DecodeTo(): string {
     return utf8TextDecoder.decode(this.view);
   }
-  //TODO BOM
+  // TODO BOM
 
   /**
    * 文字列を指定した符号化器で符号化したバイト列からインスタンスを生成し返却
@@ -575,7 +575,7 @@ class ByteSequence {
    * @param decoder 復号器
    * @returns 文字列
    */
-  textDecodeTo(decoder: { decode: (input?: BufferSource) => string } = utf8TextDecoder): string {
+  textDecodeTo(decoder: { decode: (input?: Uint8Array) => string } = utf8TextDecoder): string {
     return decoder.decode(this.view);
   }
 

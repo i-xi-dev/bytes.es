@@ -259,6 +259,56 @@ const str = bytes.utf8DecodeTo();
 // → "あいうえお"
 ```
 
+##### Other text encodings
+
+Example in Node.js
+```javascript
+import iconv from "iconv-lite";
+
+const bytes = ByteSequence.textEncodeFrom("あいうえお", {
+  // encode: (toEncode: string) => Uint8Array
+  encode(toEncode) {
+    return iconv.encode(toEncode, "EUC-JP");
+  },
+});
+// → Uint8Array[ 0xA4, 0xA2, 0xA4, 0xA4, 0xA4, 0xA6, 0xA4, 0xA8, 0xA4, 0xAA ]
+
+const str = bytes.asText({
+  // decode: (encoded: Uint8Array) => string
+  decode(encoded) {
+    return iconv.decode(Buffer.from(encoded), "EUC-JP");
+  },
+});
+// → "あいうえお"
+```
+
+Example in browser
+```javascript
+const utf8Encoder = new TextEncoder();
+const utf8Decoder = new TextDecoder({ ignoreBOM: false });
+
+const bytes = ByteSequence.textEncodeFrom("あいうえお", {
+  // encode: (toEncode: string) => Uint8Array
+  encode(toEncode) {
+    const prepend = toEncode.startsWith("\uFEFF") ? "" : "\uFEFF";
+    return utf8Encoder.encode(prepend + toEncode);
+  },
+});
+// → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
+
+const str = bytes.asText({
+  // decode: (encoded: Uint8Array) => string
+  decode(encoded) {
+    return utf8Decoder.decode(encoded);
+  },
+});
+// → "あいうえお"
+```
+
+
+
+
+
 TODO getter, ...
 TODO edit bytes
 
@@ -276,51 +326,6 @@ TODO edit bytes
 
 
 
-
-#### Text encoding options
-
-
-BOM handling
-```javascript
-// If the string does not start with a U+FEFF, prepend a BOM
-const bytes1 = ByteSequence.fromText("あいうえお", "UTF-8", { addBom: true });
-// → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
-const bytes2 = ByteSequence.fromText("\uFEFFあいうえお", "UTF-8", { addBom: true });
-// → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE3, 0x81, 0x82, 0xE3, 0x81, 0x84, 0xE3, 0x81, 0x86, 0xE3, 0x81, 0x88, 0xE3, 0x81, 0x8A ]
-
-// If the byte sequence starts with a BOM, remove the BOM
-const str1 = bytes1.asText("UTF-8", { removeBom: true });
-// → "あいうえお"
-```
-
-#### Other text encodings
-You can register the text encoding.
-
-Example in Node.js
-```javascript
-import iconv from "iconv-lite";
-import { TextEncoding } from "@i-xi-dev/bytes";
-TextEncoding.register("EUC-JP", {
-  // name :string
-  name: "EUC-JP",
-
-  // decode: (encoded: Uint8Array) => string
-  decode(encoded) {
-    return iconv.decode(Buffer.from(encoded), "EUC-JP");
-  },
-
-  // encode: (toEncode: string) => Uint8Array
-  encode(toEncode) {
-    return iconv.encode(toEncode, "EUC-JP");
-  },
-});
-
-const bytes = ByteSequence.fromText("あいうえお", "EUC-JP");
-// → Uint8Array[ 0xA4, 0xA2, 0xA4, 0xA4, 0xA4, 0xA6, 0xA4, 0xA8, 0xA4, 0xAA ]
-
-const str = bytes.asText("EUC-JP");
-// → "あいうえお"
-```
 
 
 ### Converting the instance to a percent encoded string
