@@ -49,7 +49,7 @@ import { ByteSequence } from "https://cdn.jsdelivr.net/npm/@i-xi-dev/bytes/dist/
 
 #### Creating an instance of `ByteSequence` class
 
-##### Creating an instance as a wrapper object for [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
+##### Creating an instance as a wrapper object for [`ArrayBuffer`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
 ```javascript
 // wraps a ArrayBuffer
 const bytes = ByteSequence(arrayBuffer);
@@ -115,7 +115,7 @@ const decoded = ByteSequence.fromPercentEncoded("%68%65%6C%6C%6F");
 // → Uint8Array[ 0x68, 0x65, 0x6C, 0x6C, 0x6F ]
 ```
 
-##### Creating an instance by reading the [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of Uint8Array
+##### Creating an instance by reading the [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of Uint8Array
 ```javascript
 // stream: ReadableStream<Uint8Array>
 const loadedBytes = await ByteSequence.fromStream(stream);
@@ -158,7 +158,7 @@ const binaryString = bytes.toArray();
 ```
 
 
-#### Converting the instance to an Uint8Array
+#### Converting the instance to an `Uint8Array`
 ```javascript
 const bytes = ByteSequence.of(3, 2, 1, 0, 255, 254, 253, 252);
 const binaryString = bytes.toUint8Array();
@@ -262,6 +262,7 @@ const str = bytes.utf8DecodeTo();
 ##### Other text encodings
 
 Example in Node.js
+
 ```javascript
 import iconv from "iconv-lite";
 
@@ -282,7 +283,6 @@ const str = bytes.asText({
 // → "あいうえお"
 ```
 
-Example in browser
 ```javascript
 const utf8Encoder = new TextEncoder();
 const utf8Decoder = new TextDecoder({ ignoreBOM: false });
@@ -303,6 +303,14 @@ const str = bytes.asText({
   },
 });
 // → "あいうえお"
+```
+
+
+#### Converting the instance to a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
+```javascript
+const bytes = ByteSequence.from(uint8Array);
+const blob = bytes.toBlob("application/octet-stream");
+// → blob.type === "application/octet-stream"
 ```
 
 
@@ -355,12 +363,6 @@ const encoded = ByteSequence.fromText("hello world").toPercent({ encodeSet: "for
 //   And also, this result is match to the result of (const url = new URL("http://example.com/"); url.searchParams.set("p1", "hello world"); url.search.replace("?p1=", ""));
 ```
 
-
-### Converting the instance to a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
-```javascript
-const resource = new Resource("application/octet-stream", ByteSequence.from(uint8Array));
-const blob = resource.toBlob();
-```
 
 #### Converting the instance to a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
 ```javascript
