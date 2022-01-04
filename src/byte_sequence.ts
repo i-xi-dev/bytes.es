@@ -277,7 +277,7 @@ class ByteSequence {
    * @returns 生成したインスタンス
    */
   static fromBase64Encoded(base64Encoded: string, options?: Base64Options): ByteSequence {
-    const decoded = Base64.decode(base64Encoded, Base64.resolveOptions(options));
+    const decoded = Base64.decode(base64Encoded, options);
     return new ByteSequence(decoded.buffer);
   }
 
@@ -288,7 +288,7 @@ class ByteSequence {
    * @returns Base64符号化した文字列
    */
   toBase64Encoded(options?: Base64Options): string {
-    return Base64.encode(this.view, Base64.resolveOptions(options));
+    return Base64.encode(this.view, options);
   }
 
   /**
@@ -299,7 +299,7 @@ class ByteSequence {
    * @returns 生成したインスタンス
    */
   static fromPercentEncoded(percentEncoded: string, options?: PercentOptions): ByteSequence {
-    const decoded = Percent.decode(percentEncoded, Percent.resolveOptions(options));
+    const decoded = Percent.decode(percentEncoded, options);
     return new ByteSequence(decoded.buffer);
   }
 
@@ -310,7 +310,7 @@ class ByteSequence {
    * @returns パーセント符号化した文字列
    */
   toPercentEncoded(options?: PercentOptions): string {
-    return Percent.encode(this.view, Percent.resolveOptions(options));
+    return Percent.encode(this.view, options);
   }
 
   /**
