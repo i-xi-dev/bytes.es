@@ -19,19 +19,15 @@ import {
   TransferProgress,
   Uint8,
 } from "@i-xi-dev/fundamental";
-
 import {
   type Base64Options,
   Base64,
 } from "@i-xi-dev/base64";
-
 import {
   type PercentOptions,
   Percent,
 } from "@i-xi-dev/percent";
-
 import { MediaType } from "@i-xi-dev/mimetype";
-
 import { WebMessageUtils } from "./web_message_utils";
 
 const {
@@ -57,14 +53,6 @@ type Metadata = {
   // fileName, ...
 }
 
-// TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
-const metadataRegistry = new WeakMap<ByteSequence, Metadata>();
-
-function mediaTypeOf(bytes: ByteSequence): MediaType | null {
-  const mediaType = metadataRegistry.get(bytes)?.mediaType;
-  return mediaType ? mediaType : null;
-}
-
 type WebMessage = Request | Response;
 
 type WebMessageReadingOptions = {
@@ -76,6 +64,9 @@ type WebMessageReadingOptions = {
  * バイト列
  */
 class ByteSequence {
+  // TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
+  static #metadataStore = new WeakMap<ByteSequence, Metadata>();
+
   /**
    * 内部表現
    */
@@ -113,21 +104,20 @@ class ByteSequence {
    * 自身のArrayBufferのビューを返却
    */
   get view(): Uint8Array {
-    return new Uint8Array(this.#buffer);
+    return new Uint8Array(this.#buffer); // freezeなどされても困るので毎度生成する
   }
 
-  get mediaType(): string {
-    const mediaType = mediaTypeOf(this);
-    return mediaType ? mediaType.toString() : "";
+  static #storedMediaType(bytes: ByteSequence): MediaType | null {
+    const mediaType = ByteSequence.#metadataStore.get(bytes)?.mediaType;
+    return mediaType ? mediaType : null;
   }
-
+  
   /**
-   * 指定したバイト数でインスタンスを生成し返却
-   *     ※ArrayBufferは新たに生成する
-   *     ※各バイトは0
+   * Create a new instance of `ByteSequence` of the specified size.
+   * Its bytes are initialized to 0.
    * 
-   * @param byteCount - 生成するバイト列のバイト数
-   * @returns 生成したインスタンス
+   * @param byteCount - The size, in bytes.
+   * @returns A new `ByteSequence` object.
    */
   static allocate(byteCount: number): ByteSequence {
     if (NumberUtils.isNonNegativeInteger(byteCount) !== true) {
@@ -636,7 +626,7 @@ class ByteSequence {
       const bytes = ByteSequence.wrap(buffer);
       if (blob.type) {
         const mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
-        metadataRegistry.set(bytes, { mediaType });
+        ByteSequence.#metadataStore.set(bytes, { mediaType });
       }
 
       return bytes;
@@ -672,7 +662,7 @@ class ByteSequence {
       return preferredType;
     }
     else {
-      return mediaTypeOf(this);
+      return ByteSequence.#storedMediaType(this);
     }
   }
 
@@ -748,7 +738,7 @@ class ByteSequence {
       void exception;
       mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
     }
-    metadataRegistry.set(bytes, { mediaType });
+    ByteSequence.#metadataStore.set(bytes, { mediaType });
 
     return bytes;
   }
@@ -836,7 +826,7 @@ class ByteSequence {
 
         const size = WebMessageUtils.extractContentLength(message.headers);
         const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
-        metadataRegistry.set(bytes, { mediaType });
+        ByteSequence.#metadataStore.set(bytes, { mediaType });
         return bytes;
       }
     }
