@@ -2,15 +2,17 @@
 
 import { MediaType } from "@i-xi-dev/mimetype";
 
+type ResourceMetadataInit = {
+  mediaType?: MediaType,
+  fileName?: string,
+};
+
 class ResourceMetadata {
   mediaType?: MediaType;
   fileName?: string;
   // 
 
-  constructor(init?: {
-    mediaType?: MediaType,
-    fileName?: string,
-  }) {
+  constructor(init: ResourceMetadataInit = {}) {
     this.mediaType = init?.mediaType;
     this.fileName = init?.fileName;
   }
@@ -32,5 +34,6 @@ class ResourceMetadata {
 }
 
 export {
+  type ResourceMetadataInit,
   ResourceMetadata,
 };

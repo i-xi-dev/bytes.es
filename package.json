@@ -55,7 +55,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.16.5",
     "@babel/preset-env": "^7.16.5",
     "@i-xi-dev/base64": "^1.1.4",
-    "@i-xi-dev/fundamental": "^1.5.2",
+    "@i-xi-dev/fundamental": "^1.5.3",
     "@i-xi-dev/mimetype": "^1.0.2",
     "@i-xi-dev/percent": "^1.0.2",
     "@types/jest": "^27.0.3",

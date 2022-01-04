@@ -2,6 +2,7 @@
 
 // バイト列
 
+//TODO uint8を外に出さない
 import {
   type uint8,
   type ByteFormatOptions,
@@ -28,6 +29,10 @@ import {
   Percent,
 } from "@i-xi-dev/percent";
 import { MediaType } from "@i-xi-dev/mimetype";
+import {
+  type ResourceMetadataInit,
+  ResourceMetadata,
+} from "./metadata";
 import { WebMessageUtils } from "./web_message_utils";
 
 const {
@@ -48,11 +53,6 @@ const utf8TextEncoder = new TextEncoder();
 
 const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 
-type Metadata = {
-  mediaType: MediaType | null,
-  // fileName, ...
-}
-
 type WebMessage = Request | Response;
 
 type WebMessageReadingOptions = {
@@ -64,24 +64,26 @@ type WebMessageReadingOptions = {
  * バイト列
  */
 class ByteSequence {
-  // TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
-  static #metadataStore = new WeakMap<ByteSequence, Metadata>();
 
   /**
    * 内部表現
    */
   #buffer: ArrayBuffer;
 
+  // TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
+  #metadata: ResourceMetadata;
+
   /**
    * ArrayBufferをラップするインスタンスを生成
    *     ※外部からのArrayBufferの変更は当インスタンスに影響する
    */
-  private constructor(bytes: ArrayBuffer) {
+  private constructor(bytes: ArrayBuffer, metadata?: ResourceMetadataInit) {
     // if ((bytes instanceof ArrayBuffer) !== true) {
     //   throw new TypeError("bytes");
     // }
     console.assert(bytes instanceof ArrayBuffer);
     this.#buffer = bytes;
+    this.#metadata = new ResourceMetadata(metadata);
     Object.freeze(this);
   }
 
@@ -107,11 +109,13 @@ class ByteSequence {
     return new Uint8Array(this.#buffer); // freezeなどされても困るので毎度生成する
   }
 
-  static #storedMediaType(bytes: ByteSequence): MediaType | null {
-    const mediaType = ByteSequence.#metadataStore.get(bytes)?.mediaType;
-    return mediaType ? mediaType : null;
+  //TODO 
+  // 直接持たせたくない
+  // WeakMapで持ってみたりしたがそれはそれで面倒
+  get __metadata(): ResourceMetadata {
+    return this.#metadata;
   }
-  
+
   /**
    * Create a new instance of `ByteSequence` of the specified size.
    * Its bytes are initialized to 0.
@@ -626,7 +630,7 @@ class ByteSequence {
       const bytes = ByteSequence.wrap(buffer);
       if (blob.type) {
         const mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
-        ByteSequence.#metadataStore.set(bytes, { mediaType });
+        bytes.#metadata.mediaType = mediaType;
       }
 
       return bytes;
@@ -662,7 +666,7 @@ class ByteSequence {
       return preferredType;
     }
     else {
-      return ByteSequence.#storedMediaType(this);
+      return this.#metadata.mediaType ? this.#metadata.mediaType : null;
     }
   }
 
@@ -738,7 +742,7 @@ class ByteSequence {
       void exception;
       mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
     }
-    ByteSequence.#metadataStore.set(bytes, { mediaType });
+    bytes.#metadata.mediaType = mediaType;
 
     return bytes;
   }
@@ -774,22 +778,22 @@ class ByteSequence {
    * @returns The {@link [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)} that
    *     fulfills with a SRI integrity (base64-encoded digest).
    */
-  async #toIntegrity(algorithm: DigestAlgorithm, prefix: string): Promise<string> {
+  async #integrity(algorithm: DigestAlgorithm, prefix: string): Promise<string> {
     // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
     const digestBytes = await this.toDigest(algorithm);
     return prefix + digestBytes.toBase64Encoded();
   }
 
-  async toSha256Integrity(): Promise<string> {
-    return this.#toIntegrity(Sha256, "sha256-");
+  get sha256Integrity(): Promise<string> {
+    return this.#integrity(Sha256, "sha256-");
   }
 
-  async toSha384Integrity(): Promise<string> {
-    return this.#toIntegrity(Sha384, "sha384-");
+  get sha384Integrity(): Promise<string> {
+    return this.#integrity(Sha384, "sha384-");
   }
 
-  async toSha512Integrity(): Promise<string> {
-    return this.#toIntegrity(Sha512, "sha512-");
+  get sha512Integrity(): Promise<string> {
+    return this.#integrity(Sha512, "sha512-");
   }
 
   /**
@@ -826,7 +830,7 @@ class ByteSequence {
 
         const size = WebMessageUtils.extractContentLength(message.headers);
         const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
-        ByteSequence.#metadataStore.set(bytes, { mediaType });
+        bytes.#metadata.mediaType = mediaType;
         return bytes;
       }
     }
