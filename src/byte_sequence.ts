@@ -2,7 +2,7 @@
 
 // バイト列
 
-//TODO uint8を外に出さない
+// TODO uint8を外に出さない
 import {
   type uint8,
   type ByteFormatOptions,
@@ -30,8 +30,7 @@ import {
 } from "@i-xi-dev/percent";
 import { MediaType } from "@i-xi-dev/mimetype";
 import {
-  type ResourceMetadataInit,
-  ResourceMetadata,
+  ResourceMetadataStore,
 } from "./metadata";
 import { WebMessageUtils } from "./web_message_utils";
 
@@ -64,26 +63,24 @@ type WebMessageReadingOptions = {
  * バイト列
  */
 class ByteSequence {
+  // TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
+  static MetadataStore: ResourceMetadataStore<ByteSequence> = new ResourceMetadataStore();
 
   /**
    * 内部表現
    */
   #buffer: ArrayBuffer;
 
-  // TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
-  #metadata: ResourceMetadata;
-
   /**
    * ArrayBufferをラップするインスタンスを生成
    *     ※外部からのArrayBufferの変更は当インスタンスに影響する
    */
-  private constructor(bytes: ArrayBuffer, metadata?: ResourceMetadataInit) {
+  private constructor(bytes: ArrayBuffer) {
     // if ((bytes instanceof ArrayBuffer) !== true) {
     //   throw new TypeError("bytes");
     // }
     console.assert(bytes instanceof ArrayBuffer);
     this.#buffer = bytes;
-    this.#metadata = new ResourceMetadata(metadata);
     Object.freeze(this);
   }
 
@@ -107,13 +104,6 @@ class ByteSequence {
    */
   get view(): Uint8Array {
     return new Uint8Array(this.#buffer); // freezeなどされても困るので毎度生成する
-  }
-
-  //TODO 
-  // 直接持たせたくない
-  // WeakMapで持ってみたりしたがそれはそれで面倒
-  get __metadata(): ResourceMetadata {
-    return this.#metadata;
   }
 
   /**
@@ -630,7 +620,7 @@ class ByteSequence {
       const bytes = ByteSequence.wrap(buffer);
       if (blob.type) {
         const mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
-        bytes.#metadata.mediaType = mediaType;
+        ByteSequence.MetadataStore.put(bytes, { mediaType });
       }
 
       return bytes;
@@ -666,7 +656,7 @@ class ByteSequence {
       return preferredType;
     }
     else {
-      return this.#metadata.mediaType ? this.#metadata.mediaType : null;
+      return ByteSequence.MetadataStore.getMediaType(this);
     }
   }
 
@@ -742,7 +732,7 @@ class ByteSequence {
       void exception;
       mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
     }
-    bytes.#metadata.mediaType = mediaType;
+    ByteSequence.MetadataStore.put(bytes, { mediaType });
 
     return bytes;
   }
@@ -830,7 +820,7 @@ class ByteSequence {
 
         const size = WebMessageUtils.extractContentLength(message.headers);
         const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
-        bytes.#metadata.mediaType = mediaType;
+        ByteSequence.MetadataStore.put(bytes, { mediaType });
         return bytes;
       }
     }
