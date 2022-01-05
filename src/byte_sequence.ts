@@ -239,9 +239,9 @@ class ByteSequence {
   }
 
   /**
-   * 自身のバイト列を同型復号し、結果のBinary stringを生成し返却
+   * Returns the [isomorphic decoded](https://infra.spec.whatwg.org/#isomorphic-decode) string of this byte sequence.
    * 
-   * @returns Binary string
+   * @returns The [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary).
    */
   toBinaryString(): string {
     return IsomorphicEncoding.decode(this.#buffer);
@@ -282,10 +282,10 @@ class ByteSequence {
   }
 
   /**
-   * 自身のバイト列をBase64符号化した文字列を返却
+   * Returns the Base64-encoded string of this byte sequence.
    * 
-   * @param options - 符号化方式のオプション
-   * @returns Base64符号化した文字列
+   * @param options - The options for Base64 encoding.
+   * @returns The Base64-encoded string.
    */
   toBase64Encoded(options?: Base64Options): string {
     return Base64.encode(this.view, options);
@@ -304,10 +304,10 @@ class ByteSequence {
   }
 
   /**
-   * 自身のバイト列をパーセント符号化した文字列を返却
+   * Returns the Percent-encoded string of this byte sequence.
    * 
-   * @param options - 符号化方式のオプション
-   * @returns パーセント符号化した文字列
+   * @param options - The options for Percent encoding.
+   * @returns The Percent-encoded string.
    */
   toPercentEncoded(options?: PercentOptions): string {
     return Percent.encode(this.view, options);
@@ -333,27 +333,27 @@ class ByteSequence {
   }
 
   /**
-   * 自身のバイト列のSHA-256ハッシュを生成し返却
+   * Computes the SHA-256 digest for this byte sequence.
    * 
-   * @returns 生成したハッシュのバイト列で解決されるPromise
+   * @returns The `Promise` that fulfills with a byte sequence of the SHA-256 digest.
    */
   async toSha256Digest(): Promise<ByteSequence> {
     return this.toDigest(Sha256);
   }
 
   /**
-   * 自身のバイト列のSHA-384ハッシュを生成し返却
+   * Computes the SHA-384 digest for this byte sequence.
    * 
-   * @returns 生成したハッシュのバイト列で解決されるPromise
+   * @returns The `Promise` that fulfills with a byte sequence of the SHA-384 digest.
    */
   async toSha384Digest(): Promise<ByteSequence> {
     return this.toDigest(Sha384);
   }
 
   /**
-   * 自身のバイト列のSHA-512ハッシュを生成し返却
+   * Computes the SHA-512 digest for this byte sequence.
    * 
-   * @returns 生成したハッシュのバイト列で解決されるPromise
+   * @returns The `Promise` that fulfills with a byte sequence of the SHA-512 digest.
    */
   async toSha512Digest(): Promise<ByteSequence> {
     return this.toDigest(Sha512);
@@ -780,21 +780,21 @@ class ByteSequence {
   }
 
   /**
-   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-256 digest.
+   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-256 digest for this byte sequence.
    */
   get sha256Integrity(): Promise<string> {
     return this.#integrity(Sha256, "sha256-");
   }
 
   /**
-   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-384 digest.
+   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-384 digest for this byte sequence.
    */
   get sha384Integrity(): Promise<string> {
     return this.#integrity(Sha384, "sha384-");
   }
 
   /**
-   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-512 digest.
+   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-512 digest for this byte sequence.
    */
   get sha512Integrity(): Promise<string> {
     return this.#integrity(Sha512, "sha512-");
