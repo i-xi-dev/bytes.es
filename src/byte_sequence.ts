@@ -30,7 +30,9 @@ import {
 } from "@i-xi-dev/percent";
 import { MediaType } from "@i-xi-dev/mimetype";
 import {
-  ResourceMetadataStore,
+  type ResourceMetadata,
+  type ResourceMetadataStore,
+  MetadataMap,
 } from "./metadata";
 import { WebMessageUtils } from "./web_message_utils";
 
@@ -64,7 +66,11 @@ type WebMessageReadingOptions = {
  */
 class ByteSequence {
   // TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
-  static MetadataStore: ResourceMetadataStore<ByteSequence> = new ResourceMetadataStore();
+  static MetadataStore: ResourceMetadataStore<ByteSequence> = new MetadataMap();
+
+  static #storeMeatdata(instance: ByteSequence, metadata: ResourceMetadata): void {
+    (ByteSequence.MetadataStore as MetadataMap<ByteSequence>).put(instance, metadata);
+  }
 
   /**
    * 内部表現
@@ -620,7 +626,7 @@ class ByteSequence {
       const bytes = ByteSequence.wrap(buffer);
       if (blob.type) {
         const mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
-        ByteSequence.MetadataStore.put(bytes, { mediaType });
+        ByteSequence.#storeMeatdata(bytes, { mediaType });
       }
 
       return bytes;
@@ -732,7 +738,7 @@ class ByteSequence {
       void exception;
       mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
     }
-    ByteSequence.MetadataStore.put(bytes, { mediaType });
+    ByteSequence.#storeMeatdata(bytes, { mediaType });
 
     return bytes;
   }
@@ -820,7 +826,7 @@ class ByteSequence {
 
         const size = WebMessageUtils.extractContentLength(message.headers);
         const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
-        ByteSequence.MetadataStore.put(bytes, { mediaType });
+        ByteSequence.#storeMeatdata(bytes, { mediaType });
         return bytes;
       }
     }

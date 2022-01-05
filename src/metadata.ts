@@ -7,7 +7,43 @@ type ResourceMetadata = {
   fileName?: string,
 };
 
-class ResourceMetadataStore<T extends object> {
+/**
+ * A store for storing metadata of resources.
+ * The store has a weak reference to the resources.
+ * 
+ * @typeParam T - The type of the resources.
+ */
+interface ResourceMetadataStore<T extends object> {
+  /**
+   * Retruns the `MediaType` of the specified resource.
+   * 
+   * @param resource - A resource.
+   * @returns If the `MediaType` is stored in the store, the `MediaType`; Otherwise, `null`.
+   */
+  getMediaType(resource: T): MediaType | null;
+
+  /**
+   * Retruns the [`BlobPropertyBag`](https://w3c.github.io/FileAPI/#dfn-BlobPropertyBag) of the specified resource.
+   * 
+   * `BlobPropertyBag.endings` is not implemented.
+   * 
+   * @param resource - A resource.
+   * @returns If the `MediaType` is stored in the store, the `BlobPropertyBag`; Otherwise, `undefined`.
+   */
+  getBlobProperties(resource: T): BlobPropertyBag | undefined;
+
+  /**
+   * Retruns the [`FilePropertyBag`](https://w3c.github.io/FileAPI/#dfn-FilePropertyBag) of the specified resource.
+   * 
+   * `FilePropertyBag.lastModified` is not implemented.
+   * 
+   * @param resource - A resource.
+   * @returns If the `MediaType` is stored in the store, the `FilePropertyBag`; Otherwise, `undefined`.
+   */
+  getFileProperties(resource: T): FilePropertyBag | undefined;
+}
+
+class MetadataMap<T extends object> implements ResourceMetadataStore<T> {
   #store: WeakMap<T, ResourceMetadata>;
 
   constructor() {
@@ -15,17 +51,17 @@ class ResourceMetadataStore<T extends object> {
     Object.freeze(this);
   }
 
-  put(obj: T, metadata: ResourceMetadata): void {
-    this.#store.set(obj, metadata);
+  put(resource: T, metadata: ResourceMetadata): void {
+    this.#store.set(resource, metadata);
   }
 
-  getMediaType(obj: T): MediaType | null {
-    const metadata = this.#store.get(obj);
+  getMediaType(resource: T): MediaType | null {
+    const metadata = this.#store.get(resource);
     return (metadata?.mediaType instanceof MediaType) ? metadata.mediaType : null;
   }
 
-  getBlobProperties(obj: T): BlobPropertyBag | undefined {
-    const mediaType = this.getMediaType(obj);
+  getBlobProperties(resource: T): BlobPropertyBag | undefined {
+    const mediaType = this.getMediaType(resource);
     const type: string | undefined = (mediaType) ? mediaType.toString() : undefined;
     const endings = undefined; // TODO
     if (type || endings) {
@@ -37,8 +73,8 @@ class ResourceMetadataStore<T extends object> {
     return undefined;
   }
 
-  getFileProperties(obj: T): FilePropertyBag | undefined {
-    const blobProperties = this.getBlobProperties(obj);
+  getFileProperties(resource: T): FilePropertyBag | undefined {
+    const blobProperties = this.getBlobProperties(resource);
     const lastModified = undefined; // TODO
     if (blobProperties || lastModified) {
 
@@ -49,8 +85,10 @@ class ResourceMetadataStore<T extends object> {
     return undefined;
   }
 }
-Object.freeze(ResourceMetadataStore);
+Object.freeze(MetadataMap);
 
 export {
-  ResourceMetadataStore,
+  type ResourceMetadata,
+  type ResourceMetadataStore,
+  MetadataMap,
 };
