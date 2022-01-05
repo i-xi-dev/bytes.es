@@ -769,10 +769,9 @@ class ByteSequence {
   /**
    * Computes the SRI integrity (Base64-encoded digest).
    * 
-   * @see {@link [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)}
-   * @param algorithm The digest algorithm.
-   * @returns The {@link [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)} that
-   *     fulfills with a SRI integrity (base64-encoded digest).
+   * @param algorithm - The digest algorithm.
+   * @returns The `Promise` that fulfills with a SRI integrity (base64-encoded digest).
+   * @see [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
    */
   async #integrity(algorithm: DigestAlgorithm, prefix: string): Promise<string> {
     // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
@@ -780,14 +779,23 @@ class ByteSequence {
     return prefix + digestBytes.toBase64Encoded();
   }
 
+  /**
+   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-256 digest.
+   */
   get sha256Integrity(): Promise<string> {
     return this.#integrity(Sha256, "sha256-");
   }
 
+  /**
+   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-384 digest.
+   */
   get sha384Integrity(): Promise<string> {
     return this.#integrity(Sha384, "sha384-");
   }
 
+  /**
+   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-512 digest.
+   */
   get sha512Integrity(): Promise<string> {
     return this.#integrity(Sha512, "sha512-");
   }
