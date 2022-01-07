@@ -9,4 +9,7 @@ export { type Base64Options } from "@i-xi-dev/base64";
 export { type PercentOptions } from "@i-xi-dev/percent";
 export { MediaType } from "@i-xi-dev/mimetype";
 export { type ResourceMetadataStore } from "./metadata";
-export { ByteSequence } from "./byte_sequence";
+export {
+  type Bytes,
+  ByteSequence,
+} from "./byte_sequence";

@@ -41,14 +41,9 @@ const {
 } = StringUtils.RangePattern;
 
 /**
- * バイト列を表す整数の配列
+ * A typedef that representing a `ByteSequence`, [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource), or `Array` of 8-bit unsigned integers.
  */
-type ByteArray = Array<number> | BufferSource;
-
-/**
- * バイト列を表すオブジェクト
- */
-type Bytes = ByteSequence | ByteArray;
+type Bytes = ByteSequence | BufferSource | Array<number>;
 
 const utf8TextEncoder = new TextEncoder();
 
@@ -86,12 +81,13 @@ class ByteSequence {
     //   throw new TypeError("bytes");
     // }
     console.assert(bytes instanceof ArrayBuffer);
+
     this.#buffer = bytes;
     Object.freeze(this);
   }
 
   /**
-   * バイト数
+   * Gets the number of bytes.
    */
   get count(): number {
     return this.#buffer.byteLength;
@@ -118,6 +114,7 @@ class ByteSequence {
    * 
    * @param byteCount - The size, in bytes.
    * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `byteCount` is not non-negative integer.
    */
   static allocate(byteCount: number): ByteSequence {
     if (NumberUtils.isNonNegativeInteger(byteCount) !== true) {
@@ -133,6 +130,7 @@ class ByteSequence {
    * 
    * @param bytes バイト列
    * @returns 生成したインスタンス
+   * @throws {TypeError} The `bytes` is not type of [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource).
    */
   static wrap(bytes: BufferSource): ByteSequence {
     let bytesSrc: ArrayBuffer;
@@ -155,6 +153,7 @@ class ByteSequence {
    * 
    * @param bytes バイト列
    * @returns 生成したインスタンス
+   * @throws {TypeError} The `bytes` is not type of `Bytes`.
    */
   static from(bytes: Bytes): ByteSequence {
     let bytesSrc: ArrayBuffer;
@@ -213,12 +212,14 @@ class ByteSequence {
    * @param {number} byteCount - 生成するバイト列のバイト数
    *     RandomSource.getRandomValuesの制約により、最大値は65536
    * @returns 生成したインスタンス
+   * @throws {TypeError} The `byteCount` is not non-negative integer.
+   * @throws {RangeError} The `byteCount` is greater than 65536.
    */
   static generateRandom(byteCount: number): ByteSequence {
     if (NumberUtils.isNonNegativeInteger(byteCount) !== true) {
       throw new TypeError("byteCount");
     }
-    if (byteCount > 65536) {
+    if (byteCount > 65536) { //TODO 連結すれば良いのでは
       throw new RangeError("byteCount");
     }
 
@@ -377,6 +378,10 @@ class ByteSequence {
    * @param start 開始インデックス
    * @param end 終了インデックス
    * @returns 自身のバイト列の部分複製
+   * @throws {TypeError} The `start` is not non-negative integer.
+   * @throws {RangeError} The `start` is greater than the `count` of this.
+   * @throws {TypeError} The `end` is not non-negative integer.
+   * @throws {RangeError} The `end` is less than the `start`.
    */
   subsequence(start: number, end?: number): ByteSequence {
     if (NumberUtils.isNonNegativeInteger(start) !== true) {
@@ -414,6 +419,10 @@ class ByteSequence {
    * @param byteOffset - ビューのオフセット
    * @param byteCount - ビューのバイト数
    * @returns 自身のArrayBufferのビュー
+   * @throws {TypeError} The `byteOffset` is not non-negative integer.
+   * @throws {RangeError} The `byteOffset` is greater than the `count` of this.
+   * @throws {TypeError} The `byteCount` is not non-negative integer.
+   * @throws {RangeError} The `byteCount` is greater than the result of subtracting `byteOffset` from the `count` of this.
    */
   viewScope(byteOffset: number, byteCount: number): Uint8Array {
     if (NumberUtils.isNonNegativeInteger(byteOffset) !== true) {
@@ -439,7 +448,7 @@ class ByteSequence {
    * @param otherBytes バイト列
    * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
    */
-  #startsWith(otherBytes: ByteArray): boolean {
+  #startsWith(otherBytes: BufferSource | Array<uint8>): boolean {
     const thisView = this.view;
     if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
       const otherView = new Uint8Array((otherBytes instanceof ArrayBuffer) ? otherBytes : otherBytes.buffer);
@@ -466,6 +475,7 @@ class ByteSequence {
    * 
    * @param bytes バイト列
    * @returns 自身のバイト列と、他のオブジェクトの表すバイト列が等しいか否か
+   * @throws {TypeError} The `bytes` is not type of `Bytes`.
    */
   equals(bytes: Bytes): boolean {
     if (bytes instanceof ByteSequence) {
@@ -474,13 +484,19 @@ class ByteSequence {
       }
       return this.#startsWith(bytes.buffer);
     }
-    else {
-      const bytesCount = ((bytes instanceof ArrayBuffer) || ArrayBuffer.isView(bytes)) ? bytes.byteLength : bytes.length;
-      if (bytesCount !== this.count) {
+    else if ((bytes instanceof ArrayBuffer) || ArrayBuffer.isView(bytes)) {
+      if (bytes.byteLength !== this.count) {
         return false;
       }
       return this.#startsWith(bytes);
     }
+    else if (Array.isArray(bytes) && bytes.every((byte) => Uint8.isUint8(byte))) {
+      if (bytes.length !== this.count) {
+        return false;
+      }
+      return this.#startsWith(bytes as Array<uint8>);
+    }
+    throw new TypeError("bytes");
   }
 
   /**
@@ -488,14 +504,19 @@ class ByteSequence {
    * 
    * @param bytes バイト列
    * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
+   * @throws {TypeError} The `bytes` is not type of `Bytes`.
    */
   startsWith(bytes: Bytes): boolean {
     if (bytes instanceof ByteSequence) {
       return this.#startsWith(bytes.buffer);
     }
-    else {
+    else if ((bytes instanceof ArrayBuffer) || ArrayBuffer.isView(bytes)) {
       return this.#startsWith(bytes);
     }
+    else if (Array.isArray(bytes) && bytes.every((byte) => Uint8.isUint8(byte))) {
+      return this.#startsWith(bytes as Array<uint8>);
+    }
+    throw new TypeError("bytes");
   }
 
   /**
@@ -504,6 +525,7 @@ class ByteSequence {
    * 
    * @param segmentByteCount 分割するバイト数
    * @returns 自身のバイト列の部分複製を返却するジェネレーター
+   * @throws {TypeError} The `segmentByteCount` is not non-negative integer.
    */
   segments(segmentByteCount: number): Generator<ByteSequence, void, void> {
     if (NumberUtils.isPositiveInteger(segmentByteCount) !== true) {
@@ -619,6 +641,7 @@ class ByteSequence {
    * 
    * @param blob Blob
    * @returns 生成したインスタンス
+   * @throws {Error} `blob.arrayBuffer()` is failed.
    */
   static async fromBlob(blob: Blob): Promise<ByteSequence> {
     try {
@@ -675,6 +698,9 @@ class ByteSequence {
    * 
    * @param dataUrl Data URL
    * @returns 生成したインスタンス
+   * @throws {TypeError} The `dataUrl` parsing is failed.
+   * @throws {TypeError} The URL scheme of the `dataUrl` is not "data".
+   * @throws {TypeError} The `dataUrl` does not contain `","`.
    */
   static fromDataURL(dataUrl: URL | string): ByteSequence {
     let parsed: URL;
@@ -750,6 +776,7 @@ class ByteSequence {
    * //XXX Base64なしもできるようにする？
    * 
    * @returns Data URL
+   * @throws {TypeError}
    */
   toDataURL(preferredType?: string | MediaType): URL {
     const resolvedType: MediaType | null = this.#resolveMediaType(preferredType);
@@ -811,6 +838,7 @@ class ByteSequence {
    * TODO options を任意に
    * TODO signal,timeout
    * TODO createReadingProgress
+   * @throws {Error}
    */
   static async fromWebMessage(message: WebMessage, options: WebMessageReadingOptions): Promise<ByteSequence | null> {
     if (message.body) {
@@ -843,4 +871,7 @@ class ByteSequence {
 }
 Object.freeze(ByteSequence);
 
-export { ByteSequence };
+export {
+  type Bytes,
+  ByteSequence,
+};

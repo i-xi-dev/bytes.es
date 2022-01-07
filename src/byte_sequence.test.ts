@@ -5,7 +5,6 @@ import { Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
 import iconv from "iconv-lite";
 import { ByteSequence } from "./byte_sequence";
-import { uint8 } from "./index";
 import { MediaType } from "@i-xi-dev/mimetype";
 
 describe("ByteSequence.allocate", () => {
@@ -172,7 +171,7 @@ describe("ByteSequence.wrap", () => {
 
 describe("ByteSequence.from", () => {
   it("from(Array<number>)", () => {
-    const a0: uint8[] = [9,8,7,6,5,4,3,2,0,255];
+    const a0 = [9,8,7,6,5,4,3,2,0,255];
     const bs0 = ByteSequence.from(a0);
 
     assert.strictEqual(bs0.count, 10);
@@ -180,14 +179,14 @@ describe("ByteSequence.from", () => {
     assert.strictEqual(bs0a[8], 0);
     assert.strictEqual(bs0a[9], 255);
 
-    const a1: uint8[] = [];
+    const a1: number[] = [];
     const bs1 = ByteSequence.from(a1);
 
     assert.strictEqual(bs1.count, 0);
 
     const a2 = ["a"];
     assert.throws(() => {
-      ByteSequence.from(a2 as unknown as uint8[]);
+      ByteSequence.from(a2 as unknown as number[]);
     }, {
       message: "bytes"
     });
@@ -297,7 +296,7 @@ describe("ByteSequence.prototype.toArray", () => {
     assert.strictEqual(bs0.toArray().length, 0);
     assert.strictEqual(bs1.toArray().length, 1000);
 
-    const a2: uint8[] = [1,2,3,4,5];
+    const a2 = [1,2,3,4,5];
     const bs2 = ByteSequence.from(a2);
     assert.strictEqual(JSON.stringify(a2), JSON.stringify(bs2.toArray()));
 
@@ -310,7 +309,7 @@ describe("ByteSequence.of", () => {
     const bs0 = ByteSequence.of(1,2,3,4,5);
     assert.strictEqual(bs0.buffer.byteLength, 5);
 
-    const a1: uint8[] = [1,2,3,4,5,6];
+    const a1 = [1,2,3,4,5,6];
     const bs1 = ByteSequence.of(...a1);
     assert.strictEqual(bs1.buffer.byteLength, 6);
 
@@ -606,7 +605,7 @@ describe("ByteSequence.prototype.toJSON", () => {
     assert.strictEqual(bs0.toJSON().length, 0);
     assert.strictEqual(bs1.toJSON().length, 1000);
 
-    const a2: uint8[] = [1,2,3,4,5];
+    const a2 = [1,2,3,4,5];
     const bs2 = ByteSequence.from(a2);
     assert.strictEqual(JSON.stringify(a2), JSON.stringify(bs2.toJSON()));
 
@@ -693,7 +692,7 @@ describe("ByteSequence.prototype.subsequence", () => {
     assert.notStrictEqual(bs1.subsequence(0).buffer, bs1.buffer);
     assert.strictEqual(bs1.subsequence(0).toString(), bs1.toString());
 
-    const a2: uint8[] = [1,2,3,4,5];
+    const a2 = [1,2,3,4,5];
     const bs2 = ByteSequence.from(a2);
     assert.strictEqual(JSON.stringify(a2), JSON.stringify(bs2.subsequence(0).toArray()));
 
@@ -752,7 +751,7 @@ describe("ByteSequence.prototype.duplicate", () => {
     assert.notStrictEqual(bs1.duplicate().buffer, bs1.buffer);
     assert.strictEqual(bs1.duplicate().toString(), bs1.toString());
 
-    const a2: uint8[] = [1,2,3,4,5];
+    const a2 = [1,2,3,4,5];
     const bs2 = ByteSequence.from(a2);
     assert.strictEqual(JSON.stringify(a2), JSON.stringify(bs2.duplicate().toArray()));
 
@@ -1216,7 +1215,7 @@ describe("ByteSequence.fromBlob", () => {
     assert.strictEqual(b11v[2], 1);
     assert.strictEqual(b11v[3], 127);
     assert.strictEqual(b11.count, 4);
-    assert.strictEqual(b11.mediaType, "text/plain");
+    assert.strictEqual(JSON.stringify(b11.__metadata.toBlobProperties()), `{"type":"text/plain"}`);
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
 
@@ -1227,7 +1226,7 @@ describe("ByteSequence.fromBlob", () => {
     assert.strictEqual(b21v[2], 1);
     assert.strictEqual(b21v[3], 127);
     assert.strictEqual(b21.count, 4);
-    assert.strictEqual(b21.mediaType, "");
+    assert.strictEqual(JSON.stringify(b21.__metadata.toBlobProperties()), `{}`);
 
   });
 
@@ -1298,30 +1297,30 @@ describe("ByteSequence.fromDataURL", () => {
 
     const b0 = ByteSequence.fromDataURL("data:text/plain,");
     assert.strictEqual(b0.count, 0);
-    assert.strictEqual(b0.mediaType, "text/plain");
+    assert.strictEqual(JSON.stringify(b0.__metadata.toBlobProperties()), `{"type":"text/plain"}`);
 
     const b0b = ByteSequence.fromDataURL("data:text/plain;base64,");
     assert.strictEqual(b0b.count, 0);
-    assert.strictEqual(b0b.mediaType, "text/plain");
+    assert.strictEqual(JSON.stringify(b0b.__metadata.toBlobProperties()), `{"type":"text/plain"}`);
 
     const b0c = ByteSequence.fromDataURL("data: ,");
     assert.strictEqual(b0c.count, 0);
-    assert.strictEqual(b0c.mediaType, "text/plain;charset=US-ASCII");
+    assert.strictEqual(JSON.stringify(b0c.__metadata.toBlobProperties()), `{"type":"text/plain;charset=US-ASCII"}`);
 
     const b0d = ByteSequence.fromDataURL("data: ; ,");
     assert.strictEqual(b0d.count, 0);
-    assert.strictEqual(b0d.mediaType, "text/plain");
+    assert.strictEqual(JSON.stringify(b0d.__metadata.toBlobProperties()), `{"type":"text/plain"}`);
 
     const b0e = ByteSequence.fromDataURL("data: ; x=y ,");
     assert.strictEqual(b0e.count, 0);
-    assert.strictEqual(b0e.mediaType, "text/plain;x=y");
+    assert.strictEqual(JSON.stringify(b0e.__metadata.toBlobProperties()), `{"type":"text/plain;x=y"}`);
 
     const b11 = ByteSequence.fromDataURL("data:text/plain,a1");
     const b11v = b11.view;
     assert.strictEqual(b11v[0], 97);
     assert.strictEqual(b11v[1], 49);
     assert.strictEqual(b11.count, 2);
-    assert.strictEqual(b11.mediaType, "text/plain");
+    assert.strictEqual(JSON.stringify(b11.__metadata.toBlobProperties()), `{"type":"text/plain"}`);
 
     const b12 = ByteSequence.fromDataURL("data:application/octet-stream;base64,AwIBAP/+/fw=");
     const b12v = b12.view;
@@ -1334,14 +1333,14 @@ describe("ByteSequence.fromDataURL", () => {
     assert.strictEqual(b12v[6], 253);
     assert.strictEqual(b12v[7], 252);
     assert.strictEqual(b12.count, 8);
-    assert.strictEqual(b12.mediaType, "application/octet-stream");
+    assert.strictEqual(JSON.stringify(b12.__metadata.toBlobProperties()), `{"type":"application/octet-stream"}`);
 
     const b21 = ByteSequence.fromDataURL("data:text/plain; p1=a,a1");
     const b21v = b21.view;
     assert.strictEqual(b21v[0], 97);
     assert.strictEqual(b21v[1], 49);
     assert.strictEqual(b21.count, 2);
-    assert.strictEqual(b21.mediaType, "text/plain;p1=a");
+    assert.strictEqual(JSON.stringify(b21.__metadata.toBlobProperties()), `{"type":"text/plain;p1=a"}`);
 
     const b22 = ByteSequence.fromDataURL("data:text/plain; p1=a;p2=\"b,c\",a1");
     const b22v = b22.view;
@@ -1351,21 +1350,21 @@ describe("ByteSequence.fromDataURL", () => {
     assert.strictEqual(b22v[3], 97);
     assert.strictEqual(b22v[4], 49);
     assert.strictEqual(b22.count, 5);
-    assert.strictEqual(b22.mediaType, "text/plain;p1=a;p2=b");
+    assert.strictEqual(JSON.stringify(b22.__metadata.toBlobProperties()), `{"type":"text/plain;p1=a;p2=b"}`);
 
     const b31 = ByteSequence.fromDataURL("data:text/plain,%FF%");
     const b31v = b31.view;
     assert.strictEqual(b31v[0], 255);
     assert.strictEqual(b31v[1], 0x25);
     assert.strictEqual(b31.count, 2);
-    assert.strictEqual(b31.mediaType, "text/plain");
+    assert.strictEqual(JSON.stringify(b31.__metadata.toBlobProperties()), `{"type":"text/plain"}`);
 
     const b32 = ByteSequence.fromDataURL("data:text/plain,%fff");
     const b32v = b32.view;
     assert.strictEqual(b32v[0], 255);
     assert.strictEqual(b32v[1], 0x66);
     assert.strictEqual(b32.count, 2);
-    assert.strictEqual(b32.mediaType, "text/plain");
+    assert.strictEqual(JSON.stringify(b32.__metadata.toBlobProperties()), `{"type":"text/plain"}`);
 
     const b33 = ByteSequence.fromDataURL("data:text/plain,a?a=2");
     const b33v = b33.view;
@@ -1375,7 +1374,7 @@ describe("ByteSequence.fromDataURL", () => {
     assert.strictEqual(b33v[3], 0x3D);
     assert.strictEqual(b33v[4], 0x32);
     assert.strictEqual(b33.count, 5);
-    assert.strictEqual(b33.mediaType, "text/plain");
+    assert.strictEqual(JSON.stringify(b33.__metadata.toBlobProperties()), `{"type":"text/plain"}`);
 
     assert.throws(() => {
       ByteSequence.fromDataURL("data:text/plain");
@@ -1403,7 +1402,7 @@ describe("ByteSequence.fromDataURL", () => {
     assert.strictEqual(b11v[0], 97);
     assert.strictEqual(b11v[1], 49);
     assert.strictEqual(b11.count, 2);
-    assert.strictEqual(b11.mediaType, "text/plain");
+    assert.strictEqual(JSON.stringify(b11.__metadata.toBlobProperties()), `{"type":"text/plain"}`);
 
   });
 
@@ -1457,36 +1456,36 @@ describe("ByteSequence.prototype.toDataURL", () => {
 
 });
 
-describe("ByteSequence.prototype.toSha256Integrity", () => {
-  it("toSha256Integrity()", async () => {
+describe("ByteSequence.prototype.sha256Integrity", () => {
+  it("sha256Integrity", async () => {
     const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
 
     const b11 = await ByteSequence.fromBlob(b1);
-    const i11a = await b11.toSha256Integrity();
+    const i11a = await b11.sha256Integrity;
     assert.strictEqual(i11a, "sha256-IIm8EKKH9DeP2uG3Kn/lD4bbs5lgbsIi/L8hAswrj/w=");
 
   });
 
 });
 
-describe("ByteSequence.prototype.toSha384Integrity", () => {
-  it("toSha384Integrity()", async () => {
+describe("ByteSequence.prototype.sha384Integrity", () => {
+  it("sha384Integrity", async () => {
     const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
 
     const b11 = await ByteSequence.fromBlob(b1);
-    const i11b = await b11.toSha384Integrity();
+    const i11b = await b11.sha384Integrity;
     assert.strictEqual(i11b, "sha384-0uhOVMndkWKKHtfDkQSsXCcT4r7Xr5Q2bcQ/uczTl2WivQ5094ZFIZZut1y32IsF");
 
   });
 
 });
 
-describe("ByteSequence.prototype.toSha512Integrity", () => {
-  it("toSha512Integrity()", async () => {
+describe("ByteSequence.prototype.sha512Integrity", () => {
+  it("sha512Integrity", async () => {
     const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
 
     const b11 = await ByteSequence.fromBlob(b1);
-    const i11c = await b11.toSha512Integrity();
+    const i11c = await b11.sha512Integrity;
     assert.strictEqual(i11c, "sha512-lphfU9I644pv1b+t8yZp7b+kg+lFD+WcIeTqhWieCTRZJ4wWOxTAJxSk9rWrOmVb+TFJ2HfaKIBRFqQ0OOxyAw==");
 
   });

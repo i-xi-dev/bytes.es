@@ -46,6 +46,7 @@ function splitWebHeaderValue(value: string): Array<string> {
  * 
  * @param headers ヘッダー
  * @returns Content-Typeの値から生成したMediaTypeインスタンス
+ * //TODO throws
  */
 function extractContentType(headers: Headers): MediaType {
   // 5.
@@ -114,6 +115,7 @@ function extractContentType(headers: Headers): MediaType {
  * 
  * @param headers ヘッダー
  * @returns Content-Lengthの値から生成した数値、取得できなかった場合はnull
+ * //TODO throws
  */
 function extractContentLength(headers: Headers): number | null {
   // 当ファイルの処理において、圧縮や分割されている場合はContent-Lengthの値は必要ない為nullを返す
