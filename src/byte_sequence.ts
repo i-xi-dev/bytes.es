@@ -94,15 +94,14 @@ class ByteSequence {
   }
 
   /**
-   * 自身が参照しているArrayBufferへの参照を返却
-   *     ※返却値に変更をくわえた場合、当インスタンスに影響する
+   * Gets the underlying `ArrayBuffer`.
    */
   get buffer(): ArrayBuffer {
     return this.#buffer;
   }
 
   /**
-   * 自身のArrayBufferのビューを返却
+   * Gets the `Uint8Array` that views the underlying `ArrayBuffer` of this instance.
    */
   get view(): Uint8Array {
     return new Uint8Array(this.#buffer); // freezeなどされても困るので毎度生成する
@@ -176,33 +175,21 @@ class ByteSequence {
   }
 
   /**
-   * 自身のバイト列を表す整数の配列を生成し返却
-   *     ※ArrayBufferは新たに生成する
+   * Returns the `Uint8Array` that views a new `ArrayBuffer` that duplicates the underlying `ArrayBuffer` of this instance.
    * 
-   * @returns バイト列を表す整数の配列
+   * @returns The `Uint8Array`.
    */
   toUint8Array(): Uint8Array {
     return new Uint8Array(this.#buffer.slice(0));
   }
 
   /**
-   * 自身のバイト列を表す整数の配列を生成し返却
+   * Returns the 8-bit unsigned integer `Array` representing this byte sequence.
    * 
-   * @returns バイト列を表す整数の配列
+   * @returns The `Array` of 8-bit unsigned integers.
    */
   toArray(): Array<uint8> {
-    return Array.from(this.toUint8Array()) as Array<uint8>;
-  }
-
-  /**
-   * バイト列を表す整数の配列をもとにインスタンスを生成し返却
-   *     ※ArrayBufferは新たに生成する
-   * 
-   * @param bytes - バイト列を表す整数の配列
-   * @returns 生成したインスタンス
-   */
-  static of(...bytes: Array<number>): ByteSequence {
-    return ByteSequence.from(bytes);
+    return [ ...this.view ] as Array<uint8>;
   }
 
   /**
@@ -325,9 +312,9 @@ class ByteSequence {
   }
 
   /**
-   * 自身のバイト列を表す整数の配列を生成し返却
+   * Returns the 8-bit unsigned integer `Array` representing this byte sequence.
    * 
-   * @returns 自身のバイト列を表す整数の配列
+   * @returns The `Array` of 8-bit unsigned integers.
    */
   toJSON(): Array<uint8> {
     return this.toArray();
