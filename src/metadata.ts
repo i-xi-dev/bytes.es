@@ -33,6 +33,14 @@ interface ResourceMetadataStore<T extends object> {
   getBlobProperties(resource: T): BlobPropertyBag | undefined;
 
   /**
+   * Retruns the file name of the specified resource.
+   * 
+   * @param resource - A resource.
+   * @returns If the file name is stored in the store, the file name; Otherwise, `undefined`.
+   */
+  getFileName(resource: T): string | undefined;
+
+  /**
    * Retruns the [`FilePropertyBag`](https://w3c.github.io/FileAPI/#dfn-FilePropertyBag) of the specified resource.
    * 
    * `FilePropertyBag.lastModified` is not implemented.
@@ -71,6 +79,11 @@ class MetadataMap<T extends object> implements ResourceMetadataStore<T> {
       };
     }
     return undefined;
+  }
+
+  getFileName(resource: T): string | undefined {
+    const metadata = this.#store.get(resource);
+    return ((typeof metadata?.fileName === "string") && (metadata.fileName.length > 0)) ? metadata.fileName : undefined;
   }
 
   getFileProperties(resource: T): FilePropertyBag | undefined {

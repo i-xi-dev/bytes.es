@@ -34,7 +34,7 @@ import {
   type ResourceMetadataStore,
   MetadataMap,
 } from "./metadata";
-import { WebMessageUtils } from "./web_message_utils";
+// import { WebMessageUtils } from "./web_message_utils";
 
 const {
   ASCII_WHITESPACE,
@@ -49,18 +49,57 @@ const utf8TextEncoder = new TextEncoder();
 
 const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 
-type WebMessage = Request | Response;
+// type WebMessage = Request | Response;
 
-type WebMessageReadingOptions = {
-  ignoreHttpStatus: boolean,
-  readAs: "blob" | "stream",
-};// TODO default options
+// type WebMessageReadingOptions = {
+//   ignoreHttpStatus: boolean,
+//   readAs: "blob" | "stream",
+// };// TODO default options
 
 /**
- * バイト列
+ * The type of the `TypedArray` constructors.
+ */
+type TypedArrayConstructor = Uint8ArrayConstructor
+| Uint8ClampedArrayConstructor
+| Int8ArrayConstructor
+| Uint16ArrayConstructor
+| Int16ArrayConstructor
+| Uint32ArrayConstructor
+| Int32ArrayConstructor
+| Float32ArrayConstructor
+| Float64ArrayConstructor
+| BigUint64ArrayConstructor
+| BigInt64ArrayConstructor;
+
+function isTypedArrayConstructor(value: unknown): value is TypedArrayConstructor {
+  return (
+    (value === Uint8Array)
+    || (value === Uint8ClampedArray)
+    || (value === Int8Array)
+    || (value === Uint16Array)
+    || (value === Int16Array)
+    || (value === Uint32Array)
+    || (value === Int32Array)
+    || (value === Float32Array)
+    || (value === Float64Array)
+    || (value === BigUint64Array)
+    || (value === BigInt64Array)
+  );
+}
+
+/**
+ * The type of the `ArrayBufferView` constructors.
+ */
+type ViewConstructor = TypedArrayConstructor | DataViewConstructor;
+
+/**
+ * Byte sequence
  */
 class ByteSequence {
   // TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
+  /**
+   * TODO
+   */
   static MetadataStore: ResourceMetadataStore<ByteSequence> = new MetadataMap();
 
   static #storeMeatdata(instance: ByteSequence, metadata: ResourceMetadata): void {
@@ -73,6 +112,11 @@ class ByteSequence {
   #buffer: ArrayBuffer;
 
   /**
+   * 内部表現のビュー
+   */
+  #view: Uint8Array;
+
+  /**
    * ArrayBufferをラップするインスタンスを生成
    *     ※外部からのArrayBufferの変更は当インスタンスに影響する
    */
@@ -83,13 +127,14 @@ class ByteSequence {
     console.assert(bytes instanceof ArrayBuffer);
 
     this.#buffer = bytes;
+    this.#view = new Uint8Array(this.#buffer);
     Object.freeze(this);
   }
 
   /**
    * Gets the number of bytes.
    */
-  get count(): number {
+  get byteLength(): number {
     return this.#buffer.byteLength;
   }
 
@@ -101,86 +146,151 @@ class ByteSequence {
   }
 
   /**
-   * Gets the `Uint8Array` that views the underlying `ArrayBuffer` of this instance.
+   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-256 digest for this byte sequence.
    */
-  get view(): Uint8Array {
-    return new Uint8Array(this.#buffer); // freezeなどされても困るので毎度生成する
+  get sha256Integrity(): Promise<string> {
+    return this.#integrity(Sha256, "sha256-");
   }
 
   /**
-   * Create a new instance of `ByteSequence` of the specified size.
-   * Its bytes are initialized to 0.
+   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-384 digest for this byte sequence.
+   */
+  get sha384Integrity(): Promise<string> {
+    return this.#integrity(Sha384, "sha384-");
+  }
+
+  /**
+   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-512 digest for this byte sequence.
+   */
+  get sha512Integrity(): Promise<string> {
+    return this.#integrity(Sha512, "sha512-");
+  }
+
+  /**
+   * Creates a new instance of `ByteSequence` of the specified size.
+   * Its bytes are filled with zeros.
    * 
-   * @param byteCount - The size, in bytes.
+   * @param byteLength - The size, in bytes.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `byteCount` is not non-negative integer.
+   * @throws {TypeError} The `byteLength` is not non-negative integer.
    */
-  static allocate(byteCount: number): ByteSequence {
-    if (NumberUtils.isNonNegativeInteger(byteCount) !== true) {
-      throw new TypeError("byteCount");
+  static allocate(byteLength: number): ByteSequence {
+    if (NumberUtils.isNonNegativeInteger(byteLength) !== true) {
+      throw new TypeError("byteLength");
     }
-    return new ByteSequence(new ArrayBuffer(byteCount));
+    return new ByteSequence(new ArrayBuffer(byteLength));
   }
 
   /**
-   * バイト列をもとにインスタンスを生成し返却
-   *     ※ArrayBufferは新たに生成しない
-   *     ※bytesがArrayBufferViewの場合、ビューのbyteOffset,byteLengthは無視する（ビュー.bufferを使用するのみ）
+   * Creates a new instance of `ByteSequence` with the specified underlying `ArrayBuffer`.
    * 
-   * @param bytes バイト列
-   * @returns 生成したインスタンス
-   * @throws {TypeError} The `bytes` is not type of [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource).
+   * @param buffer - The `ArrayBuffer`.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `buffer` is not type of `ArrayBuffer`.
    */
-  static wrap(bytes: BufferSource): ByteSequence {
-    let bytesSrc: ArrayBuffer;
-    if (ArrayBuffer.isView(bytes)) {
-      bytesSrc = bytes.buffer;
+  static wrapArrayBuffer(buffer: ArrayBuffer): ByteSequence {
+    if (buffer instanceof ArrayBuffer) {
+      return new ByteSequence(buffer);
     }
-    else if (bytes instanceof ArrayBuffer) {
-      bytesSrc = bytes;
-    }
-    else {
-      throw new TypeError("bytes");
-    }
-    return new ByteSequence(bytesSrc);
+    throw new TypeError("buffer");
   }
 
   /**
-   * バイト列をもとにインスタンスを生成し返却
-   *     ※ArrayBufferは新たに生成する
-   *     ※bytesがArrayBufferViewの場合、ビューの範囲外は無視する
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * that duplicates the specified `ArrayBuffer`.
    * 
-   * @param bytes バイト列
-   * @returns 生成したインスタンス
-   * @throws {TypeError} The `bytes` is not type of `Bytes`.
+   * @param buffer - The `ArrayBuffer`.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `buffer` is not type of `ArrayBuffer`.
    */
-  static from(bytes: Bytes): ByteSequence {
-    let bytesSrc: ArrayBuffer;
-    if (bytes instanceof ByteSequence) {
-      bytesSrc = bytes.buffer.slice(0);
+  static fromArrayBuffer(buffer: ArrayBuffer): ByteSequence {
+    if (buffer instanceof ArrayBuffer) {
+      return new ByteSequence(buffer.slice(0));
     }
-    else if (ArrayBuffer.isView(bytes)) {
-      bytesSrc = bytes.buffer.slice(bytes.byteOffset, (bytes.byteOffset + bytes.byteLength));
-    }
-    else if (bytes instanceof ArrayBuffer) {
-      bytesSrc = bytes.slice(0);
-    }
-    else if (Array.isArray(bytes) && bytes.every((byte) => Uint8.isUint8(byte))) {
-      bytesSrc = Uint8Array.from(bytes).buffer;
-    }
-    else {
-      throw new TypeError("bytes");
-    }
-    return new ByteSequence(bytesSrc);
+    throw new TypeError("buffer");
   }
 
   /**
-   * Returns the `Uint8Array` that views a new `ArrayBuffer` that duplicates the underlying `ArrayBuffer` of this instance.
+   * Returns the `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    * 
+   * @returns The `ArrayBuffer`.
+   */
+  toArrayBuffer(): ArrayBuffer {
+    return this.#buffer.slice(0);
+  }
+
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * that duplicates the underlying `ArrayBuffer` of the specified [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView).
+   * 
+   * @param bufferView - The object that represents a byte sequence.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `bufferView` is not type of `ArrayBufferView`.
+   */
+  static fromArrayBufferView(bufferView: ArrayBufferView): ByteSequence {
+    if (ArrayBuffer.isView(bufferView)) {
+      const buffer = bufferView.buffer.slice(bufferView.byteOffset, (bufferView.byteOffset + bufferView.byteLength));
+      return new ByteSequence(buffer);
+    }
+    throw new TypeError("bufferView");
+  }
+
+  /**
+   * TODO
+   * Returns the `Uint8Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @param byteOffset - The 
+   * @param byteLength - 
    * @returns The `Uint8Array`.
    */
-  toUint8Array(): Uint8Array {
-    return new Uint8Array(this.#buffer.slice(0));
+  toUint8Array(byteOffset = 0, byteLength: number = this.byteLength): Uint8Array {
+    return new Uint8Array(this.toArrayBuffer(), byteOffset, byteLength);
+  }
+
+  // XXX toInt8Array
+  // XXX toUint8ClampedArray
+  // XXX toInt16Array
+  // XXX toUint16Array
+  // XXX toInt32Array
+  // XXX toUint32Array
+  // XXX toFloat32Array
+  // XXX toFloat64Array
+  // XXX toBigInt64Array
+  // XXX toBigUint64Array
+  // XXX toDataView
+
+  // TODO
+  // toArrayBufferView(viewConstructor: ViewConstructor = Uint8Array, byteOffset: number = 0, byteLength: number = this.byteLength): ArrayBufferView {
+  //   return new viewConstructor(this.toArrayBuffer(), byteOffset, byteLength);
+  // }
+
+  /**
+   * The alias for the `fromArrayBuffer` and `fromArrayBufferView` methods.
+   * 
+   * @param bufferSource - The object that represents a byte sequence.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `bufferSource` is not type of [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource).
+   */
+  static fromBufferSource(bufferSource: BufferSource): ByteSequence {
+    if (bufferSource instanceof ArrayBuffer) {
+      return ByteSequence.fromArrayBuffer(bufferSource);
+    }
+    return ByteSequence.fromArrayBufferView(bufferSource);
+  }
+
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 8-bit unsigned integer `Array`.
+   * 
+   * @param byteArray - The 8-bit unsigned integer `Array` representing this byte sequence.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `byteArray` is not an 8-bit unsigned integer `Array`.
+   */
+  static fromArray(byteArray: Array<number>): ByteSequence {
+    if (Array.isArray(byteArray) && byteArray.every((byte) => Uint8.isUint8(byte))) {
+      return ByteSequence.fromArrayBufferView(Uint8Array.from(byteArray));
+    }
+    throw new TypeError("byteArray");
   }
 
   /**
@@ -188,38 +298,37 @@ class ByteSequence {
    * 
    * @returns The `Array` of 8-bit unsigned integers.
    */
-  toArray(): Array<uint8> {
-    return [ ...this.view ] as Array<uint8>;
+  toArray(): Array<number> {
+    return [ ...this.#view ] as Array<uint8>;
   }
 
   /**
-   * ランダムなバイトからなるインスタンスを生成し返却
-   *     ※ArrayBufferは新たに生成する
+   * Creates a new instance of `ByteSequence` of the specified size.
+   * Its bytes are filled with random values.
    * 
-   * @param {number} byteCount - 生成するバイト列のバイト数
-   *     RandomSource.getRandomValuesの制約により、最大値は65536
-   * @returns 生成したインスタンス
-   * @throws {TypeError} The `byteCount` is not non-negative integer.
-   * @throws {RangeError} The `byteCount` is greater than 65536.
+   * @param {number} byteLength - The size, in bytes.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `byteLength` is not non-negative integer.
+   * @throws {RangeError} The `byteLength` is greater than 65536.
    */
-  static generateRandom(byteCount: number): ByteSequence {
-    if (NumberUtils.isNonNegativeInteger(byteCount) !== true) {
-      throw new TypeError("byteCount");
+  static generateRandom(byteLength: number): ByteSequence {
+    if (NumberUtils.isNonNegativeInteger(byteLength) !== true) {
+      throw new TypeError("byteLength");
     }
-    if (byteCount > 65536) { //TODO 連結すれば良いのでは
-      throw new RangeError("byteCount");
+    if (byteLength > 65536) { // TODO 連結すれば良いのでは
+      throw new RangeError("byteLength");
     }
 
-    const randomBytes = crypto.getRandomValues(new Uint8Array(byteCount));
+    const randomBytes = crypto.getRandomValues(new Uint8Array(byteLength));
     return new ByteSequence(randomBytes.buffer);
   }
 
   /**
-   * バイト列を表すBinary stringを同型符号化し、インスタンスを生成し返却
-   *     ※ArrayBufferは新たに生成する
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the [isomorphic encoded](https://infra.spec.whatwg.org/#isomorphic-encode) string.
    * 
-   * @param binaryString - バイト列を表すBinary string
-   * @returns 生成したインスタンス
+   * @param binaryString - The [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary).
+   * @returns A new `ByteSequence` object.
    */
   static fromBinaryString(binaryString: string): ByteSequence {
     const bytes = IsomorphicEncoding.encode(binaryString);
@@ -236,33 +345,35 @@ class ByteSequence {
   }
 
   /**
-   * バイト列をフォーマットした文字列からインスタンスを生成し返却
-   *     ※ArrayBufferは新たに生成する
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the string contains formatted bytes.
    * 
-   * @param format - フォーマッター
-   * @returns 生成したインスタンス
+   * @param formattedBytes - The string to parse.
+   * @param options - The `ByteFormatOptions` dictionary.
+   * @returns A new `ByteSequence` object.
    */
-  static parse(toParse: string, options?: ByteFormatOptions): ByteSequence {
-    const parsed = ByteFormat.parse(toParse, options);
+  static parse(formattedBytes: string, options?: ByteFormatOptions): ByteSequence {
+    const parsed = ByteFormat.parse(formattedBytes, options);
     return new ByteSequence(parsed.buffer);
   }
 
   /**
-   * 自身のバイト列をフォーマットした文字列を生成し返却
+   * Returns the string contains formatted bytes.
    * 
-   * @param format - フォーマッター
-   * @returns バイト列をフォーマットした文字列
+   * @param options - The `ByteFormatOptions` dictionary.
+   * @returns The string contains formatted bytes.
    */
   format(options?: ByteFormatOptions): string {
-    return ByteFormat.format(this.view, options);
+    return ByteFormat.format(this.#view, options);
   }
 
   /**
-   * Base64符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the string contains Base64-encoded bytes.
    * 
-   * @param base64Encoded - Base64符号化された文字列
-   * @param options - 符号化方式のオプション
-   * @returns 生成したインスタンス
+   * @param base64Encoded - The string to decode.
+   * @param options - The `Base64Options` dictionary.
+   * @returns A new `ByteSequence` object.
    */
   static fromBase64Encoded(base64Encoded: string, options?: Base64Options): ByteSequence {
     const decoded = Base64.decode(base64Encoded, options);
@@ -270,21 +381,22 @@ class ByteSequence {
   }
 
   /**
-   * Returns the Base64-encoded string of this byte sequence.
+   * Returns the string contains Base64-encoded bytes of this byte sequence.
    * 
-   * @param options - The options for Base64 encoding.
-   * @returns The Base64-encoded string.
+   * @param options - The `Base64Options` dictionary.
+   * @returns The string contains Base64-encoded bytes.
    */
   toBase64Encoded(options?: Base64Options): string {
-    return Base64.encode(this.view, options);
+    return Base64.encode(this.#view, options);
   }
 
   /**
-   * パーセント符号化された文字列をバイト列に復号し、バイト列からインスタンスを生成し返却
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the string contains Percent-encoded bytes.
    * 
-   * @param percentEncoded パーセント符号化された文字列
-   * @param options 符号化方式オプション
-   * @returns 生成したインスタンス
+   * @param percentEncoded - The string to decode.
+   * @param options - The `PercentOptions` dictionary.
+   * @returns A new `ByteSequence` object.
    */
   static fromPercentEncoded(percentEncoded: string, options?: PercentOptions): ByteSequence {
     const decoded = Percent.decode(percentEncoded, options);
@@ -292,38 +404,19 @@ class ByteSequence {
   }
 
   /**
-   * Returns the Percent-encoded string of this byte sequence.
+   * Returns the string contains Percent-encoded bytes of this byte sequence.
    * 
-   * @param options - The options for Percent encoding.
-   * @returns The Percent-encoded string.
+   * @param options - The `PercentOptions` dictionary.
+   * @returns The string contains Percent-encoded bytes.
    */
   toPercentEncoded(options?: PercentOptions): string {
-    return Percent.encode(this.view, options);
-  }
-
-  /**
-   * 自身のバイト列をフォーマットした文字列を生成し返却
-   * 
-   * @override
-   * @returns 自身のバイト列をフォーマットした文字列
-   */
-  toString(): string {
-    return this.format();
-  }
-
-  /**
-   * Returns the 8-bit unsigned integer `Array` representing this byte sequence.
-   * 
-   * @returns The `Array` of 8-bit unsigned integers.
-   */
-  toJSON(): Array<uint8> {
-    return this.toArray();
+    return Percent.encode(this.#view, options);
   }
 
   /**
    * Computes the SHA-256 digest for this byte sequence.
    * 
-   * @returns The `Promise` that fulfills with a byte sequence of the SHA-256 digest.
+   * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-256 digest.
    */
   async toSha256Digest(): Promise<ByteSequence> {
     return this.toDigest(Sha256);
@@ -332,7 +425,7 @@ class ByteSequence {
   /**
    * Computes the SHA-384 digest for this byte sequence.
    * 
-   * @returns The `Promise` that fulfills with a byte sequence of the SHA-384 digest.
+   * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-384 digest.
    */
   async toSha384Digest(): Promise<ByteSequence> {
     return this.toDigest(Sha384);
@@ -341,202 +434,63 @@ class ByteSequence {
   /**
    * Computes the SHA-512 digest for this byte sequence.
    * 
-   * @returns The `Promise` that fulfills with a byte sequence of the SHA-512 digest.
+   * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-512 digest.
    */
   async toSha512Digest(): Promise<ByteSequence> {
     return this.toDigest(Sha512);
   }
 
   /**
-   * 自身のバイト列のハッシュを生成し返却
+   * Computes the digest for this byte sequence.
    * 
-   * @param algorithmName - ハッシュアルゴリズム
-   * @returns 生成したハッシュのバイト列で解決されるPromise
+   * @param algorithm - The digest algorithm.
+   * @returns The `Promise` that fulfills with a `ByteSequence` object of the digest.
    */
   async toDigest(algorithm: DigestAlgorithm): Promise<ByteSequence> {
-    const digest = await algorithm.compute(this.view);
+    const digest = await algorithm.compute(this.#view);
     return new ByteSequence(digest.buffer);
   }
 
   /**
-   * 自身のバイト列の部分複製を生成し返却
-   *     ※参照するArrayBufferも複製する
+   * Computes the SRI integrity (Base64-encoded digest).
    * 
-   * @param start 開始インデックス
-   * @param end 終了インデックス
-   * @returns 自身のバイト列の部分複製
-   * @throws {TypeError} The `start` is not non-negative integer.
-   * @throws {RangeError} The `start` is greater than the `count` of this.
-   * @throws {TypeError} The `end` is not non-negative integer.
-   * @throws {RangeError} The `end` is less than the `start`.
+   * @param algorithm - The digest algorithm.
+   * @returns The `Promise` that fulfills with a SRI integrity (base64-encoded digest).
+   * @see [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
    */
-  subsequence(start: number, end?: number): ByteSequence {
-    if (NumberUtils.isNonNegativeInteger(start) !== true) {
-      throw new TypeError("start");
-    }
-    if (start > this.count) {
-      throw new RangeError("start");
-    }
-
-    if (typeof end === "number") {
-      if (NumberUtils.isNonNegativeInteger(end) !== true) {
-        throw new TypeError("end");
-      }
-      if (end < start) {
-        throw new RangeError("end");
-      }
-    }
-
-    return new ByteSequence(this.#buffer.slice(start, end));
+  async #integrity(algorithm: DigestAlgorithm, prefix: string): Promise<string> {
+    // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
+    const digestBytes = await this.toDigest(algorithm);
+    return prefix + digestBytes.toBase64Encoded();
   }
 
   /**
-   * 自身のバイト列の複製を生成し返却
-   *     ※参照するArrayBufferも複製する
+   * Returns the string contains hexadecimal formatted bytes.
+   * Equivalents to the `format` method with no parameters.
    * 
-   * @returns 自身のバイト列の複製
+   * @override
+   * @returns The string contains hexadecimal formatted bytes.
    */
-  duplicate(): ByteSequence {
-    return new ByteSequence(this.#buffer.slice(0));
+  toString(): string {
+    return this.format();
   }
 
   /**
-   * 自身のArrayBufferのビューを返却
+   * The alias for the `toArray` method.
    * 
-   * @param byteOffset - ビューのオフセット
-   * @param byteCount - ビューのバイト数
-   * @returns 自身のArrayBufferのビュー
-   * @throws {TypeError} The `byteOffset` is not non-negative integer.
-   * @throws {RangeError} The `byteOffset` is greater than the `count` of this.
-   * @throws {TypeError} The `byteCount` is not non-negative integer.
-   * @throws {RangeError} The `byteCount` is greater than the result of subtracting `byteOffset` from the `count` of this.
+   * @returns The `Array` of 8-bit unsigned integers.
    */
-  viewScope(byteOffset: number, byteCount: number): Uint8Array {
-    if (NumberUtils.isNonNegativeInteger(byteOffset) !== true) {
-      throw new TypeError("byteOffset");
-    }
-    if (byteOffset > this.count) {
-      throw new RangeError("byteOffset");
-    }
-
-    if (NumberUtils.isNonNegativeInteger(byteCount) !== true) {
-      throw new TypeError("byteCount");
-    }
-    if (byteCount > (this.count - byteOffset)) {
-      throw new RangeError("byteCount");
-    }
-
-    return new Uint8Array(this.#buffer, byteOffset, byteCount);
+  toJSON(): Array<number> {
+    return this.toArray();
   }
 
   /**
-   * 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否かを返却
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * generated from the specified string by UTF-8 encoding.
+   * Neither adds nor removes BOM.
    * 
-   * @param otherBytes バイト列
-   * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
-   */
-  #startsWith(otherBytes: BufferSource | Array<uint8>): boolean {
-    const thisView = this.view;
-    if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
-      const otherView = new Uint8Array((otherBytes instanceof ArrayBuffer) ? otherBytes : otherBytes.buffer);
-      for (let i = 0; i < otherView.byteLength; i++) {
-        if (otherView[i] !== thisView[i]) {
-          return false;
-        }
-      }
-      return true;
-    }
-    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => Uint8.isUint8(byte))) {
-      for (let i = 0; i < otherBytes.length; i++) {
-        if (otherBytes[i] !== thisView[i]) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * 自身のバイト列と、他のオブジェクトの表すバイト列が等しいか否かを返却
-   * 
-   * @param bytes バイト列
-   * @returns 自身のバイト列と、他のオブジェクトの表すバイト列が等しいか否か
-   * @throws {TypeError} The `bytes` is not type of `Bytes`.
-   */
-  equals(bytes: Bytes): boolean {
-    if (bytes instanceof ByteSequence) {
-      if (bytes.count !== this.count) {
-        return false;
-      }
-      return this.#startsWith(bytes.buffer);
-    }
-    else if ((bytes instanceof ArrayBuffer) || ArrayBuffer.isView(bytes)) {
-      if (bytes.byteLength !== this.count) {
-        return false;
-      }
-      return this.#startsWith(bytes);
-    }
-    else if (Array.isArray(bytes) && bytes.every((byte) => Uint8.isUint8(byte))) {
-      if (bytes.length !== this.count) {
-        return false;
-      }
-      return this.#startsWith(bytes as Array<uint8>);
-    }
-    throw new TypeError("bytes");
-  }
-
-  /**
-   * 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否かを返却
-   * 
-   * @param bytes バイト列
-   * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
-   * @throws {TypeError} The `bytes` is not type of `Bytes`.
-   */
-  startsWith(bytes: Bytes): boolean {
-    if (bytes instanceof ByteSequence) {
-      return this.#startsWith(bytes.buffer);
-    }
-    else if ((bytes instanceof ArrayBuffer) || ArrayBuffer.isView(bytes)) {
-      return this.#startsWith(bytes);
-    }
-    else if (Array.isArray(bytes) && bytes.every((byte) => Uint8.isUint8(byte))) {
-      return this.#startsWith(bytes as Array<uint8>);
-    }
-    throw new TypeError("bytes");
-  }
-
-  /**
-   * 指定したバイト数毎に自身のバイト列の部分複製を生成し返却するジェネレーター
-   *     ※参照するArrayBufferも複製する
-   * 
-   * @param segmentByteCount 分割するバイト数
-   * @returns 自身のバイト列の部分複製を返却するジェネレーター
-   * @throws {TypeError} The `segmentByteCount` is not non-negative integer.
-   */
-  segments(segmentByteCount: number): Generator<ByteSequence, void, void> {
-    if (NumberUtils.isPositiveInteger(segmentByteCount) !== true) {
-      throw new TypeError("segmentByteCount");
-    }
-
-    return (function*(bytes: ByteSequence): Generator<ByteSequence, void, void> {
-      let i = 0;
-      let itemLength = segmentByteCount;
-      while (i < bytes.count) {
-        if ((i + segmentByteCount) > bytes.count) {
-          itemLength = bytes.count - i;
-        }
-        yield bytes.subsequence(i, i + itemLength);
-        i = i + segmentByteCount;
-      }
-    })(this);
-  }
-
-  /**
-   * 文字列をUTF-8で符号化したバイト列からインスタンスを生成し返却
-   * 
-   * @param text 文字列
-   * @returns 生成したインスタンス
+   * @param text - The string.
+   * @returns A new `ByteSequence` object.
    */
   static utf8EncodeFrom(text: string): ByteSequence {
     const encoded = utf8TextEncoder.encode(text);
@@ -544,99 +498,60 @@ class ByteSequence {
   }
 
   /**
-   * バイト列をUTF-8で復号し、文字列を返却
+   * Returns a UTF-8 decoded string of this bytes.
+   * Neither adds nor removes BOM.
    * 
-   * @param encodingName 文字符号化方式名
-   * @returns 文字列
+   * @returns A string decoded in UTF-8.
    */
   utf8DecodeTo(): string {
-    return utf8TextDecoder.decode(this.view);
+    return utf8TextDecoder.decode(this.#view);
   }
-  // TODO BOM
 
   /**
-   * 文字列を指定した符号化器で符号化したバイト列からインスタンスを生成し返却
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * generated from the specified string by the specified text encoding.
    * 
-   * @param text 文字列
-   * @param encoder 符号化器
-   * @returns 生成したインスタンス
+   * @param text - The string.
+   * @param encoder - The text encoder, for example `TextEncoder`.
+   * @returns A new `ByteSequence` object.
    */
   static textEncodeFrom(text: string, encoder: { encode: (input?: string) => Uint8Array } = utf8TextEncoder): ByteSequence {
     const encoded = encoder.encode(text);
     // return new ByteSequence(encoded.buffer);// Node.jsのBufferを返すエンコーダーだとプールが余計
-    return ByteSequence.from(encoded);
+    return ByteSequence.fromArrayBufferView(encoded);
   }
 
   /**
-   * バイト列を指定した復号器で復号し、文字列を返却
+   * Returns a decoded string by the specified text encoding of this bytes.
    * 
-   * @param encodingName 文字符号化方式名
-   * @param decoder 復号器
-   * @returns 文字列
+   * @param decoder - The text decoder, for example `TextDecoder`.
+   * @returns A string decoded in the specified text encoding.
    */
   textDecodeTo(decoder: { decode: (input?: Uint8Array) => string } = utf8TextDecoder): string {
-    return decoder.decode(this.view);
-  }
-
-  static createStreamReadingProgress(stream: ReadableStream<Uint8Array>, options?: TransferOptions): TransferProgress<ByteSequence> {
-    const reader: ReadableStreamDefaultReader<Uint8Array> = stream.getReader();
-    const totalUnitCount: number | undefined = ((typeof options?.total === "number") && NumberUtils.isNonNegativeInteger(options.total)) ? options.total : undefined;
-    const buffer: ByteBuffer = new ByteBuffer(totalUnitCount);
-
-    return new TransferProgress<Uint8Array, ByteSequence>({
-      chunkGenerator: StreamUtils.streamToAsyncGenerator<Uint8Array>(reader),
-
-      transferChunk(chunkBytes: Uint8Array): number {
-        buffer.put(chunkBytes);
-        return buffer.position;
-      },
-
-      terminate(): void {
-        // this.#stream.cancel()しても読取終了まで待ちになるので、reader.cancel()する
-        void reader.cancel().catch(); // XXX closeで良い？
-      },
-
-      transferredResult(): ByteSequence {
-        let bytes: Uint8Array;
-        if (buffer.capacity !== buffer.position) {
-          bytes = buffer.slice();
-        }
-        else {
-          bytes = buffer.subarray();
-        }
-        return new ByteSequence(bytes.buffer);
-      },
-    }, options);
+    return decoder.decode(this.#view);
   }
 
   /**
-   * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object.
    * 
-   * @experimental
-   * @param stream - Uint8Arrayの可読ストリーム
-   * @param totalByteCount - ストリームから読み取るバイト数
-   * @returns 生成したインスタンス
-   */
-  static async fromStream(stream: ReadableStream<Uint8Array>, totalByteCount?: number): Promise<ByteSequence> {
-    const progress = ByteSequence.createStreamReadingProgress(stream, { total: totalByteCount });
-    const bytes = await progress.initiate();
-    return new ByteSequence(bytes.buffer);
-  }
-
-  /**
-   * Blobからインスタンスを生成し返却
-   * 
-   * @param blob Blob
-   * @returns 生成したインスタンス
+   * @param blob - The `Blob` object (including `File` object).
+   * @returns The `Promise` that fulfills with a new `ByteSequence` object.
    * @throws {Error} `blob.arrayBuffer()` is failed.
    */
   static async fromBlob(blob: Blob): Promise<ByteSequence> {
     try {
       const buffer = await blob.arrayBuffer(); // XXX Node.jsでもstream()を取得できるようになった
-      const bytes = ByteSequence.wrap(buffer);
+      const bytes = ByteSequence.wrapArrayBuffer(buffer);
+      const metadata: ResourceMetadata = {};
       if (blob.type) {
-        const mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
-        ByteSequence.#storeMeatdata(bytes, { mediaType });
+        metadata.mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
+      }
+      if (blob instanceof File) {
+        metadata.fileName = blob.name;
+      }
+      if (metadata.mediaType || metadata.fileName) {
+        ByteSequence.#storeMeatdata(bytes, metadata);
       }
 
       return bytes;
@@ -651,40 +566,69 @@ class ByteSequence {
   }
 
   /**
-   * 自身のメディアタイプとバイト列からBlobを生成し返却
+   * Returns the [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object representing this byte sequence.
    * 
-   * @returns Blob
+   * @param mediaType - The MIME type.
+   * @returns The `Blob` object.
    */
-  toBlob(preferredType?: MediaType | string): Blob {
-    const resolvedType: MediaType | null = this.#resolveMediaType(preferredType);
+  toBlob(mediaType?: MediaType | string): Blob {
+    const resolvedMediaType: MediaType | null = this.#resolveMediaType(mediaType);
     let options: BlobPropertyBag | undefined;
-    if (resolvedType) {
-      options = { type: resolvedType.toString() };
+    if (resolvedMediaType) {
+      options = { type: resolvedMediaType.toString() };
     }
     return new Blob([ this.#buffer ], options);
   }
 
-  #resolveMediaType(preferredType?: MediaType | string): MediaType | null {
-    if (typeof preferredType === "string") {
-      return MediaType.fromString(preferredType);
+  /**
+   * Returns the [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File) object representing this byte sequence.
+   * 
+   * @param fileName - The file name.
+   * @param mediaType - The MIME type.
+   * @returns The `File` object.
+   */
+  toFile(fileName?: string, mediaType?: MediaType | string): File {
+    const resolvedFileName: string | undefined = this.#resolveFileName(fileName);
+    if ((typeof resolvedFileName === "string") && (resolvedFileName.length > 0)) {
+      throw new TypeError("fileName");
     }
-    else if (preferredType instanceof MediaType) {
-      return preferredType;
+
+    const resolvedMediaType: MediaType | null = this.#resolveMediaType(mediaType);
+    let options: FilePropertyBag | undefined;
+    if (resolvedMediaType) {
+      options = { type: resolvedMediaType.toString() };
+    }
+    return new File([ this.#buffer ], "", options);
+  }
+
+  #resolveMediaType(preferredMediaType?: MediaType | string): MediaType | null {
+    if (typeof preferredMediaType === "string") {
+      return MediaType.fromString(preferredMediaType);
+    }
+    else if (preferredMediaType instanceof MediaType) {
+      return preferredMediaType;
     }
     else {
       return ByteSequence.MetadataStore.getMediaType(this);
     }
   }
 
+  #resolveFileName(preferredFileName?: string): string | undefined {
+    if ((typeof preferredFileName === "string") && (preferredFileName.length > 0)) {
+      return preferredFileName;
+    }
+    else {
+      return ByteSequence.MetadataStore.getFileName(this);
+    }
+  }
+
   /**
-   * Data URLからインスタンスを生成し返却
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * 
-   * {@link [Fetch Standard](https://fetch.spec.whatwg.org/#data-urls)}の仕様に従った。
-   * 最初に出現した","をメディアタイプとデータの区切りとみなす。（メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする）
-   * クエリはデータの一部とみなす。
-   * 
-   * @param dataUrl Data URL
-   * @returns 生成したインスタンス
+   * @see [https://fetch.spec.whatwg.org/#data-urls](https://fetch.spec.whatwg.org/#data-urls)
+   * @param dataUrl - The data URL
+   * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `dataUrl` parsing is failed.
    * @throws {TypeError} The URL scheme of the `dataUrl` is not "data".
    * @throws {TypeError} The `dataUrl` does not contain `","`.
@@ -704,6 +648,8 @@ class ByteSequence {
     }
 
     // 2
+    // https://fetch.spec.whatwg.org/#data-urls に従い、（また、ブラウザの実装にあわせ）
+    // ・フラグメントは無視する
     parsed.hash = "";
 
     // 3, 4
@@ -714,6 +660,10 @@ class ByteSequence {
       throw new TypeError("U+002C not found");
     }
 
+    // 最初に出現した","をメディアタイプとデータの区切りとみなす。
+    // https://fetch.spec.whatwg.org/#data-urls に従い、（また、ブラウザの実装にあわせ）
+    // ・メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする
+    // ・クエリはデータの一部とみなす
     const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
     let mediaTypeWork = StringUtils.trim(mediaTypeOriginal, ASCII_WHITESPACE);
 
@@ -757,17 +707,17 @@ class ByteSequence {
   }
 
   /**
-   * 自身のメディアタイプとバイト列からData URLを生成し返却
+   * Returns the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs) representing this byte sequence.
    * 
-   * FileReaderの仕様に倣い、テキストかどうかに関係なく常時Base64エンコードする。
-   * //XXX Base64なしもできるようにする？
-   * 
-   * @returns Data URL
+   * @param mediaType - The MIME type.
+   * @returns The [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * @throws {TypeError}
    */
-  toDataURL(preferredType?: string | MediaType): URL {
-    const resolvedType: MediaType | null = this.#resolveMediaType(preferredType);
-    if (resolvedType) {
+  toDataURL(mediaType?: string | MediaType): URL {
+    // FileReaderの仕様に倣い、テキストかどうかに関係なく常時Base64エンコードする仕様
+    // XXX Base64なしも対応する
+    const resolvedMediaType: MediaType | null = this.#resolveMediaType(mediaType);
+    if (resolvedMediaType) {
       // let encoding = "";
       // let dataEncoded: string;
       // if (base64) {
@@ -775,90 +725,299 @@ class ByteSequence {
       const dataEncoded = this.toBase64Encoded();
       // }
 
-      return new URL("data:" + resolvedType.toString() + encoding + "," + dataEncoded);
+      return new URL("data:" + resolvedMediaType.toString() + encoding + "," + dataEncoded);
     }
     throw new TypeError("MIME type not resolved");
   }
 
   /**
-   * Computes the SRI integrity (Base64-encoded digest).
+   * Returns a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * duplicated from the underlying `ArrayBuffer` of this instance.
    * 
-   * @param algorithm - The digest algorithm.
-   * @returns The `Promise` that fulfills with a SRI integrity (base64-encoded digest).
-   * @see [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
+   * @returns A new `ByteSequence` object.
    */
-  async #integrity(algorithm: DigestAlgorithm, prefix: string): Promise<string> {
-    // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
-    const digestBytes = await this.toDigest(algorithm);
-    return prefix + digestBytes.toBase64Encoded();
+  duplicate(): ByteSequence {
+    return new ByteSequence(this.toArrayBuffer());
   }
 
   /**
-   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-256 digest for this byte sequence.
-   */
-  get sha256Integrity(): Promise<string> {
-    return this.#integrity(Sha256, "sha256-");
-  }
-
-  /**
-   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-384 digest for this byte sequence.
-   */
-  get sha384Integrity(): Promise<string> {
-    return this.#integrity(Sha384, "sha384-");
-  }
-
-  /**
-   * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-512 digest for this byte sequence.
-   */
-  get sha512Integrity(): Promise<string> {
-    return this.#integrity(Sha512, "sha512-");
-  }
-
-  /**
-   * 想定用途
-   * ・ブラウザのfetchでのResponseのcontent取得
-   * ・DenoのfetchでのResponseのcontent取得
-   * ・Denoのstd/httpでのRequestのcontent取得
-   * など
+   * Returns a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * duplicated from a subsequence of the underlying `ArrayBuffer` of this instance.
    * 
-   * @experimental
-   * TODO options を任意に
-   * TODO signal,timeout
-   * TODO createReadingProgress
-   * @throws {Error}
+   * @param start - The subsequence start index.
+   * @param end - The subsequence end index.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `start` is not non-negative integer.
+   * @throws {RangeError} The `start` is greater than the `byteLength` of this.
+   * @throws {TypeError} The `end` is not non-negative integer.
+   * @throws {RangeError} The `end` is less than the `start`.
    */
-  static async fromWebMessage(message: WebMessage, options: WebMessageReadingOptions): Promise<ByteSequence | null> {
-    if (message.body) {
-      if (message instanceof Response) {
-        if ((message.ok !== true) && (options.ignoreHttpStatus !== true)) {
-          throw new Error(`HTTP status: ${ message.status }`);
-        }
+  subsequence(start: number, end?: number): ByteSequence {
+    if (NumberUtils.isNonNegativeInteger(start) !== true) {
+      throw new TypeError("start");
+    }
+    if (start > this.byteLength) {
+      throw new RangeError("start");
+    }
+
+    if (typeof end === "number") {
+      if (NumberUtils.isNonNegativeInteger(end) !== true) {
+        throw new TypeError("end");
       }
-
-      if (options.readAs === "blob") {
-        const blob = await message.blob();
-        return ByteSequence.fromBlob(blob);
-      }
-
-      const mediaType = WebMessageUtils.extractContentType(message.headers);
-      if (message.body !== null) {
-        // メモ
-        // ・Transfer-Encodingがchunkedであってもfetch API側でまとめてくれるので、考慮不要
-        // ・Content-Encodingで圧縮されていてもfetch API側で展開してくれるので、展開は考慮不要
-        //    ただしその場合、Content-Lengthは展開結果のバイト数ではない
-
-        const size = WebMessageUtils.extractContentLength(message.headers);
-        const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
-        ByteSequence.#storeMeatdata(bytes, { mediaType });
-        return bytes;
+      if (end < start) {
+        throw new RangeError("end");
       }
     }
-    return null;
+
+    return new ByteSequence(this.#buffer.slice(start, end));
   }
+
+  /**
+   * Returns the `ArrayBufferView` that views the underlying `ArrayBuffer` of this instance.
+   * 
+   * @param viewConstructor - The constructor of `ArrayBufferView`.
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `ArrayBufferView`, in bytes.
+   * @returns The `ArrayBufferView`.
+   * @throws {TypeError} The `viewConstructor` is not a constructor of `ArrayBufferView`.
+   * @throws {TypeError} The `byteOffset` is not non-negative integer.
+   * @throws {RangeError} The `byteOffset` is greater than the `byteLength` of this.
+   * @throws {RangeError} The `byteOffset` is not divisible by `viewConstructor.BYTES_PER_ELEMENT`.
+   * @throws {TypeError} The `byteLength` is not non-negative integer.
+   * @throws {RangeError} The `byteLength` is greater than the result of subtracting `byteOffset` from the `byteLength` of this.
+   * @throws {RangeError} The `byteLength` is not divisible by `viewConstructor.BYTES_PER_ELEMENT`.
+   */
+  getView(viewConstructor: ViewConstructor = Uint8Array, byteOffset = 0, byteLength: number = this.byteLength): ArrayBufferView {
+    let bytesPerElement: number;
+    if (isTypedArrayConstructor(viewConstructor)) {
+      bytesPerElement = viewConstructor.BYTES_PER_ELEMENT;
+    }
+    else if (viewConstructor === DataView) {
+      bytesPerElement = 1;
+    }
+    else {
+      throw new TypeError("viewConstructor");
+    }
+
+    if (NumberUtils.isNonNegativeInteger(byteOffset) !== true) {
+      throw new TypeError("byteOffset");
+    }
+    else if ((byteOffset > this.byteLength) || ((byteOffset % bytesPerElement) !== 0)) {
+      throw new RangeError("byteOffset");
+    }
+
+    if (NumberUtils.isNonNegativeInteger(byteLength) !== true) {
+      throw new TypeError("byteLength");
+    }
+    else if (((byteOffset + byteLength) > this.byteLength) || ((byteLength % bytesPerElement) !== 0)) {
+      throw new RangeError("byteLength");
+    }
+
+    return new viewConstructor(this.#buffer, byteOffset, (byteLength / bytesPerElement));
+  }
+
+  /**
+   * 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否かを返却
+   * 
+   * @param otherBytes - バイト列
+   * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
+   */
+  #startsWith(otherBytes: BufferSource | Array<uint8>): boolean {
+    const thisView = this.#view;
+    if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
+      const otherView = new Uint8Array((otherBytes instanceof ArrayBuffer) ? otherBytes : otherBytes.buffer);
+      for (let i = 0; i < otherView.byteLength; i++) {
+        if (otherView[i] !== thisView[i]) {
+          return false;
+        }
+      }
+      return true;
+    }
+    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => Uint8.isUint8(byte))) {
+      for (let i = 0; i < otherBytes.length; i++) {
+        if (otherBytes[i] !== thisView[i]) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Determines whether this byte sequence is equal to the byte sequence represented by another object.
+   * 
+   * @param otherBytes - The object that represents a byte sequence.
+   * @returns If this is equal to the specified byte sequence, `true`; otherwise, `false`.
+   * @throws {TypeError} The `otherBytes` is not type of `Bytes`.
+   */
+  equals(otherBytes: Bytes): boolean {
+    if (otherBytes instanceof ByteSequence) {
+      if (otherBytes.byteLength !== this.byteLength) {
+        return false;
+      }
+      return this.#startsWith(otherBytes.buffer);
+    }
+    else if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
+      if (otherBytes.byteLength !== this.byteLength) {
+        return false;
+      }
+      return this.#startsWith(otherBytes);
+    }
+    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => Uint8.isUint8(byte))) {
+      if (otherBytes.length !== this.byteLength) {
+        return false;
+      }
+      return this.#startsWith(otherBytes as Array<uint8>);
+    }
+    throw new TypeError("otherBytes");
+  }
+
+  /**
+   * Determines whether this byte sequence starts with the specified byte sequence.
+   * 
+   * @param otherBytes - The object that represents a byte sequence.
+   * @returns If this starts with the specified byte sequence, `true`; otherwise, `false`.
+   * @throws {TypeError} The `otherBytes` is not type of `Bytes`.
+   */
+  startsWith(otherBytes: Bytes): boolean {
+    if (otherBytes instanceof ByteSequence) {
+      return this.#startsWith(otherBytes.buffer);
+    }
+    else if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
+      return this.#startsWith(otherBytes);
+    }
+    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => Uint8.isUint8(byte))) {
+      return this.#startsWith(otherBytes as Array<uint8>);
+    }
+    throw new TypeError("otherBytes");
+  }
+
+
+
+  // TODO -----------------------------------------
+
+
+
+  /**
+   * Returns a new Iterator
+   * 指定したバイト数毎に自身のバイト列の部分複製を生成し返却するジェネレーター
+   *     ※参照するArrayBufferも複製する
+   * 
+   * @param segmentByteLength 分割するバイト数
+   * @returns 自身のバイト列の部分複製を返却するジェネレーター
+   * @throws {TypeError} The `segmentByteLength` is not non-negative integer.
+   */
+  segments(segmentByteLength: number): IterableIterator<ByteSequence> {
+    if (NumberUtils.isPositiveInteger(segmentByteLength) !== true) {
+      throw new TypeError("segmentByteLength");
+    }
+
+    return (function*(bytes: ByteSequence): Generator<ByteSequence, void, void> {
+      let i = 0;
+      let itemLength = segmentByteLength;
+      while (i < bytes.byteLength) {
+        if ((i + segmentByteLength) > bytes.byteLength) {
+          itemLength = bytes.byteLength - i;
+        }
+        yield bytes.subsequence(i, i + itemLength);
+        i = i + segmentByteLength;
+      }
+    })(this);
+  }
+
+  static createStreamReadingProgress(stream: ReadableStream<Uint8Array>, options?: TransferOptions): TransferProgress<ByteSequence> {
+    const reader: ReadableStreamDefaultReader<Uint8Array> = stream.getReader();
+    const totalUnitCount: number | undefined = ((typeof options?.total === "number") && NumberUtils.isNonNegativeInteger(options.total)) ? options.total : undefined;
+    const buffer: ByteBuffer = new ByteBuffer(totalUnitCount);
+
+    return new TransferProgress<Uint8Array, ByteSequence>({
+      chunkGenerator: StreamUtils.streamToAsyncGenerator<Uint8Array>(reader),
+
+      transferChunk(chunkBytes: Uint8Array): number {
+        buffer.put(chunkBytes);
+        return buffer.position;
+      },
+
+      terminate(): void {
+        // this.#stream.cancel()しても読取終了まで待ちになるので、reader.cancel()する
+        void reader.cancel().catch(); // XXX closeで良い？
+      },
+
+      transferredResult(): ByteSequence {
+        let bytes: Uint8Array;
+        if (buffer.capacity !== buffer.position) {
+          bytes = buffer.slice();
+        }
+        else {
+          bytes = buffer.subarray();
+        }
+        return new ByteSequence(bytes.buffer);
+      },
+    }, options);
+  }
+
+  /**
+   * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
+   * 
+   * @experimental
+   * @param stream - Uint8Arrayの可読ストリーム
+   * @param totalByteLength - ストリームから読み取るバイト数
+   * @returns 生成したインスタンス
+   */
+  static async fromStream(stream: ReadableStream<Uint8Array>, totalByteLength?: number): Promise<ByteSequence> {
+    const progress = ByteSequence.createStreamReadingProgress(stream, { total: totalByteLength });
+    const bytes = await progress.initiate();
+    return new ByteSequence(bytes.buffer);
+  }
+
+  // /**
+  //  * 想定用途
+  //  * ・ブラウザのfetchでのResponseのcontent取得
+  //  * ・DenoのfetchでのResponseのcontent取得
+  //  * ・Denoのstd/httpでのRequestのcontent取得
+  //  * など
+  //  * 
+  //  * @experimental
+  //  * TODO options を任意に
+  //  * TODO signal,timeout
+  //  * TODO createReadingProgress
+  //  * @throws {Error}
+  //  */
+  // static async fromWebMessage(message: WebMessage, options: WebMessageReadingOptions): Promise<ByteSequence | null> {
+  //   if (message.body) {
+  //     if (message instanceof Response) {
+  //       if ((message.ok !== true) && (options.ignoreHttpStatus !== true)) {
+  //         throw new Error(`HTTP status: ${ message.status }`);
+  //       }
+  //     }
+
+  //     if (options.readAs === "blob") {
+  //       const blob = await message.blob();
+  //       return ByteSequence.fromBlob(blob);
+  //     }
+
+  //     const mediaType = WebMessageUtils.extractContentType(message.headers);
+  //     if (message.body !== null) {
+  //       // メモ
+  //       // ・Transfer-Encodingがchunkedであってもfetch API側でまとめてくれるので、考慮不要
+  //       // ・Content-Encodingで圧縮されていてもfetch API側で展開してくれるので、展開は考慮不要
+  //       //    ただしその場合、Content-Lengthは展開結果のバイト数ではない
+
+  //       const size = WebMessageUtils.extractContentLength(message.headers);
+  //       const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
+  //       ByteSequence.#storeMeatdata(bytes, { mediaType });
+  //       return bytes;
+  //     }
+  //   }
+  //   return null;
+  // }
 }
 Object.freeze(ByteSequence);
 
 export {
+  type TypedArrayConstructor,
+  type ViewConstructor,
   type Bytes,
   ByteSequence,
 };
