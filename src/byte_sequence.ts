@@ -1,8 +1,5 @@
 //
 
-// バイト列
-
-// TODO uint8を外に出さない
 import {
   type uint8,
   type ByteFormatOptions,
@@ -96,13 +93,12 @@ type ViewConstructor = TypedArrayConstructor | DataViewConstructor;
  * Byte sequence
  */
 class ByteSequence {
-  // TODO 丸ごとコピーしたときmetadataもコピーすべき？duplicateとかfromとか
   /**
    * TODO
    */
   static MetadataStore: ResourceMetadataStore<ByteSequence> = new MetadataMap();
 
-  static #storeMeatdata(instance: ByteSequence, metadata: ResourceMetadata): void {
+  static #storeMetadata(instance: ByteSequence, metadata: ResourceMetadata): void {
     (ByteSequence.MetadataStore as MetadataMap<ByteSequence>).put(instance, metadata);
   }
 
@@ -551,7 +547,7 @@ class ByteSequence {
         metadata.fileName = blob.name;
       }
       if (metadata.mediaType || metadata.fileName) {
-        ByteSequence.#storeMeatdata(bytes, metadata);
+        ByteSequence.#storeMetadata(bytes, metadata);
       }
 
       return bytes;
@@ -701,7 +697,7 @@ class ByteSequence {
       void exception;
       mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
     }
-    ByteSequence.#storeMeatdata(bytes, { mediaType });
+    ByteSequence.#storeMetadata(bytes, { mediaType });
 
     return bytes;
   }
@@ -901,7 +897,7 @@ class ByteSequence {
 
   /**
    * Returns a new Iterator
-   * 指定したバイト数毎に自身のバイト列の部分複製を生成し返却するジェネレーター
+   * TODO 指定したバイト数毎に自身のバイト列の部分複製を生成し返却するジェネレーター
    *     ※参照するArrayBufferも複製する
    * 
    * @param segmentByteLength 分割するバイト数
@@ -1006,7 +1002,7 @@ class ByteSequence {
 
   //       const size = WebMessageUtils.extractContentLength(message.headers);
   //       const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
-  //       ByteSequence.#storeMeatdata(bytes, { mediaType });
+  //       ByteSequence.#storeMetadata(bytes, { mediaType });
   //       return bytes;
   //     }
   //   }
