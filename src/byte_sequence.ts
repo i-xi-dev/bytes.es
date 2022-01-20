@@ -867,7 +867,7 @@ class ByteSequence {
     let bytesPerElement: number;
     if (isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
-      new Uint8ClampedArray()
+      new Uint8ClampedArray();
     }
     else if (isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
