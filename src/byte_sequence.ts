@@ -51,50 +51,24 @@ const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true 
 // type WebMessageReadingOptions = {
 //   ignoreHttpStatus: boolean,
 //   readAs: "blob" | "stream",
-// };// TODO default options
+// };// XXX default options
 
-/**
- * The type of the `TypedArray` constructors.
- */
-type TypedArrayConstructor = Uint8ArrayConstructor
-| Uint8ClampedArrayConstructor
-| Int8ArrayConstructor
-| Uint16ArrayConstructor
-| Int16ArrayConstructor
-| Uint32ArrayConstructor
-| Int32ArrayConstructor
-| Float32ArrayConstructor
-| Float64ArrayConstructor
-| BigUint64ArrayConstructor
-| BigInt64ArrayConstructor;
-
-function isTypedArrayConstructor(value: unknown): value is TypedArrayConstructor {
-  return (
-    (value === Uint8Array)
-    || (value === Uint8ClampedArray)
-    || (value === Int8Array)
-    || (value === Uint16Array)
-    || (value === Int16Array)
-    || (value === Uint32Array)
-    || (value === Int32Array)
-    || (value === Float32Array)
-    || (value === Float64Array)
-    || (value === BigUint64Array)
-    || (value === BigInt64Array)
-  );
+function isTypedArrayConstructor(value: unknown): value is (Uint8ArrayConstructor | Uint8ClampedArrayConstructor | Int8ArrayConstructor | Uint16ArrayConstructor | Int16ArrayConstructor | Uint32ArrayConstructor | Int32ArrayConstructor | Float32ArrayConstructor | Float64ArrayConstructor | BigUint64ArrayConstructor | BigInt64ArrayConstructor) {
+  return ((value === Uint8Array) || (value === Uint8ClampedArray) || (value === Int8Array) || (value === Uint16Array) || (value === Int16Array) || (value === Uint32Array) || (value === Int32Array) || (value === Float32Array) || (value === Float64Array) || (value === BigUint64Array) || (value === BigInt64Array));
 }
 
-/**
- * The type of the `ArrayBufferView` constructors.
- */
-type ViewConstructor = TypedArrayConstructor | DataViewConstructor;
+function isDataViewConstructor(value: unknown): value is DataViewConstructor {
+  return value === DataView;
+}
+
+type ArrayBufferViewConstructor<T> = { new(a: ArrayBuffer, b?: number, c?: number): T };
 
 /**
  * Byte sequence
  */
 class ByteSequence {
   /**
-   * TODO
+   * A metadata store for the instances of byte sequence.
    */
   static MetadataStore: ResourceMetadataStore<ByteSequence> = new MetadataMap();
 
@@ -191,6 +165,8 @@ class ByteSequence {
     throw new TypeError("buffer");
   }
 
+  // TODO byteOffset
+  // TODO byteLength
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * that duplicates the specified `ArrayBuffer`.
@@ -232,34 +208,136 @@ class ByteSequence {
   }
 
   /**
-   * TODO
    * Returns the `Uint8Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    * 
-   * @param byteOffset - The 
-   * @param byteLength - 
    * @returns The `Uint8Array`.
    */
-  toUint8Array(byteOffset = 0, byteLength: number = this.byteLength): Uint8Array {
-    return new Uint8Array(this.toArrayBuffer(), byteOffset, byteLength);
+  toUint8Array(): Uint8Array {
+    return this.toArrayBufferView(Uint8Array);
   }
 
-  // XXX toInt8Array
-  // XXX toUint8ClampedArray
-  // XXX toInt16Array
-  // XXX toUint16Array
-  // XXX toInt32Array
-  // XXX toUint32Array
-  // XXX toFloat32Array
-  // XXX toFloat64Array
-  // XXX toBigInt64Array
-  // XXX toBigUint64Array
-  // XXX toDataView
+  /**
+   * Returns the `Uint8ClampedArray` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `Uint8ClampedArray`.
+   */
+  toUint8ClampedArray(): Uint8ClampedArray {
+    return this.toArrayBufferView(Uint8ClampedArray);
+  }
 
-  // TODO
-  // toArrayBufferView(viewConstructor: ViewConstructor = Uint8Array, byteOffset: number = 0, byteLength: number = this.byteLength): ArrayBufferView {
-  //   return new viewConstructor(this.toArrayBuffer(), byteOffset, byteLength);
-  // }
+  /**
+   * Returns the `Int8Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `Int8Array`.
+   */
+  toInt8Array(): Int8Array {
+    return this.toArrayBufferView(Int8Array);
+  }
 
+  /**
+   * Returns the `Uint16Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `Uint16Array`.
+   */
+  toUint16Array(): Uint16Array {
+    return this.toArrayBufferView(Uint16Array);
+  }
+
+  /**
+   * Returns the `Int16Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `Int16Array`.
+   */
+  toInt16Array(): Int16Array {
+    return this.toArrayBufferView(Int16Array);
+  }
+
+  /**
+   * Returns the `Uint32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `Uint32Array`.
+   */
+  toUint32Array(): Uint32Array {
+    return this.toArrayBufferView(Uint32Array);
+  }
+
+  /**
+   * Returns the `Int32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `Int32Array`.
+   */
+  toInt32Array(): Int32Array {
+    return this.toArrayBufferView(Int32Array);
+  }
+
+  /**
+   * Returns the `Float32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `Float32Array`.
+   */
+  toFloat32Array(): Float32Array {
+    return this.toArrayBufferView(Float32Array);
+  }
+
+  /**
+   * Returns the `Float64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `Float64Array`.
+   */
+  toFloat64Array(): Float64Array {
+    return this.toArrayBufferView(Float64Array);
+  }
+
+  /**
+   * Returns the `BigUint64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `BigUint64Array`.
+   */
+  toBigUint64Array(): BigUint64Array {
+    return this.toArrayBufferView(BigUint64Array);
+  }
+
+  /**
+   * Returns the `BigInt64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `BigInt64Array`.
+   */
+  toBigInt64Array(): BigInt64Array {
+    return this.toArrayBufferView(BigInt64Array);
+  }
+
+  /**
+   * Returns the `DataView` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @returns The `DataView`.
+   */
+  toDataView(): DataView {
+    return this.toArrayBufferView(DataView);
+  }
+
+  /**
+   * Returns the [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView) that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   * 
+   * @param ctor - The `ArrayBufferView`s constructor.
+   * @returns The `ArrayBufferView`.
+   */
+  toArrayBufferView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T>): T {
+    let bytesPerElement: number;
+    if (isTypedArrayConstructor(ctor)) {
+      bytesPerElement = ctor.BYTES_PER_ELEMENT;
+    }
+    else if (isDataViewConstructor(ctor)) {
+      bytesPerElement = 1;
+    }
+    else {
+      throw new TypeError("ctor");
+    }
+
+    return new ctor(this.toArrayBuffer(), 0, (this.byteLength / bytesPerElement));
+  }
+
+  // TODO byteOffset
+  // TODO byteLength
   /**
    * The alias for the `fromArrayBuffer` and `fromArrayBufferView` methods.
    * 
@@ -274,6 +352,8 @@ class ByteSequence {
     return ByteSequence.fromArrayBufferView(bufferSource);
   }
 
+  // TODO offset
+  // TODO length
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified 8-bit unsigned integer `Array`.
@@ -311,7 +391,7 @@ class ByteSequence {
     if (NumberUtils.isNonNegativeInteger(byteLength) !== true) {
       throw new TypeError("byteLength");
     }
-    if (byteLength > 65536) { // TODO 連結すれば良いのでは
+    if (byteLength > 65536) { // XXX 連結すれば良いのでは
       throw new RangeError("byteLength");
     }
 
@@ -556,7 +636,7 @@ class ByteSequence {
       // Blob#arrayBufferでの NotFoundError | SecurityError | NotReadableError
       // またはMediaTypeのパース失敗
 
-      // TODO throw new Error("reading failed", { cause: exception });
+      // XXX throw new Error("reading failed", { cause: exception });
       throw new Error("reading failed");
     }
   }
@@ -783,16 +863,17 @@ class ByteSequence {
    * @throws {RangeError} The `byteLength` is greater than the result of subtracting `byteOffset` from the `byteLength` of this.
    * @throws {RangeError} The `byteLength` is not divisible by `viewConstructor.BYTES_PER_ELEMENT`.
    */
-  getView(viewConstructor: ViewConstructor = Uint8Array, byteOffset = 0, byteLength: number = this.byteLength): ArrayBufferView {
+  getView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T>, byteOffset = 0, byteLength: number = this.byteLength): T {
     let bytesPerElement: number;
-    if (isTypedArrayConstructor(viewConstructor)) {
-      bytesPerElement = viewConstructor.BYTES_PER_ELEMENT;
+    if (isTypedArrayConstructor(ctor)) {
+      bytesPerElement = ctor.BYTES_PER_ELEMENT;
+      new Uint8ClampedArray()
     }
-    else if (viewConstructor === DataView) {
+    else if (isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     }
     else {
-      throw new TypeError("viewConstructor");
+      throw new TypeError("ctor");
     }
 
     if (NumberUtils.isNonNegativeInteger(byteOffset) !== true) {
@@ -809,7 +890,7 @@ class ByteSequence {
       throw new RangeError("byteLength");
     }
 
-    return new viewConstructor(this.#buffer, byteOffset, (byteLength / bytesPerElement));
+    return new ctor(this.#buffer, byteOffset, (byteLength / bytesPerElement));
   }
 
   /**
@@ -889,22 +970,14 @@ class ByteSequence {
     throw new TypeError("otherBytes");
   }
 
-
-
-  // TODO -----------------------------------------
-
-
-
   /**
-   * Returns a new Iterator
-   * TODO 指定したバイト数毎に自身のバイト列の部分複製を生成し返却するジェネレーター
-   *     ※参照するArrayBufferも複製する
+   * Returns a new iterator that contains byte sequences divided by the specified length.
    * 
-   * @param segmentByteLength 分割するバイト数
-   * @returns 自身のバイト列の部分複製を返却するジェネレーター
+   * @param segmentByteLength - The segment length, in bytes.
+   * @returns A new iterator.
    * @throws {TypeError} The `segmentByteLength` is not non-negative integer.
    */
-  segments(segmentByteLength: number): IterableIterator<ByteSequence> {
+  segment(segmentByteLength: number): IterableIterator<ByteSequence> {
     if (NumberUtils.isPositiveInteger(segmentByteLength) !== true) {
       throw new TypeError("segmentByteLength");
     }
@@ -922,6 +995,12 @@ class ByteSequence {
     })(this);
   }
 
+  /**
+   * @experimental
+   * @param stream - 
+   * @param options - 
+   * @returns 
+   */
   static createStreamReadingProgress(stream: ReadableStream<Uint8Array>, options?: TransferOptions): TransferProgress<ByteSequence> {
     const reader: ReadableStreamDefaultReader<Uint8Array> = stream.getReader();
     const totalUnitCount: number | undefined = ((typeof options?.total === "number") && NumberUtils.isNonNegativeInteger(options.total)) ? options.total : undefined;
@@ -954,12 +1033,10 @@ class ByteSequence {
   }
 
   /**
-   * 可読ストリームを読み取り、読み取ったバイト列からインスタンスを生成し返却
-   * 
    * @experimental
-   * @param stream - Uint8Arrayの可読ストリーム
-   * @param totalByteLength - ストリームから読み取るバイト数
-   * @returns 生成したインスタンス
+   * @param stream - 
+   * @param totalByteLength - 
+   * @returns 
    */
   static async fromStream(stream: ReadableStream<Uint8Array>, totalByteLength?: number): Promise<ByteSequence> {
     const progress = ByteSequence.createStreamReadingProgress(stream, { total: totalByteLength });
@@ -975,9 +1052,9 @@ class ByteSequence {
   //  * など
   //  * 
   //  * @experimental
-  //  * TODO options を任意に
-  //  * TODO signal,timeout
-  //  * TODO createReadingProgress
+  //  * XXX options を任意に
+  //  * XXX signal,timeout
+  //  * XXX createReadingProgress
   //  * @throws {Error}
   //  */
   // static async fromWebMessage(message: WebMessage, options: WebMessageReadingOptions): Promise<ByteSequence | null> {
@@ -1012,8 +1089,6 @@ class ByteSequence {
 Object.freeze(ByteSequence);
 
 export {
-  type TypedArrayConstructor,
-  type ViewConstructor,
   type Bytes,
   ByteSequence,
 };
