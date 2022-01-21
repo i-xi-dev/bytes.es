@@ -217,96 +217,6 @@ class ByteSequence {
   }
 
   /**
-   * Returns the `Uint8ClampedArray` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `Uint8ClampedArray`.
-   */
-  toUint8ClampedArray(): Uint8ClampedArray {
-    return this.toArrayBufferView(Uint8ClampedArray);
-  }
-
-  /**
-   * Returns the `Int8Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `Int8Array`.
-   */
-  toInt8Array(): Int8Array {
-    return this.toArrayBufferView(Int8Array);
-  }
-
-  /**
-   * Returns the `Uint16Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `Uint16Array`.
-   */
-  toUint16Array(): Uint16Array {
-    return this.toArrayBufferView(Uint16Array);
-  }
-
-  /**
-   * Returns the `Int16Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `Int16Array`.
-   */
-  toInt16Array(): Int16Array {
-    return this.toArrayBufferView(Int16Array);
-  }
-
-  /**
-   * Returns the `Uint32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `Uint32Array`.
-   */
-  toUint32Array(): Uint32Array {
-    return this.toArrayBufferView(Uint32Array);
-  }
-
-  /**
-   * Returns the `Int32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `Int32Array`.
-   */
-  toInt32Array(): Int32Array {
-    return this.toArrayBufferView(Int32Array);
-  }
-
-  /**
-   * Returns the `Float32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `Float32Array`.
-   */
-  toFloat32Array(): Float32Array {
-    return this.toArrayBufferView(Float32Array);
-  }
-
-  /**
-   * Returns the `Float64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `Float64Array`.
-   */
-  toFloat64Array(): Float64Array {
-    return this.toArrayBufferView(Float64Array);
-  }
-
-  /**
-   * Returns the `BigUint64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `BigUint64Array`.
-   */
-  toBigUint64Array(): BigUint64Array {
-    return this.toArrayBufferView(BigUint64Array);
-  }
-
-  /**
-   * Returns the `BigInt64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   * 
-   * @returns The `BigInt64Array`.
-   */
-  toBigInt64Array(): BigInt64Array {
-    return this.toArrayBufferView(BigInt64Array);
-  }
-
-  /**
    * Returns the `DataView` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    * 
    * @returns The `DataView`.
@@ -852,6 +762,28 @@ class ByteSequence {
   }
 
   /**
+   * Returns the `Uint8Array` that views the underlying `ArrayBuffer` of this instance.
+   * 
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `ArrayBufferView`, in bytes.
+   * @returns The `Uint8Array`.
+   */
+  getUint8View(byteOffset?: number, byteLength?: number): Uint8Array {
+    return this.getView(Uint8Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `DataView` that views the underlying `ArrayBuffer` of this instance.
+   * 
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `ArrayBufferView`, in bytes.
+   * @returns The `DataView`.
+   */
+  getDataView(byteOffset?: number, byteLength?: number): DataView {
+    return this.getView(DataView, byteOffset, byteLength);
+  }
+
+  /**
    * Returns the `ArrayBufferView` that views the underlying `ArrayBuffer` of this instance.
    * 
    * @param viewConstructor - The constructor of `ArrayBufferView`.
@@ -866,7 +798,7 @@ class ByteSequence {
    * @throws {RangeError} The `byteLength` is greater than the result of subtracting `byteOffset` from the `byteLength` of this.
    * @throws {RangeError} The `byteLength` is not divisible by `viewConstructor.BYTES_PER_ELEMENT`.
    */
-  getView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T>, byteOffset = 0, byteLength: number = this.byteLength): T {
+  getView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>, byteOffset = 0, byteLength: number = (this.byteLength - byteOffset)): T {
     let bytesPerElement: number;
     if (isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;

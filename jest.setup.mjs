@@ -6,6 +6,15 @@ globalThis.crypto = webcrypto;
 const { Blob } = require("node:buffer");
 globalThis.Blob = Blob;
 
+class File extends Blob {
+  name;
+  constructor(fileBits, fileName, options) {
+    super(fileBits, options);
+    this.name = fileName;
+  }
+}
+globalThis.File = File;
+
 // globalThisがNodeのと違うのでimportしないと使えないもの
 const { performance } = require("node:perf_hooks");
 globalThis.performance = performance;
