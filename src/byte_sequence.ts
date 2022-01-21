@@ -321,7 +321,7 @@ class ByteSequence {
    * @param ctor - The `ArrayBufferView`s constructor.
    * @returns The `ArrayBufferView`.
    */
-  toArrayBufferView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T>): T {
+  toArrayBufferView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>): T {
     let bytesPerElement: number;
     if (isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
@@ -623,7 +623,7 @@ class ByteSequence {
       if (blob.type) {
         metadata.mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
       }
-      if (blob instanceof File) {
+      if (globalThis.File && (blob instanceof File)) {
         metadata.fileName = blob.name;
       }
       if (metadata.mediaType || metadata.fileName) {
@@ -666,6 +666,9 @@ class ByteSequence {
   toFile(fileName?: string, mediaType?: MediaType | string): File {
     const resolvedFileName: string | undefined = this.#resolveFileName(fileName);
     if ((typeof resolvedFileName === "string") && (resolvedFileName.length > 0)) {
+      // ok
+    }
+    else {
       throw new TypeError("fileName");
     }
 
@@ -674,7 +677,7 @@ class ByteSequence {
     if (resolvedMediaType) {
       options = { type: resolvedMediaType.toString() };
     }
-    return new File([ this.#buffer ], "", options);
+    return new File([ this.#buffer ], resolvedFileName, options);
   }
 
   #resolveMediaType(preferredMediaType?: MediaType | string): MediaType | null {

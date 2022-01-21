@@ -11,7 +11,5 @@ export { MediaType } from "@i-xi-dev/mimetype";
 export { type ResourceMetadataStore } from "./metadata";
 export {
   type Bytes,
-  type TypedArrayConstructor,
-  type ViewConstructor,
   ByteSequence,
 } from "./byte_sequence";
