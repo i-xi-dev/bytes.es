@@ -63,6 +63,9 @@ const bytes1 = ByteSequence.fromArray(bytesArray);
 const numberArray = bytes1.toArray();
 // → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 
+const numberArray2 = bytes1.toJSON();
+// → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+
 const bytesFromNumberArray = ByteSequence.fromArray(numberArray);
 bytesFromNumberArray.getUint8View();
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
@@ -141,6 +144,7 @@ const base64Options = {
 };
 const base64Encoded2 = bytes1.toBase64Encoded(base64Options);
 // → "5a-M5aOr5bGx"
+
 const bytesFromBase64Encoded2 = ByteSequence.fromBase64Encoded(base64Encoded2, base64Options);
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
@@ -167,6 +171,7 @@ const percentOptions = {
 const percentEncoded2 = bytes1.toPercentEncoded(percentOptions);
 // → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
 //   This result is match to the result of (globalThis.encodeURIComponent("富士山"))
+
 const bytesFromPercentEncoded2 = ByteSequence.fromPercentEncoded(percentEncoded2, percentOptions);
 bytesFromPercentEncoded2.getUint8View();
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
@@ -182,6 +187,7 @@ const percentEncoded3 = bytes1.toPercentEncoded(percentOptions2);
 // → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
 //   This result is match to the result of (globalThis.encodeURIComponent("富士山").replaceAll(/[!'()~]/g, (c) => `%${ c.charCodeAt(0).toString(16).toUpperCase() }`))
 //   And also, this result is match to the result of (const url = new URL("http://example.com/"); url.searchParams.set("p1", "富士山"); url.search.replace("?p1=", ""));
+
 const bytesFromPercentEncoded3 = ByteSequence.fromPercentEncoded(percentEncoded3, percentOptions2);
 bytesFromPercentEncoded3.getUint8View();
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
@@ -191,6 +197,9 @@ bytesFromPercentEncoded3.getUint8View();
 #### Converting the instance to a string based on the specified format
 ```javascript
 const formatted = bytes1.format();
+// → "E5AF8CE5A3ABE5B1B1"
+
+const formatted2 = bytes1.toString();
 // → "E5AF8CE5A3ABE5B1B1"
 
 const bytesFromFormatted = ByteSequence.parse(formatted);
@@ -208,6 +217,11 @@ const formatOptions = {
 };
 const formatted2 = bytes1.format(formatOptions);
 // → "e5af8ce5a3abe5b1b1"
+
+// toString method has no arguments
+const formatted2 = bytes1.toString(formatOptions);
+// → "E5AF8CE5A3ABE5B1B1"
+
 const bytesFromFormatted2 = ByteSequence.parse(formatted2, formatOptions);
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
@@ -412,21 +426,23 @@ const bytesFromStream = await ByteSequence.fromStream(Readable.toWeb(nodeJsStrea
 
 
 TODO
-MetadataStore
-byteLength
 buffer
+getUint8View
+getView
+
+byteLength
+
 allocate
 wrapArrayBuffer
 fromBufferSource
 generateRandom
-toString
-toJSON
+
 duplicate
 subsequence
-getUint8View
-getDataView
-getView
+
 equals
 startsWith
+
 segment
-createStreamReadingProgress
+
+MetadataStore
