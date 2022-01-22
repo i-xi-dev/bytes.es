@@ -825,7 +825,7 @@ describe("ByteSequence.fromBlob", () => {
     assert.strictEqual(b11v[2], 1);
     assert.strictEqual(b11v[3], 127);
     assert.strictEqual(b11.byteLength, 4);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11)), `{"type":"text/plain"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11)), `{"type":"text/plain"}`);
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
 
@@ -836,7 +836,7 @@ describe("ByteSequence.fromBlob", () => {
     assert.strictEqual(b21v[2], 1);
     assert.strictEqual(b21v[3], 127);
     assert.strictEqual(b21.byteLength, 4);
-    assert.strictEqual(ByteSequence.MetadataStore.getBlobProperties(b21), undefined);
+    //assert.strictEqual(ByteSequence.MetadataStore.getBlobProperties(b21), undefined);
 
   });
 
@@ -958,30 +958,30 @@ describe("ByteSequence.fromDataURL", () => {
 
     const b0 = ByteSequence.fromDataURL("data:text/plain,");
     assert.strictEqual(b0.byteLength, 0);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0)), `{"type":"text/plain"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0)), `{"type":"text/plain"}`);
 
     const b0b = ByteSequence.fromDataURL("data:text/plain;base64,");
     assert.strictEqual(b0b.byteLength, 0);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0b)), `{"type":"text/plain"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0b)), `{"type":"text/plain"}`);
 
     const b0c = ByteSequence.fromDataURL("data: ,");
     assert.strictEqual(b0c.byteLength, 0);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0c)), `{"type":"text/plain;charset=US-ASCII"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0c)), `{"type":"text/plain;charset=US-ASCII"}`);
 
     const b0d = ByteSequence.fromDataURL("data: ; ,");
     assert.strictEqual(b0d.byteLength, 0);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0d)), `{"type":"text/plain"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0d)), `{"type":"text/plain"}`);
 
     const b0e = ByteSequence.fromDataURL("data: ; x=y ,");
     assert.strictEqual(b0e.byteLength, 0);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0e)), `{"type":"text/plain;x=y"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0e)), `{"type":"text/plain;x=y"}`);
 
     const b11 = ByteSequence.fromDataURL("data:text/plain,a1");
     const b11v = b11.getView(Uint8Array);
     assert.strictEqual(b11v[0], 97);
     assert.strictEqual(b11v[1], 49);
     assert.strictEqual(b11.byteLength, 2);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11)), `{"type":"text/plain"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11)), `{"type":"text/plain"}`);
 
     const b12 = ByteSequence.fromDataURL("data:application/octet-stream;base64,AwIBAP/+/fw=");
     const b12v = b12.getView(Uint8Array);
@@ -994,14 +994,14 @@ describe("ByteSequence.fromDataURL", () => {
     assert.strictEqual(b12v[6], 253);
     assert.strictEqual(b12v[7], 252);
     assert.strictEqual(b12.byteLength, 8);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b12)), `{"type":"application/octet-stream"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b12)), `{"type":"application/octet-stream"}`);
 
     const b21 = ByteSequence.fromDataURL("data:text/plain; p1=a,a1");
     const b21v = b21.getView(Uint8Array);
     assert.strictEqual(b21v[0], 97);
     assert.strictEqual(b21v[1], 49);
     assert.strictEqual(b21.byteLength, 2);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b21)), `{"type":"text/plain;p1=a"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b21)), `{"type":"text/plain;p1=a"}`);
 
     const b22 = ByteSequence.fromDataURL("data:text/plain; p1=a;p2=\"b,c\",a1");
     const b22v = b22.getView(Uint8Array);
@@ -1011,21 +1011,21 @@ describe("ByteSequence.fromDataURL", () => {
     assert.strictEqual(b22v[3], 97);
     assert.strictEqual(b22v[4], 49);
     assert.strictEqual(b22.byteLength, 5);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b22)), `{"type":"text/plain;p1=a;p2=b"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b22)), `{"type":"text/plain;p1=a;p2=b"}`);
 
     const b31 = ByteSequence.fromDataURL("data:text/plain,%FF%");
     const b31v = b31.getView(Uint8Array);
     assert.strictEqual(b31v[0], 255);
     assert.strictEqual(b31v[1], 0x25);
     assert.strictEqual(b31.byteLength, 2);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b31)), `{"type":"text/plain"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b31)), `{"type":"text/plain"}`);
 
     const b32 = ByteSequence.fromDataURL("data:text/plain,%fff");
     const b32v = b32.getView(Uint8Array);
     assert.strictEqual(b32v[0], 255);
     assert.strictEqual(b32v[1], 0x66);
     assert.strictEqual(b32.byteLength, 2);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b32)), `{"type":"text/plain"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b32)), `{"type":"text/plain"}`);
 
     const b33 = ByteSequence.fromDataURL("data:text/plain,a?a=2");
     const b33v = b33.getView(Uint8Array);
@@ -1035,7 +1035,7 @@ describe("ByteSequence.fromDataURL", () => {
     assert.strictEqual(b33v[3], 0x3D);
     assert.strictEqual(b33v[4], 0x32);
     assert.strictEqual(b33.byteLength, 5);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b33)), `{"type":"text/plain"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b33)), `{"type":"text/plain"}`);
 
     assert.throws(() => {
       ByteSequence.fromDataURL("data:text/plain");
@@ -1063,7 +1063,7 @@ describe("ByteSequence.fromDataURL", () => {
     assert.strictEqual(b11v[0], 97);
     assert.strictEqual(b11v[1], 49);
     assert.strictEqual(b11.byteLength, 2);
-    assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11)), `{"type":"text/plain"}`);
+    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11)), `{"type":"text/plain"}`);
 
   });
 

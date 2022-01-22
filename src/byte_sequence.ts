@@ -26,11 +26,6 @@ import {
   Percent,
 } from "@i-xi-dev/percent";
 import { MediaType } from "@i-xi-dev/mimetype";
-import {
-  type ResourceMetadata,
-  type ResourceMetadataStore,
-  MetadataMap,
-} from "./metadata";
 // import { WebMessageUtils } from "./web_message_utils";
 
 const {
@@ -63,6 +58,11 @@ function isDataViewConstructor(value: unknown): value is DataViewConstructor {
 
 type ArrayBufferViewConstructor<T> = { new(a: ArrayBuffer, b?: number, c?: number): T };
 
+type ResourceMetadata = {
+  mediaType?: MediaType,
+  fileName?: string,
+};
+
 /**
  * Byte sequence
  */
@@ -70,11 +70,24 @@ class ByteSequence {
   /**
    * A metadata store for the instances of byte sequence.
    */
-  static MetadataStore: ResourceMetadataStore<ByteSequence> = new MetadataMap();
+  static #metadataStore: WeakMap<ByteSequence, ResourceMetadata> = new WeakMap();
 
   static #storeMetadata(instance: ByteSequence, metadata: ResourceMetadata): void {
-    (ByteSequence.MetadataStore as MetadataMap<ByteSequence>).put(instance, metadata);
+    ByteSequence.#metadataStore.set(instance, metadata);
   }
+
+  static #getStoredMediaType(instance: ByteSequence): MediaType | null {
+    const metadata = this.#metadataStore.get(instance);
+    return (metadata?.mediaType instanceof MediaType) ? metadata.mediaType : null;
+  }
+
+  static #getStoredFileName(instance: ByteSequence): string | undefined {
+    const metadata = this.#metadataStore.get(instance);
+    return (typeof metadata?.fileName === "string") ? metadata.fileName : undefined;
+  }
+
+  //TODO getStoredBlobProperties
+  //TODO getStoredFileProperties
 
   /**
    * 内部表現
@@ -589,24 +602,21 @@ class ByteSequence {
     });
   }
 
-  #resolveMediaType(preferredMediaType?: MediaType | string): MediaType | null {
+  #resolveMediaType(preferredMediaType?: string): MediaType | null {
     if (typeof preferredMediaType === "string") {
       return MediaType.fromString(preferredMediaType);
     }
-    else if (preferredMediaType instanceof MediaType) {
-      return preferredMediaType;
-    }
     else {
-      return ByteSequence.MetadataStore.getMediaType(this);
+      return ByteSequence.#getStoredMediaType(this);
     }
   }
 
   #resolveFileName(preferredFileName?: string): string | undefined {
-    if ((typeof preferredFileName === "string") && (preferredFileName.length > 0)) {
+    if (typeof preferredFileName === "string") {
       return preferredFileName;
     }
     else {
-      return ByteSequence.MetadataStore.getFileName(this);
+      return ByteSequence.#getStoredFileName(this);
     }
   }
 
