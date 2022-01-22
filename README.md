@@ -54,7 +54,8 @@ const zeroFilledBytes = ByteSequence.allocate(1024);
 
 Creates an instance filled with random bytes
 ```javascript
-const randomBytes = ByteSequence.generateRandom(size);
+const randomBytes = ByteSequence.generateRandom(1024);
+// randomBytes.byteLength → 1024
 ```
 
 Creates an instance with a new underlying buffer
