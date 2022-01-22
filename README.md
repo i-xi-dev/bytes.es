@@ -272,9 +272,7 @@ bytesFromBlob.getUint8View();
 
 #### Converting the instance to a [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File)
 
-:::note warn
 Node.js not support the `File` object
-:::
 
 ```javascript
 const file = bytes1.toFile();

@@ -86,8 +86,8 @@ class ByteSequence {
     return (typeof metadata?.fileName === "string") ? metadata.fileName : undefined;
   }
 
-  //TODO getStoredBlobProperties
-  //TODO getStoredFileProperties
+  // TODO getStoredBlobProperties
+  // TODO getStoredFileProperties
 
   /**
    * 内部表現
