@@ -4,7 +4,7 @@ import fs from "node:fs";
 import { Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
 import iconv from "iconv-lite";
-import { ByteSequence, MediaType } from "../../node/index.mjs";
+import { ByteSequence } from "../../node/index.mjs";
 
 describe("ByteSequence.prototype.byteLength", () => {
   it("byteLength", () => {

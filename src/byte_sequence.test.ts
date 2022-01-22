@@ -5,7 +5,6 @@ import { Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
 import iconv from "iconv-lite";
 import { ByteSequence } from "./byte_sequence";
-import { MediaType } from "@i-xi-dev/mimetype";
 
 describe("ByteSequence.prototype.byteLength", () => {
   it("byteLength", () => {
