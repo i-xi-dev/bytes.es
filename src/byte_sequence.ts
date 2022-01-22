@@ -554,16 +554,15 @@ class ByteSequence {
   /**
    * Returns the [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object representing this byte sequence.
    * 
-   * @param mediaType - The MIME type.
+   * @param options - The `BlobPropertyBag` object, but `endings` property is ignored.
    * @returns The `Blob` object.
    */
-  toBlob(mediaType?: MediaType | string): Blob {
-    const resolvedMediaType: MediaType | null = this.#resolveMediaType(mediaType);
-    let options: BlobPropertyBag | undefined;
-    if (resolvedMediaType) {
-      options = { type: resolvedMediaType.toString() };
-    }
-    return new Blob([ this.#buffer ], options);
+  toBlob(options?: BlobPropertyBag): Blob {
+    const resolvedMediaType: MediaType | null = this.#resolveMediaType(options?.type);
+
+    return new Blob([ this.#buffer ], {
+      type: resolvedMediaType ? resolvedMediaType.toString() : "",
+    });
   }
 
   /**

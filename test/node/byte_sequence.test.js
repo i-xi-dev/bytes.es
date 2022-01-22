@@ -862,11 +862,11 @@ describe("ByteSequence.prototype.toBlob", () => {
 
   });
 
-  it("toBlob(string)", async () => {
+  it("toBlob({})", async () => {
     const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
 
     const b11 = await ByteSequence.fromBlob(b1);
-    const b11b = b11.toBlob("application/pdf");
+    const b11b = b11.toBlob({type:"application/pdf"});
     const b11r = await b11b.arrayBuffer();
     assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
     assert.strictEqual(b11b.type, "application/pdf");
@@ -874,26 +874,7 @@ describe("ByteSequence.prototype.toBlob", () => {
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
 
     const b21 = await ByteSequence.fromBlob(b2);
-    const b21b = b21.toBlob("text/html; charset=utf-8");
-    const b21r = await b21b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b21b.type, "text/html;charset=utf-8");
-
-  });
-
-  it("toBlob(MediaType)", async () => {
-    const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
-
-    const b11 = await ByteSequence.fromBlob(b1);
-    const b11b = b11.toBlob(MediaType.fromString("application/pdf"));
-    const b11r = await b11b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b11b.type, "application/pdf");
-
-    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
-
-    const b21 = await ByteSequence.fromBlob(b2);
-    const b21b = b21.toBlob(MediaType.fromString("text/html; charset=utf-8"));
+    const b21b = b21.toBlob({type:"text/html; charset=utf-8"});
     const b21r = await b21b.arrayBuffer();
     assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
     assert.strictEqual(b21b.type, "text/html;charset=utf-8");
