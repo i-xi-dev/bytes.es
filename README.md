@@ -146,6 +146,7 @@ const base64Encoded2 = bytes1.toBase64Encoded(base64Options);
 // → "5a-M5aOr5bGx"
 
 const bytesFromBase64Encoded2 = ByteSequence.fromBase64Encoded(base64Encoded2, base64Options);
+bytesFromBase64Encoded2.getUint8View();
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
 
@@ -223,6 +224,7 @@ const formatted2 = bytes1.toString(formatOptions);
 // → "E5AF8CE5A3ABE5B1B1"
 
 const bytesFromFormatted2 = ByteSequence.parse(formatted2, formatOptions);
+bytesFromFormatted2.getUint8View();
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
 
@@ -312,6 +314,7 @@ const utf8Text = bytes1.utf8DecodeTo();
 
 // UTF-8 encode
 const bytesFromUtf8Text = ByteSequence.utf8EncodeFrom(utf8Text);
+bytesFromUtf8Text.getUint8View();
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
 
@@ -336,6 +339,7 @@ const bytesFromEucJpText = ByteSequence.textEncodeFrom(eucJpText, {
     return iconv.encode(toEncode, "EUC-JP");
   },
 });
+bytesFromEucJpText.getUint8View();
 // → Uint8Array[ 0xC9, 0xD9, 0xBB, 0xCE, 0xBB, 0xB3 ]
 ```
 
@@ -360,6 +364,7 @@ const bytesFromUtf8Text2 = ByteSequence.textEncodeFrom(utf8Text2, {
     return utf8Encoder.encode(prepend + toEncode);
   },
 });
+bytesFromUtf8Text2.getUint8View();
 // → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
 
@@ -417,19 +422,55 @@ const bytesFromStream = await ByteSequence.fromStream(Readable.toWeb(nodeJsStrea
 ```
 
 
+#### Editing byte sequence
+Gets the underlying `ArrayBuffer`
+```javascript
+const bytes1c = bytes1.duplicate();
+const bytes1Buffer = bytes1c.buffer;
 
+const bytes1BufferView = new Uint8Array(bytes1Buffer);
 
+bytes1BufferView[0] = 0;
+bytes1BufferView[1] = 0;
+bytes1BufferView[2] = 0;
 
+bytes1c.getUint8View();
+// → Uint8Array[ 0x00, 0x00, 0x00, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+```
 
+Gets the `ArrayBufferView` that views the underlying `ArrayBuffer`
+```javascript
+const bytes1c2 = bytes1.duplicate();
+
+const uint8ViewPart = bytes1c2.getUint8View(0, 3);
+// → Uint8Array[ 0xE5, 0xAF, 0x8C ]
+
+uint8ViewPart[0] = 0;
+uint8ViewPart[1] = 0;
+uint8ViewPart[2] = 0;
+
+bytes1c2.getUint8View();
+// → Uint8Array[ 0x00, 0x00, 0x00, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+```
+
+```javascript
+const bytes1c3 = bytes1.duplicate();
+
+const int8ViewPart = bytes1c3.getView(Int8Array, 0, 3);
+// → Int8Array[ -27, -81, -116 ]
+
+int8ViewPart[0] = 0;
+int8ViewPart[1] = 0;
+int8ViewPart[2] = 0;
+
+bytes1c3.getView(Uint8Array);
+// → Uint8Array[ 0x00, 0x00, 0x00, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+```
 
 
 
 
 TODO
-buffer
-getUint8View
-getView
-
 byteLength
 
 allocate
@@ -444,5 +485,3 @@ equals
 startsWith
 
 segment
-
-MetadataStore
