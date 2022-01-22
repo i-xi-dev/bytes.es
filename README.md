@@ -422,7 +422,7 @@ const bytesFromStream = await ByteSequence.fromStream(Readable.toWeb(nodeJsStrea
 ```
 
 
-#### Editing byte sequence
+#### Editing the byte sequence
 Gets the underlying `ArrayBuffer`
 ```javascript
 const bytes1c = bytes1.duplicate();
@@ -442,15 +442,15 @@ Gets the `ArrayBufferView` that views the underlying `ArrayBuffer`
 ```javascript
 const bytes1c2 = bytes1.duplicate();
 
-const uint8ViewPart = bytes1c2.getUint8View(0, 3);
-// → Uint8Array[ 0xE5, 0xAF, 0x8C ]
+const uint8ViewPart = bytes1c2.getUint8View(6, 3);
+// → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
 
 uint8ViewPart[0] = 0;
 uint8ViewPart[1] = 0;
 uint8ViewPart[2] = 0;
 
 bytes1c2.getUint8View();
-// → Uint8Array[ 0x00, 0x00, 0x00, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
 ```
 
 ```javascript
@@ -467,6 +467,36 @@ bytes1c3.getView(Uint8Array);
 // → Uint8Array[ 0x00, 0x00, 0x00, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
 
+#### Duplicating the byte sequence
+Duplicates with the new underlying `ArrayBuffer`
+```javascript
+const bytes1d = bytes1.duplicate();
+
+bytes1d.getUint8View()[0] = 0;
+bytes1d.toUint8Array();
+// → Uint8Array[ 0x00, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+
+bytes1.toUint8Array();
+// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+```
+
+Duplicates the subsequence with the new underlying `ArrayBuffer`
+```javascript
+const bytes1d2 = bytes1.subsequence(6, 9);
+
+bytes1d2.getUint8View()[0] = 0;
+bytes1d2.getUint8View()[1] = 0;
+bytes1d2.getUint8View()[2] = 0;
+bytes1d2.toUint8Array();
+// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
+
+bytes1.toUint8Array();
+// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+```
+
+
+
+
 
 
 
@@ -477,9 +507,6 @@ allocate
 wrapArrayBuffer
 fromBufferSource
 generateRandom
-
-duplicate
-subsequence
 
 equals
 startsWith
