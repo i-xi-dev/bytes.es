@@ -45,17 +45,33 @@ import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
 
 ![Conversion](assets/conversion.svg)
 
+#### Creating an instance
+Creates an instance filled with zeros
 ```javascript
-const bytesArray = [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ];
-const uint8Array = Uint8Array.form(bytesArray);
-const buffer = bytesArray.buffer;
+const zeroFilledBytes = ByteSequence.allocate(1024);
+// zeroFilledBytes.byteLength → 1024
+```
 
-// Creating an instance with a new underlying buffer
-const bytes1 = ByteSequence.fromArray(bytesArray);
-//const bytes1 = ByteSequence.fromArrayBufferView(uint8Array);
-//const bytes1 = ByteSequence.fromArrayBuffer(buffer);
-//const bytes1 = ByteSequence.fromBufferSource(uint8Array);
-//const bytes1 = ByteSequence.fromBufferSource(buffer);
+Creates an instance filled with random bytes
+```javascript
+const randomBytes = ByteSequence.generateRandom(size);
+```
+
+Creates an instance with a new underlying buffer
+```javascript
+const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+const buffer = uint8Array.buffer;
+
+// The following represents the same sequence.
+const bytes1 = ByteSequence.fromArrayBufferView(uint8Array);
+const bytes2 = ByteSequence.fromArrayBuffer(buffer);
+const bytes3 = ByteSequence.fromBufferSource(uint8Array);
+const bytes4 = ByteSequence.fromBufferSource(buffer);
+```
+
+Creates an instance with the specified underlying buffer
+```javascript
+const bytes5 = ByteSequence.wrapArrayBuffer(buffer);
 ```
 
 #### Converting the instance to a number array
@@ -487,28 +503,9 @@ const bytes1d2 = bytes1.subsequence(6, 9);
 bytes1d2.getUint8View()[0] = 0;
 bytes1d2.getUint8View()[1] = 0;
 bytes1d2.getUint8View()[2] = 0;
-bytes1d2.toUint8Array();
+bytes1d2.getUint8View();
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
 
-bytes1.toUint8Array();
+bytes1.getUint8View();
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
-
-
-
-
-
-
-
-TODO
-byteLength
-
-allocate
-wrapArrayBuffer
-fromBufferSource
-generateRandom
-
-equals
-startsWith
-
-segment
