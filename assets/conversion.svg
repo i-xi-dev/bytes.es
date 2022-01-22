@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 500">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 550">
   <defs>
     <linearGradient id="class-paint" x1="0%" x2="0%" y1="0%" y2="100%">
       <stop offset="0%" style="stop-color: rgb(47, 143, 227);"/>
@@ -181,5 +181,14 @@
 
   <path class="connecter" d="M 508 314 L 464 412 A 8 8 0 0 0 480 420 L 528 314"/>
   <text class="connecter-label" x="460" y="380">Digest</text>
+
+  <g class="class" style="transform: translate(480px, 460px);">
+    <rect class="class-frame" height="60" width="240"/>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/BufferSource" rel="noopener noreferrer">
+      <text class="class-label" x="120" y="30">BufferSource</text>
+    </a>
+  </g>
+
+  <path class="connecter bidi" d="M 570 314 L 598 456"/>
 
 </svg>
