@@ -906,7 +906,7 @@ describe("ByteSequence.prototype.toFile", () => {
 
   });
 
-  it("toFile(string)", async () => {
+  it("toFile({})", async () => {
     const b1 = new File([ Uint8Array.of(255,0,1,127) ], "test.txt", { type: "text/plain" });
 
     const b11 = await ByteSequence.fromBlob(b1);
@@ -930,23 +930,12 @@ describe("ByteSequence.prototype.toFile", () => {
     const b1 = new File([ Uint8Array.of(255,0,1,127) ], "test.txt", { type: "text/plain" });
 
     const b11 = await ByteSequence.fromBlob(b1);
-    const b11b = b11.toFile("a.xml", "application/xml");
+    const b11b = b11.toFile("a.xml", {type:"application/xml",lastModified:Date.parse("2021-02-03T04:05:06Z")});
     const b11r = await b11b.arrayBuffer();
     assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
     assert.strictEqual(b11b.type, "application/xml");
     assert.strictEqual(b11b.name, "a.xml");
-
-  });
-
-  it("toFile(string, MediaType)", async () => {
-    const b1 = new File([ Uint8Array.of(255,0,1,127) ], "test.txt", { type: "text/plain" });
-
-    const b11 = await ByteSequence.fromBlob(b1);
-    const b11b = b11.toFile("a.xml", MediaType.fromString("application/xml"));
-    const b11r = await b11b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b11b.type, "application/xml");
-    assert.strictEqual(b11b.name, "a.xml");
+    assert.strictEqual(b11b.lastModified, Date.parse("2021-02-03T04:05:06Z"));
 
   });
 

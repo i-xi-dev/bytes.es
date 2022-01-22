@@ -569,10 +569,10 @@ class ByteSequence {
    * Returns the [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File) object representing this byte sequence.
    * 
    * @param fileName - The file name.
-   * @param mediaType - The MIME type.
+   * @param options - The `FilePropertyBag` object, but `endings` property is ignored.
    * @returns The `File` object.
    */
-  toFile(fileName?: string, mediaType?: MediaType | string): File {
+  toFile(fileName?: string, options?: FilePropertyBag): File {
     const resolvedFileName: string | undefined = this.#resolveFileName(fileName);
     if ((typeof resolvedFileName === "string") && (resolvedFileName.length > 0)) {
       // ok
@@ -581,12 +581,12 @@ class ByteSequence {
       throw new TypeError("fileName");
     }
 
-    const resolvedMediaType: MediaType | null = this.#resolveMediaType(mediaType);
-    let options: FilePropertyBag | undefined;
-    if (resolvedMediaType) {
-      options = { type: resolvedMediaType.toString() };
-    }
-    return new File([ this.#buffer ], resolvedFileName, options);
+    const resolvedMediaType: MediaType | null = this.#resolveMediaType(options?.type);
+
+    return new File([ this.#buffer ], resolvedFileName, {
+      type: resolvedMediaType ? resolvedMediaType.toString() : "",
+      lastModified: options?.lastModified ? options.lastModified : Date.now(),
+    });
   }
 
   #resolveMediaType(preferredMediaType?: MediaType | string): MediaType | null {

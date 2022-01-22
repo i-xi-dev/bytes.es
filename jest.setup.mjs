@@ -8,9 +8,11 @@ globalThis.Blob = Blob;
 
 class File extends Blob {
   name;
+  lastModified;
   constructor(fileBits, fileName, options) {
     super(fileBits, options);
     this.name = fileName;
+    this.lastModified = options?.lastModified ? options.lastModified : Date.now();
   }
 }
 globalThis.File = File;
