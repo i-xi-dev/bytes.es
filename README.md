@@ -333,14 +333,16 @@ const sha512DigestBytes = await bytes1.toSha512Digest();
 Example in Node.js
 ```javascript
 import { createHash } from "node:crypto";
-
-const md5DigestBytes = await bytes1.toDigest({
+const md5 = {
+  // compute: (input: Uint8Array) => Promise<Uint8Array>
   async compute(input) {
-    const md5 = createHash("md5");
-    md5.update(input);
-    return md5.digest();
+    const hash = createHash("md5");
+    hash.update(input);
+    return hash.digest();
   }
-});
+};
+
+const md5DigestBytes = await bytes1.toDigest(md5);
 // md5DigestBytes.format() → "52A6AD27415BD86EC64B57EFBEA27F98"
 ```
 

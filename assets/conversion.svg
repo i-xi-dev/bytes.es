@@ -106,8 +106,7 @@
 
   <g class="class" style="transform: translate(440px, 250px);">
     <rect class="class-frame" height="60" width="240"/>
-    <text class="class-label" x="120" y="22">Byte array</text>
-    <text class="class-desc" x="120" y="44">Uint8Array</text>
+    <text class="class-label" x="120" y="30">ByteSequence</text>
   </g>
 
   <g class="class" style="transform: translate(100px, 100px);">
