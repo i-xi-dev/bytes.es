@@ -1087,30 +1087,16 @@ describe("ByteSequence.prototype.toDataURL", () => {
 
   });
 
-  it("toDataURL(string)", async () => {
+  it("toDataURL({})", async () => {
     const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
     const b11 = await ByteSequence.fromBlob(b1);
-    const b11b = b11.toDataURL("application/pdf");
+    const b11b = b11.toDataURL({type:"application/pdf"});
 
     assert.strictEqual(b11b.toString(), "data:application/pdf;base64,QQABfw==");
 
     const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
     const b21 = await ByteSequence.fromBlob(b2);
-    const b21b = b21.toDataURL("application/pdf");
-    assert.strictEqual(b21b.toString(), "data:application/pdf;base64,QQABfw==");
-
-  });
-
-  it("toDataURL(MediaType)", async () => {
-    const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
-    const b11 = await ByteSequence.fromBlob(b1);
-    const b11b = b11.toDataURL(MediaType.fromString("application/pdf"));
-
-    assert.strictEqual(b11b.toString(), "data:application/pdf;base64,QQABfw==");
-
-    const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
-    const b21 = await ByteSequence.fromBlob(b2);
-    const b21b = b21.toDataURL(MediaType.fromString("application/pdf"));
+    const b21b = b21.toDataURL({type:"application/pdf"});
     assert.strictEqual(b21b.toString(), "data:application/pdf;base64,QQABfw==");
 
   });

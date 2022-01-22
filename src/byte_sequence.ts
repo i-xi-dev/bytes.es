@@ -697,14 +697,14 @@ class ByteSequence {
   /**
    * Returns the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs) representing this byte sequence.
    * 
-   * @param mediaType - The MIME type.
+   * @param options - The `BlobPropertyBag` object, but `endings` property is ignored.
    * @returns The [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * @throws {TypeError}
    */
-  toDataURL(mediaType?: string | MediaType): URL {
+  toDataURL(options?: BlobPropertyBag): URL {
     // FileReaderの仕様に倣い、テキストかどうかに関係なく常時Base64エンコードする仕様
     // XXX Base64なしも対応する
-    const resolvedMediaType: MediaType | null = this.#resolveMediaType(mediaType);
+    const resolvedMediaType: MediaType | null = this.#resolveMediaType(options?.type);
     if (resolvedMediaType) {
       // let encoding = "";
       // let dataEncoded: string;
