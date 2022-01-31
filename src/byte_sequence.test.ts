@@ -518,7 +518,7 @@ describe("ByteSequence.parse", () => {
   });
 
   it("parse(string, FormatOptions)", () => {
-    const bs0 = ByteSequence.parse("0041004200430044", {radix:16, paddedLength:4, upperCase:true});
+    const bs0 = ByteSequence.parse("0041004200430044", {radix:16, paddedLength:4, lowerCase:true});
     assert.strictEqual(bs0.toString(), "41424344");
 
   });
@@ -542,8 +542,8 @@ describe("ByteSequence.prototype.format", () => {
   });
 
   it("format(FormatOptions)", () => {
-    assert.strictEqual(bs1.format({radix:16,upperCase:false}), "413c0a20a9");
-    assert.strictEqual(bs1.format({radix:16,paddedLength:3,upperCase:false}), "04103c00a0200a9");
+    assert.strictEqual(bs1.format({radix:16,lowerCase:true}), "413c0a20a9");
+    assert.strictEqual(bs1.format({radix:16,paddedLength:3,lowerCase:true}), "04103c00a0200a9");
     assert.strictEqual(bs1.format({radix:10,paddedLength:4}), "00650060001000320169");
 
   });
@@ -570,7 +570,7 @@ describe("ByteSequence.fromBase64Encoded", () => {
     const bs1b = ByteSequence.fromBase64Encoded(" A wIBAP/+/fw ", {});
     assert.strictEqual(bs1b.toArray().join(","), "3,2,1,0,255,254,253,252");
 
-    const bs1c = ByteSequence.fromBase64Encoded("AwIBAP/+/fw", {padEnd:false});
+    const bs1c = ByteSequence.fromBase64Encoded("AwIBAP/+/fw", {noPadding:true});
     assert.strictEqual(bs1c.toArray().join(","), "3,2,1,0,255,254,253,252");
 
     const rfc4648urlTable = [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ];
@@ -581,7 +581,7 @@ describe("ByteSequence.fromBase64Encoded", () => {
     const bs2b = ByteSequence.fromBase64Encoded(" A wIBAP_-_fw ", {table:rfc4648urlTable});
     assert.strictEqual(bs2b.toArray().join(","), "3,2,1,0,255,254,253,252");
 
-    const bs2c = ByteSequence.fromBase64Encoded("AwIBAP_-_fw", {table:rfc4648urlTable,padEnd:false});
+    const bs2c = ByteSequence.fromBase64Encoded("AwIBAP_-_fw", {table:rfc4648urlTable,noPadding:true});
     assert.strictEqual(bs2c.toArray().join(","), "3,2,1,0,255,254,253,252");
 
   });
@@ -613,7 +613,7 @@ describe("ByteSequence.prototype.toBase64Encoded", () => {
     const s11b = bs1.toBase64Encoded({table:rfc4648urlTable});
     assert.strictEqual(s11b, "AwIBAP_-_fw=");
 
-    const s11c = bs1.toBase64Encoded({padEnd:false});
+    const s11c = bs1.toBase64Encoded({noPadding:true});
     assert.strictEqual(s11c, "AwIBAP/+/fw");
 
   });

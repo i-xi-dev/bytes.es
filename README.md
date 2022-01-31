@@ -157,7 +157,7 @@ Example: [Base64 URL encoding](https://datatracker.ietf.org/doc/html/rfc4648#sec
 ```javascript
 const base64Options = {
   table: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ],
-  padEnd: false,
+  noPadding: true,
 };
 const base64Encoded2 = bytes1.toBase64Encoded(base64Options);
 // → "5a-M5aOr5bGx"
@@ -231,7 +231,7 @@ bytesFromFormatted.getUint8View();
 Example
 ```javascript
 const formatOptions = {
-  upperCase: false,
+  lowerCase: true,
 };
 const formatted2 = bytes1.format(formatOptions);
 // → "e5af8ce5a3abe5b1b1"
