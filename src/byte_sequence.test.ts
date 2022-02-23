@@ -1,18 +1,19 @@
-import assert from "node:assert";
+import { expect } from '@esm-bundle/chai';
+import { ByteSequence } from "./byte_sequence";
+
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import { Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
 import iconv from "iconv-lite";
-import { ByteSequence } from "./byte_sequence";
 
 describe("ByteSequence.prototype.byteLength", () => {
   it("byteLength", () => {
     const bs0 = ByteSequence.allocate(0);
     const bs1 = ByteSequence.allocate(1000);
 
-    assert.strictEqual(bs0.byteLength, 0);
-    assert.strictEqual(bs1.byteLength, 1000);
+    expect(bs0.byteLength).to.equal(0);
+    expect(bs1.byteLength).to.equal(1000);
 
   });
 
@@ -27,10 +28,10 @@ describe("ByteSequence.prototype.buffer", () => {
     const bs1 = ByteSequence.fromArrayBuffer(a1);
     const bs1b = ByteSequence.fromArrayBuffer(a1);
 
-    assert.strictEqual(bs0.buffer, a0);
-    assert.strictEqual(bs0.buffer, bs0b.buffer);
-    assert.notStrictEqual(bs1.buffer, a1);
-    assert.notStrictEqual(bs1.buffer, bs1b.buffer);
+    expect(bs0.buffer).to.equal(a0);
+    expect(bs0.buffer).to.equal(bs0b.buffer);
+    expect(bs1.buffer).to.not.equal(a1);
+    expect(bs1.buffer).to.not.equal(bs1b.buffer);
 
   });
 
@@ -38,11 +39,11 @@ describe("ByteSequence.prototype.buffer", () => {
     const bs1 = ByteSequence.wrapArrayBuffer(new ArrayBuffer(100));
 
     const x = new Uint8Array(bs1.buffer);
-    assert.strictEqual(x[0], 0);
+    expect(x[0]).to.equal(0);
 
     x[0] = 255;
-    assert.strictEqual(x[0], 255);
-    assert.strictEqual(new Uint8Array(bs1.buffer)[0], 255);
+    expect(x[0]).to.equal(255);
+    expect(new Uint8Array(bs1.buffer)[0]).to.equal(255);
 
   });
 
@@ -54,7 +55,7 @@ describe("ByteSequence.prototype.sha256Integrity", () => {
 
     const b11 = await ByteSequence.fromBlob(b1);
     const i11a = await b11.sha256Integrity;
-    assert.strictEqual(i11a, "sha256-IIm8EKKH9DeP2uG3Kn/lD4bbs5lgbsIi/L8hAswrj/w=");
+    expect(i11a).to.equal("sha256-IIm8EKKH9DeP2uG3Kn/lD4bbs5lgbsIi/L8hAswrj/w=");
 
   });
 
@@ -66,7 +67,7 @@ describe("ByteSequence.prototype.sha384Integrity", () => {
 
     const b11 = await ByteSequence.fromBlob(b1);
     const i11b = await b11.sha384Integrity;
-    assert.strictEqual(i11b, "sha384-0uhOVMndkWKKHtfDkQSsXCcT4r7Xr5Q2bcQ/uczTl2WivQ5094ZFIZZut1y32IsF");
+    expect(i11b).to.equal("sha384-0uhOVMndkWKKHtfDkQSsXCcT4r7Xr5Q2bcQ/uczTl2WivQ5094ZFIZZut1y32IsF");
 
   });
 
@@ -78,7 +79,7 @@ describe("ByteSequence.prototype.sha512Integrity", () => {
 
     const b11 = await ByteSequence.fromBlob(b1);
     const i11c = await b11.sha512Integrity;
-    assert.strictEqual(i11c, "sha512-lphfU9I644pv1b+t8yZp7b+kg+lFD+WcIeTqhWieCTRZJ4wWOxTAJxSk9rWrOmVb+TFJ2HfaKIBRFqQ0OOxyAw==");
+    expect(i11c).to.equal("sha512-lphfU9I644pv1b+t8yZp7b+kg+lFD+WcIeTqhWieCTRZJ4wWOxTAJxSk9rWrOmVb+TFJ2HfaKIBRFqQ0OOxyAw==");
 
   });
 
@@ -89,27 +90,20 @@ describe("ByteSequence.allocate", () => {
     const bs0 = ByteSequence.allocate(0);
     const bs1 = ByteSequence.allocate(1024 * 1024 * 1);
 
-    assert.strictEqual(bs0.buffer.byteLength, 0);
-    assert.strictEqual(bs1.buffer.byteLength, 1024 * 1024 * 1);
+    expect(bs0.buffer.byteLength).to.equal(0);
+    expect(bs1.buffer.byteLength).to.equal(1024 * 1024 * 1);
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.allocate(-1);
-    }, {
-      name: "TypeError",
-      message: "byteLength"
-    });
+    }).to.throw(TypeError, "byteLength").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.allocate(1.5);
-    }, {
-      message: "byteLength"
-    });
+    }).to.throw(TypeError, "byteLength").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.allocate(Number.NaN);
-    }, {
-      message: "byteLength"
-    });
+    }).to.throw(TypeError, "byteLength").with.property("name", "TypeError");
 
   });
 
@@ -123,23 +117,19 @@ describe("ByteSequence.wrapArrayBuffer", () => {
     const bs0 = ByteSequence.wrapArrayBuffer(bytes0.buffer);
     const bs1 = ByteSequence.wrapArrayBuffer(bytes1.buffer);
 
-    assert.strictEqual(bs0 instanceof ByteSequence, true);
-    assert.strictEqual(bs0.byteLength, 0);
-    assert.strictEqual(bs1.byteLength, 5);
+    expect(bs0 instanceof ByteSequence).to.equal(true);
+    expect(bs0.byteLength).to.equal(0);
+    expect(bs1.byteLength).to.equal(5);
   });
 
   it("wrapArrayBuffer(*)", () => {
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.wrapArrayBuffer(Uint8Array.of(255, 254, 1, 0, 100));
-    }, {
-      message: "buffer"
-    });
+    }).to.throw(TypeError, "buffer").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.wrapArrayBuffer([] as unknown as Uint8Array);
-    }, {
-      message: "buffer"
-    });
+    }).to.throw(TypeError, "buffer").with.property("name", "TypeError");
 
   });
 
@@ -152,11 +142,11 @@ describe("ByteSequence.wrapArrayBuffer", () => {
     nb1.set([1,2,3,4]);
 
     const bs1v = bs1.getView(Uint8Array);
-    assert.strictEqual(bs1v[0], 1);
-    assert.strictEqual(bs1v[1], 2);
-    assert.strictEqual(bs1v[2], 3);
-    assert.strictEqual(bs1v[3], 4);
-    assert.strictEqual(bs1v[4], 100);
+    expect(bs1v[0]).to.equal(1);
+    expect(bs1v[1]).to.equal(2);
+    expect(bs1v[2]).to.equal(3);
+    expect(bs1v[3]).to.equal(4);
+    expect(bs1v[4]).to.equal(100);
   });
 
 });
@@ -166,25 +156,23 @@ describe("ByteSequence.fromArrayBuffer", () => {
     const a0 = Uint8Array.of(9,8,7,6,5,4,3,2,1,0);
     const bs0 = ByteSequence.fromArrayBuffer(a0.buffer);
 
-    assert.strictEqual(bs0.byteLength, 10);
+    expect(bs0.byteLength).to.equal(10);
     const bs0a = bs0.getView(Uint8Array);
-    assert.strictEqual(bs0a[0], 9);
-    assert.strictEqual(bs0a[9], 0);
+    expect(bs0a[0]).to.equal(9);
+    expect(bs0a[9]).to.equal(0);
 
     const a1 = new ArrayBuffer(0);
     const bs1 = ByteSequence.fromArrayBuffer(a1);
 
-    assert.strictEqual(bs1.byteLength, 0);
+    expect(bs1.byteLength).to.equal(0);
 
   });
 
   it("fromArrayBuffer(*)", () => {
     const a0 = Uint8Array.of(9,8,7,6,5,4,3,2,1,0);
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.fromArrayBuffer(a0);
-    }, {
-      message: "buffer"
-    });
+    }).to.throw(TypeError, "buffer").with.property("name", "TypeError");
 
   });
 
@@ -199,10 +187,10 @@ describe("ByteSequence.prototype.toArrayBuffer", () => {
     const bs1 = ByteSequence.fromArrayBuffer(a1);
     const bs1b = ByteSequence.fromArrayBuffer(a1);
 
-    assert.notStrictEqual(bs0.toArrayBuffer(), a0);
-    assert.notStrictEqual(bs0.toArrayBuffer(), bs0b.buffer);
-    assert.notStrictEqual(bs1.toArrayBuffer(), a1);
-    assert.notStrictEqual(bs1.toArrayBuffer(), bs1b.buffer);
+    expect(bs0.toArrayBuffer()).to.not.equal(a0);
+    expect(bs0.toArrayBuffer()).to.not.equal(bs0b.buffer);
+    expect(bs1.toArrayBuffer()).to.not.equal(a1);
+    expect(bs1.toArrayBuffer()).to.not.equal(bs1b.buffer);
 
   });
 
@@ -210,11 +198,11 @@ describe("ByteSequence.prototype.toArrayBuffer", () => {
     const bs1 = ByteSequence.wrapArrayBuffer(new ArrayBuffer(100));
 
     const x = new Uint8Array(bs1.toArrayBuffer());
-    assert.strictEqual(x[0], 0);
+    expect(x[0]).to.equal(0);
 
     x[0] = 255;
-    assert.strictEqual(x[0], 255);
-    assert.notStrictEqual(new Uint8Array(bs1.toArrayBuffer())[0], 255);
+    expect(x[0]).to.equal(255);
+    expect(new Uint8Array(bs1.toArrayBuffer())[0]).to.not.equal(255);
 
   });
 
@@ -225,24 +213,22 @@ describe("ByteSequence.fromArrayBufferView", () => {
     const a0 = Uint8Array.of(9,8,7,6,5,4,3,2,1,0);
     const bs0 = ByteSequence.fromArrayBufferView(a0);
 
-    assert.strictEqual(bs0.byteLength, 10);
+    expect(bs0.byteLength).to.equal(10);
     const bs0a = bs0.getView(Uint8Array);
-    assert.strictEqual(bs0a[0], 9);
-    assert.strictEqual(bs0a[9], 0);
+    expect(bs0a[0]).to.equal(9);
+    expect(bs0a[9]).to.equal(0);
 
     const a1 = new Uint8Array(0);
     const bs1 = ByteSequence.fromArrayBufferView(a1);
 
-    assert.strictEqual(bs1.byteLength, 0);
+    expect(bs1.byteLength).to.equal(0);
 
   });
 
   it("fromArrayBufferView(*)", () => {
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.fromArrayBufferView([] as unknown as Uint8Array);
-    }, {
-      message: "bufferView"
-    });
+    }).to.throw(TypeError, "bufferView").with.property("name", "TypeError");
 
   });
 
@@ -254,14 +240,14 @@ describe("ByteSequence.prototype.toUint8Array", () => {
     const bs1 = ByteSequence.fromArrayBufferView(a1);
 
     const c1 = bs1.toUint8Array();
-    assert.strictEqual(c1 instanceof Uint8Array, true);
-    assert.strictEqual([...c1].join(","), "3,2,1,0");
-    assert.notStrictEqual(a1, c1);
+    expect(c1 instanceof Uint8Array).to.equal(true);
+    expect([...c1].join(",")).to.equal("3,2,1,0");
+    expect(a1).to.not.equal(c1);
 
     // 返却値への操作は自身に影響しない
     c1[0] = 255;
-    assert.strictEqual([...a1].join(","), "3,2,1,0");
-    assert.strictEqual([...c1].join(","), "255,2,1,0");
+    expect([...a1].join(",")).to.equal("3,2,1,0");
+    expect([...c1].join(",")).to.equal("255,2,1,0");
 
   });
 
@@ -273,8 +259,8 @@ describe("ByteSequence.prototype.toDataView", () => {
     const bs1 = ByteSequence.fromArrayBufferView(a1);
 
     const c1 = bs1.toDataView();
-    assert.strictEqual(c1 instanceof DataView, true);
-    assert.strictEqual(c1.getUint8(0), 3);
+    expect(c1 instanceof DataView).to.equal(true);
+    expect(c1.getUint8(0)).to.equal(3);
 
   });
 
@@ -286,8 +272,8 @@ describe("ByteSequence.prototype.toArrayBufferView", () => {
     const bs1 = ByteSequence.fromArrayBufferView(a1);
 
     const c1 = bs1.toArrayBufferView<Uint8Array>();
-    assert.strictEqual(c1 instanceof Uint8Array, true);
-    assert.strictEqual([...c1].join(","), "3,2,1,0");
+    expect(c1 instanceof Uint8Array).to.equal(true);
+    expect([...c1].join(",")).to.equal("3,2,1,0");
 
   });
 
@@ -296,8 +282,8 @@ describe("ByteSequence.prototype.toArrayBufferView", () => {
     const bs1 = ByteSequence.fromArrayBufferView(a1);
 
     const c1 = bs1.toArrayBufferView(Uint8Array);
-    assert.strictEqual(c1 instanceof Uint8Array, true);
-    assert.strictEqual([...c1].join(","), "3,2,1,0");
+    expect(c1 instanceof Uint8Array).to.equal(true);
+    expect([...c1].join(",")).to.equal("3,2,1,0");
 
   });
 
@@ -306,8 +292,8 @@ describe("ByteSequence.prototype.toArrayBufferView", () => {
     const bs1 = ByteSequence.fromArrayBufferView(a1);
 
     const c1 = bs1.toArrayBufferView(BigInt64Array);
-    assert.strictEqual(c1 instanceof BigInt64Array, true);
-    assert.strictEqual([...c1].join(","), "-216736835873734141");
+    expect(c1 instanceof BigInt64Array).to.equal(true);
+    expect([...c1].join(",")).to.equal("-216736835873734141");
 
   });
 
@@ -315,11 +301,9 @@ describe("ByteSequence.prototype.toArrayBufferView", () => {
     const a1 = Uint8Array.of(3,2,1,0,255,254,253,252);
     const bs1 = ByteSequence.fromArrayBufferView(a1);
 
-    assert.throws(() => {
+    expect(() => {
       bs1.toArrayBufferView(Blob as unknown as Uint8ArrayConstructor);
-    }, {
-      message: "ctor"
-    });
+    }).to.throw(TypeError, "ctor").with.property("name", "TypeError");
 
   });
 
@@ -330,15 +314,15 @@ describe("ByteSequence.fromBufferSource", () => {
     const a0 = Uint8Array.of(9,8,7,6,5,4,3,2,1,0);
     const bs0 = ByteSequence.fromBufferSource(a0.buffer);
 
-    assert.strictEqual(bs0.byteLength, 10);
+    expect(bs0.byteLength).to.equal(10);
     const bs0a = bs0.getView(Uint8Array);
-    assert.strictEqual(bs0a[0], 9);
-    assert.strictEqual(bs0a[9], 0);
+    expect(bs0a[0]).to.equal(9);
+    expect(bs0a[9]).to.equal(0);
 
     const a1 = new ArrayBuffer(0);
     const bs1 = ByteSequence.fromBufferSource(a1);
 
-    assert.strictEqual(bs1.byteLength, 0);
+    expect(bs1.byteLength).to.equal(0);
 
   });
 
@@ -346,15 +330,15 @@ describe("ByteSequence.fromBufferSource", () => {
     const a0 = Uint8Array.of(9,8,7,6,5,4,3,2,1,0);
     const bs0 = ByteSequence.fromBufferSource(a0);
 
-    assert.strictEqual(bs0.byteLength, 10);
+    expect(bs0.byteLength).to.equal(10);
     const bs0a = bs0.getView(Uint8Array);
-    assert.strictEqual(bs0a[0], 9);
-    assert.strictEqual(bs0a[9], 0);
+    expect(bs0a[0]).to.equal(9);
+    expect(bs0a[9]).to.equal(0);
 
     const a1 = new Uint8Array(0);
     const bs1 = ByteSequence.fromBufferSource(a1);
 
-    assert.strictEqual(bs1.byteLength, 0);
+    expect(bs1.byteLength).to.equal(0);
 
   });
 
@@ -365,22 +349,20 @@ describe("ByteSequence.fromArray", () => {
     const a0 = [9,8,7,6,5,4,3,2,0,255];
     const bs0 = ByteSequence.fromArray(a0);
 
-    assert.strictEqual(bs0.byteLength, 10);
+    expect(bs0.byteLength).to.equal(10);
     const bs0a = bs0.getView(Uint8Array);
-    assert.strictEqual(bs0a[8], 0);
-    assert.strictEqual(bs0a[9], 255);
+    expect(bs0a[8]).to.equal(0);
+    expect(bs0a[9]).to.equal(255);
 
     const a1: number[] = [];
     const bs1 = ByteSequence.fromArray(a1);
 
-    assert.strictEqual(bs1.byteLength, 0);
+    expect(bs1.byteLength).to.equal(0);
 
     const a2 = ["a"];
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.fromArray(a2 as unknown as number[]);
-    }, {
-      message: "byteArray"
-    });
+    }).to.throw(TypeError, "byteArray").with.property("name", "TypeError");
 
   });
 
@@ -391,12 +373,12 @@ describe("ByteSequence.prototype.toArray", () => {
     const bs0 = ByteSequence.allocate(0);
     const bs1 = ByteSequence.allocate(1000);
 
-    assert.strictEqual(bs0.toArray().length, 0);
-    assert.strictEqual(bs1.toArray().length, 1000);
+    expect(bs0.toArray().length).to.equal(0);
+    expect(bs1.toArray().length).to.equal(1000);
 
     const a2 = [1,2,3,4,5];
     const bs2 = ByteSequence.fromArray(a2);
-    assert.strictEqual(JSON.stringify(a2), JSON.stringify(bs2.toArray()));
+    expect(JSON.stringify(a2)).to.equal(JSON.stringify(bs2.toArray()));
 
   });
 
@@ -407,32 +389,24 @@ describe("ByteSequence.generateRandom", () => {
     const bs0 = ByteSequence.generateRandom(0);
     const bs1 = ByteSequence.generateRandom(65536);
 
-    assert.strictEqual(bs0.buffer.byteLength, 0);
-    assert.strictEqual(bs1.buffer.byteLength, 65536);
+    expect(bs0.buffer.byteLength).to.equal(0);
+    expect(bs1.buffer.byteLength).to.equal(65536);
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.generateRandom(-1);
-    }, {
-      message: "byteLength"
-    });
+    }).to.throw(TypeError, "byteLength").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.generateRandom(1.5);
-    }, {
-      message: "byteLength"
-    });
+    }).to.throw(TypeError, "byteLength").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.generateRandom(Number.NaN);
-    }, {
-      message: "byteLength"
-    });
+    }).to.throw(TypeError, "byteLength").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.generateRandom(65537);
-    }, {
-      message: "byteLength"
-    });
+    }).to.throw(RangeError, "byteLength").with.property("name", "RangeError");
 
   });
 
@@ -445,24 +419,20 @@ describe("ByteSequence.fromBinaryString", () => {
 
     const bsa = bsbs.toArray();
 
-    assert.strictEqual(bsa[0], 65);
-    assert.strictEqual(bsa[1], 66);
-    assert.strictEqual(bsa[2], 67);
-    assert.strictEqual(bsa[3], 68);
+    expect(bsa[0]).to.equal(65);
+    expect(bsa[1]).to.equal(66);
+    expect(bsa[2]).to.equal(67);
+    expect(bsa[3]).to.equal(68);
 
-    assert.strictEqual(ByteSequence.fromBinaryString("").byteLength, 0);
+    expect(ByteSequence.fromBinaryString("").byteLength).to.equal(0);
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.fromBinaryString("あ");
-    }, {
-      message: "input"
-    });
+    }).to.throw(TypeError, "input").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.fromBinaryString("\u0100");
-    }, {
-      message: "input"
-    });
+    }).to.throw(TypeError, "input").with.property("name", "TypeError");
 
   });
 
@@ -473,7 +443,7 @@ describe("ByteSequence.prototype.toBinaryString", () => {
     const binStr = "ABCD";
     const bsbs = ByteSequence.fromBinaryString(binStr);
 
-    assert.strictEqual(bsbs.toBinaryString(), binStr);
+    expect(bsbs.toBinaryString()).to.equal(binStr);
 
   });
 
@@ -482,44 +452,40 @@ describe("ByteSequence.prototype.toBinaryString", () => {
 describe("ByteSequence.parse", () => {
   it("parse(string)", () => {
     const bs0 = ByteSequence.parse("41A24344");
-    assert.strictEqual(bs0.toString(), "41A24344");
-    assert.strictEqual(ByteSequence.parse("").toString(), "");
+    expect(bs0.toString()).to.equal("41A24344");
+    expect(ByteSequence.parse("").toString()).to.equal("");
 
     const bs1 = ByteSequence.parse("41a24344");
-    assert.strictEqual(bs1.toString(), "41A24344");
+    expect(bs1.toString()).to.equal("41A24344");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.parse("あ");
-    }, {
-      message: "parse error: あ"
-    });
+    }).to.throw(TypeError, "parse error: あ").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.parse("GG");
-    }, {
-      message: "parse error: GG"
-    });
+    }).to.throw(TypeError, "parse error: GG").with.property("name", "TypeError");
 
   });
 
   it("parse(string, {radix:number})", () => {
     const bs0 = ByteSequence.parse("41424344", {radix:16});
-    assert.strictEqual(bs0.toString(), "41424344");
+    expect(bs0.toString()).to.equal("41424344");
 
     const bs1 = ByteSequence.parse("065066067068", {radix:10});
-    assert.strictEqual(bs1.toString(), "41424344");
+    expect(bs1.toString()).to.equal("41424344");
 
     const bs2 = ByteSequence.parse("101102103104", {radix:8});
-    assert.strictEqual(bs2.toString(), "41424344");
+    expect(bs2.toString()).to.equal("41424344");
 
     const bs3 = ByteSequence.parse("01000001010000100100001101000100", {radix:2});
-    assert.strictEqual(bs3.toString(), "41424344");
+    expect(bs3.toString()).to.equal("41424344");
 
   });
 
   it("parse(string, FormatOptions)", () => {
     const bs0 = ByteSequence.parse("0041004200430044", {radix:16, paddedLength:4, lowerCase:true});
-    assert.strictEqual(bs0.toString(), "41424344");
+    expect(bs0.toString()).to.equal("41424344");
 
   });
 
@@ -530,21 +496,21 @@ describe("ByteSequence.prototype.format", () => {
   const bs1 = ByteSequence.fromArray([0x41, 0x3C, 0xA, 0x20, 0xA9]);
 
   it("format()", () => {
-    assert.strictEqual(bs0.format(), "");
-    assert.strictEqual(bs1.format(), "413C0A20A9");
+    expect(bs0.format()).to.equal("");
+    expect(bs1.format()).to.equal("413C0A20A9");
 
   });
 
   it("format({radix:number})", () => {
-    assert.strictEqual(bs1.format({radix:16}), "413C0A20A9");
-    assert.strictEqual(bs1.format({radix:10}), "065060010032169");
+    expect(bs1.format({radix:16})).to.equal("413C0A20A9");
+    expect(bs1.format({radix:10})).to.equal("065060010032169");
 
   });
 
   it("format(FormatOptions)", () => {
-    assert.strictEqual(bs1.format({radix:16,lowerCase:true}), "413c0a20a9");
-    assert.strictEqual(bs1.format({radix:16,paddedLength:3,lowerCase:true}), "04103c00a0200a9");
-    assert.strictEqual(bs1.format({radix:10,paddedLength:4}), "00650060001000320169");
+    expect(bs1.format({radix:16,lowerCase:true})).to.equal("413c0a20a9");
+    expect(bs1.format({radix:16,paddedLength:3,lowerCase:true})).to.equal("04103c00a0200a9");
+    expect(bs1.format({radix:10,paddedLength:4})).to.equal("00650060001000320169");
 
   });
 
@@ -553,36 +519,36 @@ describe("ByteSequence.prototype.format", () => {
 describe("ByteSequence.fromBase64Encoded", () => {
   it("fromBase64Encoded(string)", () => {
     const bs0 = ByteSequence.fromBase64Encoded("");
-    assert.strictEqual(bs0.byteLength, 0);
+    expect(bs0.byteLength).to.equal(0);
 
     const bs1 = ByteSequence.fromBase64Encoded("AwIBAP/+/fw=");
-    assert.strictEqual(bs1.toArray().join(","), "3,2,1,0,255,254,253,252");
+    expect(bs1.toArray().join(",")).to.equal("3,2,1,0,255,254,253,252");
 
   });
 
   it("fromBase64Encoded(string, Object)", () => {
     const bs0 = ByteSequence.fromBase64Encoded("", {});
-    assert.strictEqual(bs0.byteLength, 0);
+    expect(bs0.byteLength).to.equal(0);
 
     const bs1 = ByteSequence.fromBase64Encoded("AwIBAP/+/fw=", {});
-    assert.strictEqual(bs1.toArray().join(","), "3,2,1,0,255,254,253,252");
+    expect(bs1.toArray().join(",")).to.equal("3,2,1,0,255,254,253,252");
 
     const bs1b = ByteSequence.fromBase64Encoded(" A wIBAP/+/fw ", {});
-    assert.strictEqual(bs1b.toArray().join(","), "3,2,1,0,255,254,253,252");
+    expect(bs1b.toArray().join(",")).to.equal("3,2,1,0,255,254,253,252");
 
     const bs1c = ByteSequence.fromBase64Encoded("AwIBAP/+/fw", {noPadding:true});
-    assert.strictEqual(bs1c.toArray().join(","), "3,2,1,0,255,254,253,252");
+    expect(bs1c.toArray().join(",")).to.equal("3,2,1,0,255,254,253,252");
 
     const rfc4648urlTable = [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ];
 
     const bs2 = ByteSequence.fromBase64Encoded("AwIBAP_-_fw=", {table:rfc4648urlTable});
-    assert.strictEqual(bs2.toArray().join(","), "3,2,1,0,255,254,253,252");
+    expect(bs2.toArray().join(",")).to.equal("3,2,1,0,255,254,253,252");
 
     const bs2b = ByteSequence.fromBase64Encoded(" A wIBAP_-_fw ", {table:rfc4648urlTable});
-    assert.strictEqual(bs2b.toArray().join(","), "3,2,1,0,255,254,253,252");
+    expect(bs2b.toArray().join(",")).to.equal("3,2,1,0,255,254,253,252");
 
     const bs2c = ByteSequence.fromBase64Encoded("AwIBAP_-_fw", {table:rfc4648urlTable,noPadding:true});
-    assert.strictEqual(bs2c.toArray().join(","), "3,2,1,0,255,254,253,252");
+    expect(bs2c.toArray().join(",")).to.equal("3,2,1,0,255,254,253,252");
 
   });
 
@@ -594,27 +560,27 @@ describe("ByteSequence.prototype.toBase64Encoded", () => {
 
   it("toBase64Encoded()", () => {
     const s1 = bs0.toBase64Encoded();
-    assert.strictEqual(s1.length, 0);
+    expect(s1.length).to.equal(0);
 
     const s11 = bs1.toBase64Encoded();
-    assert.strictEqual(s11, "AwIBAP/+/fw=");
+    expect(s11).to.equal("AwIBAP/+/fw=");
 
   });
 
   it("toBase64Encoded(Base64Options)", () => {
     const s1 = bs0.toBase64Encoded({});
-    assert.strictEqual(s1.length, 0);
+    expect(s1.length).to.equal(0);
 
     const s11 = bs1.toBase64Encoded({});
-    assert.strictEqual(s11, "AwIBAP/+/fw=");
+    expect(s11).to.equal("AwIBAP/+/fw=");
 
     const rfc4648urlTable = [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ];
 
     const s11b = bs1.toBase64Encoded({table:rfc4648urlTable});
-    assert.strictEqual(s11b, "AwIBAP_-_fw=");
+    expect(s11b).to.equal("AwIBAP_-_fw=");
 
     const s11c = bs1.toBase64Encoded({noPadding:true});
-    assert.strictEqual(s11c, "AwIBAP/+/fw");
+    expect(s11c).to.equal("AwIBAP/+/fw");
 
   });
 
@@ -623,16 +589,16 @@ describe("ByteSequence.prototype.toBase64Encoded", () => {
 describe("ByteSequence.fromPercentEncoded", () => {
   it("fromPercentEncoded(string)", () => {
     const bs1 = ByteSequence.fromPercentEncoded("");
-    assert.strictEqual(bs1.byteLength, 0);
+    expect(bs1.byteLength).to.equal(0);
 
     const bs2 = ByteSequence.fromPercentEncoded("%03");
-    assert.strictEqual(bs2.getView(Uint8Array)[0], 0x03);
+    expect(bs2.getView(Uint8Array)[0]).to.equal(0x03);
 
   });
 
   it("fromPercentEncoded(string, ByteEncodingOptions)", () => {
     const bs0 = ByteSequence.fromPercentEncoded("", {});
-    assert.strictEqual(bs0.byteLength, 0);
+    expect(bs0.byteLength).to.equal(0);
 
   });
 
@@ -645,25 +611,25 @@ describe("ByteSequence.prototype.toPercentEncoded", () => {
 
   it("toPercentEncoded()", () => {
     const s1 = bs0.toPercentEncoded();
-    assert.strictEqual(s1.length, 0);
+    expect(s1.length).to.equal(0);
 
     const s11 = bs1.toPercentEncoded();
-    assert.strictEqual(s11, "%03%02%01%00%FF%FE%FD%FC");
+    expect(s11).to.equal("%03%02%01%00%FF%FE%FD%FC");
 
   });
 
   it("toPercentEncoded(PercentOptions)", () => {
     const s1 = bs0.toPercentEncoded({});
-    assert.strictEqual(s1.length, 0);
+    expect(s1.length).to.equal(0);
 
     const s11 = bs1.toPercentEncoded({});
-    assert.strictEqual(s11, "%03%02%01%00%FF%FE%FD%FC");
+    expect(s11).to.equal("%03%02%01%00%FF%FE%FD%FC");
 
     const s3a = bs3.toPercentEncoded({spaceAsPlus:true});
-    assert.strictEqual(s3a, "+%21%22%23");
+    expect(s3a).to.equal("+%21%22%23");
 
     const s3b = bs3.toPercentEncoded({encodeSet:[]});
-    assert.strictEqual(s3b, " !\"#");
+    expect(s3b).to.equal(" !\"#");
   });
 
 });
@@ -673,7 +639,7 @@ describe("ByteSequence.prototype.toSha256Digest", () => {
 
   it("toSha256Digest()", async () => {
     const s1 = await bs0.toSha256Digest();
-    assert.strictEqual(s1.format(), "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855");
+    expect(s1.format()).to.equal("E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855");
 
   });
 
@@ -684,7 +650,7 @@ describe("ByteSequence.prototype.toSha384Digest", () => {
 
   it("toSha384Digest()", async () => {
     const s1 = await bs0.toSha384Digest();
-    assert.strictEqual(s1.format(), "38B060A751AC96384CD9327EB1B1E36A21FDB71114BE07434C0CC7BF63F6E1DA274EDEBFE76F65FBD51AD2F14898B95B");
+    expect(s1.format()).to.equal("38B060A751AC96384CD9327EB1B1E36A21FDB71114BE07434C0CC7BF63F6E1DA274EDEBFE76F65FBD51AD2F14898B95B");
 
   });
 
@@ -695,7 +661,7 @@ describe("ByteSequence.prototype.toSha512Digest", () => {
 
   it("toSha512Digest()", async () => {
     const s1 = await bs0.toSha512Digest();
-    assert.strictEqual(s1.format(), "CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E");
+    expect(s1.format()).to.equal("CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E");
 
   });
 
@@ -714,7 +680,7 @@ describe("ByteSequence.prototype.toDigest", () => {
 
   it("toDigest({})", async () => {
     const s1 = await bs0.toDigest(MD5);
-    assert.strictEqual(s1.format(), "D41D8CD98F00B204E9800998ECF8427E");
+    expect(s1.format()).to.equal("D41D8CD98F00B204E9800998ECF8427E");
 
   });
 
@@ -725,8 +691,8 @@ describe("ByteSequence.prototype.toString", () => {
   const bs1 = ByteSequence.fromArray([0x41, 0x3C, 0xA, 0x20, 0xA9]);
 
   it("toString()", () => {
-    assert.strictEqual(bs0.toString(), "");
-    assert.strictEqual(bs1.toString(), "413C0A20A9");
+    expect(bs0.toString()).to.equal("");
+    expect(bs1.toString()).to.equal("413C0A20A9");
 
   });
 
@@ -737,12 +703,12 @@ describe("ByteSequence.prototype.toJSON", () => {
     const bs0 = ByteSequence.allocate(0);
     const bs1 = ByteSequence.allocate(1000);
 
-    assert.strictEqual(bs0.toJSON().length, 0);
-    assert.strictEqual(bs1.toJSON().length, 1000);
+    expect(bs0.toJSON().length).to.equal(0);
+    expect(bs1.toJSON().length).to.equal(1000);
 
     const a2 = [1,2,3,4,5];
     const bs2 = ByteSequence.fromArray(a2);
-    assert.strictEqual(JSON.stringify(a2), JSON.stringify(bs2.toJSON()));
+    expect(JSON.stringify(a2)).to.equal(JSON.stringify(bs2.toJSON()));
 
   });
 
@@ -751,10 +717,10 @@ describe("ByteSequence.prototype.toJSON", () => {
 describe("ByteSequence.utf8EncodeFrom", () => {
   it("utf8EncodeFrom(string)", () => {
     const bs1 = ByteSequence.utf8EncodeFrom("");
-    assert.strictEqual(bs1.byteLength, 0);
+    expect(bs1.byteLength).to.equal(0);
 
     const bs2 = ByteSequence.utf8EncodeFrom("1あ3\u{A9}");
-    assert.strictEqual(bs2.toArray().join(","), "49,227,129,130,51,194,169");
+    expect(bs2.toArray().join(",")).to.equal("49,227,129,130,51,194,169");
 
   });
 
@@ -763,7 +729,7 @@ describe("ByteSequence.utf8EncodeFrom", () => {
 describe("ByteSequence.prototype.utf8DecodeTo", () => {
   it("utf8DecodeTo()", () => {
     const bs1 = ByteSequence.fromArray([49,227,129,130,51,194,169]);
-    assert.strictEqual(bs1.utf8DecodeTo(), "1あ3\u{A9}");
+    expect(bs1.utf8DecodeTo()).to.equal("1あ3\u{A9}");
 
   });
 
@@ -772,10 +738,10 @@ describe("ByteSequence.prototype.utf8DecodeTo", () => {
 describe("ByteSequence.textEncodeFrom", () => {
   it("textEncodeFrom(string)", () => {
     const bs1 = ByteSequence.textEncodeFrom("");
-    assert.strictEqual(bs1.byteLength, 0);
+    expect(bs1.byteLength).to.equal(0);
 
     const bs2 = ByteSequence.textEncodeFrom("1あ3\u{A9}");
-    assert.strictEqual(bs2.toArray().join(","), "49,227,129,130,51,194,169");
+    expect(bs2.toArray().join(",")).to.equal("49,227,129,130,51,194,169");
 
   });
 
@@ -788,10 +754,10 @@ describe("ByteSequence.textEncodeFrom", () => {
     }
 
     const bs1 = ByteSequence.textEncodeFrom("", eucJpEncoder);
-    assert.strictEqual(bs1.byteLength, 0);
+    expect(bs1.byteLength).to.equal(0);
 
     const bs2 = ByteSequence.textEncodeFrom("あいうえお", eucJpEncoder);
-    assert.strictEqual(bs2.toArray().join(","), "164,162,164,164,164,166,164,168,164,170");
+    expect(bs2.toArray().join(",")).to.equal("164,162,164,164,164,166,164,168,164,170");
 
   });
 
@@ -800,7 +766,7 @@ describe("ByteSequence.textEncodeFrom", () => {
 describe("ByteSequence.prototype.textDecodeTo", () => {
   it("textDecodeTo()", () => {
     const bs1 = ByteSequence.fromArray([49,227,129,130,51,194,169]);
-    assert.strictEqual(bs1.textDecodeTo(), "1あ3\u{A9}");
+    expect(bs1.textDecodeTo()).to.equal("1あ3\u{A9}");
 
   });
 
@@ -808,7 +774,7 @@ describe("ByteSequence.prototype.textDecodeTo", () => {
     const eucJpDecoder = new TextDecoder("euc-jp");
 
     const bs1 = ByteSequence.fromArray([164,162,164,164,164,166,164,168,164,170]);
-    assert.strictEqual(bs1.textDecodeTo(eucJpDecoder), "あいうえお");
+    expect(bs1.textDecodeTo(eucJpDecoder)).to.equal("あいうえお");
 
   });
 
@@ -820,23 +786,23 @@ describe("ByteSequence.fromBlob", () => {
 
     const b11 = await ByteSequence.fromBlob(b1);
     const b11v = b11.getView(Uint8Array);
-    assert.strictEqual(b11v[0], 255);
-    assert.strictEqual(b11v[1], 0);
-    assert.strictEqual(b11v[2], 1);
-    assert.strictEqual(b11v[3], 127);
-    assert.strictEqual(b11.byteLength, 4);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11)), `{"type":"text/plain"}`);
+    expect(b11v[0]).to.equal(255);
+    expect(b11v[1]).to.equal(0);
+    expect(b11v[2]).to.equal(1);
+    expect(b11v[3]).to.equal(127);
+    expect(b11.byteLength).to.equal(4);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11))).to.equal(`{"type":"text/plain"}`);
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
 
     const b21 = await ByteSequence.fromBlob(b2);
     const b21v = b21.getView(Uint8Array);
-    assert.strictEqual(b21v[0], 255);
-    assert.strictEqual(b21v[1], 0);
-    assert.strictEqual(b21v[2], 1);
-    assert.strictEqual(b21v[3], 127);
-    assert.strictEqual(b21.byteLength, 4);
-    //assert.strictEqual(ByteSequence.MetadataStore.getBlobProperties(b21), undefined);
+    expect(b21v[0]).to.equal(255);
+    expect(b21v[1]).to.equal(0);
+    expect(b21v[2]).to.equal(1);
+    expect(b21v[3]).to.equal(127);
+    expect(b21.byteLength).to.equal(4);
+    //expect(ByteSequence.MetadataStore.getBlobProperties(b21)).to.equal(undefined);
 
   });
 
@@ -849,16 +815,16 @@ describe("ByteSequence.prototype.toBlob", () => {
     const b11 = await ByteSequence.fromBlob(b1);
     const b11b = b11.toBlob();
     const b11r = await b11b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b11b.type, "text/plain");
+    expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
+    expect(b11b.type).to.equal("text/plain");
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
 
     const b21 = await ByteSequence.fromBlob(b2);
     const b21b = b21.toBlob();
     const b21r = await b21b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b21b.type, "");
+    expect([ ...new Uint8Array(b21r) ].join(",")).to.equal("255,0,1,127");
+    expect(b21b.type).to.equal("");
 
   });
 
@@ -868,16 +834,16 @@ describe("ByteSequence.prototype.toBlob", () => {
     const b11 = await ByteSequence.fromBlob(b1);
     const b11b = b11.toBlob({type:"application/pdf"});
     const b11r = await b11b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b11b.type, "application/pdf");
+    expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
+    expect(b11b.type).to.equal("application/pdf");
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
 
     const b21 = await ByteSequence.fromBlob(b2);
     const b21b = b21.toBlob({type:"text/html; charset=utf-8"});
     const b21r = await b21b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b21b.type, "text/html;charset=utf-8");
+    expect([ ...new Uint8Array(b21r) ].join(",")).to.equal("255,0,1,127");
+    expect(b21b.type).to.equal("text/html;charset=utf-8");
 
   });
 
@@ -890,18 +856,16 @@ describe("ByteSequence.prototype.toFile", () => {
     const b11 = await ByteSequence.fromBlob(b1);
     const b11b = b11.toFile();
     const b11r = await b11b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b11b.type, "text/plain");
-    assert.strictEqual(b11b.name, "test.txt");
+    expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
+    expect(b11b.type).to.equal("text/plain");
+    expect(b11b.name).to.equal("test.txt");
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
     const b21 = await ByteSequence.fromBlob(b2);
 
-    assert.throws(() => {
+    expect(() => {
       b21.toFile();
-    }, {
-      message: "fileName"
-    });
+    }).to.throw(TypeError, "fileName").with.property("name", "TypeError");
 
   });
 
@@ -911,17 +875,17 @@ describe("ByteSequence.prototype.toFile", () => {
     const b11 = await ByteSequence.fromBlob(b1);
     const b11b = b11.toFile("a.xml");
     const b11r = await b11b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b11b.type, "text/plain");
-    assert.strictEqual(b11b.name, "a.xml");
+    expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
+    expect(b11b.type).to.equal("text/plain");
+    expect(b11b.name).to.equal("a.xml");
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
     const b21 = await ByteSequence.fromBlob(b2);
     const b21b = b21.toFile("a.xml");
     const b21r = await b21b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b21r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b21b.type, "");
-    assert.strictEqual(b21b.name, "a.xml");
+    expect([ ...new Uint8Array(b21r) ].join(",")).to.equal("255,0,1,127");
+    expect(b21b.type).to.equal("");
+    expect(b21b.name).to.equal("a.xml");
 
   });
 
@@ -931,10 +895,10 @@ describe("ByteSequence.prototype.toFile", () => {
     const b11 = await ByteSequence.fromBlob(b1);
     const b11b = b11.toFile("a.xml", {type:"application/xml",lastModified:Date.parse("2021-02-03T04:05:06Z")});
     const b11r = await b11b.arrayBuffer();
-    assert.strictEqual([ ...new Uint8Array(b11r) ].join(","), "255,0,1,127");
-    assert.strictEqual(b11b.type, "application/xml");
-    assert.strictEqual(b11b.name, "a.xml");
-    assert.strictEqual(b11b.lastModified, Date.parse("2021-02-03T04:05:06Z"));
+    expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
+    expect(b11b.type).to.equal("application/xml");
+    expect(b11b.name).to.equal("a.xml");
+    expect(b11b.lastModified).to.equal(Date.parse("2021-02-03T04:05:06Z"));
 
   });
 
@@ -944,113 +908,107 @@ describe("ByteSequence.fromDataURL", () => {
   it("fromDataURL(string)", async () => {
 
     const b0 = ByteSequence.fromDataURL("data:text/plain,");
-    assert.strictEqual(b0.byteLength, 0);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0)), `{"type":"text/plain"}`);
+    expect(b0.byteLength).to.equal(0);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0))).to.equal( `{"type":"text/plain"}`);
 
     const b0b = ByteSequence.fromDataURL("data:text/plain;base64,");
-    assert.strictEqual(b0b.byteLength, 0);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0b)), `{"type":"text/plain"}`);
+    expect(b0b.byteLength).to.equal(0);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0b))).to.equal(`{"type":"text/plain"}`);
 
     const b0c = ByteSequence.fromDataURL("data: ,");
-    assert.strictEqual(b0c.byteLength, 0);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0c)), `{"type":"text/plain;charset=US-ASCII"}`);
+    expect(b0c.byteLength).to.equal(0);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0c))).to.equal(`{"type":"text/plain;charset=US-ASCII"}`);
 
     const b0d = ByteSequence.fromDataURL("data: ; ,");
-    assert.strictEqual(b0d.byteLength, 0);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0d)), `{"type":"text/plain"}`);
+    expect(b0d.byteLength).to.equal(0);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0d))).to.equal(`{"type":"text/plain"}`);
 
     const b0e = ByteSequence.fromDataURL("data: ; x=y ,");
-    assert.strictEqual(b0e.byteLength, 0);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0e)), `{"type":"text/plain;x=y"}`);
+    expect(b0e.byteLength).to.equal(0);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b0e))).to.equal(`{"type":"text/plain;x=y"}`);
 
     const b11 = ByteSequence.fromDataURL("data:text/plain,a1");
     const b11v = b11.getView(Uint8Array);
-    assert.strictEqual(b11v[0], 97);
-    assert.strictEqual(b11v[1], 49);
-    assert.strictEqual(b11.byteLength, 2);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11)), `{"type":"text/plain"}`);
+    expect(b11v[0]).to.equal(97);
+    expect(b11v[1]).to.equal(49);
+    expect(b11.byteLength).to.equal(2);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11))).to.equal(`{"type":"text/plain"}`);
 
     const b12 = ByteSequence.fromDataURL("data:application/octet-stream;base64,AwIBAP/+/fw=");
     const b12v = b12.getView(Uint8Array);
-    assert.strictEqual(b12v[0], 3);
-    assert.strictEqual(b12v[1], 2);
-    assert.strictEqual(b12v[2], 1);
-    assert.strictEqual(b12v[3], 0);
-    assert.strictEqual(b12v[4], 255);
-    assert.strictEqual(b12v[5], 254);
-    assert.strictEqual(b12v[6], 253);
-    assert.strictEqual(b12v[7], 252);
-    assert.strictEqual(b12.byteLength, 8);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b12)), `{"type":"application/octet-stream"}`);
+    expect(b12v[0]).to.equal(3);
+    expect(b12v[1]).to.equal(2);
+    expect(b12v[2]).to.equal(1);
+    expect(b12v[3]).to.equal(0);
+    expect(b12v[4]).to.equal(255);
+    expect(b12v[5]).to.equal(254);
+    expect(b12v[6]).to.equal(253);
+    expect(b12v[7]).to.equal(252);
+    expect(b12.byteLength).to.equal(8);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b12))).to.equal(`{"type":"application/octet-stream"}`);
 
     const b21 = ByteSequence.fromDataURL("data:text/plain; p1=a,a1");
     const b21v = b21.getView(Uint8Array);
-    assert.strictEqual(b21v[0], 97);
-    assert.strictEqual(b21v[1], 49);
-    assert.strictEqual(b21.byteLength, 2);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b21)), `{"type":"text/plain;p1=a"}`);
+    expect(b21v[0]).to.equal(97);
+    expect(b21v[1]).to.equal(49);
+    expect(b21.byteLength).to.equal(2);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b21))).to.equal(`{"type":"text/plain;p1=a"}`);
 
     const b22 = ByteSequence.fromDataURL("data:text/plain; p1=a;p2=\"b,c\",a1");
     const b22v = b22.getView(Uint8Array);
-    assert.strictEqual(b22v[0], 99);
-    assert.strictEqual(b22v[1], 34);
-    assert.strictEqual(b22v[2], 44);
-    assert.strictEqual(b22v[3], 97);
-    assert.strictEqual(b22v[4], 49);
-    assert.strictEqual(b22.byteLength, 5);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b22)), `{"type":"text/plain;p1=a;p2=b"}`);
+    expect(b22v[0]).to.equal(99);
+    expect(b22v[1]).to.equal(34);
+    expect(b22v[2]).to.equal(44);
+    expect(b22v[3]).to.equal(97);
+    expect(b22v[4]).to.equal(49);
+    expect(b22.byteLength).to.equal(5);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b22))).to.equal(`{"type":"text/plain;p1=a;p2=b"}`);
 
     const b31 = ByteSequence.fromDataURL("data:text/plain,%FF%");
     const b31v = b31.getView(Uint8Array);
-    assert.strictEqual(b31v[0], 255);
-    assert.strictEqual(b31v[1], 0x25);
-    assert.strictEqual(b31.byteLength, 2);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b31)), `{"type":"text/plain"}`);
+    expect(b31v[0]).to.equal(255);
+    expect(b31v[1]).to.equal(0x25);
+    expect(b31.byteLength).to.equal(2);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b31))).to.equal(`{"type":"text/plain"}`);
 
     const b32 = ByteSequence.fromDataURL("data:text/plain,%fff");
     const b32v = b32.getView(Uint8Array);
-    assert.strictEqual(b32v[0], 255);
-    assert.strictEqual(b32v[1], 0x66);
-    assert.strictEqual(b32.byteLength, 2);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b32)), `{"type":"text/plain"}`);
+    expect(b32v[0]).to.equal(255);
+    expect(b32v[1]).to.equal(0x66);
+    expect(b32.byteLength).to.equal(2);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b32))).to.equal(`{"type":"text/plain"}`);
 
     const b33 = ByteSequence.fromDataURL("data:text/plain,a?a=2");
     const b33v = b33.getView(Uint8Array);
-    assert.strictEqual(b33v[0], 0x61);
-    assert.strictEqual(b33v[1], 0x3F);
-    assert.strictEqual(b33v[2], 0x61);
-    assert.strictEqual(b33v[3], 0x3D);
-    assert.strictEqual(b33v[4], 0x32);
-    assert.strictEqual(b33.byteLength, 5);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b33)), `{"type":"text/plain"}`);
+    expect(b33v[0]).to.equal(0x61);
+    expect(b33v[1]).to.equal(0x3F);
+    expect(b33v[2]).to.equal(0x61);
+    expect(b33v[3]).to.equal(0x3D);
+    expect(b33v[4]).to.equal(0x32);
+    expect(b33.byteLength).to.equal(5);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b33))).to.equal(`{"type":"text/plain"}`);
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.fromDataURL("data:text/plain");
-    }, {
-      message: "U+002C not found"
-    });
+    }).to.throw(TypeError, "U+002C not found").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.fromDataURL("data2:text/plain");
-    }, {
-      message: `URL scheme is not "data"`
-    });
+    }).to.throw(TypeError, `URL scheme is not "data"`).with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       ByteSequence.fromDataURL("");
-    }, {
-      message: "dataUrl parse error"
-    });
+    }).to.throw(TypeError, "dataUrl parse error").with.property("name", "TypeError");
 
   });
 
   it("fromDataURL(URL)", async () => {
     const b11 = ByteSequence.fromDataURL(new URL("data:text/plain,a1"));
     const b11v = b11.getView(Uint8Array);
-    assert.strictEqual(b11v[0], 97);
-    assert.strictEqual(b11v[1], 49);
-    assert.strictEqual(b11.byteLength, 2);
-    //assert.strictEqual(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11)), `{"type":"text/plain"}`);
+    expect(b11v[0]).to.equal(97);
+    expect(b11v[1]).to.equal(49);
+    expect(b11.byteLength).to.equal(2);
+    //expect(JSON.stringify(ByteSequence.MetadataStore.getBlobProperties(b11))).to.equal(`{"type":"text/plain"}`);
 
   });
 
@@ -1062,15 +1020,13 @@ describe("ByteSequence.prototype.toDataURL", () => {
     const b11 = await ByteSequence.fromBlob(b1);
     const b11b = b11.toDataURL();
 
-    assert.strictEqual(b11b.toString(), "data:text/plain;base64,QQABfw==");
+    expect(b11b.toString()).to.equal("data:text/plain;base64,QQABfw==");
 
     const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
     const b21 = await ByteSequence.fromBlob(b2);
-    assert.throws(() => {
+    expect(() => {
       b21.toDataURL();
-    }, {
-      message: "MIME type not resolved"
-    });
+    }).to.throw(TypeError, "MIME type not resolved").with.property("name", "TypeError");
 
   });
 
@@ -1079,12 +1035,12 @@ describe("ByteSequence.prototype.toDataURL", () => {
     const b11 = await ByteSequence.fromBlob(b1);
     const b11b = b11.toDataURL({type:"application/pdf"});
 
-    assert.strictEqual(b11b.toString(), "data:application/pdf;base64,QQABfw==");
+    expect(b11b.toString()).to.equal("data:application/pdf;base64,QQABfw==");
 
     const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
     const b21 = await ByteSequence.fromBlob(b2);
     const b21b = b21.toDataURL({type:"application/pdf"});
-    assert.strictEqual(b21b.toString(), "data:application/pdf;base64,QQABfw==");
+    expect(b21b.toString()).to.equal("data:application/pdf;base64,QQABfw==");
 
   });
 
@@ -1095,17 +1051,17 @@ describe("ByteSequence.prototype.duplicate", () => {
     const bs0 = ByteSequence.allocate(0);
     const bs1 = ByteSequence.allocate(1000);
 
-    assert.strictEqual(bs0.duplicate().byteLength, 0);
-    assert.notStrictEqual(bs0.duplicate().buffer, bs0.buffer);
-    assert.strictEqual(bs0.duplicate().toString(), bs0.toString());
+    expect(bs0.duplicate().byteLength).to.equal(0);
+    expect(bs0.duplicate().buffer).to.not.equal(bs0.buffer);
+    expect(bs0.duplicate().toString()).to.equal(bs0.toString());
 
-    assert.strictEqual(bs1.duplicate().byteLength, 1000);
-    assert.notStrictEqual(bs1.duplicate().buffer, bs1.buffer);
-    assert.strictEqual(bs1.duplicate().toString(), bs1.toString());
+    expect(bs1.duplicate().byteLength).to.equal(1000);
+    expect(bs1.duplicate().buffer).to.not.equal(bs1.buffer);
+    expect(bs1.duplicate().toString()).to.equal(bs1.toString());
 
     const a2 = [1,2,3,4,5];
     const bs2 = ByteSequence.fromArray(a2);
-    assert.strictEqual(JSON.stringify(a2), JSON.stringify(bs2.duplicate().toArray()));
+    expect(JSON.stringify(a2)).to.equal(JSON.stringify(bs2.duplicate().toArray()));
 
   });
 
@@ -1116,69 +1072,60 @@ describe("ByteSequence.prototype.subsequence", () => {
 
   it("subsequence()", () => {
 
-    assert.throws(() => {
+    expect(() => {
       bs0.subsequence(undefined as unknown as number);
-    }, {
-      name: "TypeError",
-      message: "start"
-    });
+    }).to.throw(TypeError, "start").with.property("name", "TypeError");
 
   });
 
   it("subsequence(number)", () => {
     const bs1 = ByteSequence.generateRandom(1000);
 
-    assert.strictEqual(bs0.subsequence(0).byteLength, 0);
-    assert.notStrictEqual(bs0.subsequence(0).buffer, bs0.buffer);
-    assert.strictEqual(bs0.subsequence(0).toString(), bs0.toString());
+    expect(bs0.subsequence(0).byteLength).to.equal(0);
+    expect(bs0.subsequence(0).buffer).to.not.equal(bs0.buffer);
+    expect(bs0.subsequence(0).toString()).to.equal(bs0.toString());
 
-    assert.strictEqual(bs1.subsequence(0).byteLength, 1000);
-    assert.strictEqual(bs1.subsequence(999).byteLength, 1);
-    assert.strictEqual(bs1.subsequence(1000).byteLength, 0);
-    assert.notStrictEqual(bs1.subsequence(0).buffer, bs1.buffer);
-    assert.strictEqual(bs1.subsequence(0).toString(), bs1.toString());
+    expect(bs1.subsequence(0).byteLength).to.equal(1000);
+    expect(bs1.subsequence(999).byteLength).to.equal(1);
+    expect(bs1.subsequence(1000).byteLength).to.equal(0);
+    expect(bs1.subsequence(0).buffer).to.not.equal(bs1.buffer);
+    expect(bs1.subsequence(0).toString()).to.equal(bs1.toString());
 
     const a2 = [1,2,3,4,5];
     const bs2 = ByteSequence.fromArray(a2);
-    assert.strictEqual(JSON.stringify(a2), JSON.stringify(bs2.subsequence(0).toArray()));
+    expect(JSON.stringify(a2)).to.equal(JSON.stringify(bs2.subsequence(0).toArray()));
 
-    assert.throws(() => {
+    expect(() => {
       bs1.subsequence(1001);
-    }, {
-      message: "start"
-    });
+    }).to.throw(RangeError, "start").with.property("name", "RangeError");
 
   });
 
   it("subsequence(number, number)", () => {
     const bs1 = ByteSequence.generateRandom(1000);
 
-    assert.strictEqual(bs0.subsequence(0, 0).byteLength, 0);
-    assert.strictEqual(bs0.subsequence(0, 1).byteLength, 0);
-    assert.notStrictEqual(bs0.subsequence(0, 0).buffer, bs0.buffer);
-    assert.strictEqual(bs0.subsequence(0, 0).toString(), bs0.toString());
+    expect(bs0.subsequence(0, 0).byteLength).to.equal(0);
+    expect(bs0.subsequence(0, 1).byteLength).to.equal(0);
+    expect(bs0.subsequence(0, 0).buffer).to.not.equal(bs0.buffer);
+    expect(bs0.subsequence(0, 0).toString()).to.equal(bs0.toString());
 
-    assert.strictEqual(bs1.subsequence(0, 1000).byteLength, 1000);
-    assert.strictEqual(bs1.subsequence(999, 1000).byteLength, 1);
-    assert.strictEqual(bs1.subsequence(1000, 1000).byteLength, 0);
-    assert.strictEqual(bs1.subsequence(1000, 1001).byteLength, 0);
-    assert.notStrictEqual(bs1.subsequence(0, 1000).buffer, bs1.buffer);
-    assert.strictEqual(bs1.subsequence(0, 1000).toString(), bs1.toString());
-    assert.strictEqual(bs1.subsequence(0, 1001).toString(), bs1.toString());
+    expect(bs1.subsequence(0, 1000).byteLength).to.equal(1000);
+    expect(bs1.subsequence(999, 1000).byteLength).to.equal(1);
+    expect(bs1.subsequence(1000, 1000).byteLength).to.equal(0);
+    expect(bs1.subsequence(1000, 1001).byteLength).to.equal(0);
+    expect(bs1.subsequence(0, 1000).buffer).to.not.equal(bs1.buffer);
+    expect(bs1.subsequence(0, 1000).toString()).to.equal(bs1.toString());
+    expect(bs1.subsequence(0, 1001).toString()).to.equal(bs1.toString());
 
-    assert.strictEqual(bs1.subsequence(100, 200).toString(), ByteSequence.fromArrayBufferView(bs1.getView(Uint8Array, 100, 100)).toString());
+    expect(bs1.subsequence(100, 200).toString()).to.equal(ByteSequence.fromArrayBufferView(bs1.getView(Uint8Array, 100, 100)).toString());
 
-    assert.throws(() => {
+    expect(() => {
       bs1.subsequence(1, -1);
-    }, {
-      message: "end"
-    });
+    }).to.throw(TypeError, "end").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       bs1.subsequence(2, 1);
-    }, {
-      message: "end"
-    });
+    }).to.throw(RangeError, "end").with.property("name", "RangeError");
 
   });
 
@@ -1189,29 +1136,29 @@ describe("ByteSequence.prototype.getUint8View", () => {
     const bs1 = ByteSequence.allocate(1000);
     const v1 = bs1.getUint8View();
     const v2 = bs1.getUint8View();
-    assert.strictEqual(v1.byteLength, 1000);
-    assert.strictEqual(v1 instanceof Uint8Array, true);
-    assert.notStrictEqual(v1, v2);
+    expect(v1.byteLength).to.equal(1000);
+    expect(v1 instanceof Uint8Array).to.equal(true);
+    expect(v1).to.not.equal(v2);
 
     v1[0] = 255;
-    assert.strictEqual(v2[0], 255);
+    expect(v2[0]).to.equal(255);
 
   });
 
   it("getUint8View(number)", () => {
     const bs1 = ByteSequence.allocate(1000);
     const v1 = bs1.getUint8View(500);
-    assert.strictEqual(v1.byteLength, 500);
+    expect(v1.byteLength).to.equal(500);
 
     v1[0] = 255;
-    assert.strictEqual(bs1.getUint8View()[500], 255);
+    expect(bs1.getUint8View()[500]).to.equal(255);
 
   });
 
   it("getUint8View(number, number)", () => {
     const bs1 = ByteSequence.allocate(1000);
     const v1 = bs1.getUint8View(500, 1);
-    assert.strictEqual(v1.byteLength, 1);
+    expect(v1.byteLength).to.equal(1);
 
   });
 
@@ -1222,29 +1169,29 @@ describe("ByteSequence.prototype.getDataView", () => {
     const bs1 = ByteSequence.allocate(1000);
     const v1 = bs1.getDataView();
     const v2 = bs1.getDataView();
-    assert.strictEqual(v1.byteLength, 1000);
-    assert.strictEqual(v1 instanceof DataView, true);
-    assert.notStrictEqual(v1, v2);
+    expect(v1.byteLength).to.equal(1000);
+    expect(v1 instanceof DataView).to.equal(true);
+    expect(v1).to.not.equal(v2);
 
     v1.setUint8(0, 255);
-    assert.strictEqual(v2.getUint8(0), 255);
+    expect(v2.getUint8(0)).to.equal(255);
 
   });
 
   it("getDataView(number)", () => {
     const bs1 = ByteSequence.allocate(1000);
     const v1 = bs1.getDataView(500);
-    assert.strictEqual(v1.byteLength, 500);
+    expect(v1.byteLength).to.equal(500);
 
     v1.setUint8(0, 255);
-    assert.strictEqual(bs1.getDataView().getUint8(500), 255);
+    expect(bs1.getDataView().getUint8(500)).to.equal(255);
 
   });
 
   it("getDataView(number, number)", () => {
     const bs1 = ByteSequence.allocate(1000);
     const v1 = bs1.getDataView(500, 1);
-    assert.strictEqual(v1.byteLength, 1);
+    expect(v1.byteLength).to.equal(1);
 
   });
 
@@ -1253,98 +1200,81 @@ describe("ByteSequence.prototype.getDataView", () => {
 describe("ByteSequence.prototype.getView", () => {
   it("getView()", () => {
     const bs1 = ByteSequence.allocate(1000);
-    assert.strictEqual(bs1.getView().byteLength, 1000);
+    expect(bs1.getView().byteLength).to.equal(1000);
   });
 
   it("getView(Uint8Array)", () => {
     const bs1 = ByteSequence.allocate(1000);
-    assert.strictEqual(bs1.getView(Uint8Array).byteLength, 1000);
+    expect(bs1.getView(Uint8Array).byteLength).to.equal(1000);
   });
 
   it("getView(DataView)", () => {
     const bs1 = ByteSequence.allocate(1000);
-    assert.strictEqual(bs1.getView(DataView).byteLength, 1000);
+    expect(bs1.getView(DataView).byteLength).to.equal(1000);
   });
 
   it("getView(*)", () => {
     const bs1 = ByteSequence.allocate(1000);
-    assert.throws(() => {
+    expect(() => {
       bs1.getView(Blob as unknown as Uint8ArrayConstructor);
-    }, {
-      message: "ctor"
-    });
+    }).to.throw(TypeError, "ctor").with.property("name", "TypeError");
+
   });
 
   it("getView({}, number)", () => {
     const bs1 = ByteSequence.allocate(1000);
-    assert.strictEqual(bs1.getView(Uint8Array, 0).byteLength, 1000);
-    assert.strictEqual(bs1.getView(Uint8Array, 500).byteLength, 500);
+    expect(bs1.getView(Uint8Array, 0).byteLength).to.equal(1000);
+    expect(bs1.getView(Uint8Array, 500).byteLength).to.equal(500);
   });
 
   it("getView({}, number, number)", () => {
     const bs1 = ByteSequence.allocate(1000);
 
-    assert.strictEqual(bs1.getView(Uint8Array, 0, 1).byteLength, 1);
-    assert.strictEqual(bs1.getView(Uint8Array, 0, 1000).byteLength, 1000);
-    assert.strictEqual(bs1.getView(Uint8Array, 1, 999).byteLength, 999);
-    assert.strictEqual(bs1.getView(Uint8Array, 999, 1).byteLength, 1);
-    assert.strictEqual(bs1.getView(Uint8Array, 1000, 0).byteLength, 0);
-    assert.strictEqual(bs1.getView(Uint8Array, 0, 0).byteLength, 0);
+    expect(bs1.getView(Uint8Array, 0, 1).byteLength).to.equal(1);
+    expect(bs1.getView(Uint8Array, 0, 1000).byteLength).to.equal(1000);
+    expect(bs1.getView(Uint8Array, 1, 999).byteLength).to.equal(999);
+    expect(bs1.getView(Uint8Array, 999, 1).byteLength).to.equal(1);
+    expect(bs1.getView(Uint8Array, 1000, 0).byteLength).to.equal(0);
+    expect(bs1.getView(Uint8Array, 0, 0).byteLength).to.equal(0);
 
-    assert.throws(() => {
+    expect(() => {
       bs1.getView(Uint8Array, -1, 1);
-    }, {
-      message: "byteOffset"
-    });
+    }).to.throw(TypeError, "byteOffset").with.property("name", "TypeError");
 
-    assert.throws(() => {
-      bs1.getView(Uint8Array, 1001, 1)
-    }, {
-      message: "byteOffset"
-    });
+    expect(() => {
+      bs1.getView(Uint8Array, 1001, 1);
+    }).to.throw(RangeError, "byteOffset").with.property("name", "RangeError");
 
-    assert.throws(() => {
-      bs1.getView(Uint8Array, Number.NaN, 1)
-    }, {
-      message: "byteOffset"
-    });
+    expect(() => {
+      bs1.getView(Uint8Array, Number.NaN, 1);
+    }).to.throw(TypeError, "byteOffset").with.property("name", "TypeError");
 
-    assert.throws(() => {
-      bs1.getView(Uint8Array, 1.5, 1)
-    }, {
-      message: "byteOffset"
-    });
+    expect(() => {
+      bs1.getView(Uint8Array, 1.5, 1);
+    }).to.throw(TypeError, "byteOffset").with.property("name", "TypeError");
 
-    assert.throws(() => {
-      bs1.getView(Uint8Array, 0, Number.NaN)
-    }, {
-      message: "byteLength"
-    });
+    expect(() => {
+      bs1.getView(Uint8Array, 0, Number.NaN);
+    }).to.throw(TypeError, "byteLength").with.property("name", "TypeError");
 
-    assert.throws(() => {
-      bs1.getView(Uint8Array, 0, 1.5)
-    }, {
-      message: "byteLength"
-    });
+    expect(() => {
+      bs1.getView(Uint8Array, 0, 1.5);
+    }).to.throw(TypeError, "byteLength").with.property("name", "TypeError");
 
-    assert.throws(() => {
-      bs1.getView(Uint8Array, 0, 1001)
-    }, {
-      message: "byteLength"
-    });
+    expect(() => {
+      bs1.getView(Uint8Array, 0, 1001);
+    }).to.throw(RangeError, "byteLength").with.property("name", "RangeError");
 
-    assert.throws(() => {
-      bs1.getView(Uint8Array, 999, 2)
-    }, {
-      message: "byteLength"
-    });
+    expect(() => {
+      bs1.getView(Uint8Array, 999, 2);
+    }).to.throw(RangeError, "byteLength").with.property("name", "RangeError");
 
   });
 
   it("fromメソッドに渡したインスタンスとは異なるインスタンスが返る", () => {
     const b0 = new Uint8Array(0);
     const bs0 = ByteSequence.fromArrayBufferView(b0);
-    assert.notStrictEqual(bs0.getView(Uint8Array, 0, 0), b0);
+    expect(bs0.getView(Uint8Array, 0, 0)).to.not.equal(b0);
 
   });
 
@@ -1352,15 +1282,15 @@ describe("ByteSequence.prototype.getView", () => {
     const bs1 = ByteSequence.allocate(100);
 
     const x = bs1.getView(Uint8Array, 0, 100);
-    assert.strictEqual(x[0], 0);
+    expect(x[0]).to.equal(0);
 
     x[0] = 255;
-    assert.strictEqual(x[0], 255);
-    assert.strictEqual(new Uint8Array(bs1.buffer)[0], 255);
+    expect(x[0]).to.equal(255);
+    expect(new Uint8Array(bs1.buffer)[0]).to.equal(255);
 
     x[0] = 32;
-    assert.strictEqual(x[0], 32);
-    assert.strictEqual(new Uint8Array(bs1.buffer)[0], 32);
+    expect(x[0]).to.equal(32);
+    expect(new Uint8Array(bs1.buffer)[0]).to.equal(32);
 
   });
 
@@ -1374,41 +1304,41 @@ describe("ByteSequence.prototype.equals", () => {
   const bs1b =  ByteSequence.fromArray([255, 0, 127, 1]);
 
   it("equals(ByteSequence)", () => {
-    assert.strictEqual(bs0.equals(bs0), true);
-    assert.strictEqual(bs0.equals(bs0b), true);
+    expect(bs0.equals(bs0)).to.equal(true);
+    expect(bs0.equals(bs0b)).to.equal(true);
 
-    assert.strictEqual(bs1.equals(bs1), true);
-    assert.strictEqual(bs1.equals(bs1b), true);
-    assert.strictEqual(bs1.equals(bs0), false);
-    assert.strictEqual(bs0.equals(bs1), false);
+    expect(bs1.equals(bs1)).to.equal(true);
+    expect(bs1.equals(bs1b)).to.equal(true);
+    expect(bs1.equals(bs0)).to.equal(false);
+    expect(bs0.equals(bs1)).to.equal(false);
 
   });
 
   it("equals(Uint8Array)", () => {
-    assert.strictEqual(bs0.equals(new Uint8Array(0)), true);
-    assert.strictEqual(bs1.equals(bs1.toUint8Array()), true);
-    assert.strictEqual(bs1.equals(Uint8Array.of(255, 0, 127, 1)), true);
+    expect(bs0.equals(new Uint8Array(0))).to.equal(true);
+    expect(bs1.equals(bs1.toUint8Array())).to.equal(true);
+    expect(bs1.equals(Uint8Array.of(255, 0, 127, 1))).to.equal(true);
 
-    assert.strictEqual(bs1.equals(Uint8Array.of(255, 0, 123, 1)), false);
-    assert.strictEqual(bs1.equals(Uint8Array.of(255, 0, 127, 1, 5)), false);
-    assert.strictEqual(bs1.equals(Uint8Array.of(255, 0, 127)), false);
+    expect(bs1.equals(Uint8Array.of(255, 0, 123, 1))).to.equal(false);
+    expect(bs1.equals(Uint8Array.of(255, 0, 127, 1, 5))).to.equal(false);
+    expect(bs1.equals(Uint8Array.of(255, 0, 127))).to.equal(false);
 
   });
 
   it("equals(Array<number>)", () => {
-    assert.strictEqual(bs0.equals([]), true);
-    assert.strictEqual(bs1.equals(bs1.toArray()), true);
-    assert.strictEqual(bs1.equals([255, 0, 127, 1]), true);
+    expect(bs0.equals([])).to.equal(true);
+    expect(bs1.equals(bs1.toArray())).to.equal(true);
+    expect(bs1.equals([255, 0, 127, 1])).to.equal(true);
 
-    assert.strictEqual(bs1.equals([255, 0, 127, 2]), false);
-    assert.strictEqual(bs1.equals([255, 0, 127, 1, 2]), false);
-    assert.strictEqual(bs1.equals([255, 0, 127]), false);
+    expect(bs1.equals([255, 0, 127, 2])).to.equal(false);
+    expect(bs1.equals([255, 0, 127, 1, 2])).to.equal(false);
+    expect(bs1.equals([255, 0, 127])).to.equal(false);
 
   });
 
   it("equals(ArrayBuffer)", () => {
-    assert.strictEqual(bs0.equals(bs0.buffer), true);
-    assert.strictEqual(bs1.equals(bs1b.buffer), true);
+    expect(bs0.equals(bs0.buffer)).to.equal(true);
+    expect(bs1.equals(bs1b.buffer)).to.equal(true);
 
   });
 
@@ -1422,64 +1352,60 @@ describe("ByteSequence.prototype.startsWith", () => {
   const bs1b =  ByteSequence.fromArray([255, 0, 127, 1]);
 
   it("startsWith(ByteSequence)", () => {
-    assert.strictEqual(bs0.startsWith(bs0), true);
-    assert.strictEqual(bs0.startsWith(bs0b), true);
+    expect(bs0.startsWith(bs0)).to.equal(true);
+    expect(bs0.startsWith(bs0b)).to.equal(true);
 
-    assert.strictEqual(bs1.startsWith(bs1), true);
-    assert.strictEqual(bs1.startsWith(bs1b), true);
-    assert.strictEqual(bs1.startsWith(bs0), true);
-    assert.strictEqual(bs0.startsWith(bs1), false);
+    expect(bs1.startsWith(bs1)).to.equal(true);
+    expect(bs1.startsWith(bs1b)).to.equal(true);
+    expect(bs1.startsWith(bs0)).to.equal(true);
+    expect(bs0.startsWith(bs1)).to.equal(false);
 
   });
 
   it("startsWith(Uint8Array)", () => {
-    assert.strictEqual(bs0.startsWith(new Uint8Array(0)), true);
-    assert.strictEqual(bs1.startsWith(bs1.toUint8Array()), true);
-    assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 127, 1)), true);
+    expect(bs0.startsWith(new Uint8Array(0))).to.equal(true);
+    expect(bs1.startsWith(bs1.toUint8Array())).to.equal(true);
+    expect(bs1.startsWith(Uint8Array.of(255, 0, 127, 1))).to.equal(true);
 
-    assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 123, 1)), false);
-    assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 127, 1, 5)), false);
-    assert.strictEqual(bs1.startsWith(Uint8Array.of(255, 0, 127)), true);
+    expect(bs1.startsWith(Uint8Array.of(255, 0, 123, 1))).to.equal(false);
+    expect(bs1.startsWith(Uint8Array.of(255, 0, 127, 1, 5))).to.equal(false);
+    expect(bs1.startsWith(Uint8Array.of(255, 0, 127))).to.equal(true);
 
-    assert.strictEqual(bs1.startsWith([255, 0, 127, 2]), false);
-    assert.strictEqual(bs1.startsWith([255, 0, 127, 1, 2]), false);
-    assert.strictEqual(bs1.startsWith([255, 0, 127]), true);
-    assert.strictEqual(bs1.startsWith([255, 0]), true);
-    assert.strictEqual(bs1.startsWith([255]), true);
-    assert.strictEqual(bs1.startsWith([]), true);
+    expect(bs1.startsWith([255, 0, 127, 2])).to.equal(false);
+    expect(bs1.startsWith([255, 0, 127, 1, 2])).to.equal(false);
+    expect(bs1.startsWith([255, 0, 127])).to.equal(true);
+    expect(bs1.startsWith([255, 0])).to.equal(true);
+    expect(bs1.startsWith([255])).to.equal(true);
+    expect(bs1.startsWith([])).to.equal(true);
 
   });
 
   it("startsWith(Array<number>)", () => {
-    assert.strictEqual(bs0.startsWith([]), true);
-    assert.strictEqual(bs1.startsWith(bs1.toArray()), true);
-    assert.strictEqual(bs1.startsWith([255, 0, 127, 1]), true);
+    expect(bs0.startsWith([])).to.equal(true);
+    expect(bs1.startsWith(bs1.toArray())).to.equal(true);
+    expect(bs1.startsWith([255, 0, 127, 1])).to.equal(true);
 
-    assert.strictEqual(bs1.startsWith([255, 0, 127, 2]), false);
-    assert.strictEqual(bs1.startsWith([255, 0, 127, 1, 2]), false);
-    assert.strictEqual(bs1.startsWith([255, 0, 127]), true);
+    expect(bs1.startsWith([255, 0, 127, 2])).to.equal(false);
+    expect(bs1.startsWith([255, 0, 127, 1, 2])).to.equal(false);
+    expect(bs1.startsWith([255, 0, 127])).to.equal(true);
 
   });
 
   it("startsWith(ArrayBuffer)", () => {
-    assert.strictEqual(bs0.startsWith(bs0.buffer), true);
-    assert.strictEqual(bs1.startsWith(bs1b.buffer), true);
-    assert.strictEqual(bs1.startsWith(bs0.buffer), true);
+    expect(bs0.startsWith(bs0.buffer)).to.equal(true);
+    expect(bs1.startsWith(bs1b.buffer)).to.equal(true);
+    expect(bs1.startsWith(bs0.buffer)).to.equal(true);
 
   });
 
   it("startsWith(*)", () => {
-    assert.throws(() => {
+    expect(() => {
       bs0.startsWith("" as unknown as Uint8Array);
-    }, {
-      message: "otherBytes"
-    });
+    }).to.throw(TypeError, "otherBytes").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       bs1.startsWith(["255"] as unknown as Uint8Array);
-    }, {
-      message: "otherBytes"
-    });
+    }).to.throw(TypeError, "otherBytes").with.property("name", "TypeError");
 
   });
 
@@ -1489,47 +1415,41 @@ describe("ByteSequence.prototype.segment", () => {
   it("segment(number)", () => {
     const bs1 = ByteSequence.generateRandom(1000);
 
-    assert.throws(() => {
+    expect(() => {
       bs1.segment(0);
-    }, {
-      message: "segmentByteLength"
-    });
+    }).to.throw(TypeError, "segmentByteLength").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       bs1.segment(-1);
-    }, {
-      message: "segmentByteLength"
-    });
+    }).to.throw(TypeError, "segmentByteLength").with.property("name", "TypeError");
 
-    assert.throws(() => {
+    expect(() => {
       bs1.segment(undefined as unknown as number);
-    }, {
-      message: "segmentByteLength"
-    });
+    }).to.throw(TypeError, "segmentByteLength").with.property("name", "TypeError");
 
     const i1 = bs1.segment(100);
     let i = 0;
     for (const i1i of i1) {
-      assert.strictEqual(i1i.byteLength, 100);
-      assert.strictEqual(JSON.stringify(i1i.toArray()), JSON.stringify([...bs1.getView(Uint8Array, i, 100)]));
+      expect(i1i.byteLength).to.equal(100);
+      expect(JSON.stringify(i1i.toArray())).to.equal(JSON.stringify([...bs1.getView(Uint8Array, i, 100)]));
       i = i + 100;
     }
-    assert.strictEqual(i, 1000);
+    expect(i).to.equal(1000);
 
     const i1b = bs1.segment(150);
     let ib = 0;
     for (const i1i of i1b) {
       if (ib < 900) {
-        assert.strictEqual(i1i.byteLength, 150);
-        assert.strictEqual(JSON.stringify(i1i.toArray()), JSON.stringify([...bs1.getView(Uint8Array, ib, 150)]));
+        expect(i1i.byteLength).to.equal(150);
+        expect(JSON.stringify(i1i.toArray())).to.equal(JSON.stringify([...bs1.getView(Uint8Array, ib, 150)]));
       }
       else {
-        assert.strictEqual(i1i.byteLength, 100);
-        assert.strictEqual(JSON.stringify(i1i.toArray()), JSON.stringify([...bs1.getView(Uint8Array, ib, 100)]));
+        expect(i1i.byteLength).to.equal(100);
+        expect(JSON.stringify(i1i.toArray())).to.equal(JSON.stringify([...bs1.getView(Uint8Array, ib, 100)]));
       }
       ib = ib + 150;
     }
-    assert.strictEqual(ib, 1050);
+    expect(ib).to.equal(1050);
 
   });
 
@@ -1543,32 +1463,32 @@ describe("ByteSequence.createStreamReadingProgress", () => {
   it("createStreamReadingProgress(ReadableStream)", async () => {
     const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
     const p = ByteSequence.createStreamReadingProgress(stream);
-    assert.strictEqual(p.total, undefined);
-    assert.strictEqual(p.loaded, 0);
-    assert.strictEqual(p.indeterminate, true);
-    assert.strictEqual(p.percentage, 0);
+    expect(p.total).to.equal(undefined);
+    expect(p.loaded).to.equal(0);
+    expect(p.indeterminate).to.equal(true);
+    expect(p.percentage).to.equal(0);
     const r = await p.initiate();
-    assert.strictEqual(p.total, undefined);
-    assert.strictEqual(p.loaded, 128);
-    assert.strictEqual(p.indeterminate, true);
-    assert.strictEqual(p.percentage, 0);
-    assert.strictEqual(r.byteLength, 128);
+    expect(p.total).to.equal(undefined);
+    expect(p.loaded).to.equal(128);
+    expect(p.indeterminate).to.equal(true);
+    expect(p.percentage).to.equal(0);
+    expect(r.byteLength).to.equal(128);
 
   });
 
   it("createStreamReadingProgress(ReadableStream, {total:number})", async () => {
     const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
     const p = ByteSequence.createStreamReadingProgress(stream, {total:128});
-    assert.strictEqual(p.total, 128);
-    assert.strictEqual(p.loaded, 0);
-    assert.strictEqual(p.indeterminate, false);
-    assert.strictEqual(p.percentage, 0);
+    expect(p.total).to.equal(128);
+    expect(p.loaded).to.equal(0);
+    expect(p.indeterminate).to.equal(false);
+    expect(p.percentage).to.equal(0);
     const r = await p.initiate();
-    assert.strictEqual(p.total, 128);
-    assert.strictEqual(p.loaded, 128);
-    assert.strictEqual(p.indeterminate, false);
-    assert.strictEqual(p.percentage, 100);
-    assert.strictEqual(r.byteLength, 128);
+    expect(p.total).to.equal(128);
+    expect(p.loaded).to.equal(128);
+    expect(p.indeterminate).to.equal(false);
+    expect(p.percentage).to.equal(100);
+    expect(r.byteLength).to.equal(128);
 
   });
 
@@ -1597,47 +1517,47 @@ describe("ByteSequence.createStreamReadingProgress", () => {
     });
 
     const p = ByteSequence.createStreamReadingProgress(s, {timeout:250});
-    assert.strictEqual(p.total, undefined);
-    assert.strictEqual(p.loaded, 0);
-    assert.strictEqual(p.indeterminate, true);
-    assert.strictEqual(p.percentage, 0);
+    expect(p.total).to.equal(undefined);
+    expect(p.loaded).to.equal(0);
+    expect(p.indeterminate).to.equal(true);
+    expect(p.percentage).to.equal(0);
     let r;
     try {
       r = await p.initiate();
-      assert.strictEqual(true, false);
+      expect(true).to.equal(false);
     }
     catch (exception) {
-      assert.strictEqual((exception as Error).name, "TimeoutError");
+      expect((exception as Error).name).to.equal("TimeoutError");
     }
-    assert.strictEqual(p.total, undefined);
-    assert.strictEqual(p.loaded, 4);
-    assert.strictEqual(p.indeterminate, true);
-    assert.strictEqual(p.percentage, 0);
-    //assert.strictEqual(r.count, 4);
+    expect(p.total).to.equal(undefined);
+    expect(p.loaded).to.equal(4);
+    expect(p.indeterminate).to.equal(true);
+    expect(p.percentage).to.equal(0);
+    //expect(r.count).to.equal(4);
 
   });
 
   it("createStreamReadingProgress(ReadableStream, {timeout:number}) - 2", async () => {
     const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/4096.txt", { highWaterMark: 64 }));
     const p = ByteSequence.createStreamReadingProgress(stream, {timeout:4});
-    assert.strictEqual(p.total, undefined);
-    assert.strictEqual(p.loaded, 0);
-    assert.strictEqual(p.indeterminate, true);
-    assert.strictEqual(p.percentage, 0);
+    expect(p.total).to.equal(undefined);
+    expect(p.loaded).to.equal(0);
+    expect(p.indeterminate).to.equal(true);
+    expect(p.percentage).to.equal(0);
     let r;
     try {
       r = await p.initiate();
-      assert.strictEqual(true, false);
+      expect(true).to.equal(false);
     }
     catch (exception) {
-      assert.strictEqual((exception as Error).name, "TimeoutError");
+      expect((exception as Error).name).to.equal("TimeoutError");
     }
-    assert.strictEqual(p.total, undefined);
-    assert.strictEqual(p.loaded > 0, true);
+    expect(p.total).to.equal(undefined);
+    expect(p.loaded > 0).to.equal(true);
     console.log(p.loaded)
-    assert.strictEqual(p.indeterminate, true);
-    assert.strictEqual(p.percentage, 0);
-    //assert.strictEqual(r.count, 4);
+    expect(p.indeterminate).to.equal(true);
+    expect(p.percentage).to.equal(0);
+    //expect(r.count).to.equal(4);
 
   });
 
@@ -1647,22 +1567,22 @@ describe("ByteSequence.fromStream", () => {
   it("fromStream(ReadableStream)", async () => {
     const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
     const r = await ByteSequence.fromStream(stream);
-    assert.strictEqual(r.byteLength, 128);
+    expect(r.byteLength).to.equal(128);
 
   });
 
   it("fromStream(ReadableStream)", async () => {
     const stream = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
     const r = await ByteSequence.fromStream(stream, 128);
-    assert.strictEqual(r.byteLength, 128);
+    expect(r.byteLength).to.equal(128);
 
     const stream2 = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
     const r2 = await ByteSequence.fromStream(stream2, 64);
-    assert.strictEqual(r2.byteLength, 128);
+    expect(r2.byteLength).to.equal(128);
 
     const stream3 = (Readable as unknown as Temp1).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
     const r3 = await ByteSequence.fromStream(stream3, 512);
-    assert.strictEqual(r3.byteLength, 128);
+    expect(r3.byteLength).to.equal(128);
 
   });
 
