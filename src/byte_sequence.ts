@@ -7,15 +7,17 @@ import {
   type TransferOptions,
   ByteBuffer,
   ByteFormat,
+  CodePointRange,
+  isNonNegativeInteger,
   IsomorphicEncoding,
-  NumberUtils,
+  isPositiveInteger,
+  isUint8,
   Sha256,
   Sha384,
   Sha512,
-  StreamUtils,
-  StringUtils,
+  streamToAsyncGenerator,
   TransferProgress,
-  Uint8,
+  trim,
 } from "@i-xi-dev/fundamental";
 import {
   type Base64Options,
@@ -30,7 +32,7 @@ import { MediaType } from "@i-xi-dev/mimetype";
 
 const {
   ASCII_WHITESPACE,
-} = StringUtils.RangePattern;
+} = CodePointRange;
 
 /**
  * A typedef that representing a `ByteSequence`, [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource), or `Array` of 8-bit unsigned integers.
@@ -158,7 +160,7 @@ class ByteSequence {
    * @throws {TypeError} The `byteLength` is not non-negative integer.
    */
   static allocate(byteLength: number): ByteSequence {
-    if (NumberUtils.isNonNegativeInteger(byteLength) !== true) {
+    if (isNonNegativeInteger(byteLength) !== true) {
       throw new TypeError("byteLength");
     }
     return new ByteSequence(new ArrayBuffer(byteLength));
@@ -286,7 +288,7 @@ class ByteSequence {
    * @throws {TypeError} The `byteArray` is not an 8-bit unsigned integer `Array`.
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
-    if (Array.isArray(byteArray) && byteArray.every((byte) => Uint8.isUint8(byte))) {
+    if (Array.isArray(byteArray) && byteArray.every((byte) => isUint8(byte))) {
       return ByteSequence.fromArrayBufferView(Uint8Array.from(byteArray));
     }
     throw new TypeError("byteArray");
@@ -311,7 +313,7 @@ class ByteSequence {
    * @throws {RangeError} The `byteLength` is greater than 65536.
    */
   static generateRandom(byteLength: number): ByteSequence {
-    if (NumberUtils.isNonNegativeInteger(byteLength) !== true) {
+    if (isNonNegativeInteger(byteLength) !== true) {
       throw new TypeError("byteLength");
     }
     if (byteLength > 65536) { // XXX 連結すれば良いのでは
@@ -663,7 +665,7 @@ class ByteSequence {
     // ・メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする
     // ・クエリはデータの一部とみなす
     const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
-    let mediaTypeWork = StringUtils.trim(mediaTypeOriginal, ASCII_WHITESPACE);
+    let mediaTypeWork = trim(mediaTypeOriginal, ASCII_WHITESPACE);
 
     // 8, 9
     bodyStringWork = bodyStringWork.substring(mediaTypeOriginal.length + 1);
@@ -751,7 +753,7 @@ class ByteSequence {
    * @throws {RangeError} The `end` is less than the `start`.
    */
   subsequence(start: number, end?: number): ByteSequence {
-    if (NumberUtils.isNonNegativeInteger(start) !== true) {
+    if (isNonNegativeInteger(start) !== true) {
       throw new TypeError("start");
     }
     if (start > this.byteLength) {
@@ -759,7 +761,7 @@ class ByteSequence {
     }
 
     if (typeof end === "number") {
-      if (NumberUtils.isNonNegativeInteger(end) !== true) {
+      if (isNonNegativeInteger(end) !== true) {
         throw new TypeError("end");
       }
       if (end < start) {
@@ -820,14 +822,14 @@ class ByteSequence {
       throw new TypeError("ctor");
     }
 
-    if (NumberUtils.isNonNegativeInteger(byteOffset) !== true) {
+    if (isNonNegativeInteger(byteOffset) !== true) {
       throw new TypeError("byteOffset");
     }
     else if ((byteOffset > this.byteLength) || ((byteOffset % bytesPerElement) !== 0)) {
       throw new RangeError("byteOffset");
     }
 
-    if (NumberUtils.isNonNegativeInteger(byteLength) !== true) {
+    if (isNonNegativeInteger(byteLength) !== true) {
       throw new TypeError("byteLength");
     }
     else if (((byteOffset + byteLength) > this.byteLength) || ((byteLength % bytesPerElement) !== 0)) {
@@ -854,7 +856,7 @@ class ByteSequence {
       }
       return true;
     }
-    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => Uint8.isUint8(byte))) {
+    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => isUint8(byte))) {
       for (let i = 0; i < otherBytes.length; i++) {
         if (otherBytes[i] !== thisView[i]) {
           return false;
@@ -885,7 +887,7 @@ class ByteSequence {
       }
       return this.#startsWith(otherBytes);
     }
-    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => Uint8.isUint8(byte))) {
+    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => isUint8(byte))) {
       if (otherBytes.length !== this.byteLength) {
         return false;
       }
@@ -908,7 +910,7 @@ class ByteSequence {
     else if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
       return this.#startsWith(otherBytes);
     }
-    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => Uint8.isUint8(byte))) {
+    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => isUint8(byte))) {
       return this.#startsWith(otherBytes as Array<uint8>);
     }
     throw new TypeError("otherBytes");
@@ -922,7 +924,7 @@ class ByteSequence {
    * @throws {TypeError} The `segmentByteLength` is not non-negative integer.
    */
   segment(segmentByteLength: number): IterableIterator<ByteSequence> {
-    if (NumberUtils.isPositiveInteger(segmentByteLength) !== true) {
+    if (isPositiveInteger(segmentByteLength) !== true) {
       throw new TypeError("segmentByteLength");
     }
 
@@ -947,11 +949,11 @@ class ByteSequence {
    */
   static createStreamReadingProgress(stream: ReadableStream<Uint8Array>, options?: TransferOptions): TransferProgress<ByteSequence> {
     const reader: ReadableStreamDefaultReader<Uint8Array> = stream.getReader();
-    const totalUnitCount: number | undefined = ((typeof options?.total === "number") && NumberUtils.isNonNegativeInteger(options.total)) ? options.total : undefined;
+    const totalUnitCount: number | undefined = ((typeof options?.total === "number") && isNonNegativeInteger(options.total)) ? options.total : undefined;
     const buffer: ByteBuffer = new ByteBuffer(totalUnitCount);
 
     return new TransferProgress<Uint8Array, ByteSequence>({
-      chunkGenerator: StreamUtils.streamToAsyncGenerator<Uint8Array>(reader),
+      chunkGenerator: streamToAsyncGenerator<Uint8Array>(reader),
 
       transferChunk(chunkBytes: Uint8Array): number {
         buffer.put(chunkBytes);

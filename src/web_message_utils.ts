@@ -1,13 +1,16 @@
 // //
 
 import {
-  StringUtils,
+  CodePointRange,
+  collectHttpQuotedString,
+  collectStart,
+  trim,
 } from "@i-xi-dev/fundamental";
 import { MediaType } from "@i-xi-dev/mimetype";
 
 const {
   HTTP_TAB_OR_SPACE,
-} = StringUtils.RangePattern;
+} = CodePointRange;
 
 /**
  * Headers#getで取得した値を分割する
@@ -20,21 +23,21 @@ const {
  * @returns 分割結果
  */
 function splitWebHeaderValue(value: string): Array<string> {
-  const notU0022OrU002C = "\\u0022\\u002C";
+  const notU0022OrU002C: Array<[ number ]> = [ [ 0x22 ], [ 0x2C ] ];
   const values: Array<string> = [];
   let work = value;
   while (work.length > 0) {
-    let splitted = StringUtils.collect(work, notU0022OrU002C);
+    let splitted = collectStart(work, notU0022OrU002C);
     work = work.substring(splitted.length);
     if (work.startsWith("\u0022")) {
-      const result = StringUtils.collectHttpQuotedString(work);
+      const result = collectHttpQuotedString(work);
       splitted = splitted + result.collected;
       work = work.substring(result.progression);
     }
     else { // work.startsWith("\u002C")
       work = work.substring(1);
     }
-    values.push(StringUtils.trim(splitted, HTTP_TAB_OR_SPACE));
+    values.push(trim(splitted, HTTP_TAB_OR_SPACE));
   }
   return values;
 }
