@@ -9,9 +9,9 @@ import {
   ByteFormat,
   CodePointRange,
   isNonNegativeInteger,
+  isArrayOfUint8,
   IsomorphicEncoding,
   isPositiveInteger,
-  isUint8,
   Sha256,
   Sha384,
   Sha512,
@@ -288,7 +288,7 @@ class ByteSequence {
    * @throws {TypeError} The `byteArray` is not an 8-bit unsigned integer `Array`.
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
-    if (Array.isArray(byteArray) && byteArray.every((byte) => isUint8(byte))) {
+    if (isArrayOfUint8(byteArray)) {
       return ByteSequence.fromArrayBufferView(Uint8Array.from(byteArray));
     }
     throw new TypeError("byteArray");
@@ -856,7 +856,7 @@ class ByteSequence {
       }
       return true;
     }
-    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => isUint8(byte))) {
+    else if (isArrayOfUint8(otherBytes)) {
       for (let i = 0; i < otherBytes.length; i++) {
         if (otherBytes[i] !== thisView[i]) {
           return false;
@@ -887,11 +887,11 @@ class ByteSequence {
       }
       return this.#startsWith(otherBytes);
     }
-    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => isUint8(byte))) {
+    else if (isArrayOfUint8(otherBytes)) {
       if (otherBytes.length !== this.byteLength) {
         return false;
       }
-      return this.#startsWith(otherBytes as Array<uint8>);
+      return this.#startsWith(otherBytes);
     }
     throw new TypeError("otherBytes");
   }
@@ -910,8 +910,8 @@ class ByteSequence {
     else if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
       return this.#startsWith(otherBytes);
     }
-    else if (Array.isArray(otherBytes) && otherBytes.every((byte) => isUint8(byte))) {
-      return this.#startsWith(otherBytes as Array<uint8>);
+    else if (isArrayOfUint8(otherBytes)) {
+      return this.#startsWith(otherBytes);
     }
     throw new TypeError("otherBytes");
   }
