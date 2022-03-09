@@ -5,8 +5,8 @@ export {
   type DigestAlgorithm,
   type TransferOptions,
 } from "@i-xi-dev/fundamental";
-export { type Base64Options } from "@i-xi-dev/base64";
-export { type PercentOptions } from "@i-xi-dev/percent";
+export { Base64Options } from "@i-xi-dev/base64";
+export { PercentOptions } from "@i-xi-dev/percent";
 export {
   type Bytes,
   ByteSequence,
