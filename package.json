@@ -1,6 +1,6 @@
 {
   "name": "@i-xi-dev/bytes",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "A JavaScript byte array library for the browser, Deno and Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -60,7 +60,7 @@
     "@i-xi-dev/base64": "^1.4.0",
     "@i-xi-dev/fundamental": "^2.2.0",
     "@i-xi-dev/mimetype": "^1.0.2",
-    "@i-xi-dev/percent": "^1.1.0",
+    "@i-xi-dev/percent": "^1.1.1",
     "@types/jest": "^27.4.1",
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
