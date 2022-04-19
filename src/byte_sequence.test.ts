@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { ByteSequence } from "./byte_sequence";
+import { ByteSequence } from "./index";
 
 import { createHash } from "node:crypto";
 import fs from "node:fs";
