@@ -2,7 +2,6 @@
 
 import {
   type uint8,
-  type TransferOptions as TODO,
   ByteBuffer,
   ByteFormat,
   CodePointRange,
@@ -10,7 +9,7 @@ import {
   Integer,
   IsomorphicEncoding,
   streamToAsyncGenerator,
-  TransferProgress,
+  Transfer,
   trim,
   Uint8Utils,
 } from "@i-xi-dev/fundamental";
@@ -55,9 +54,10 @@ namespace ByteSequence {
    */
   export type Bytes = ByteSequence | BufferSource | Array<number>;
 
+  // TODO そのままexportしたい
   export type FormatOptions = ByteFormat.Options;
   export type DigestAlgorithm = Digest.Algorithm;
-  export type TransferOptions = TODO;
+  export type TransferOptions = Transfer.Options;
   export type PercentOptions = PercentEncoding.Options;
   export type Base64Options = Base64.Options;
 }
@@ -122,6 +122,14 @@ class ByteSequence {
 
   /**
    * Gets the underlying `ArrayBuffer`.
+   * 
+   * @example
+   * ```javascript
+   * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
+   * const bytes = ByteSequence.fromArrayBuffer(srcBuffer);
+   * const dstBuffer = bytes.buffer;
+   * // new Uint8Array(dstBuffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   get buffer(): ArrayBuffer {
     return this.#buffer;
@@ -169,6 +177,13 @@ class ByteSequence {
    * @param buffer - The `ArrayBuffer`.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `buffer` is not type of `ArrayBuffer`.
+   * @example
+   * ```javascript
+   * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
+   * const bytes = ByteSequence.wrapArrayBuffer(srcBuffer);
+   * const dstBuffer = bytes.buffer;
+   * // (dstBuffer === srcBuffer) → true
+   * ```
    */
   static wrapArrayBuffer(buffer: ArrayBuffer): ByteSequence {
     if (buffer instanceof ArrayBuffer) {
@@ -186,6 +201,13 @@ class ByteSequence {
    * @param buffer - The `ArrayBuffer`.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `buffer` is not type of `ArrayBuffer`.
+   * @example
+   * ```javascript
+   * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
+   * const bytes = ByteSequence.fromArrayBuffer(srcBuffer);
+   * const dstBuffer = bytes.buffer;
+   * // (dstBuffer !== srcBuffer) → true
+   * ```
    */
   static fromArrayBuffer(buffer: ArrayBuffer): ByteSequence {
     if (buffer instanceof ArrayBuffer) {
@@ -944,12 +966,12 @@ class ByteSequence {
    * @param options - 
    * @returns 
    */
-  static createStreamReadingProgress(stream: ReadableStream<Uint8Array>, options?: TODO): TransferProgress<ByteSequence> {
+  static createStreamReadingProgress(stream: ReadableStream<Uint8Array>, options?: ByteSequence.TransferOptions): Transfer.Progress<ByteSequence> {
     const reader: ReadableStreamDefaultReader<Uint8Array> = stream.getReader();
     const totalUnitCount: number | undefined = ((typeof options?.total === "number") && Integer.isNonNegativeInteger(options.total)) ? options.total : undefined;
     const buffer: ByteBuffer = new ByteBuffer(totalUnitCount);
 
-    return new TransferProgress<Uint8Array, ByteSequence>({
+    return new Transfer.Progress<Uint8Array, ByteSequence>({
       chunkGenerator: streamToAsyncGenerator<Uint8Array>(reader),
 
       transferChunk(chunkBytes: Uint8Array): number {
