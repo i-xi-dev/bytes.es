@@ -93,6 +93,11 @@ describe("ByteSequence.allocate", () => {
     expect(bs0.buffer.byteLength).to.equal(0);
     expect(bs1.buffer.byteLength).to.equal(1024 * 1024 * 1);
 
+    const bs2 = ByteSequence.allocate(2);
+    const bs2v = new Uint8Array(bs2.buffer);
+    bs2v[0] = 255;
+    expect(bs2.toUint8Array()[0]).to.equal(255);
+
     expect(() => {
       ByteSequence.allocate(-1);
     }).to.throw(TypeError, "byteLength").with.property("name", "TypeError");

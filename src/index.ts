@@ -115,6 +115,16 @@ class ByteSequence {
 
   /**
    * Gets the number of bytes.
+   * 
+   * @example
+   * ```javascript
+   * const bytesA = ByteSequence.allocate(1024);
+   * // bytesA.byteLength → 1024
+   * 
+   * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const bytesB = ByteSequence.fromArrayBufferView(uint8Array);
+   * // bytesB.byteLength → 8
+   * ```
    */
   get byteLength(): number {
     return this.#buffer.byteLength;
@@ -125,10 +135,11 @@ class ByteSequence {
    * 
    * @example
    * ```javascript
-   * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
-   * const bytes = ByteSequence.fromArrayBuffer(srcBuffer);
+   * const bytes = ByteSequence.fromArray([ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]);
    * const dstBuffer = bytes.buffer;
-   * // new Uint8Array(dstBuffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * dstBuffer[0] = 0x0;
+   * // new Uint8Array(bytes.buffer) → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // new Uint8Array(dstBuffer) → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   get buffer(): ArrayBuffer {
@@ -137,6 +148,15 @@ class ByteSequence {
 
   /**
    * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-256 digest for this byte sequence.
+   * 
+   * @example
+   * ```javascript
+   * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const bytes = ByteSequence.fromArrayBufferView(uint8Array);
+   * 
+   * const sha256Integrity = await bytes.sha256Integrity;
+   * // → "sha256-4pSrnUKfmpomeNmW5dvUDL9iNjpe1Bf2VMXwuoYeQgA="
+   * ```
    */
   get sha256Integrity(): Promise<string> {
     return this.#integrity(Digest.Sha256, "sha256-");
@@ -163,6 +183,11 @@ class ByteSequence {
    * @param byteLength - The size, in bytes.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `byteLength` is not non-negative integer.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.allocate(1024);
+   * // bytes.byteLength → 1024
+   * ```
    */
   static allocate(byteLength: number): ByteSequence {
     if (Integer.isNonNegativeInteger(byteLength) !== true) {
@@ -220,6 +245,14 @@ class ByteSequence {
    * Returns the `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    * 
    * @returns The `ArrayBuffer`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.fromArray([ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]);
+   * const dstBuffer = bytes.toArrayBuffer();
+   * dstBuffer[0] = 0x0;
+   * // new Uint8Array(bytes.buffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // new Uint8Array(dstBuffer) → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   toArrayBuffer(): ArrayBuffer {
     return this.#buffer.slice(0);
