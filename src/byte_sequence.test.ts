@@ -429,7 +429,7 @@ describe("ByteSequence.from", () => {
   it("from(*)", () => {
     expect(() => {
       ByteSequence.from(["1"] as unknown as number[]);
-    }).to.throw(TypeError, "bytes").with.property("name", "TypeError");
+    }).to.throw(TypeError, "sourceBytes").with.property("name", "TypeError");
 
   });
 
