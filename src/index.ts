@@ -2,21 +2,18 @@
 
 import {
   type uint8,
-  ByteBuffer,
   ByteFormat,
+  ByteStream,
   CodePointRange,
   Digest,
   Integer,
   IsomorphicEncoding,
-  streamToAsyncGenerator,
-  Transfer,
   trim,
   Uint8Utils,
 } from "@i-xi-dev/fundamental";
 import { Base64 } from "@i-xi-dev/base64";
-import { PercentEncoding } from "@i-xi-dev/percent";
+import { Percent } from "@i-xi-dev/percent";
 import { MediaType } from "@i-xi-dev/mimetype";
-// import { WebMessageUtils } from "./web_message_utils";
 
 const {
   ASCII_WHITESPACE,
@@ -47,20 +44,6 @@ type ResourceMetadata = {
   mediaType?: MediaType,
   fileName?: string,
 };
-
-namespace ByteSequence {
-  /**
-   * A typedef that representing a `ByteSequence`, [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource), or `Array` of 8-bit unsigned integers.
-   */
-  export type Bytes = ByteSequence | BufferSource | Array<number>;
-
-  // TODO そのままexportしたい
-  export type FormatOptions = ByteFormat.Options;
-  export type DigestAlgorithm = Digest.Algorithm;
-  export type TransferOptions = Transfer.Options;
-  export type PercentOptions = PercentEncoding.Options;
-  export type Base64Options = Base64.Options;
-}
 
 /**
  * Byte sequence
@@ -180,7 +163,7 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` of the specified size.
    * Its bytes are filled with zeros.
    * 
-   * @param byteLength - The size, in bytes.
+   * @param byteLength The size, in bytes.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `byteLength` is not non-negative integer.
    * @example
@@ -199,7 +182,7 @@ class ByteSequence {
   /**
    * Creates a new instance of `ByteSequence` with the specified underlying `ArrayBuffer`.
    * 
-   * @param buffer - The `ArrayBuffer`.
+   * @param buffer The `ArrayBuffer`.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `buffer` is not type of `ArrayBuffer`.
    * @example
@@ -223,7 +206,7 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * that duplicates the specified `ArrayBuffer`.
    * 
-   * @param buffer - The `ArrayBuffer`.
+   * @param buffer The `ArrayBuffer`.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `buffer` is not type of `ArrayBuffer`.
    * @example
@@ -262,7 +245,7 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * that duplicates the underlying `ArrayBuffer` of the specified [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView).
    * 
-   * @param bufferView - The object that represents a byte sequence.
+   * @param bufferView The object that represents a byte sequence.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `bufferView` is not type of `ArrayBufferView`.
    */
@@ -295,7 +278,7 @@ class ByteSequence {
   /**
    * Returns the [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView) that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    * 
-   * @param ctor - The `ArrayBufferView`s constructor.
+   * @param ctor The `ArrayBufferView`s constructor.
    * @returns The `ArrayBufferView`.
    */
   toArrayBufferView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>): T {
@@ -318,7 +301,7 @@ class ByteSequence {
   /**
    * The alias for the `fromArrayBuffer` and `fromArrayBufferView` methods.
    * 
-   * @param bufferSource - The object that represents a byte sequence.
+   * @param bufferSource The object that represents a byte sequence.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `bufferSource` is not type of [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource).
    */
@@ -335,7 +318,7 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified 8-bit unsigned integer `Array`.
    * 
-   * @param byteArray - The 8-bit unsigned integer `Array` representing this byte sequence.
+   * @param byteArray The 8-bit unsigned integer `Array` represents a byte sequence.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `byteArray` is not an 8-bit unsigned integer `Array`.
    */
@@ -356,10 +339,46 @@ class ByteSequence {
   }
 
   /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified `ByteSequence`, `BufferSource`, or 8-bit unsigned integer `Array`.
+   * 
+   * @param sourceBytes The `Bytes` object represents a byte sequence.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `bufferSource` is not type of `Bytes`.
+   */
+  static from(sourceBytes: ByteSequence.Bytes): ByteSequence {
+    if (sourceBytes instanceof ByteSequence) {
+      return sourceBytes.duplicate();
+    }
+    else if (sourceBytes instanceof ArrayBuffer) {
+      return ByteSequence.fromArrayBuffer(sourceBytes);
+    }
+    else if (ArrayBuffer.isView(sourceBytes)) {
+      return ByteSequence.fromArrayBufferView(sourceBytes);
+    }
+    else if (Uint8Utils.isArrayOfUint8(sourceBytes)) {
+      return ByteSequence.fromArray(sourceBytes);
+    }
+    throw new TypeError("sourceBytes");
+  }
+
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 8-bit unsigned integer iterator.
+   * 
+   * @param bytes The iterator of 8-bit unsigned integers.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `bytes` is not an 8-bit unsigned integer iterator.
+   */
+  static of(...bytes: Array<number>): ByteSequence {
+    return ByteSequence.fromArray(bytes);
+  }
+
+  /**
    * Creates a new instance of `ByteSequence` of the specified size.
    * Its bytes are filled with random values.
    * 
-   * @param {number} byteLength - The size, in bytes.
+   * @param {number} byteLength The size, in bytes.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `byteLength` is not non-negative integer.
    * @throws {RangeError} The `byteLength` is greater than 65536.
@@ -380,7 +399,7 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the [isomorphic encoded](https://infra.spec.whatwg.org/#isomorphic-encode) string.
    * 
-   * @param binaryString - The [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary).
+   * @param binaryString The [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary).
    * @returns A new `ByteSequence` object.
    */
   static fromBinaryString(binaryString: string): ByteSequence {
@@ -401,11 +420,11 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the string contains formatted bytes.
    * 
-   * @param formattedBytes - The string to parse.
-   * @param options - The `ByteSequence.FormatOptions` dictionary.
+   * @param formattedBytes The string to parse.
+   * @param options The `ByteFormat.Options` dictionary.
    * @returns A new `ByteSequence` object.
    */
-  static parse(formattedBytes: string, options?: ByteSequence.FormatOptions): ByteSequence {
+  static parse(formattedBytes: string, options?: ByteFormat.Options): ByteSequence {
     const parsed = ByteFormat.parse(formattedBytes, options);
     return new ByteSequence(parsed.buffer);
   }
@@ -413,10 +432,10 @@ class ByteSequence {
   /**
    * Returns the string contains formatted bytes.
    * 
-   * @param options - The `ByteSequence.FormatOptions` dictionary.
+   * @param options The `ByteFormat.Options` dictionary.
    * @returns The string contains formatted bytes.
    */
-  format(options?: ByteSequence.FormatOptions): string {
+  format(options?: ByteFormat.Options): string {
     return ByteFormat.format(this.#view, options);
   }
 
@@ -424,11 +443,11 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the string contains Base64-encoded bytes.
    * 
-   * @param base64Encoded - The string to decode.
-   * @param options - The `ByteSequence.Base64Options` dictionary.
+   * @param base64Encoded The string to decode.
+   * @param options The `Base64.Options` dictionary.
    * @returns A new `ByteSequence` object.
    */
-  static fromBase64Encoded(base64Encoded: string, options?: ByteSequence.Base64Options): ByteSequence {
+  static fromBase64Encoded(base64Encoded: string, options?: Base64.Options): ByteSequence {
     const decoded = Base64.decode(base64Encoded, options);
     return new ByteSequence(decoded.buffer);
   }
@@ -436,10 +455,10 @@ class ByteSequence {
   /**
    * Returns the string contains Base64-encoded bytes of this byte sequence.
    * 
-   * @param options - The `ByteSequence.Base64Options` dictionary.
+   * @param options The `Base64.Options` dictionary.
    * @returns The string contains Base64-encoded bytes.
    */
-  toBase64Encoded(options?: ByteSequence.Base64Options): string {
+  toBase64Encoded(options?: Base64.Options): string {
     return Base64.encode(this.#view, options);
   }
 
@@ -447,23 +466,23 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the string contains Percent-encoded bytes.
    * 
-   * @param percentEncoded - The string to decode.
-   * @param options - The `ByteSequence.PercentOptions` dictionary.
+   * @param percentEncoded The string to decode.
+   * @param options The `Percent.Options` dictionary.
    * @returns A new `ByteSequence` object.
    */
-  static fromPercentEncoded(percentEncoded: string, options?: ByteSequence.PercentOptions): ByteSequence {
-    const decoded = PercentEncoding.decode(percentEncoded, options);
+  static fromPercentEncoded(percentEncoded: string, options?: Percent.Options): ByteSequence {
+    const decoded = Percent.decode(percentEncoded, options);
     return new ByteSequence(decoded.buffer);
   }
 
   /**
    * Returns the string contains Percent-encoded bytes of this byte sequence.
    * 
-   * @param options - The `ByteSequence.PercentOptions` dictionary.
+   * @param options The `Percent.Options` dictionary.
    * @returns The string contains Percent-encoded bytes.
    */
-  toPercentEncoded(options?: ByteSequence.PercentOptions): string {
-    return PercentEncoding.encode(this.#view, options);
+  toPercentEncoded(options?: Percent.Options): string {
+    return Percent.encode(this.#view, options);
   }
 
   /**
@@ -496,10 +515,10 @@ class ByteSequence {
   /**
    * Computes the digest for this byte sequence.
    * 
-   * @param algorithm - The digest algorithm.
+   * @param algorithm The digest algorithm.
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the digest.
    */
-  async toDigest(algorithm: ByteSequence.DigestAlgorithm): Promise<ByteSequence> {
+  async toDigest(algorithm: Digest.Algorithm): Promise<ByteSequence> {
     const digest = await algorithm.compute(this.#view);
     return new ByteSequence(digest.buffer);
   }
@@ -507,11 +526,11 @@ class ByteSequence {
   /**
    * Computes the SRI integrity (Base64-encoded digest).
    * 
-   * @param algorithm - The digest algorithm.
+   * @param algorithm The digest algorithm.
    * @returns The `Promise` that fulfills with a SRI integrity (base64-encoded digest).
    * @see [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
    */
-  async #integrity(algorithm: ByteSequence.DigestAlgorithm, prefix: string): Promise<string> {
+  async #integrity(algorithm: Digest.Algorithm, prefix: string): Promise<string> {
     // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
     const digestBytes = await this.toDigest(algorithm);
     return prefix + digestBytes.toBase64Encoded();
@@ -542,7 +561,7 @@ class ByteSequence {
    * generated from the specified string by UTF-8 encoding.
    * Neither adds nor removes BOM.
    * 
-   * @param text - The string.
+   * @param text The string.
    * @returns A new `ByteSequence` object.
    */
   static utf8EncodeFrom(text: string): ByteSequence {
@@ -564,8 +583,8 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * generated from the specified string by the specified text encoding.
    * 
-   * @param text - The string.
-   * @param encoder - The text encoder, for example `TextEncoder`.
+   * @param text The string.
+   * @param encoder The text encoder, for example `TextEncoder`.
    * @returns A new `ByteSequence` object.
    */
   static textEncodeFrom(text: string, encoder: { encode: (input?: string) => Uint8Array } = utf8TextEncoder): ByteSequence {
@@ -577,7 +596,7 @@ class ByteSequence {
   /**
    * Returns a decoded string by the specified text encoding of this bytes.
    * 
-   * @param decoder - The text decoder, for example `TextDecoder`.
+   * @param decoder The text decoder, for example `TextDecoder`.
    * @returns A string decoded in the specified text encoding.
    */
   textDecodeTo(decoder: { decode: (input?: Uint8Array) => string } = utf8TextDecoder): string {
@@ -588,7 +607,7 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object.
    * 
-   * @param blob - The `Blob` object (including `File` object).
+   * @param blob The `Blob` object (including `File` object).
    * @returns The `Promise` that fulfills with a new `ByteSequence` object.
    * @throws {Error} `blob.arrayBuffer()` is failed.
    */
@@ -621,7 +640,7 @@ class ByteSequence {
   /**
    * Returns the [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object representing this byte sequence.
    * 
-   * @param options - The `BlobPropertyBag` object, but `endings` property is ignored.
+   * @param options The `BlobPropertyBag` object, but `endings` property is ignored.
    * @returns The `Blob` object.
    */
   toBlob(options?: BlobPropertyBag): Blob {
@@ -635,8 +654,8 @@ class ByteSequence {
   /**
    * Returns the [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File) object representing this byte sequence.
    * 
-   * @param fileName - The file name.
-   * @param options - The `FilePropertyBag` object, but `endings` property is ignored.
+   * @param fileName The file name.
+   * @param options The `FilePropertyBag` object, but `endings` property is ignored.
    * @returns The `File` object.
    */
   toFile(fileName?: string, options?: FilePropertyBag): File {
@@ -679,7 +698,7 @@ class ByteSequence {
    * created from the specified [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * 
    * @see [https://fetch.spec.whatwg.org/#data-urls](https://fetch.spec.whatwg.org/#data-urls)
-   * @param dataUrl - The data URL
+   * @param dataUrl The data URL
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `dataUrl` parsing is failed.
    * @throws {TypeError} The URL scheme of the `dataUrl` is not "data".
@@ -761,7 +780,7 @@ class ByteSequence {
   /**
    * Returns the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs) representing this byte sequence.
    * 
-   * @param options - The `BlobPropertyBag` object, but `endings` property is ignored.
+   * @param options The `BlobPropertyBag` object, but `endings` property is ignored.
    * @returns The [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * @throws {TypeError}
    */
@@ -796,8 +815,8 @@ class ByteSequence {
    * Returns a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * duplicated from a subsequence of the underlying `ArrayBuffer` of this instance.
    * 
-   * @param start - The subsequence start index.
-   * @param end - The subsequence end index.
+   * @param start The subsequence start index.
+   * @param end The subsequence end index.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `start` is not non-negative integer.
    * @throws {RangeError} The `start` is greater than the `byteLength` of this.
@@ -827,8 +846,8 @@ class ByteSequence {
   /**
    * Returns the `Uint8Array` that views the underlying `ArrayBuffer` of this instance.
    * 
-   * @param byteOffset - The offset, in bytes.
-   * @param byteLength - The length of the `ArrayBufferView`, in bytes.
+   * @param byteOffset The offset, in bytes.
+   * @param byteLength The length of the `ArrayBufferView`, in bytes.
    * @returns The `Uint8Array`.
    */
   getUint8View(byteOffset?: number, byteLength?: number): Uint8Array {
@@ -838,8 +857,8 @@ class ByteSequence {
   /**
    * Returns the `DataView` that views the underlying `ArrayBuffer` of this instance.
    * 
-   * @param byteOffset - The offset, in bytes.
-   * @param byteLength - The length of the `ArrayBufferView`, in bytes.
+   * @param byteOffset The offset, in bytes.
+   * @param byteLength The length of the `ArrayBufferView`, in bytes.
    * @returns The `DataView`.
    */
   getDataView(byteOffset?: number, byteLength?: number): DataView {
@@ -849,9 +868,9 @@ class ByteSequence {
   /**
    * Returns the `ArrayBufferView` that views the underlying `ArrayBuffer` of this instance.
    * 
-   * @param viewConstructor - The constructor of `ArrayBufferView`.
-   * @param byteOffset - The offset, in bytes.
-   * @param byteLength - The length of the `ArrayBufferView`, in bytes.
+   * @param viewConstructor The constructor of `ArrayBufferView`.
+   * @param byteOffset The offset, in bytes.
+   * @param byteLengThe length of the `ArrayBufferView`, in bytes.
    * @returns The `ArrayBufferView`.
    * @throws {TypeError} The `viewConstructor` is not a constructor of `ArrayBufferView`.
    * @throws {TypeError} The `byteOffset` is not non-negative integer.
@@ -894,7 +913,7 @@ class ByteSequence {
   /**
    * 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否かを返却
    * 
-   * @param otherBytes - バイト列
+   * @param otherBytes バイト列
    * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
    */
   #startsWith(otherBytes: BufferSource | Array<uint8>): boolean {
@@ -922,7 +941,7 @@ class ByteSequence {
   /**
    * Determines whether this byte sequence is equal to the byte sequence represented by another object.
    * 
-   * @param otherBytes - The object that represents a byte sequence.
+   * @param otherBytes The object that represents a byte sequence.
    * @returns If this is equal to the specified byte sequence, `true`; otherwise, `false`.
    * @throws {TypeError} The `otherBytes` is not type of `ByteSequence.Bytes`.
    */
@@ -951,7 +970,7 @@ class ByteSequence {
   /**
    * Determines whether this byte sequence starts with the specified byte sequence.
    * 
-   * @param otherBytes - The object that represents a byte sequence.
+   * @param otherBytes The object that represents a byte sequence.
    * @returns If this starts with the specified byte sequence, `true`; otherwise, `false`.
    * @throws {TypeError} The `otherBytes` is not type of `ByteSequence.Bytes`.
    */
@@ -971,7 +990,7 @@ class ByteSequence {
   /**
    * Returns a new iterator that contains byte sequences divided by the specified length.
    * 
-   * @param segmentByteLength - The segment length, in bytes.
+   * @param segmentByteLength The segment length, in bytes.
    * @returns A new iterator.
    * @throws {TypeError} The `segmentByteLength` is not non-negative integer.
    */
@@ -995,50 +1014,46 @@ class ByteSequence {
 
   /**
    * @experimental
-   * @param stream - 
-   * @param options - 
+   * @param stream 
+   * @param options 
    * @returns 
    */
-  static createStreamReadingProgress(stream: ReadableStream<Uint8Array>, options?: ByteSequence.TransferOptions): Transfer.Progress<ByteSequence> {
-    const reader: ReadableStreamDefaultReader<Uint8Array> = stream.getReader();
-    const totalUnitCount: number | undefined = ((typeof options?.total === "number") && Integer.isNonNegativeInteger(options.total)) ? options.total : undefined;
-    const buffer: ByteBuffer = new ByteBuffer(totalUnitCount);
+  static async fromStream(stream: ReadableStream<Uint8Array>, options?: ByteSequence.StreamReadingOptions): Promise<ByteSequence> {
+    const reader = new ByteStream.Reader();
 
-    return new Transfer.Progress<Uint8Array, ByteSequence>({
-      chunkGenerator: streamToAsyncGenerator<Uint8Array>(reader),
+    const listenerOptions = {
+      once: true,
+      passive: true,
+    };
+    const progressListenerOptions = {
+      passive: true,
+    };
+    if (typeof options?.onloadstart === "function") {
+      reader.addEventListener("loadstart", options.onloadstart as EventListener, listenerOptions);
+    }
+    if (typeof options?.onprogress === "function") {
+      reader.addEventListener("progress", options.onprogress as EventListener, progressListenerOptions);
+    }
+    if (typeof options?.onload === "function") {
+      reader.addEventListener("load", options.onload as EventListener, listenerOptions);
+    }
+    if (typeof options?.onabort === "function") {
+      reader.addEventListener("abort", options.onabort as EventListener, listenerOptions);
+    }
+    if (typeof options?.ontimeout === "function") {
+      reader.addEventListener("timeout", options.ontimeout as EventListener, listenerOptions);
+    }
+    if (typeof options?.onerror === "function") {
+      reader.addEventListener("error", options.onerror as EventListener, listenerOptions);
+    }
+    if (typeof options?.onloadend === "function") {
+      reader.addEventListener("loadend", options.onloadend as EventListener, listenerOptions);
+    }
 
-      transferChunk(chunkBytes: Uint8Array): number {
-        buffer.put(chunkBytes);
-        return buffer.position;
-      },
-
-      terminate(): void {
-        // this.#stream.cancel()しても読取終了まで待ちになるので、reader.cancel()する
-        void reader.cancel().catch(); // XXX closeで良い？
-      },
-
-      transferredResult(): ByteSequence {
-        let bytes: Uint8Array;
-        if (buffer.capacity !== buffer.position) {
-          bytes = buffer.slice();
-        }
-        else {
-          bytes = buffer.subarray();
-        }
-        return new ByteSequence(bytes.buffer);
-      },
-    }, options);
-  }
-
-  /**
-   * @experimental
-   * @param stream - 
-   * @param totalByteLength - 
-   * @returns 
-   */
-  static async fromStream(stream: ReadableStream<Uint8Array>, totalByteLength?: number): Promise<ByteSequence> {
-    const progress = ByteSequence.createStreamReadingProgress(stream, { total: totalByteLength });
-    const bytes = await progress.initiate();
+    const bytes = await reader.read(stream, {
+      totalByteLength: options?.totalByteLength,
+      signal: options?.signal,
+    });
     return new ByteSequence(bytes.buffer);
   }
 
@@ -1085,8 +1100,71 @@ class ByteSequence {
   // }
 }
 
+namespace ByteSequence {
+  /**
+   * A typedef that representing a `ByteSequence`, [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource), or `Array` of 8-bit unsigned integers.
+   */
+  export type Bytes = ByteSequence | BufferSource | Array<number>;
+
+  /**
+   * @experimental
+   */
+  export type StreamReadingOptions = {
+    /**
+     * The total number of bytes in the byte stream.
+     */
+    totalByteLength?: number,
+
+    /**
+     * The `AbortSignal` object.
+     */
+    signal?: AbortSignal,
+
+    /**
+     * The event listener for the `loadstart` event.
+     */
+    onloadstart?: (event: ProgressEvent) => void,
+
+    /**
+     * The event listener for the `progress` event.
+     */
+    onprogress?: (event: ProgressEvent) => void,
+
+    /**
+     * The event listener for the `load` event.
+     */
+    onload?: (event: ProgressEvent) => void,
+
+    /**
+     * The event listener for the `abort` event.
+     */
+    onabort?: (event: ProgressEvent) => void,
+
+    /**
+     * The event listener for the `timeout` event.
+     */
+    ontimeout?: (event: ProgressEvent) => void,
+
+    /**
+     * The event listener for the `error` event.
+     */
+    onerror?: (event: ProgressEvent) => void,
+
+    /**
+     * The event listener for the `loadend` event.
+     */
+    onloadend?: (event: ProgressEvent) => void,
+
+    // abortはrejectしない設定とか？
+  };
+}
+
 Object.freeze(ByteSequence);
 
 export {
+  Base64,
+  ByteFormat,
+  Digest,
+  Percent,
   ByteSequence,
 };

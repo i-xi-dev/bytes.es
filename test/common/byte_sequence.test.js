@@ -407,6 +407,64 @@ describe("ByteSequence.prototype.toArray", () => {
 
 });
 
+describe("ByteSequence.from", () => {
+  it("from(ByteSequence)", () => {
+    const bs0 = ByteSequence.allocate(100);
+    const bs0c = ByteSequence.from(bs0);
+
+    expect(bs0c.byteLength).to.equal(100);
+    expect(bs0c).to.not.equal(bs0);
+
+  });
+
+  it("from(ArrayBuffer)", () => {
+    const bs0 = ByteSequence.allocate(100);
+    const bs0c = ByteSequence.from(bs0.buffer);
+
+    expect(bs0c.byteLength).to.equal(100);
+    expect(bs0c).to.not.equal(bs0);
+
+  });
+
+  it("from(ArrayBufferView)", () => {
+    const bs0 = ByteSequence.allocate(100);
+    const bs0c = ByteSequence.from(bs0.toUint8Array());
+
+    expect(bs0c.byteLength).to.equal(100);
+    expect(bs0c).to.not.equal(bs0);
+
+  });
+
+  it("from(number[])", () => {
+    const bs0 = ByteSequence.allocate(100);
+    const bs0c = ByteSequence.from(bs0.toArray());
+
+    expect(bs0c.byteLength).to.equal(100);
+    expect(bs0c).to.not.equal(bs0);
+
+  });
+
+  it("from(*)", () => {
+    expect(() => {
+      ByteSequence.from(["1"]);
+    }).to.throw(TypeError, "bytes").with.property("name", "TypeError");
+
+  });
+
+});
+
+describe("ByteSequence.of", () => {
+  it("of(...number[])", () => {
+    const bs0 = ByteSequence.allocate(100);
+    const bs0c = ByteSequence.of(...bs0.toArray());
+
+    expect(bs0c.byteLength).to.equal(100);
+    expect(bs0c).to.not.equal(bs0);
+
+  });
+
+});
+
 describe("ByteSequence.generateRandom", () => {
   it("generateRandom(number)", () => {
     const bs0 = ByteSequence.generateRandom(0);
@@ -1491,166 +1549,6 @@ describe("ByteSequence.prototype.segment", () => {
 
 });
 
-describe("ByteSequence.createStreamReadingProgress", () => {
-  it("createStreamReadingProgress(ReadableStream)", async () => {
-    if (Readable) {
-      const stream = (Readable).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
-      const p = ByteSequence.createStreamReadingProgress(stream);
-      expect(p.total).to.equal(undefined);
-      expect(p.loaded).to.equal(0);
-      expect(p.indeterminate).to.equal(true);
-      expect(p.percentage).to.equal(0);
-      const r = await p.initiate();
-      expect(p.total).to.equal(undefined);
-      expect(p.loaded).to.equal(128);
-      expect(p.indeterminate).to.equal(true);
-      expect(p.percentage).to.equal(0);
-      expect(r.byteLength).to.equal(128);
-    }
-    else {
-      const res = await fetch("./test/_data/128.txt");
-      const p = ByteSequence.createStreamReadingProgress(res.body);
-      expect(p.total).to.equal(undefined);
-      expect(p.loaded).to.equal(0);
-      expect(p.indeterminate).to.equal(true);
-      expect(p.percentage).to.equal(0);
-      const r = await p.initiate();
-      expect(p.total).to.equal(undefined);
-      expect(p.loaded).to.equal(128);
-      expect(p.indeterminate).to.equal(true);
-      expect(p.percentage).to.equal(0);
-      expect(r.byteLength).to.equal(128);
-    }
-
-  });
-
-  it("createStreamReadingProgress(ReadableStream, {total:number})", async () => {
-    if (Readable) {
-      const stream = (Readable).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
-      const p = ByteSequence.createStreamReadingProgress(stream, {total:128});
-      expect(p.total).to.equal(128);
-      expect(p.loaded).to.equal(0);
-      expect(p.indeterminate).to.equal(false);
-      expect(p.percentage).to.equal(0);
-      const r = await p.initiate();
-      expect(p.total).to.equal(128);
-      expect(p.loaded).to.equal(128);
-      expect(p.indeterminate).to.equal(false);
-      expect(p.percentage).to.equal(100);
-      expect(r.byteLength).to.equal(128);
-    }
-    else {
-      const res = await fetch("./test/_data/128.txt");
-      const p = ByteSequence.createStreamReadingProgress(res.body, {total:128});
-      expect(p.total).to.equal(128);
-      expect(p.loaded).to.equal(0);
-      expect(p.indeterminate).to.equal(false);
-      expect(p.percentage).to.equal(0);
-      const r = await p.initiate();
-      expect(p.total).to.equal(128);
-      expect(p.loaded).to.equal(128);
-      expect(p.indeterminate).to.equal(false);
-      expect(p.percentage).to.equal(100);
-      expect(r.byteLength).to.equal(128);
-    }
-
-  });
-
-  it("createStreamReadingProgress(ReadableStream, {timeout:number})", async () => {
-    let ti;
-    const s = new ReadableStream({
-      start(controller) {
-        let c = 0;
-        ti = setInterval(() => {
-          if (c >= 10) {
-            clearInterval(ti);
-            controller.close();
-            return;
-          }
-          c = c + 1;
-          try {
-            controller.enqueue(Uint8Array.of(1,2));
-          }
-          catch (ex) {
-            clearInterval(ti);
-            return;
-          }
-
-        }, 100);
-      },
-    });
-
-    const p = ByteSequence.createStreamReadingProgress(s, {timeout:250});
-    expect(p.total).to.equal(undefined);
-    expect(p.loaded).to.equal(0);
-    expect(p.indeterminate).to.equal(true);
-    expect(p.percentage).to.equal(0);
-    let r;
-    try {
-      r = await p.initiate();
-      expect(true).to.equal(false);
-    }
-    catch (exception) {
-      expect((exception).name).to.equal("TimeoutError");
-    }
-    expect(p.total).to.equal(undefined);
-    expect(p.loaded).to.equal(4);
-    expect(p.indeterminate).to.equal(true);
-    expect(p.percentage).to.equal(0);
-    //expect(r.count).to.equal(4);
-
-  });
-
-  it("createStreamReadingProgress(ReadableStream, {timeout:number}) - 2", async () => {
-    if (Readable) {
-      const stream = (Readable).toWeb(fs.createReadStream("./test/_data/4096.txt", { highWaterMark: 64 }));
-      const p = ByteSequence.createStreamReadingProgress(stream, {timeout:4});
-      expect(p.total).to.equal(undefined);
-      expect(p.loaded).to.equal(0);
-      expect(p.indeterminate).to.equal(true);
-      expect(p.percentage).to.equal(0);
-      let r;
-      try {
-        r = await p.initiate();
-        expect(true).to.equal(false);
-      }
-      catch (exception) {
-        expect((exception).name).to.equal("TimeoutError");
-      }
-      expect(p.total).to.equal(undefined);
-      expect(p.loaded > 0).to.equal(true);
-      console.log(p.loaded)
-      expect(p.indeterminate).to.equal(true);
-      expect(p.percentage).to.equal(0);
-      //expect(r.count).to.equal(4);
-    }
-    else {
-      const res = await fetch("./test/_data/4096.txt");
-      const p = ByteSequence.createStreamReadingProgress(res.body, {timeout:1});//TODO サイズ足りない
-      expect(p.total).to.equal(undefined);
-      expect(p.loaded).to.equal(0);
-      expect(p.indeterminate).to.equal(true);
-      expect(p.percentage).to.equal(0);
-      let r;
-      try {
-        r = await p.initiate();
-        expect(true).to.equal(false);
-      }
-      catch (exception) {
-        expect((exception).name).to.equal("TimeoutError");
-      }
-      expect(p.total).to.equal(undefined);
-      expect(p.loaded > 0).to.equal(true);
-      console.log(p.loaded)
-      expect(p.indeterminate).to.equal(true);
-      expect(p.percentage).to.equal(0);
-      //expect(r.count).to.equal(4);
-    }
-
-  });
-
-});
-
 describe("ByteSequence.fromStream", () => {
   it("fromStream(ReadableStream)", async () => {
     if (Readable) {
@@ -1666,33 +1564,173 @@ describe("ByteSequence.fromStream", () => {
 
   });
 
-  it("fromStream(ReadableStream)", async () => {
+  it("fromStream(ReadableStream, {totalByteLength:number})", async () => {
     if (Readable) {
       const stream = (Readable).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
-      const r = await ByteSequence.fromStream(stream, 128);
+      const r = await ByteSequence.fromStream(stream, {totalByteLength:128});
       expect(r.byteLength).to.equal(128);
 
       const stream2 = (Readable).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
-      const r2 = await ByteSequence.fromStream(stream2, 64);
+      const r2 = await ByteSequence.fromStream(stream2, {totalByteLength:64});
       expect(r2.byteLength).to.equal(128);
 
       const stream3 = (Readable).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
-      const r3 = await ByteSequence.fromStream(stream3, 512);
+      const r3 = await ByteSequence.fromStream(stream3, {totalByteLength:512});
       expect(r3.byteLength).to.equal(128);
     }
     else {
       const res = await fetch("./test/_data/128.txt");
-      const r = await ByteSequence.fromStream(res.body, 128);
+      const r = await ByteSequence.fromStream(res.body, {totalByteLength:128});
       expect(r.byteLength).to.equal(128);
 
       const res2 = await fetch("./test/_data/128.txt");
-      const r2 = await ByteSequence.fromStream(res2.body, 64);
+      const r2 = await ByteSequence.fromStream(res2.body, {totalByteLength:64});
       expect(r2.byteLength).to.equal(128);
 
       const res3 = await fetch("./test/_data/128.txt");
-      const r3 = await ByteSequence.fromStream(res3.body, 512);
+      const r3 = await ByteSequence.fromStream(res3.body, {totalByteLength:512});
       expect(r3.byteLength).to.equal(128);
     }
+
+  });
+
+  it("fromStream(ReadableStream, { on*: function })", async () => {
+    let stream;
+    if (Readable) {
+      stream = (Readable).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
+    }else{
+      const res = await fetch("./test/_data/128.txt");
+      stream = res.body;
+    }
+    const evtNames = [];
+    const data = {
+      total: -1,
+      loaded: -1,
+      lengthComputable: undefined,
+    };
+    const listener = (evt) => {
+      evtNames.push(evt.type);
+      data.total = evt.total;
+      data.loaded = evt.loaded;
+      data.lengthComputable = evt.lengthComputable;
+    };
+    const r = await ByteSequence.fromStream(stream, {
+      onloadstart: listener,
+      onloadend: listener,
+      onprogress: listener,
+      onabort: listener,
+      ontimeout: listener,
+      onerror: listener,
+      onload: listener,
+    });
+    expect(r.byteLength).to.equal(128);
+    expect(evtNames.filter(n => n === "loadstart").length).to.equal(1);
+    expect(evtNames.filter(n => n === "loadend").length).to.equal(1);
+    expect(evtNames.filter(n => n === "progress").length).to.greaterThanOrEqual(1);
+    expect(evtNames.filter(n => n === "abort").length).to.equal(0);
+    expect(evtNames.filter(n => n === "timeout").length).to.equal(0);
+    expect(evtNames.filter(n => n === "error").length).to.equal(0);
+    expect(evtNames.filter(n => n === "load").length).to.equal(1);
+    expect(data.total).to.equal(0);
+    expect(data.loaded).to.equal(128);
+    expect(data.lengthComputable).to.equal(false);
+
+  });
+
+  it("fromStream(ReadableStream, { totalByteLength:number, on*: function })", async () => {
+    let stream;
+    if (Readable) {
+      stream = (Readable).toWeb(fs.createReadStream("./test/_data/128.txt", { highWaterMark: 64 }));
+    }else{
+      const res = await fetch("./test/_data/128.txt");
+      stream = res.body;
+    }
+    const evtNames = [];
+    const data = {
+      total: -1,
+      loaded: -1,
+      lengthComputable: undefined,
+    };
+    const listener = (evt) => {
+      evtNames.push(evt.type);
+      data.total = evt.total;
+      data.loaded = evt.loaded;
+      data.lengthComputable = evt.lengthComputable;
+    };
+    const r = await ByteSequence.fromStream(stream, {
+      totalByteLength: 128,
+      onloadstart: listener,
+      onloadend: listener,
+      onprogress: listener,
+      onabort: listener,
+      ontimeout: listener,
+      onerror: listener,
+      onload: listener,
+    });
+    expect(r.byteLength).to.equal(128);
+    expect(evtNames.filter(n => n === "loadstart").length).to.equal(1);
+    expect(evtNames.filter(n => n === "loadend").length).to.equal(1);
+    expect(evtNames.filter(n => n === "progress").length).to.greaterThanOrEqual(1);
+    expect(evtNames.filter(n => n === "abort").length).to.equal(0);
+    expect(evtNames.filter(n => n === "timeout").length).to.equal(0);
+    expect(evtNames.filter(n => n === "error").length).to.equal(0);
+    expect(evtNames.filter(n => n === "load").length).to.equal(1);
+    expect(data.total).to.equal(128);
+    expect(data.loaded).to.equal(128);
+    expect(data.lengthComputable).to.equal(true);
+
+  });
+
+  it("fromStream(ReadableStream, { totalByteLength:number, signal: AbortSignal, on*: function })", async () => {
+    let stream;
+    if (Readable) {
+      stream = (Readable).toWeb(fs.createReadStream("./test/_data/4096.txt", { highWaterMark: 64 }));
+    }else{
+      const res = await fetch("./test/_data/4096.txt");
+      stream = res.body;
+    }
+    const evtNames = [];
+    const data = {
+      total: -1,
+      loaded: -1,
+      lengthComputable: undefined,
+    };
+    const listener = (evt) => {
+      evtNames.push(evt.type);
+      data.total = evt.total;
+      data.loaded = evt.loaded;
+      data.lengthComputable = evt.lengthComputable;
+    };
+    const ac = new AbortController();
+    setTimeout(() => {
+      ac.abort();
+    }, 5);
+    try {
+      const r = await ByteSequence.fromStream(stream, {
+        totalByteLength: 4096,
+        signal: ac.signal,
+        onloadstart: listener,
+        onloadend: listener,
+        onprogress: listener,
+        onabort: listener,
+        ontimeout: listener,
+        onerror: listener,
+        onload: listener,
+      });
+      throw new Error();
+    }catch(e){
+      expect(e?.name).to.equal("AbortError");
+    }
+    expect(evtNames.filter(n => n === "loadstart").length).to.equal(1);
+    expect(evtNames.filter(n => n === "loadend").length).to.equal(1);
+    expect(evtNames.filter(n => n === "progress").length).to.greaterThanOrEqual(1);
+    expect(evtNames.filter(n => n === "abort").length).to.equal(1);
+    expect(evtNames.filter(n => n === "timeout").length).to.equal(0);
+    expect(evtNames.filter(n => n === "error").length).to.equal(0);
+    expect(evtNames.filter(n => n === "load").length).to.equal(0);
+    expect(data.total).to.equal(4096);
+    expect(data.loaded).to.greaterThanOrEqual(1);
+    expect(data.lengthComputable).to.equal(true);
 
   });
 
