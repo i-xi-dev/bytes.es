@@ -1028,11 +1028,10 @@ class ByteSequence {
 
   /**
    * @experimental
-   * @param stream 
+   * @param asyncSource 
    * @param options 
-   * @returns 
    */
-  static async fromStream(stream: ReadableStream<Uint8Array>, options?: ByteSequence.StreamReadingOptions): Promise<ByteSequence> {
+  static async fromAsync(asyncSource: ByteSequence.AsyncSource, options?: ByteSequence.AsyncReadingOptions): Promise<ByteSequence> {
     const reader = new ByteStream.Reader();
 
     const listenerOptions = {
@@ -1064,11 +1063,24 @@ class ByteSequence {
       reader.addEventListener("loadend", options.onloadend as EventListener, listenerOptions);
     }
 
-    const bytes = await reader.read(stream, {
+    const bytes = await reader.read(asyncSource, {
       totalByteLength: options?.totalByteLength,
       signal: options?.signal,
     });
     return new ByteSequence(bytes.buffer);
+  }
+
+  /**
+   * @experimental
+   * @param stream 
+   * @param options 
+   * @returns 
+   */
+  static async fromStream(stream: ReadableStream<Uint8Array>, options?: ByteSequence.AsyncReadingOptions): Promise<ByteSequence> {
+    if (stream instanceof ReadableStream) {
+      return ByteSequence.fromAsync(stream, options);
+    }
+    throw new TypeError("stream");
   }
 
   // /**
@@ -1116,14 +1128,21 @@ class ByteSequence {
 
 namespace ByteSequence {
   /**
-   * A typedef that representing a `ByteSequence`, [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource), or `Array` of 8-bit unsigned integers.
+   * A typedef that representing a `ByteSequence`, [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource), or `Iterable` of 8-bit unsigned integers.
    */
   export type Bytes = ByteSequence | BufferSource | Iterable<number>;
 
   /**
    * @experimental
    */
-  export type StreamReadingOptions = {
+  export type AsyncSource = AsyncIterable<Uint8Array> | ReadableStream<Uint8Array> | Iterable<Uint8Array>;
+  // XXX ReadableStreamは、そのうちAsyncIterableになる
+  // XXX Iterable<number>も通るようにする？
+
+  /**
+   * @experimental
+   */
+  export type AsyncReadingOptions = {
     /**
      * The total number of bytes in the byte stream.
      */

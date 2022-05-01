@@ -21,6 +21,9 @@ globalThis.File = File;
 const { performance } = require("node:perf_hooks");
 globalThis.performance = performance;
 
+const { ReadableStream } = require("node:stream/web");
+globalThis.ReadableStream = ReadableStream;
+
 // NodeのglobalThis.AbortControllerを参照できないので、node-abort-controllerを使用
 const { AbortController, AbortSignal } = require("node-abort-controller");
 globalThis.AbortController = AbortController;
