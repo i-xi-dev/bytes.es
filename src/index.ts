@@ -23,18 +23,11 @@ const utf8TextEncoder = new TextEncoder();
 
 const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 
-// type WebMessage = Request | Response;
-
-// type WebMessageReadingOptions = {
-//   ignoreHttpStatus: boolean,
-//   readAs: "blob" | "stream",
-// };// XXX default options
-
-function isTypedArrayConstructor(value: unknown): value is (Uint8ArrayConstructor | Uint8ClampedArrayConstructor | Int8ArrayConstructor | Uint16ArrayConstructor | Int16ArrayConstructor | Uint32ArrayConstructor | Int32ArrayConstructor | Float32ArrayConstructor | Float64ArrayConstructor | BigUint64ArrayConstructor | BigInt64ArrayConstructor) {
+function _isTypedArrayConstructor(value: unknown): value is (Uint8ArrayConstructor | Uint8ClampedArrayConstructor | Int8ArrayConstructor | Uint16ArrayConstructor | Int16ArrayConstructor | Uint32ArrayConstructor | Int32ArrayConstructor | Float32ArrayConstructor | Float64ArrayConstructor | BigUint64ArrayConstructor | BigInt64ArrayConstructor) {
   return ((value === Uint8Array) || (value === Uint8ClampedArray) || (value === Int8Array) || (value === Uint16Array) || (value === Int16Array) || (value === Uint32Array) || (value === Int32Array) || (value === Float32Array) || (value === Float64Array) || (value === BigUint64Array) || (value === BigInt64Array));
 }
 
-function isDataViewConstructor(value: unknown): value is DataViewConstructor {
+function _isDataViewConstructor(value: unknown): value is DataViewConstructor {
   return value === DataView;
 }
 
@@ -44,6 +37,16 @@ type ResourceMetadata = {
   mediaType?: MediaType,
   fileName?: string,
 };
+
+function _iterableToArray<T>(iterable: Iterable<T>): Array<T> {
+  if (Array.isArray(iterable)) {
+    return iterable as Array<T>;
+  }
+  if (iterable && iterable[Symbol.iterator]) {
+    return [ ...iterable ];
+  }
+  throw new TypeError("iterable");
+}
 
 /**
  * Byte sequence
@@ -283,10 +286,10 @@ class ByteSequence {
    */
   toArrayBufferView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>): T {
     let bytesPerElement: number;
-    if (isTypedArrayConstructor(ctor)) {
+    if (_isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
     }
-    else if (isDataViewConstructor(ctor)) {
+    else if (_isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     }
     else {
@@ -350,14 +353,18 @@ class ByteSequence {
     if (sourceBytes instanceof ByteSequence) {
       return sourceBytes.duplicate();
     }
-    else if (sourceBytes instanceof ArrayBuffer) {
+
+    if (sourceBytes instanceof ArrayBuffer) {
       return ByteSequence.fromArrayBuffer(sourceBytes);
     }
-    else if (ArrayBuffer.isView(sourceBytes)) {
+
+    if (ArrayBuffer.isView(sourceBytes)) {
       return ByteSequence.fromArrayBufferView(sourceBytes);
     }
-    else if (Uint8Utils.isArrayOfUint8(sourceBytes)) {
-      return ByteSequence.fromArray(sourceBytes);
+
+    const array = _iterableToArray(sourceBytes);
+    if (Uint8Utils.isArrayOfUint8(array)) {
+      return ByteSequence.fromArray([ ...sourceBytes ]);
     }
     throw new TypeError("sourceBytes");
   }
@@ -882,11 +889,11 @@ class ByteSequence {
    */
   getView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>, byteOffset = 0, byteLength: number = (this.byteLength - byteOffset)): T {
     let bytesPerElement: number;
-    if (isTypedArrayConstructor(ctor)) {
+    if (_isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
       new Uint8ClampedArray();
     }
-    else if (isDataViewConstructor(ctor)) {
+    else if (_isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     }
     else {
@@ -952,17 +959,20 @@ class ByteSequence {
       }
       return this.#startsWith(otherBytes.buffer);
     }
-    else if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
+
+    if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
       if (otherBytes.byteLength !== this.byteLength) {
         return false;
       }
       return this.#startsWith(otherBytes);
     }
-    else if (Uint8Utils.isArrayOfUint8(otherBytes)) {
-      if (otherBytes.length !== this.byteLength) {
+
+    const array = _iterableToArray(otherBytes);
+    if (Uint8Utils.isArrayOfUint8(array)) {
+      if (array.length !== this.byteLength) {
         return false;
       }
-      return this.#startsWith(otherBytes);
+      return this.#startsWith(array);
     }
     throw new TypeError("otherBytes");
   }
@@ -978,12 +988,16 @@ class ByteSequence {
     if (otherBytes instanceof ByteSequence) {
       return this.#startsWith(otherBytes.buffer);
     }
-    else if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
+
+    if ((otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)) {
       return this.#startsWith(otherBytes);
     }
-    else if (Uint8Utils.isArrayOfUint8(otherBytes)) {
-      return this.#startsWith(otherBytes);
+
+    const array = _iterableToArray(otherBytes);
+    if (Uint8Utils.isArrayOfUint8(array)) {
+      return this.#startsWith(array);
     }
+
     throw new TypeError("otherBytes");
   }
 
@@ -1104,7 +1118,7 @@ namespace ByteSequence {
   /**
    * A typedef that representing a `ByteSequence`, [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource), or `Array` of 8-bit unsigned integers.
    */
-  export type Bytes = ByteSequence | BufferSource | Array<number>;
+  export type Bytes = ByteSequence | BufferSource | Iterable<number>;
 
   /**
    * @experimental

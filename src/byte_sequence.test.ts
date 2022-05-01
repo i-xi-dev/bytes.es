@@ -1454,6 +1454,26 @@ describe("ByteSequence.prototype.startsWith", () => {
 
   });
 
+  it("startsWith(Iterable<number>)", () => {
+    const a = function*() {
+      return;
+    };
+    expect(bs0.startsWith(a())).to.equal(true);
+
+    const b = function*() {
+      yield 1;
+      yield 2;
+    };
+    expect(bs1.startsWith(b())).to.equal(false);
+
+    const c = function*() {
+      yield 255;
+      yield 0;
+    };
+    expect(bs1.startsWith(c())).to.equal(true);
+
+  });
+
   it("startsWith(ArrayBuffer)", () => {
     expect(bs0.startsWith(bs0.buffer)).to.equal(true);
     expect(bs1.startsWith(bs1b.buffer)).to.equal(true);
@@ -1463,8 +1483,12 @@ describe("ByteSequence.prototype.startsWith", () => {
 
   it("startsWith(*)", () => {
     expect(() => {
-      bs0.startsWith("" as unknown as Uint8Array);
-    }).to.throw(TypeError, "otherBytes").with.property("name", "TypeError");
+      bs0.startsWith(null as unknown as Uint8Array);
+    }).to.throw(TypeError, "iterable").with.property("name", "TypeError");
+
+    expect(() => {
+      bs0.startsWith(undefined as unknown as Uint8Array);
+    }).to.throw(TypeError, "iterable").with.property("name", "TypeError");
 
     expect(() => {
       bs1.startsWith(["255"] as unknown as Uint8Array);
