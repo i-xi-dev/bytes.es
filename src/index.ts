@@ -345,11 +345,11 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified `ByteSequence`, `BufferSource`, or 8-bit unsigned integer `Array`.
    * 
-   * @param sourceBytes The `Bytes` object represents a byte sequence.
+   * @param sourceBytes The `ByteSequence.Source` object represents a byte sequence.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `bufferSource` is not type of `Bytes`.
+   * @throws {TypeError} The `bufferSource` is not type of `ByteSequence.Source`.
    */
-  static from(sourceBytes: ByteSequence.Bytes): ByteSequence {
+  static from(sourceBytes: ByteSequence.Source): ByteSequence {
     if (sourceBytes instanceof ByteSequence) {
       return sourceBytes.duplicate();
     }
@@ -950,9 +950,9 @@ class ByteSequence {
    * 
    * @param otherBytes The object that represents a byte sequence.
    * @returns If this is equal to the specified byte sequence, `true`; otherwise, `false`.
-   * @throws {TypeError} The `otherBytes` is not type of `ByteSequence.Bytes`.
+   * @throws {TypeError} The `otherBytes` is not type of `ByteSequence.Source`.
    */
-  equals(otherBytes: ByteSequence.Bytes): boolean {
+  equals(otherBytes: ByteSequence.Source): boolean {
     if (otherBytes instanceof ByteSequence) {
       if (otherBytes.byteLength !== this.byteLength) {
         return false;
@@ -982,9 +982,9 @@ class ByteSequence {
    * 
    * @param otherBytes The object that represents a byte sequence.
    * @returns If this starts with the specified byte sequence, `true`; otherwise, `false`.
-   * @throws {TypeError} The `otherBytes` is not type of `ByteSequence.Bytes`.
+   * @throws {TypeError} The `otherBytes` is not type of `ByteSequence.Source`.
    */
-  startsWith(otherBytes: ByteSequence.Bytes): boolean {
+  startsWith(otherBytes: ByteSequence.Source): boolean {
     if (otherBytes instanceof ByteSequence) {
       return this.#startsWith(otherBytes.buffer);
     }
@@ -1028,10 +1028,10 @@ class ByteSequence {
 
   /**
    * @experimental
-   * @param asyncSource 
+   * @param streamLike 
    * @param options 
    */
-  static async fromAsync(asyncSource: ByteSequence.AsyncSource, options?: ByteSequence.AsyncReadingOptions): Promise<ByteSequence> {
+  static async fromStream(streamLike: ByteSequence.StreamLike, options?: ByteSequence.AsyncReadingOptions): Promise<ByteSequence> {
     const reader = new ByteStream.Reader();
 
     const listenerOptions = {
@@ -1063,25 +1063,15 @@ class ByteSequence {
       reader.addEventListener("loadend", options.onloadend as EventListener, listenerOptions);
     }
 
-    const bytes = await reader.read(asyncSource, {
+    const bytes = await reader.read(streamLike, {
       totalByteLength: options?.totalByteLength,
       signal: options?.signal,
     });
     return new ByteSequence(bytes.buffer);
   }
 
-  /**
-   * @experimental
-   * @param stream 
-   * @param options 
-   * @returns 
-   */
-  static async fromStream(stream: ReadableStream<Uint8Array>, options?: ByteSequence.AsyncReadingOptions): Promise<ByteSequence> {
-    if (stream instanceof ReadableStream) {
-      return ByteSequence.fromAsync(stream, options);
-    }
-    throw new TypeError("stream");
-  }
+  //XXX at(): Uint8Arrayで出来る
+  //XXX [Symbol.iterator](): Uint8Arrayで出来る
 
   // /**
   //  * 想定用途
@@ -1130,14 +1120,18 @@ namespace ByteSequence {
   /**
    * A typedef that representing a `ByteSequence`, [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource), or `Iterable` of 8-bit unsigned integers.
    */
-  export type Bytes = ByteSequence | BufferSource | Iterable<number>;
+  export type Source = ByteSequence | BufferSource | Iterable<number>;
 
   /**
    * @experimental
    */
-  export type AsyncSource = AsyncIterable<Uint8Array> | ReadableStream<Uint8Array> | Iterable<Uint8Array>;
+  export type AsyncSource = AsyncIterable<number>;
+
+  /**
+   * @experimental
+   */
+  export type StreamLike = AsyncIterable<Uint8Array> | ReadableStream<Uint8Array> | Iterable<Uint8Array>;
   // XXX ReadableStreamは、そのうちAsyncIterableになる
-  // XXX Iterable<number>も通るようにする？
 
   /**
    * @experimental
