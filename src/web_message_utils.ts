@@ -8,40 +8,6 @@
 // } from "@i-xi-dev/fundamental";
 // import { MediaType } from "@i-xi-dev/mimetype";
 
-// const {
-//   HTTP_TAB_OR_SPACE,
-// } = CodePointRange;
-
-// /**
-//  * Headers#getで取得した値を分割する
-//  * （複数ヘッダーだった場合、","で連結されているので分割する）
-//  * 
-//  * かつてはHeaders#getAllすれば良かったが、それは廃止されたので。
-//  * {@link https://fetch.spec.whatwg.org/#concept-header-list-get-decode-split} のsplitの部分の仕様で分割する
-//  * 
-//  * @param value Headers#getで取得した値
-//  * @returns 分割結果
-//  */
-// function splitWebHeaderValue(value: string): Array<string> {
-//   const notU0022OrU002C: Array<[ number ]> = [ [ 0x22 ], [ 0x2C ] ];
-//   const values: Array<string> = [];
-//   let work = value;
-//   while (work.length > 0) {
-//     let splitted = collectStart(work, notU0022OrU002C);
-//     work = work.substring(splitted.length);
-//     if (work.startsWith("\u0022")) {
-//       const result = collectHttpQuotedString(work);
-//       splitted = splitted + result.collected;
-//       work = work.substring(result.progression);
-//     }
-//     else { // work.startsWith("\u002C")
-//       work = work.substring(1);
-//     }
-//     values.push(trim(splitted, HTTP_TAB_OR_SPACE));
-//   }
-//   return values;
-// }
-
 // /**
 //  * RequestまたはResponseのヘッダーからContent-Typeの値を取得し返却する
 //  * 
