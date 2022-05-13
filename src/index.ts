@@ -519,7 +519,7 @@ class ByteSequence {
   /**
    * Returns the string contains Base64-encoded bytes of this byte sequence.
    * 
-   * @param options The `Base64.Options` dictionary.
+   * @param options The [`Base64.Options`](https://i-xi-dev.github.io/base64.es/modules/Base64.html#Options-1) dictionary.
    * @returns The string contains Base64-encoded bytes.
    */
   toBase64Encoded(options?: Base64.Options): string {
@@ -531,7 +531,7 @@ class ByteSequence {
    * created from the string contains Percent-encoded bytes.
    * 
    * @param percentEncoded The string to decode.
-   * @param options The `Percent.Options` dictionary.
+   * @param options The [`Percent.Options`](https://i-xi-dev.github.io/percent.es/modules/Percent.html#Options-1) dictionary.
    * @returns A new `ByteSequence` object.
    */
   static fromPercentEncoded(percentEncoded: string, options?: Percent.Options): ByteSequence {
@@ -542,7 +542,7 @@ class ByteSequence {
   /**
    * Returns the string contains Percent-encoded bytes of this byte sequence.
    * 
-   * @param options The `Percent.Options` dictionary.
+   * @param options The [`Percent.Options`](https://i-xi-dev.github.io/percent.es/modules/Percent.html#Options-1) dictionary.
    * @returns The string contains Percent-encoded bytes.
    */
   toPercentEncoded(options?: Percent.Options): string {
@@ -1319,6 +1319,5 @@ Object.freeze(ByteSequence);
 
 export {
   ByteFormat,
-  Percent,
   ByteSequence,
 };
