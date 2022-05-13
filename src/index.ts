@@ -508,7 +508,7 @@ class ByteSequence {
    * created from the string contains Base64-encoded bytes.
    * 
    * @param base64Encoded The string to decode.
-   * @param options The `Base64.Options` dictionary.
+   * @param options The [`Base64.Options`](https://i-xi-dev.github.io/base64.es/modules/Base64.html#Options-1) dictionary.
    * @returns A new `ByteSequence` object.
    */
   static fromBase64Encoded(base64Encoded: string, options?: Base64.Options): ByteSequence {
@@ -1318,7 +1318,6 @@ namespace ByteSequence {
 Object.freeze(ByteSequence);
 
 export {
-  Base64,
   ByteFormat,
   Percent,
   ByteSequence,
