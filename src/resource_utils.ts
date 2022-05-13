@@ -1,13 +1,12 @@
-// // //
+// // // //
 
 // import {
-//   CodePointRange,
-//   collectHttpQuotedString,
-//   collectStart,
-//   trim,
+//   HttpUtils,
 // } from "@i-xi-dev/fundamental";
 // import { MediaType } from "@i-xi-dev/mimetype";
 
+// // XXX Headers#getで取得した値をgetAllでかつて取得できた値と同等に戻すのは不可能なので、
+// //     使用しない
 // /**
 //  * RequestまたはResponseのヘッダーからContent-Typeの値を取得し返却する
 //  * 
@@ -15,9 +14,8 @@
 //  * 
 //  * @param headers ヘッダー
 //  * @returns Content-Typeの値から生成したMediaTypeインスタンス
-//  * //TODO throws
 //  */
-// function extractContentType(headers: Headers): MediaType {
+// export function _extractContentType(headers: Headers): MediaType {
 //   // 5.
 //   if (headers.has("Content-Type") !== true) {
 //     throw new Error("Content-Type field not found");
@@ -25,7 +23,7 @@
 
 //   // 4, 5.
 //   const typesString = headers.get("Content-Type") as string;
-//   const typeStrings = splitWebHeaderValue(typesString);
+//   const typeStrings = HttpUtils.splitHeaderValue(typesString);
 //   if (typeStrings.length <= 0) {
 //     throw new Error("Content-Type value not found");
 //   }
@@ -86,7 +84,7 @@
 //  * @returns Content-Lengthの値から生成した数値、取得できなかった場合はnull
 //  * //TODO throws
 //  */
-// function extractContentLength(headers: Headers): number | null {
+// export function _extractContentLength(headers: Headers): number | null {
 //   // 当ファイルの処理において、圧縮や分割されている場合はContent-Lengthの値は必要ない為nullを返す
 //   // ヘッダーフィールドの値がコンマ区切りリストの場合は内容にかかわらず圧縮か分割がされているとみなす
 //   if (headers.has("Content-Encoding")) {
@@ -110,7 +108,7 @@
 
 //   // 1, 2.
 //   const sizesString = headers.get("Content-Length") as string;
-//   const sizeStrings = splitWebHeaderValue(sizesString);
+//   const sizeStrings = HttpUtils.splitHeaderValue(sizesString);
 //   if (sizeStrings.length <= 0) {
 //     return null;
 //   }
@@ -137,10 +135,3 @@
 //   // 6.
 //   return Number.parseInt(candidateValue, 10);
 // }
-
-// const WebMessageUtils = Object.freeze({
-//   extractContentType,
-//   extractContentLength,
-// });
-
-// export { WebMessageUtils };

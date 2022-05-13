@@ -2,22 +2,79 @@
 
 import {
   type uint8,
-  ByteFormat,
-  ByteStream,
-  CodePointRange,
-  Digest,
+  Byte,
+  Http,
+  HttpUtils,
   Integer,
   IsomorphicEncoding,
-  trim,
-  Uint8Utils,
+  StringUtils,
 } from "@i-xi-dev/fundamental";
 import { Base64 } from "@i-xi-dev/base64";
 import { Percent } from "@i-xi-dev/percent";
 import { MediaType } from "@i-xi-dev/mimetype";
+import { ByteFormat } from "./byte_format";
+import { ByteStream } from "./byte_stream";
+
+namespace _Uint8Utils {
+  export function isArrayOfUint8(value: unknown): value is Array<uint8> {
+    if (Array.isArray(value)) {
+      return value.every((i) => Byte.isUint8(i));
+    }
+    return false;
+  }
+}
+Object.freeze(_Uint8Utils);
+
+namespace _DigestImpl {
+  /**
+   * SHA-256 digest algorithm
+   */
+  export const Sha256: ByteSequence.DigestAlgorithm = Object.freeze({
+    /**
+     * Computes the SHA-256 digest for the byte sequence.
+     */
+    async compute(input: Uint8Array): Promise<Uint8Array> {
+      const bytes = await globalThis.crypto.subtle.digest("SHA-256", input);
+      return new Uint8Array(bytes);
+    },
+  });
+  Object.freeze(Sha256);
+
+  /**
+   * SHA-384 digest algorithm
+   */
+  export const Sha384: ByteSequence.DigestAlgorithm = Object.freeze({
+    /**
+     * Computes the SHA-384 digest for the byte sequence.
+     */
+    async compute(input: Uint8Array): Promise<Uint8Array> {
+      const bytes = await globalThis.crypto.subtle.digest("SHA-384", input);
+      return new Uint8Array(bytes);
+    },
+  });
+  Object.freeze(Sha384);
+
+  /**
+   * SHA-512 digest algorithm
+   */
+  export const Sha512: ByteSequence.DigestAlgorithm = Object.freeze({
+    /**
+     * Computes the SHA-512 digest for the byte sequence.
+     * 
+     * @see {@link Algorithm.compute}
+     */
+    async compute(input: Uint8Array): Promise<Uint8Array> {
+      const bytes = await globalThis.crypto.subtle.digest("SHA-512", input);
+      return new Uint8Array(bytes);
+    },
+  });
+  Object.freeze(Sha512);
+}
+Object.freeze(_DigestImpl);
 
 const {
   ASCII_WHITESPACE,
-} = CodePointRange;
+} = HttpUtils.CodePointRange;
 
 const utf8TextEncoder = new TextEncoder();
 
@@ -145,21 +202,21 @@ class ByteSequence {
    * ```
    */
   get sha256Integrity(): Promise<string> {
-    return this.#integrity(Digest.Sha256, "sha256-");
+    return this.#integrity(_DigestImpl.Sha256, "sha256-");
   }
 
   /**
    * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-384 digest for this byte sequence.
    */
   get sha384Integrity(): Promise<string> {
-    return this.#integrity(Digest.Sha384, "sha384-");
+    return this.#integrity(_DigestImpl.Sha384, "sha384-");
   }
 
   /**
    * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-512 digest for this byte sequence.
    */
   get sha512Integrity(): Promise<string> {
-    return this.#integrity(Digest.Sha512, "sha512-");
+    return this.#integrity(_DigestImpl.Sha512, "sha512-");
   }
 
   /**
@@ -326,7 +383,7 @@ class ByteSequence {
    * @throws {TypeError} The `byteArray` is not an 8-bit unsigned integer `Array`.
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
-    if (Uint8Utils.isArrayOfUint8(byteArray)) {
+    if (_Uint8Utils.isArrayOfUint8(byteArray)) {
       return ByteSequence.fromArrayBufferView(Uint8Array.from(byteArray));
     }
     throw new TypeError("byteArray");
@@ -363,7 +420,7 @@ class ByteSequence {
     }
 
     const array = _iterableToArray(sourceBytes);
-    if (Uint8Utils.isArrayOfUint8(array)) {
+    if (_Uint8Utils.isArrayOfUint8(array)) {
       return ByteSequence.fromArray([ ...sourceBytes ]);
     }
     throw new TypeError("sourceBytes");
@@ -498,7 +555,7 @@ class ByteSequence {
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-256 digest.
    */
   async toSha256Digest(): Promise<ByteSequence> {
-    return this.toDigest(Digest.Sha256);
+    return this.toDigest(_DigestImpl.Sha256);
   }
 
   /**
@@ -507,7 +564,7 @@ class ByteSequence {
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-384 digest.
    */
   async toSha384Digest(): Promise<ByteSequence> {
-    return this.toDigest(Digest.Sha384);
+    return this.toDigest(_DigestImpl.Sha384);
   }
 
   /**
@@ -516,7 +573,7 @@ class ByteSequence {
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-512 digest.
    */
   async toSha512Digest(): Promise<ByteSequence> {
-    return this.toDigest(Digest.Sha512);
+    return this.toDigest(_DigestImpl.Sha512);
   }
 
   /**
@@ -525,7 +582,7 @@ class ByteSequence {
    * @param algorithm The digest algorithm.
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the digest.
    */
-  async toDigest(algorithm: Digest.Algorithm): Promise<ByteSequence> {
+  async toDigest(algorithm: ByteSequence.DigestAlgorithm): Promise<ByteSequence> {
     const digest = await algorithm.compute(this.#view);
     return new ByteSequence(digest.buffer);
   }
@@ -537,7 +594,7 @@ class ByteSequence {
    * @returns The `Promise` that fulfills with a SRI integrity (base64-encoded digest).
    * @see [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
    */
-  async #integrity(algorithm: Digest.Algorithm, prefix: string): Promise<string> {
+  async #integrity(algorithm: ByteSequence.DigestAlgorithm, prefix: string): Promise<string> {
     // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
     const digestBytes = await this.toDigest(algorithm);
     return prefix + digestBytes.toBase64Encoded();
@@ -743,7 +800,7 @@ class ByteSequence {
     // ・メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする
     // ・クエリはデータの一部とみなす
     const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
-    let mediaTypeWork = trim(mediaTypeOriginal, ASCII_WHITESPACE);
+    let mediaTypeWork = StringUtils.trim(mediaTypeOriginal, ASCII_WHITESPACE);
 
     // 8, 9
     bodyStringWork = bodyStringWork.substring(mediaTypeOriginal.length + 1);
@@ -934,7 +991,7 @@ class ByteSequence {
       }
       return true;
     }
-    else if (Uint8Utils.isArrayOfUint8(otherBytes)) {
+    else if (_Uint8Utils.isArrayOfUint8(otherBytes)) {
       for (let i = 0; i < otherBytes.length; i++) {
         if (otherBytes[i] !== thisView[i]) {
           return false;
@@ -968,7 +1025,7 @@ class ByteSequence {
     }
 
     const array = _iterableToArray(otherBytes);
-    if (Uint8Utils.isArrayOfUint8(array)) {
+    if (_Uint8Utils.isArrayOfUint8(array)) {
       if (array.length !== this.byteLength) {
         return false;
       }
@@ -994,7 +1051,7 @@ class ByteSequence {
     }
 
     const array = _iterableToArray(otherBytes);
-    if (Uint8Utils.isArrayOfUint8(array)) {
+    if (_Uint8Utils.isArrayOfUint8(array)) {
       return this.#startsWith(array);
     }
 
@@ -1073,6 +1130,65 @@ class ByteSequence {
   //XXX at(): Uint8Arrayで出来る
   //XXX [Symbol.iterator](): Uint8Arrayで出来る
 
+  #contentHeaders(init?: HeadersInit): Headers {
+    const headers = new Headers(init);
+
+    // Content-Type
+    // init.headersで指定されていれば、それを指定
+    // init.headersに指定されておらず、メタデータが保持されている場合（バイト列の生成元がBlobの場合など）、それを指定
+    // XXX 複数指定されていたのかはHeadersオブジェクトからはわからないし、
+    //     また、複数指定されていたとしてもそのうち1つだけ抽出するのは不可能なので、
+    //     Headers#getで取得できた値をそのまま使う。（Content-Typeが複数指定されているRequest/Responseのblob()で生成したBlobのtypeもそうなっている）
+    const specifiedType = headers.has(Http.Header.CONTENT_TYPE) ? headers.get(Http.Header.CONTENT_TYPE) : null;
+    const resolvedMediaType: MediaType | null = this.#resolveMediaType(specifiedType ?? undefined);
+    if (resolvedMediaType) {
+      headers.set(Http.Header.CONTENT_TYPE, resolvedMediaType.toString());
+    }
+
+    // Content-Length
+    // 何もしない
+
+    return headers;
+  }
+
+  /**
+   * @experimental
+   */
+  toRequest(url: string, options: RequestInit): Request {
+    const headers = this.#contentHeaders(options?.headers);
+    const method = options.method ?? Http.Method.GET;
+    if (([ Http.Method.GET, Http.Method.HEAD ] as string[]).includes(method.toUpperCase())) {
+      throw new TypeError("options.method");
+    }
+    return new Request(url, {
+      method,
+      headers,
+      body: this.#buffer, // options.bodyはいかなる場合も無視する
+      referrer: options?.referrer,
+      referrerPolicy: options?.referrerPolicy,
+      mode: options?.mode,
+      credentials: options?.credentials,
+      cache: options?.cache,
+      redirect: options?.redirect,
+      integrity: options?.integrity,
+      keepalive: options?.keepalive,
+      signal: options?.signal,
+      // window
+    });
+  }
+
+  /**
+   * @experimental
+   */
+  toResponse(options: ResponseInit): Response {
+    const headers = this.#contentHeaders(options?.headers);
+    return new Response(this.#buffer, {
+      status: options?.status,
+      statusText: options?.statusText,
+      headers,
+    });
+  }
+
   // /**
   //  * 想定用途
   //  * ・ブラウザのfetchでのResponseのcontent取得
@@ -1126,6 +1242,19 @@ namespace ByteSequence {
    * @experimental
    */
   export type AsyncSource = AsyncIterable<number>;
+
+  /**
+   * Digest algorithm
+   */
+  export interface DigestAlgorithm {
+    /**
+     * Computes the digest for the byte sequence.
+     * 
+     * @param input The input to compute the digest.
+     * @returns The `Promise` that fulfills with a computed digest.
+     */
+    compute: (input: Uint8Array) => Promise<Uint8Array>;
+  }
 
   /**
    * @experimental
@@ -1191,7 +1320,6 @@ Object.freeze(ByteSequence);
 export {
   Base64,
   ByteFormat,
-  Digest,
   Percent,
   ByteSequence,
 };
