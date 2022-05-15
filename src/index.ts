@@ -90,10 +90,17 @@ function _isDataViewConstructor(value: unknown): value is DataViewConstructor {
 
 type ArrayBufferViewConstructor<T> = { new(a: ArrayBuffer, b?: number, c?: number): T };
 
-type ResourceMetadata = {
+type Metadata = {
   mediaType?: MediaType,
   fileName?: string,
 };
+
+type Described = {
+  description?: Metadata,
+  data: ByteSequence,
+};
+    //get blobProperties(): BlobPropertyBag {
+    //get fileProperties(): FilePropertyBag {
 
 function _iterableToArray<T>(iterable: Iterable<T>): Array<T> {
   if (Array.isArray(iterable)) {
@@ -109,28 +116,6 @@ function _iterableToArray<T>(iterable: Iterable<T>): Array<T> {
  * Byte sequence
  */
 class ByteSequence {
-  /**
-   * A metadata store for the instances of byte sequence.
-   */
-  static #metadataStore: WeakMap<ByteSequence, ResourceMetadata> = new WeakMap();
-
-  static #storeMetadata(instance: ByteSequence, metadata: ResourceMetadata): void {
-    ByteSequence.#metadataStore.set(instance, metadata);
-  }
-
-  static #getStoredMediaType(instance: ByteSequence): MediaType | null {
-    const metadata = this.#metadataStore.get(instance);
-    return (metadata?.mediaType instanceof MediaType) ? metadata.mediaType : null;
-  }
-
-  static #getStoredFileName(instance: ByteSequence): string | undefined {
-    const metadata = this.#metadataStore.get(instance);
-    return (typeof metadata?.fileName === "string") ? metadata.fileName : undefined;
-  }
-
-  // TODO getStoredBlobProperties
-  // TODO getStoredFileProperties
-
   /**
    * 内部表現
    */
@@ -678,23 +663,35 @@ class ByteSequence {
   static async fromBlob(blob: Blob): Promise<ByteSequence> {
     try {
       const buffer = await blob.arrayBuffer(); // XXX Node.jsでもstream()を取得できるようになった
-      const bytes = ByteSequence.wrapArrayBuffer(buffer);
-      const metadata: ResourceMetadata = {};
+      return ByteSequence.wrapArrayBuffer(buffer);
+    }
+    catch (exception) {
+      // Blob#arrayBufferでの NotFoundError | SecurityError | NotReadableError
+
+      // XXX throw new Error("reading failed", { cause: exception });
+      throw new Error("reading failed");
+    }
+  }
+
+  //TODO
+  static async fromBlobWithDescription(blob: Blob): Promise<Described> {
+    const data = await ByteSequence.fromBlob(blob);
+    try {
+      const metadata: Metadata = {};
       if (blob.type) {
         metadata.mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
       }
       if (globalThis.File && (blob instanceof File)) {
         metadata.fileName = blob.name;
       }
-      if (metadata.mediaType || metadata.fileName) {
-        ByteSequence.#storeMetadata(bytes, metadata);
-      }
 
-      return bytes;
+      return {
+        description: (metadata.mediaType || metadata.fileName) ? metadata : undefined,
+        data,
+      };
     }
     catch (exception) {
-      // Blob#arrayBufferでの NotFoundError | SecurityError | NotReadableError
-      // またはMediaTypeのパース失敗
+      // MediaTypeのパース失敗
 
       // XXX throw new Error("reading failed", { cause: exception });
       throw new Error("reading failed");
@@ -708,10 +705,10 @@ class ByteSequence {
    * @returns The `Blob` object.
    */
   toBlob(options?: BlobPropertyBag): Blob {
-    const resolvedMediaType: MediaType | null = this.#resolveMediaType(options?.type);
+    const mediaType: MediaType | null = (options?.type === "string") ? MediaType.fromString(options.type) : null;
 
     return new Blob([ this.#buffer ], {
-      type: resolvedMediaType ? resolvedMediaType.toString() : "",
+      type: mediaType ? mediaType.toString() : undefined,
     });
   }
 
@@ -722,53 +719,23 @@ class ByteSequence {
    * @param options The `FilePropertyBag` object, but `endings` property is ignored.
    * @returns The `File` object.
    */
-  toFile(fileName?: string, options?: FilePropertyBag): File {
-    const resolvedFileName: string | undefined = this.#resolveFileName(fileName);
-    if ((typeof resolvedFileName === "string") && (resolvedFileName.length > 0)) {
+  toFile(fileName: string, options?: FilePropertyBag): File {
+    if ((typeof fileName === "string") && (fileName.length > 0)) {
       // ok
     }
     else {
       throw new TypeError("fileName");
     }
 
-    const resolvedMediaType: MediaType | null = this.#resolveMediaType(options?.type);
+    const mediaType: MediaType | null = (options?.type === "string") ? MediaType.fromString(options.type) : null;
 
-    return new File([ this.#buffer ], resolvedFileName, {
-      type: resolvedMediaType ? resolvedMediaType.toString() : "",
+    return new File([ this.#buffer ], fileName, {
+      type: mediaType ? mediaType.toString() : "",
       lastModified: options?.lastModified ? options.lastModified : Date.now(),
     });
   }
 
-  #resolveMediaType(preferredMediaType?: string): MediaType | null {
-    if (typeof preferredMediaType === "string") {
-      return MediaType.fromString(preferredMediaType);
-    }
-    else {
-      return ByteSequence.#getStoredMediaType(this);
-    }
-  }
-
-  #resolveFileName(preferredFileName?: string): string | undefined {
-    if (typeof preferredFileName === "string") {
-      return preferredFileName;
-    }
-    else {
-      return ByteSequence.#getStoredFileName(this);
-    }
-  }
-
-  /**
-   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
-   * created from the specified [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
-   * 
-   * @see [https://fetch.spec.whatwg.org/#data-urls](https://fetch.spec.whatwg.org/#data-urls)
-   * @param dataUrl The data URL
-   * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `dataUrl` parsing is failed.
-   * @throws {TypeError} The URL scheme of the `dataUrl` is not "data".
-   * @throws {TypeError} The `dataUrl` does not contain `","`.
-   */
-  static fromDataURL(dataUrl: URL | string): ByteSequence {
+  static #fromDataURL(dataUrl: URL | string): [ ByteSequence, string ] {
     let parsed: URL;
     try {
       parsed = new URL(dataUrl);
@@ -783,8 +750,7 @@ class ByteSequence {
     }
 
     // 2
-    // https://fetch.spec.whatwg.org/#data-urls に従い、（また、ブラウザの実装にあわせ）
-    // ・フラグメントは無視する
+    // https://fetch.spec.whatwg.org/#data-urls に従い、フラグメントは無視する
     parsed.hash = "";
 
     // 3, 4
@@ -796,11 +762,11 @@ class ByteSequence {
     }
 
     // 最初に出現した","をメディアタイプとデータの区切りとみなす。
-    // https://fetch.spec.whatwg.org/#data-urls に従い、（また、ブラウザの実装にあわせ）
+    // https://fetch.spec.whatwg.org/#data-urls に従い
     // ・メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする
     // ・クエリはデータの一部とみなす
     const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
-    let mediaTypeWork = StringUtils.trim(mediaTypeOriginal, ASCII_WHITESPACE);
+    let mediaTypeSrc = StringUtils.trim(mediaTypeOriginal, ASCII_WHITESPACE);
 
     // 8, 9
     bodyStringWork = bodyStringWork.substring(mediaTypeOriginal.length + 1);
@@ -810,7 +776,7 @@ class ByteSequence {
 
     // 11
     const base64Indicator = /;[\u0020]*base64$/i;
-    const base64: boolean = base64Indicator.test(mediaTypeWork);
+    const base64: boolean = base64Indicator.test(mediaTypeSrc);
     if (base64 === true) {
       // 11.1
       bodyStringWork = bytes.toBinaryString();
@@ -819,8 +785,32 @@ class ByteSequence {
       bytes = ByteSequence.fromBase64Encoded(bodyStringWork);
 
       // 11.4, 11.5, 11.6
-      mediaTypeWork = mediaTypeWork.replace(base64Indicator, "");
+      mediaTypeSrc = mediaTypeSrc.replace(base64Indicator, "");
     }
+
+    return [ bytes, mediaTypeSrc ];
+  }
+
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
+   * 
+   * @see [https://fetch.spec.whatwg.org/#data-urls](https://fetch.spec.whatwg.org/#data-urls)
+   * @param dataUrl The data URL
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `dataUrl` parsing is failed.
+   * @throws {TypeError} The URL scheme of the `dataUrl` is not "data".
+   * @throws {TypeError} The `dataUrl` does not contain `","`.
+   */
+  static fromDataURL(dataUrl: URL | string): ByteSequence {
+    const [ bytes ] = ByteSequence.#fromDataURL(dataUrl);
+    return bytes;
+  }
+
+  //TODO
+  static fromDataURLWithDescription(dataUrl: URL | string): Described {
+    const [ bytes, mediaTypeSrc ] = ByteSequence.#fromDataURL(dataUrl);
+    let mediaTypeWork = mediaTypeSrc;
 
     // 12
     if (mediaTypeWork.startsWith(";")) {
@@ -836,9 +826,13 @@ class ByteSequence {
       void exception;
       mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
     }
-    ByteSequence.#storeMetadata(bytes, { mediaType });
 
-    return bytes;
+    return {
+      description: {
+        mediaType,
+      },
+      data: bytes,
+    };
   }
 
   /**
@@ -851,8 +845,8 @@ class ByteSequence {
   toDataURL(options?: BlobPropertyBag): URL {
     // FileReaderの仕様に倣い、テキストかどうかに関係なく常時Base64エンコードする仕様
     // XXX Base64なしも対応する
-    const resolvedMediaType: MediaType | null = this.#resolveMediaType(options?.type);
-    if (resolvedMediaType) {
+    const mediaType: MediaType | null = (options?.type === "string") ? MediaType.fromString(options.type) : null;
+    if (mediaType) {
       // let encoding = "";
       // let dataEncoded: string;
       // if (base64) {
@@ -860,7 +854,7 @@ class ByteSequence {
       const dataEncoded = this.toBase64Encoded();
       // }
 
-      return new URL("data:" + resolvedMediaType.toString() + encoding + "," + dataEncoded);
+      return new URL("data:" + mediaType.toString() + encoding + "," + dataEncoded);
     }
     throw new TypeError("MIME type not resolved");
   }
@@ -932,9 +926,9 @@ class ByteSequence {
   /**
    * Returns the `ArrayBufferView` that views the underlying `ArrayBuffer` of this instance.
    * 
-   * @param viewConstructor The constructor of `ArrayBufferView`.
+   * @param ctor The constructor of `ArrayBufferView`.
    * @param byteOffset The offset, in bytes.
-   * @param byteLengThe length of the `ArrayBufferView`, in bytes.
+   * @param byteLength The length of the `ArrayBufferView`, in bytes.
    * @returns The `ArrayBufferView`.
    * @throws {TypeError} The `viewConstructor` is not a constructor of `ArrayBufferView`.
    * @throws {TypeError} The `byteOffset` is not non-negative integer.
@@ -1140,15 +1134,38 @@ class ByteSequence {
     //     また、複数指定されていたとしてもそのうち1つだけ抽出するのは不可能なので、
     //     Headers#getで取得できた値をそのまま使う。（Content-Typeが複数指定されているRequest/Responseのblob()で生成したBlobのtypeもそうなっている）
     const specifiedType = headers.has(Http.Header.CONTENT_TYPE) ? headers.get(Http.Header.CONTENT_TYPE) : null;
-    const resolvedMediaType: MediaType | null = this.#resolveMediaType(specifiedType ?? undefined);
-    if (resolvedMediaType) {
-      headers.set(Http.Header.CONTENT_TYPE, resolvedMediaType.toString());
+    const mediaType: MediaType | null = (specifiedType === "string") ? MediaType.fromString(specifiedType) : null;
+    if (mediaType) {
+      headers.set(Http.Header.CONTENT_TYPE, mediaType.toString());
     }
 
     // Content-Length
     // 何もしない
 
     return headers;
+  }
+
+  static async #fromRequestOrResponse(reqOrRes: Request | Response, options): Promise<[ByteSequence,""]> {
+      //typeチェック
+    //ヘッダ任意チェック
+    //body任意チェック
+    
+    let bytes: ByteSequence;
+    if (reqOrRes.body) {
+      bytes = await ByteSequence.fromStream(reqOrRes.body);
+    }
+    else {
+      bytes = ByteSequence.allocate(0);
+    }
+  }
+
+  static async fromRequestOrResponse(reqOrRes: Request | Response, options): Promise<ByteSequence> {
+    const [ bytes ] = await ByteSequence.#fromRequestOrResponse(reqOrRes, options);
+    return bytes;
+  }
+
+  static async fromRequestOrResponseWithDescription(options): Promise<Described> {
+
   }
 
   /**
@@ -1188,48 +1205,6 @@ class ByteSequence {
       headers,
     });
   }
-
-  // /**
-  //  * 想定用途
-  //  * ・ブラウザのfetchでのResponseのcontent取得
-  //  * ・DenoのfetchでのResponseのcontent取得
-  //  * ・Denoのstd/httpでのRequestのcontent取得
-  //  * など
-  //  * 
-  //  * @experimental
-  //  * XXX options を任意に
-  //  * XXX signal,timeout
-  //  * XXX createReadingProgress
-  //  * @throws {Error}
-  //  */
-  // static async fromWebMessage(message: WebMessage, options: WebMessageReadingOptions): Promise<ByteSequence | null> {
-  //   if (message.body) {
-  //     if (message instanceof Response) {
-  //       if ((message.ok !== true) && (options.ignoreHttpStatus !== true)) {
-  //         throw new Error(`HTTP status: ${ message.status }`);
-  //       }
-  //     }
-
-  //     if (options.readAs === "blob") {
-  //       const blob = await message.blob();
-  //       return ByteSequence.fromBlob(blob);
-  //     }
-
-  //     const mediaType = WebMessageUtils.extractContentType(message.headers);
-  //     if (message.body !== null) {
-  //       // メモ
-  //       // ・Transfer-Encodingがchunkedであってもfetch API側でまとめてくれるので、考慮不要
-  //       // ・Content-Encodingで圧縮されていてもfetch API側で展開してくれるので、展開は考慮不要
-  //       //    ただしその場合、Content-Lengthは展開結果のバイト数ではない
-
-  //       const size = WebMessageUtils.extractContentLength(message.headers);
-  //       const bytes = await ByteSequence.fromStream(message.body, size ? size : undefined);
-  //       ByteSequence.#storeMetadata(bytes, { mediaType });
-  //       return bytes;
-  //     }
-  //   }
-  //   return null;
-  // }
 }
 
 namespace ByteSequence {
