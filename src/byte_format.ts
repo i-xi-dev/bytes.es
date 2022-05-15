@@ -5,13 +5,13 @@ import {
   type uint8,
   Integer,
   SizedMap,
-  StringUtils
+  StringUtils,
 } from "@i-xi-dev/fundamental";
 
 /**
  * 対応する基数
  */
-const _radixes = [2, 8, 10, 16] as const;
+const _radixes = [ 2, 8, 10, 16 ] as const;
 
 /**
  * @param value 検査する値
@@ -32,14 +32,14 @@ function _isRadix(value: unknown): value is ByteFormat.Radix {
  */
 function _minPaddedLengthOf(radix: ByteFormat.Radix): int {
   switch (radix) {
-    case 2:
-      return 8;
-    case 8:
-      return 3;
-    case 10:
-      return 3;
-    case 16:
-      return 2;
+  case 2:
+    return 8;
+  case 8:
+    return 3;
+  case 10:
+    return 3;
+  case 16:
+    return 2;
       // default:
       //   return -1 as never;
   }
@@ -82,7 +82,8 @@ function _resolveOptions(
 ): _ResolvedOptions {
   if (_isRadix(options.radix) || (options.radix === undefined)) {
     // ok
-  } else {
+  }
+  else {
     throw new TypeError("radix");
   }
   const radix: ByteFormat.Radix = _isRadix(options.radix) ? options.radix : 16;
@@ -92,7 +93,8 @@ function _resolveOptions(
     (options.paddedLength === undefined)
   ) {
     // ok
-  } else {
+  }
+  else {
     throw new TypeError("paddedLength");
   }
   const minPaddedLength: int = _minPaddedLengthOf(radix);
@@ -106,28 +108,32 @@ function _resolveOptions(
   let lowerCase: boolean;
   if (typeof options.lowerCase === "boolean") {
     lowerCase = options.lowerCase;
-  } else {
+  }
+  else {
     lowerCase = false;
   }
 
   let prefix: string;
   if (typeof options.prefix === "string") {
     prefix = options.prefix;
-  } else {
+  }
+  else {
     prefix = "";
   }
 
   let suffix: string;
   if (typeof options.suffix === "string") {
     suffix = options.suffix;
-  } else {
+  }
+  else {
     suffix = "";
   }
 
   let separator: string;
   if (typeof options.separator === "string") {
     separator = options.separator;
-  } else {
+  }
+  else {
     separator = "";
   }
 
@@ -158,7 +164,8 @@ function _parseByte(
   if (options.prefix.length > 0) {
     if (work.startsWith(options.prefix)) {
       work = work.substring(options.prefix.length);
-    } else {
+    }
+    else {
       throw new TypeError("unprefixed");
     }
   }
@@ -166,7 +173,8 @@ function _parseByte(
   if (options.suffix.length > 0) {
     if (work.endsWith(options.suffix)) {
       work = work.substring(0, work.length - options.suffix.length);
-    } else {
+    }
+    else {
       throw new TypeError("unsuffixed");
     }
   }
@@ -191,18 +199,18 @@ function _parseByte(
 function _createByteRegex(resolvedOptions: _ResolvedOptions): RegExp {
   let charsPattern: string;
   switch (resolvedOptions.radix) {
-    case 2:
-      charsPattern = "[01]";
-      break;
-    case 8:
-      charsPattern = "[0-7]";
-      break;
-    case 10:
-      charsPattern = "[0-9]";
-      break;
-    case 16:
-      charsPattern = "[0-9A-Fa-f]";
-      break;
+  case 2:
+    charsPattern = "[01]";
+    break;
+  case 8:
+    charsPattern = "[0-7]";
+    break;
+  case 10:
+    charsPattern = "[0-9]";
+    break;
+  case 16:
+    charsPattern = "[0-9A-Fa-f]";
+    break;
   }
   const bodyLength = _minPaddedLengthOf(resolvedOptions.radix);
   const paddingLength = resolvedOptions.paddedLength - bodyLength;
@@ -228,7 +236,8 @@ function _parse(
     if (byteStringArray.length === 1 && byteStringArray[0] === "") {
       return new Uint8Array(0);
     }
-  } else {
+  }
+  else {
     const elementLength = options.paddedLength + options.prefix.length +
       options.suffix.length;
     byteStringArray = StringUtils.segment(toParse, {
@@ -259,7 +268,7 @@ function _formatByte(byte: uint8, options: _ResolvedOptions): string {
 }
 
 function _format(bytes: Uint8Array, options: _ResolvedOptions): string {
-  const byteStringArray = [...bytes].map((byte) => {
+  const byteStringArray = [ ...bytes ].map((byte) => {
     return _formatByte(byte as uint8, options);
   });
   return byteStringArray.join(options.separator);

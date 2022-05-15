@@ -28,7 +28,8 @@ async function* _streamToAsyncGenerator<T>(
     ) {
       yield i.value;
     }
-  } catch (exception) {
+  }
+  catch (exception) {
     void exception; // XXX
     return;
   }
@@ -126,7 +127,8 @@ namespace ByteStream {
             stream as AsyncIterable<Uint8Array>,
             options,
           );
-        } else if (stream instanceof ReadableStream) {
+        }
+        else if (stream instanceof ReadableStream) {
           // ReadableStreamに[Symbol.asyncIterator]が未実装の場合
           const reader: ReadableStreamDefaultReader<Uint8Array> = stream
             .getReader();
@@ -160,9 +162,11 @@ namespace ByteStream {
           throw new RangeError("options.totalByteLength");
         }
         this.#totalByteLength = totalByteLength;
-      } else if (totalByteLength === undefined) {
+      }
+      else if (totalByteLength === undefined) {
         // ok
-      } else {
+      }
+      else {
         throw new TypeError("options.totalByteLength");
       }
 
@@ -182,9 +186,11 @@ namespace ByteStream {
         if (signal.aborted === true) {
           throw new AbortError("already aborted"); // TODO signal.reasonが広く実装されたら、signal.reasonをthrowするようにする
         }
-      } else if (signal === undefined) {
+      }
+      else if (signal === undefined) {
         // ok
-      } else {
+      }
+      else {
         throw new TypeError("options.signal");
       }
 
@@ -204,7 +210,8 @@ namespace ByteStream {
             buffer.put(chunk);
             this.#loadedByteLength = buffer.position;
             this.#notify("progress");
-          } else {
+          }
+          else {
             throw new TypeError("asyncSource");
           }
         }
@@ -214,27 +221,32 @@ namespace ByteStream {
 
         if (buffer.capacity !== buffer.position) {
           return buffer.slice();
-        } else {
+        }
+        else {
           return buffer.subarray();
         }
-      } catch (exception) {
+      }
+      catch (exception) {
         if ((exception instanceof Error) && (exception.name === "AbortError")) {
           // ・呼び出し側のAbortControllerでreason省略でabortした場合
           // ・呼び出し側のAbortControllerでreason:AbortErrorでabortした場合
           this.#notify("abort");
-        } else if (
+        }
+        else if (
           (exception instanceof Error) && (exception.name === "TimeoutError")
         ) {
           // ・AbortSignal.timeoutでabortされた場合
           // ・呼び出し側のAbortControllerでreason:TimeoutErrorでabortした場合
           this.#notify("timeout");
-        } else {
+        }
+        else {
           // ・呼び出し側のAbortControllerでreason:AbortError,TimeoutError以外でabortした場合
           // ・その他のエラー
           this.#notify("error");
         }
         throw exception;
-      } finally {
+      }
+      finally {
         // signalに追加したリスナーを削除
         this.#abortController.abort();
 

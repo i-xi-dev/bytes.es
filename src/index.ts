@@ -90,18 +90,6 @@ function _isDataViewConstructor(value: unknown): value is DataViewConstructor {
 
 type ArrayBufferViewConstructor<T> = { new(a: ArrayBuffer, b?: number, c?: number): T };
 
-type Metadata = {
-  mediaType?: MediaType,
-  fileName?: string,
-};
-
-type Described = {
-  description?: Metadata,
-  data: ByteSequence,
-};
-    //get blobProperties(): BlobPropertyBag {
-    //get fileProperties(): FilePropertyBag {
-
 function _iterableToArray<T>(iterable: Iterable<T>): Array<T> {
   if (Array.isArray(iterable)) {
     return iterable as Array<T>;
@@ -673,21 +661,39 @@ class ByteSequence {
     }
   }
 
-  //TODO
-  static async fromBlobWithDescription(blob: Blob): Promise<Described> {
+  /**
+   * @experimental
+   */
+  static async fromBlobWithProperties(blob: Blob): Promise<{
+    data: ByteSequence,
+    // name?: string,
+    // properties?: BlobPropertyBag | FilePropertyBag,
+    properties?: BlobPropertyBag,
+  }> {
     const data = await ByteSequence.fromBlob(blob);
     try {
-      const metadata: Metadata = {};
+      let mediaType: MediaType | null = null;
       if (blob.type) {
-        metadata.mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
-      }
-      if (globalThis.File && (blob instanceof File)) {
-        metadata.fileName = blob.name;
+        mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
       }
 
+      // let fileName: string | undefined = undefined;
+      // let fileLastModified: number | undefined = undefined;
+      // if (globalThis.File && (blob instanceof File)) {
+      //   fileName = blob.name;
+      //   fileLastModified = blob.lastModified;
+      // }
+
+      // const properties = (mediaType || fileLastModified) ? {
+      const properties = mediaType ? {
+        type: mediaType?.toString(),
+        // lastModified: fileLastModified,
+      } : undefined;
+
       return {
-        description: (metadata.mediaType || metadata.fileName) ? metadata : undefined,
         data,
+        // name: fileName,
+        properties,
       };
     }
     catch (exception) {
@@ -807,8 +813,13 @@ class ByteSequence {
     return bytes;
   }
 
-  //TODO
-  static fromDataURLWithDescription(dataUrl: URL | string): Described {
+  /**
+   * @experimental
+   */
+  static fromDataURLWithProperties(dataUrl: URL | string): {
+    data: ByteSequence,
+    properties?: BlobPropertyBag,
+  } {
     const [ bytes, mediaTypeSrc ] = ByteSequence.#fromDataURL(dataUrl);
     let mediaTypeWork = mediaTypeSrc;
 
@@ -828,10 +839,10 @@ class ByteSequence {
     }
 
     return {
-      description: {
-        mediaType,
-      },
       data: bytes,
+      properties: {
+        type: mediaType.toString(),
+      },
     };
   }
 
@@ -1164,7 +1175,10 @@ class ByteSequence {
     return bytes;
   }
 
-  static async fromRequestOrResponseWithDescription(options): Promise<Described> {
+  static async fromRequestOrResponseWithProperties(options): Promise<{
+    data: ByteSequence,
+    properties?: BlobPropertyBag,
+  }> {
 
   }
 
