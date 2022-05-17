@@ -6,6 +6,7 @@ import {
   Http,
   HttpUtils,
   Integer,
+  InvalidStateError,
   IsomorphicEncoding,
   StringUtils,
 } from "@i-xi-dev/fundamental";
@@ -98,6 +99,95 @@ function _iterableToArray<T>(iterable: Iterable<T>): Array<T> {
     return [ ...iterable ];
   }
   throw new TypeError("iterable");
+}
+
+/**
+ * RequestまたはResponseのヘッダーからContent-Typeの値を取得し返却する
+ * 
+ * {@link https://fetch.spec.whatwg.org/#content-type-header Fetch standard}の仕様に合わせた
+ * (await Body.blob()).type と同じになるはず？
+ * 
+ * @param headers ヘッダー
+ * @returns Content-Typeの値から生成したMediaTypeインスタンス
+ */
+ export function _extractContentType(headers: Headers): MediaType {
+  // 5.
+  if (headers.has("Content-Type") !== true) {
+    throw new Error("Content-Type field not found");
+  }
+
+  // 4, 5.
+  const typesString = headers.get("Content-Type") as string;
+  const typeStrings = HttpUtils.splitHeaderValue(typesString);
+  if (typeStrings.length <= 0) {
+    throw new Error("Content-Type value not found");
+  }
+
+  // 1, 2, 3.
+  let textEncoding = "";
+  let mediaTypeEssence = "";
+  let mediaType: MediaType | null = null;
+  // 6.
+  for (const typeString of typeStrings) {
+    try {
+      // 6.1.
+      const tempMediaType = MediaType.fromString(typeString);
+
+      // 6.3.
+      mediaType = tempMediaType;
+
+      // 6.4.
+      if (mediaTypeEssence !== mediaType.essence) {
+        // 6.4.1.
+        textEncoding = "";
+        // 6.4.2.
+        if (mediaType.hasParameter("charset")) {
+          textEncoding = mediaType.getParameterValue("charset") as string;
+        }
+        // 6.4.3.
+        mediaTypeEssence = mediaType.essence;
+      }
+      else {
+        // 6.5.
+        if ((mediaType.hasParameter("charset") !== true) && (textEncoding !== "")) {
+          // TODO mediaType.withParameters()
+        }
+      }
+    }
+    catch (exception) {
+      console.log(exception);// TODO 消す
+      // 6.2. "*/*"はMediaType.fromStringでエラーにしている
+      continue;
+    }
+  }
+
+  // 7, 8.
+  if (mediaType !== null) {
+    return mediaType;
+  }
+  else {
+    throw new Error("extraction failure");
+  }
+}
+
+function _createHeaders(init?: HeadersInit): Headers {
+  const headers = new Headers(init);
+
+  // Content-Type
+  // init.headersで指定されていれば、それを指定
+  try {
+    const mediaType = _extractContentType(headers);
+    headers.set(Http.Header.CONTENT_TYPE, mediaType.toString());
+  }
+  catch (exception) {
+    void exception;
+    headers.delete(Http.Header.CONTENT_TYPE);
+  }
+
+  // Content-Length
+  // 何もしない
+
+  return headers;
 }
 
 /**
@@ -664,12 +754,7 @@ class ByteSequence {
   /**
    * @experimental
    */
-  static async fromBlobWithProperties(blob: Blob): Promise<{
-    data: ByteSequence,
-    // name?: string,
-    // properties?: BlobPropertyBag | FilePropertyBag,
-    properties?: BlobPropertyBag,
-  }> {
+  static async fromBlobWithProperties(blob: Blob): Promise<ByteSequence.Described> {
     const data = await ByteSequence.fromBlob(blob);
     try {
       let mediaType: MediaType | null = null;
@@ -816,10 +901,7 @@ class ByteSequence {
   /**
    * @experimental
    */
-  static fromDataURLWithProperties(dataUrl: URL | string): {
-    data: ByteSequence,
-    properties?: BlobPropertyBag,
-  } {
+  static fromDataURLWithProperties(dataUrl: URL | string): ByteSequence.Described {
     const [ bytes, mediaTypeSrc ] = ByteSequence.#fromDataURL(dataUrl);
     let mediaTypeWork = mediaTypeSrc;
 
@@ -1135,58 +1217,52 @@ class ByteSequence {
   //XXX at(): Uint8Arrayで出来る
   //XXX [Symbol.iterator](): Uint8Arrayで出来る
 
-  #contentHeaders(init?: HeadersInit): Headers {
-    const headers = new Headers(init);
+  /**
+   * @experimental
+   */
+  static async fromRequestOrResponse(body: Request | Response, options/* TODO */): Promise<ByteSequence> {
+    //TODO
+    // typeチェック
+    // ヘッダ任意チェック
+    // body任意チェック
 
-    // Content-Type
-    // init.headersで指定されていれば、それを指定
-    // init.headersに指定されておらず、メタデータが保持されている場合（バイト列の生成元がBlobの場合など）、それを指定
-    // XXX 複数指定されていたのかはHeadersオブジェクトからはわからないし、
-    //     また、複数指定されていたとしてもそのうち1つだけ抽出するのは不可能なので、
-    //     Headers#getで取得できた値をそのまま使う。（Content-Typeが複数指定されているRequest/Responseのblob()で生成したBlobのtypeもそうなっている）
-    const specifiedType = headers.has(Http.Header.CONTENT_TYPE) ? headers.get(Http.Header.CONTENT_TYPE) : null;
-    const mediaType: MediaType | null = (specifiedType === "string") ? MediaType.fromString(specifiedType) : null;
-    if (mediaType) {
-      headers.set(Http.Header.CONTENT_TYPE, mediaType.toString());
+    if (body.bodyUsed === true) {
+      throw new InvalidStateError("bodyUsed:true");
     }
 
-    // Content-Length
-    // 何もしない
-
-    return headers;
-  }
-
-  static async #fromRequestOrResponse(reqOrRes: Request | Response, options): Promise<[ByteSequence,""]> {
-      //typeチェック
-    //ヘッダ任意チェック
-    //body任意チェック
-    
-    let bytes: ByteSequence;
-    if (reqOrRes.body) {
-      bytes = await ByteSequence.fromStream(reqOrRes.body);
+    if (body.body) {
+      return ByteSequence.fromStream(body.body, options);
     }
     else {
-      bytes = ByteSequence.allocate(0);
+      return ByteSequence.allocate(0);
     }
   }
 
-  static async fromRequestOrResponse(reqOrRes: Request | Response, options): Promise<ByteSequence> {
-    const [ bytes ] = await ByteSequence.#fromRequestOrResponse(reqOrRes, options);
-    return bytes;
-  }
+  static async fromRequestOrResponseWithProperties(body: Request | Response, options/* TODO */): Promise<ByteSequence.Described> {
+    let mediaType: MediaType | null = null;
+    try {
+      mediaType = _extractContentType(body.headers);
+    }
+    catch (exception) {
+      void exception;
+    }
 
-  static async fromRequestOrResponseWithProperties(options): Promise<{
-    data: ByteSequence,
-    properties?: BlobPropertyBag,
-  }> {
+    const properties = mediaType ? {
+      type: mediaType.toString(),
+    } : undefined;
 
+    const data = await ByteSequence.fromRequestOrResponse(body, options);
+    return {
+      data,
+      properties,
+    }
   }
 
   /**
    * @experimental
    */
   toRequest(url: string, options: RequestInit): Request {
-    const headers = this.#contentHeaders(options?.headers);
+    const headers = _createHeaders(options?.headers);
     const method = options.method ?? Http.Method.GET;
     if (([ Http.Method.GET, Http.Method.HEAD ] as string[]).includes(method.toUpperCase())) {
       throw new TypeError("options.method");
@@ -1212,7 +1288,7 @@ class ByteSequence {
    * @experimental
    */
   toResponse(options: ResponseInit): Response {
-    const headers = this.#contentHeaders(options?.headers);
+    const headers = _createHeaders(options?.headers);
     return new Response(this.#buffer, {
       status: options?.status,
       statusText: options?.statusText,
@@ -1243,6 +1319,21 @@ namespace ByteSequence {
      * @returns The `Promise` that fulfills with a computed digest.
      */
     compute: (input: Uint8Array) => Promise<Uint8Array>;
+  }
+
+  export type Described = {
+    data: ByteSequence,
+    properties?: BlobPropertyBag,
+  };
+
+  // export type Described = {
+  //   data: ByteSequence,
+  //   name?: string,
+  //   properties?: FilePropertyBag,
+  // };
+
+  export namespace Format {
+    //TODO
   }
 
   /**
@@ -1307,6 +1398,6 @@ namespace ByteSequence {
 Object.freeze(ByteSequence);
 
 export {
-  ByteFormat,
+  ByteFormat,//TODO 消す
   ByteSequence,
 };

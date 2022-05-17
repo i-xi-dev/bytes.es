@@ -4,7 +4,6 @@ import {
   type int,
   type uint8,
   Integer,
-  SizedMap,
   StringUtils,
 } from "@i-xi-dev/fundamental";
 
@@ -363,12 +362,6 @@ namespace ByteFormat {
 
   export class Parser {
     /**
-     * インスタンスのキャッシュ
-     * static getで使用
-     */
-    static #pool: SizedMap<string, Parser> = new SizedMap(1);
-
-    /**
      * 未設定項目を埋めたオプション
      */
     #options: _ResolvedOptions;
@@ -401,6 +394,7 @@ namespace ByteFormat {
     /**
      * Returns a `ByteFormat.Parser` object.
      *
+     * @deprecated
      * @param options The `ByteFormat.Options` dictionary.
      * @returns An instance of `ByteFormat.Parser`.
      * @throws {TypeError} The `options.radix` is not 2, 8, 10, or 16.
@@ -409,26 +403,12 @@ namespace ByteFormat {
      */
     static get(options?: Options): Parser {
       const resolvedOptions = _resolveOptions(options);
-
-      const poolKey = JSON.stringify(resolvedOptions);
-      let parser = Parser.#pool.get(poolKey);
-      if (parser) {
-        return parser;
-      }
-      parser = new Parser(resolvedOptions);
-      Parser.#pool.set(poolKey, parser);
-      return parser;
+      return new Parser(resolvedOptions);
     }
   }
   Object.freeze(Parser);
 
   export class Formatter {
-    /**
-     * インスタンスのキャッシュ
-     * static getで使用
-     */
-    static #pool: SizedMap<string, Formatter> = new SizedMap(1);
-
     /**
      * 未設定項目を埋めたオプション
      */
@@ -458,6 +438,7 @@ namespace ByteFormat {
     /**
      * Returns a `ByteFormat.Formatter` object.
      *
+     * @deprecated
      * @param options The `ByteFormat.Options` dictionary.
      * @returns An instance of `ByteFormat.Formatter`.
      * @throws {TypeError} The `options.radix` is not 2, 8, 10, or 16.
@@ -466,15 +447,7 @@ namespace ByteFormat {
      */
     static get(options?: Options): Formatter {
       const resolvedOptions = _resolveOptions(options);
-
-      const poolKey = JSON.stringify(resolvedOptions);
-      let formatter = Formatter.#pool.get(poolKey);
-      if (formatter) {
-        return formatter;
-      }
-      formatter = new Formatter(resolvedOptions);
-      Formatter.#pool.set(poolKey, formatter);
-      return formatter;
+      return new Formatter(resolvedOptions);
     }
   }
   Object.freeze(Formatter);
