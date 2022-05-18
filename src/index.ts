@@ -819,7 +819,7 @@ class ByteSequence {
    * @throws {TypeError} The `options.radix` is not 2, 8, 10, or 16.
    * @throws {TypeError} The `options.paddedLength` is not positive integer.
    * @throws {RangeError} The `options.paddedLength` is below the lower limit.
-   * @throws {TypeError} The `toParse` contains the character sequence that does not match the specified format.
+   * @throws {TypeError} The `formattedBytes` contains the character sequence that does not match the specified format.
    */
   static parse(formattedBytes: string, options?: ByteSequence.Format.Options): ByteSequence {
     const resolvedOptions = _resolveFormatOptions(options);
@@ -1027,6 +1027,7 @@ class ByteSequence {
     }
   }
 
+  //TODO 命名変えたい
   /**
    * @experimental
    */
@@ -1174,6 +1175,7 @@ class ByteSequence {
     return bytes;
   }
 
+  //TODO 命名変えたい
   /**
    * @experimental
    */
@@ -1226,6 +1228,138 @@ class ByteSequence {
       return new URL("data:" + mediaType.toString() + encoding + "," + dataEncoded);
     }
     throw new TypeError("MIME type not resolved");
+  }
+
+  /**
+   * @experimental
+   * @param streamLike 
+   * @param options 
+   */
+  static async fromStream(streamLike: ByteSequence.StreamLike, options?: ByteSequence.AsyncReadingOptions): Promise<ByteSequence> {
+    const reader = new ByteStream.Reader();
+
+    const listenerOptions = {
+      once: true,
+      passive: true,
+    };
+    const progressListenerOptions = {
+      passive: true,
+    };
+    if (typeof options?.onloadstart === "function") {
+      reader.addEventListener("loadstart", options.onloadstart as EventListener, listenerOptions);
+    }
+    if (typeof options?.onprogress === "function") {
+      reader.addEventListener("progress", options.onprogress as EventListener, progressListenerOptions);
+    }
+    if (typeof options?.onload === "function") {
+      reader.addEventListener("load", options.onload as EventListener, listenerOptions);
+    }
+    if (typeof options?.onabort === "function") {
+      reader.addEventListener("abort", options.onabort as EventListener, listenerOptions);
+    }
+    if (typeof options?.ontimeout === "function") {
+      reader.addEventListener("timeout", options.ontimeout as EventListener, listenerOptions);
+    }
+    if (typeof options?.onerror === "function") {
+      reader.addEventListener("error", options.onerror as EventListener, listenerOptions);
+    }
+    if (typeof options?.onloadend === "function") {
+      reader.addEventListener("loadend", options.onloadend as EventListener, listenerOptions);
+    }
+
+    const bytes = await reader.read(streamLike, {
+      totalByteLength: options?.totalByteLength,
+      signal: options?.signal,
+    });
+    return new ByteSequence(bytes.buffer);
+  }
+
+  /**
+   * @experimental
+   */
+  static async fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions): Promise<ByteSequence> {
+    if (typeof options?.verifyHeaders === "function") {
+      const [ verified, message ] = options.verifyHeaders(reqOrRes.headers);
+      if (verified !== true) {
+        throw new Error(message);
+      }
+    }
+
+    if (reqOrRes.bodyUsed === true) {
+      throw new InvalidStateError("bodyUsed:true");
+    }
+
+    let bytes: ByteSequence;
+    if (reqOrRes.body) {
+      bytes = await ByteSequence.fromStream(reqOrRes.body, options);
+    }
+    else {
+      bytes = ByteSequence.allocate(0);
+    }
+
+    return bytes;
+  }
+
+  //TODO 命名変えたい
+  /**
+   * @experimental
+   */
+  static async fromRequestOrResponseWithProperties(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions): Promise<ByteSequence.Described> {
+    let mediaType: MediaType | null = null;
+    try {
+      mediaType = _extractContentType(reqOrRes.headers);
+    }
+    catch (exception) {
+      void exception;
+    }
+
+    const properties = mediaType ? {
+      type: mediaType.toString(),
+    } : undefined;
+
+    const data = await ByteSequence.fromRequestOrResponse(reqOrRes, options);
+    return {
+      data,
+      properties,
+    }
+  }
+
+  /**
+   * @experimental
+   */
+  toRequest(url: string, options: RequestInit): Request {
+    const headers = _createHeaders(options?.headers);
+    const method = options.method ?? Http.Method.GET;
+    if (([ Http.Method.GET, Http.Method.HEAD ] as string[]).includes(method.toUpperCase()) !== true) {
+      throw new TypeError("options.method");
+    }
+    return new Request(url, {
+      method,
+      headers,
+      body: this.#buffer, // options.bodyはいかなる場合も無視する
+      referrer: options?.referrer,
+      referrerPolicy: options?.referrerPolicy,
+      mode: options?.mode,
+      credentials: options?.credentials,
+      cache: options?.cache,
+      redirect: options?.redirect,
+      integrity: options?.integrity,
+      keepalive: options?.keepalive,
+      signal: options?.signal,
+      // window
+    });
+  }
+
+  /**
+   * @experimental
+   */
+  toResponse(options: ResponseInit): Response {
+    const headers = _createHeaders(options?.headers);
+    return new Response(this.#buffer, {
+      status: options?.status,
+      statusText: options?.statusText,
+      headers,
+    });
   }
 
   /**
@@ -1446,131 +1580,9 @@ class ByteSequence {
     })(this);
   }
 
-  /**
-   * @experimental
-   * @param streamLike 
-   * @param options 
-   */
-  static async fromStream(streamLike: ByteSequence.StreamLike, options?: ByteSequence.AsyncReadingOptions): Promise<ByteSequence> {
-    const reader = new ByteStream.Reader();
-
-    const listenerOptions = {
-      once: true,
-      passive: true,
-    };
-    const progressListenerOptions = {
-      passive: true,
-    };
-    if (typeof options?.onloadstart === "function") {
-      reader.addEventListener("loadstart", options.onloadstart as EventListener, listenerOptions);
-    }
-    if (typeof options?.onprogress === "function") {
-      reader.addEventListener("progress", options.onprogress as EventListener, progressListenerOptions);
-    }
-    if (typeof options?.onload === "function") {
-      reader.addEventListener("load", options.onload as EventListener, listenerOptions);
-    }
-    if (typeof options?.onabort === "function") {
-      reader.addEventListener("abort", options.onabort as EventListener, listenerOptions);
-    }
-    if (typeof options?.ontimeout === "function") {
-      reader.addEventListener("timeout", options.ontimeout as EventListener, listenerOptions);
-    }
-    if (typeof options?.onerror === "function") {
-      reader.addEventListener("error", options.onerror as EventListener, listenerOptions);
-    }
-    if (typeof options?.onloadend === "function") {
-      reader.addEventListener("loadend", options.onloadend as EventListener, listenerOptions);
-    }
-
-    const bytes = await reader.read(streamLike, {
-      totalByteLength: options?.totalByteLength,
-      signal: options?.signal,
-    });
-    return new ByteSequence(bytes.buffer);
-  }
-
   //XXX at(): Uint8Arrayで出来る
   //XXX [Symbol.iterator](): Uint8Arrayで出来る
 
-  /**
-   * @experimental
-   */
-  static async fromRequestOrResponse(body: Request | Response, options/* TODO */): Promise<ByteSequence> {
-    //TODO
-    // typeチェック
-    // ヘッダ任意チェック
-    // body任意チェック
-
-    if (body.bodyUsed === true) {
-      throw new InvalidStateError("bodyUsed:true");
-    }
-
-    if (body.body) {
-      return ByteSequence.fromStream(body.body, options);
-    }
-    else {
-      return ByteSequence.allocate(0);
-    }
-  }
-
-  static async fromRequestOrResponseWithProperties(body: Request | Response, options/* TODO */): Promise<ByteSequence.Described> {
-    let mediaType: MediaType | null = null;
-    try {
-      mediaType = _extractContentType(body.headers);
-    }
-    catch (exception) {
-      void exception;
-    }
-
-    const properties = mediaType ? {
-      type: mediaType.toString(),
-    } : undefined;
-
-    const data = await ByteSequence.fromRequestOrResponse(body, options);
-    return {
-      data,
-      properties,
-    }
-  }
-
-  /**
-   * @experimental
-   */
-  toRequest(url: string, options: RequestInit): Request {
-    const headers = _createHeaders(options?.headers);
-    const method = options.method ?? Http.Method.GET;
-    if (([ Http.Method.GET, Http.Method.HEAD ] as string[]).includes(method.toUpperCase())) {
-      throw new TypeError("options.method");
-    }
-    return new Request(url, {
-      method,
-      headers,
-      body: this.#buffer, // options.bodyはいかなる場合も無視する
-      referrer: options?.referrer,
-      referrerPolicy: options?.referrerPolicy,
-      mode: options?.mode,
-      credentials: options?.credentials,
-      cache: options?.cache,
-      redirect: options?.redirect,
-      integrity: options?.integrity,
-      keepalive: options?.keepalive,
-      signal: options?.signal,
-      // window
-    });
-  }
-
-  /**
-   * @experimental
-   */
-  toResponse(options: ResponseInit): Response {
-    const headers = _createHeaders(options?.headers);
-    return new Response(this.#buffer, {
-      status: options?.status,
-      statusText: options?.statusText,
-      headers,
-    });
-  }
 }
 
 namespace ByteSequence {
@@ -1662,8 +1674,6 @@ namespace ByteSequence {
        */
       separator?: string;
     };
-
-
   }
 
   /**
@@ -1721,7 +1731,14 @@ namespace ByteSequence {
      */
     onloadend?: (event: ProgressEvent) => void,
 
-    // abortはrejectしない設定とか？
+    //XXX abortはrejectしない設定とか？
+  };
+
+  /**
+   * @experimental
+   */
+  export type RequestOrResponseReadingOptions = AsyncReadingOptions & {
+    verifyHeaders?: (headers: Headers) => [ verified: boolean, message?: string ],
   };
 }
 
