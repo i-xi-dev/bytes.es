@@ -52,6 +52,20 @@
   text-anchor: middle;
 }
 
+*.class-label.main {
+  font-size: 24px;
+}
+
+*.class-label.start {
+  text-anchor: end;
+  transform: translate(-1ch, 0);
+}
+
+*.class-label.end {
+  text-anchor: start;
+  transform: translate(1ch, 0);
+}
+
 *.class-desc {
   dominant-baseline: central;
   fill: currentcolor;
@@ -104,9 +118,9 @@
 
   <rect class="background"/>
 
-  <g class="class" style="transform: translate(440px, 250px);">
-    <rect class="class-frame" height="60" width="240"/>
-    <text class="class-label" x="120" y="30">ByteSequence</text>
+  <g class="class" style="transform: translate(430px, 240px);">
+    <rect class="class-frame" height="80" width="260"/>
+    <text class="class-label main" x="130" y="38">ByteSequence</text>
   </g>
 
   <g class="class" style="transform: translate(100px, 100px);">
@@ -115,7 +129,7 @@
     <text class="class-desc" x="120" y="44">string</text>
   </g>
 
-  <path class="connecter bidi" d="M 324 162 L 466 246"/>
+  <path class="connecter bidi" d="M 324 163 L 462 237"/>
 
   <g class="class" style="transform: translate(60px, 200px);">
     <rect class="class-frame" height="60" width="240"/>
@@ -125,7 +139,7 @@
     <text class="class-desc" x="120" y="44">string</text>
   </g>
 
-  <path class="connecter bidi" d="M 304 244 L 436 266"/>
+  <path class="connecter bidi" d="M 304 244 L 428 262"/>
 
   <g class="class" style="transform: translate(60px, 300px);">
     <rect class="class-frame" height="60" width="240"/>
@@ -133,7 +147,7 @@
     <text class="class-desc" x="120" y="44">string</text>
   </g>
 
-  <path class="connecter bidi" d="M 304 316 L 436 294"/>
+  <path class="connecter bidi" d="M 304 316 L 428 294"/>
 
   <g class="class" style="transform: translate(80px, 400px);">
     <rect class="class-frame" height="60" width="240"/>
@@ -141,45 +155,45 @@
     <text class="class-desc" x="120" y="44">string</text>
   </g>
 
-  <path class="connecter bidi" d="M 296 396 L 460 314"/>
+  <path class="connecter bidi" d="M 296 396 L 448 323"/>
 
-  <g class="class" style="transform: translate(400px, 40px);">
+  <g class="class" style="transform: translate(420px, 40px);">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Byte stream</text>
     <text class="class-desc" x="120" y="44">ReadableStream&#x3C;Uint8Array></text>
   </g>
 
-  <path class="connecter" d="M 526 104 L 554 246"/>
+  <path class="connecter" d="M 541 104 L 554 238"/>
 
-  <g class="class" style="transform: translate(800px, 260px);">
+  <g class="class" style="transform: translate(800px, 210px);">
     <rect class="class-frame" height="60" width="240"/>
     <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob" rel="noopener noreferrer">
       <text class="class-label" x="120" y="30">Blob</text>
     </a>
   </g>
 
-  <path class="connecter bidi" d="M 796 292 L 684 284"/>
+  <path class="connecter bidi" d="M 796 250 L 692 265"/>
 
-  <g class="class" style="transform: translate(780px, 360px);">
+  <g class="class" style="transform: translate(794px, 310px);">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Data URL</text>
     <text class="class-desc" x="120" y="44">string</text>
   </g>
 
-  <path class="connecter bidi" d="M 780 360 L 678 310"/>
+  <path class="connecter bidi" d="M 790 320 L 692 299"/>
 
-  <g class="class" style="transform: translate(760px, 120px);">
+  <g class="class" style="transform: translate(740px, 100px);">
     <rect class="class-frame" height="60" width="240"/>
     <text class="class-label" x="120" y="22">Text</text>
     <text class="class-desc" x="120" y="44">string</text>
   </g>
 
-  <path class="connecter" d="M 756 170 L 608 246"/>
-  <text class="connecter-label" x="680" y="190">Text encode</text>
-  <path class="connecter" d="M 648 246 L 769 184"/>
-  <text class="connecter-label" x="730" y="230">Text decode</text>
+  <path class="connecter" d="M 736 150 L 616 238"/>
+  <text class="connecter-label" x="650" y="180">Text encode</text>
+  <path class="connecter" d="M 646 238 L 749 164"/>
+  <text class="connecter-label" x="710" y="220">Text decode</text>
 
-  <path class="connecter" d="M 508 314 L 464 412 A 8 8 0 0 0 480 420 L 528 314"/>
+  <path class="connecter" d="M 505 322 L 464 412 A 8 8 0 0 0 480 420 L 525 322"/>
   <text class="connecter-label" x="460" y="380">Digest</text>
 
   <g class="class" style="transform: translate(480px, 460px);">
@@ -189,6 +203,19 @@
     </a>
   </g>
 
-  <path class="connecter bidi" d="M 570 314 L 598 456"/>
+  <path class="connecter bidi" d="M 572 322 L 598 456"/>
+
+  <g class="class" style="transform: translate(770px, 420px);">
+    <rect class="class-frame" height="60" width="240"/>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/Request" rel="noopener noreferrer">
+      <text class="class-label start" x="115" y="30">Request</text>
+    </a>
+    <text class="class-label" x="115" y="30">/</text>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/Response" rel="noopener noreferrer">
+      <text class="class-label end" x="115" y="30">Response</text>
+    </a>
+  </g>
+
+  <path class="connecter bidi" d="M 656 323 L 803 417"/>
 
 </svg>
