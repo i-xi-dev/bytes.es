@@ -1732,6 +1732,7 @@ namespace ByteSequence {
     onloadend?: (event: ProgressEvent) => void,
 
     //XXX abortはrejectしない設定とか？
+    //XXX サイズが想定と違ったらrejectする設定とか
   };
 
   /**
