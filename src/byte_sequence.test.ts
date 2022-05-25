@@ -917,7 +917,7 @@ describe("ByteSequence.prototype.toFile", () => {
     const b1 = new File([ Uint8Array.of(255,0,1,127) ], "test.txt", { type: "text/plain" });
 
     const b11 = await ByteSequence.fromBlob(b1);
-    const b11b = b11.toFile();
+    const b11b = b11.toFile("test.txt");
     const b11r = await b11b.arrayBuffer();
     expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
     expect(b11b.type).to.equal("text/plain");
@@ -927,7 +927,7 @@ describe("ByteSequence.prototype.toFile", () => {
     const b21 = await ByteSequence.fromBlob(b2);
 
     expect(() => {
-      b21.toFile();
+      b21.toFile(undefined as unknown as string);
     }).to.throw(TypeError, "fileName").with.property("name", "TypeError");
 
   });
