@@ -110,7 +110,7 @@ function _iterableToArray<T>(iterable: Iterable<T>): Array<T> {
  * @param headers ヘッダー
  * @returns Content-Typeの値から生成したMediaTypeインスタンス
  */
- export function _extractContentType(headers: Headers): MediaType {
+export function _extractContentType(headers: Headers): MediaType {
   // 5.
   if (headers.has("Content-Type") !== true) {
     throw new Error("Content-Type field not found");
@@ -1027,7 +1027,7 @@ class ByteSequence {
     }
   }
 
-  //TODO 命名変えたい
+  // TODO 命名変えたい
   /**
    * @experimental
    */
@@ -1175,7 +1175,7 @@ class ByteSequence {
     return bytes;
   }
 
-  //TODO 命名変えたい
+  // TODO 命名変えたい
   /**
    * @experimental
    */
@@ -1300,7 +1300,7 @@ class ByteSequence {
     return bytes;
   }
 
-  //TODO 命名変えたい
+  // TODO 命名変えたい
   /**
    * @experimental
    */
@@ -1321,7 +1321,7 @@ class ByteSequence {
     return {
       data,
       properties,
-    }
+    };
   }
 
   /**
@@ -1580,8 +1580,8 @@ class ByteSequence {
     })(this);
   }
 
-  //XXX at(): Uint8Arrayで出来る
-  //XXX [Symbol.iterator](): Uint8Arrayで出来る
+  // XXX at(): Uint8Arrayで出来る
+  // XXX [Symbol.iterator](): Uint8Arrayで出来る
 
 }
 
@@ -1731,8 +1731,8 @@ namespace ByteSequence {
      */
     onloadend?: (event: ProgressEvent) => void,
 
-    //XXX abortはrejectしない設定とか？
-    //XXX サイズが想定と違ったらrejectする設定とか
+    // XXX abortはrejectしない設定とか？
+    // XXX サイズが想定と違ったらrejectする設定とか
   };
 
   /**
