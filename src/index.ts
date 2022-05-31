@@ -1014,7 +1014,7 @@ class ByteSequence {
    * @returns The `Promise` that fulfills with a new `ByteSequence` object.
    * @throws {Error} `blob.arrayBuffer()` is failed.
    */
-  static async fromBlob(blob: Blob): Promise<ByteSequence> {
+  static async #fromBlob(blob: Blob): Promise<ByteSequence> {
     try {
       const buffer = await blob.arrayBuffer(); // XXX Node.jsでもstream()を取得できるようになった
       return ByteSequence.wrapArrayBuffer(buffer);
@@ -1027,35 +1027,33 @@ class ByteSequence {
     }
   }
 
-  // TODO 命名変えたい
   /**
    * @experimental
    */
-  static async fromBlobWithProperties(blob: Blob): Promise<ByteSequence.Described> {
-    const data = await ByteSequence.fromBlob(blob);
+  static async fromBlob(blob: Blob): Promise<ByteSequence.BlobComponents | ByteSequence.FileComponents> {
+    const data = await ByteSequence.#fromBlob(blob);
     try {
       let mediaType: MediaType | null = null;
       if (blob.type) {
         mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
       }
 
-      // let fileName: string | undefined = undefined;
-      // let fileLastModified: number | undefined = undefined;
-      // if (globalThis.File && (blob instanceof File)) {
-      //   fileName = blob.name;
-      //   fileLastModified = blob.lastModified;
-      // }
+      let fileName: string | undefined = undefined;
+      let fileLastModified: number | undefined = undefined;
+      if (globalThis.File && (blob instanceof File)) {
+        fileName = blob.name;
+        fileLastModified = blob.lastModified;
+      }
 
-      // const properties = (mediaType || fileLastModified) ? {
-      const properties = mediaType ? {
+      const options = (mediaType || fileLastModified) ? {
         type: mediaType?.toString(),
-        // lastModified: fileLastModified,
+        lastModified: fileLastModified,
       } : undefined;
 
       return {
         data,
-        // name: fileName,
-        properties,
+        fileName,
+        options,
       };
     }
     catch (exception) {
@@ -1163,6 +1161,7 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * 
+   * @experimental
    * @see [https://fetch.spec.whatwg.org/#data-urls](https://fetch.spec.whatwg.org/#data-urls)
    * @param dataUrl The data URL
    * @returns A new `ByteSequence` object.
@@ -1170,16 +1169,7 @@ class ByteSequence {
    * @throws {TypeError} The URL scheme of the `dataUrl` is not "data".
    * @throws {TypeError} The `dataUrl` does not contain `","`.
    */
-  static fromDataURL(dataUrl: URL | string): ByteSequence {
-    const [ bytes ] = ByteSequence.#fromDataURL(dataUrl);
-    return bytes;
-  }
-
-  // TODO 命名変えたい
-  /**
-   * @experimental
-   */
-  static fromDataURLWithProperties(dataUrl: URL | string): ByteSequence.Described {
+  static fromDataURL(dataUrl: URL | string): ByteSequence.BlobComponents {
     const [ bytes, mediaTypeSrc ] = ByteSequence.#fromDataURL(dataUrl);
     let mediaTypeWork = mediaTypeSrc;
 
@@ -1200,7 +1190,7 @@ class ByteSequence {
 
     return {
       data: bytes,
-      properties: {
+      options: {
         type: mediaType.toString(),
       },
     };
@@ -1277,7 +1267,7 @@ class ByteSequence {
   /**
    * @experimental
    */
-  static async fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions): Promise<ByteSequence> {
+  static async #fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions): Promise<ByteSequence> {
     if (typeof options?.verifyHeaders === "function") {
       const [ verified, message ] = options.verifyHeaders(reqOrRes.headers);
       if (verified !== true) {
@@ -1300,11 +1290,10 @@ class ByteSequence {
     return bytes;
   }
 
-  // TODO 命名変えたい
   /**
    * @experimental
    */
-  static async fromRequestOrResponseWithProperties(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions): Promise<ByteSequence.Described> {
+  static async fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions): Promise<ByteSequence.BlobComponents> {
     let mediaType: MediaType | null = null;
     try {
       mediaType = _extractContentType(reqOrRes.headers);
@@ -1317,10 +1306,10 @@ class ByteSequence {
       type: mediaType.toString(),
     } : undefined;
 
-    const data = await ByteSequence.fromRequestOrResponse(reqOrRes, options);
+    const data = await ByteSequence.#fromRequestOrResponse(reqOrRes, options);
     return {
       data,
-      properties,
+      options: properties,
     };
   }
 
@@ -1609,16 +1598,16 @@ namespace ByteSequence {
     compute: (input: Uint8Array) => Promise<Uint8Array>;
   }
 
-  export type Described = {
+  export type BlobComponents = {
     data: ByteSequence,
-    properties?: BlobPropertyBag,
+    options?: BlobPropertyBag,
   };
 
-  // export type Described = {
-  //   data: ByteSequence,
-  //   name?: string,
-  //   properties?: FilePropertyBag,
-  // };
+  export type FileComponents = {
+    data: ByteSequence,
+    fileName?: string,
+    options?: FilePropertyBag,
+  };
 
   export namespace Format {
     /**
