@@ -875,8 +875,8 @@ describe("ByteSequence.prototype.toBlob", () => {
   it("toBlob()", async () => {
     const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
 
-    const {data:b11} = await ByteSequence.fromBlob(b1);
-    const b11b = b11.toBlob();
+    const {data:b11, options:meta11} = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toBlob(meta11);
     const b11r = await b11b.arrayBuffer();
     expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
     expect(b11b.type).to.equal("text/plain");
@@ -1080,8 +1080,8 @@ describe("ByteSequence.fromDataURL", () => {
 describe("ByteSequence.prototype.toDataURL", () => {
   it("toDataURL()", async () => {
     const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
-    const {data:b11} = await ByteSequence.fromBlob(b1);
-    const b11b = b11.toDataURL();
+    const {data:b11, options:meta11} = await ByteSequence.fromBlob(b1);
+    const b11b = b11.toDataURL(meta11);
 
     expect(b11b.toString()).to.equal("data:text/plain;base64,QQABfw==");
 

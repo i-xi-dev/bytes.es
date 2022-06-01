@@ -1071,7 +1071,7 @@ class ByteSequence {
    * @returns The `Blob` object.
    */
   toBlob(options?: BlobPropertyBag): Blob {
-    const mediaType: MediaType | null = (options?.type === "string") ? MediaType.fromString(options.type) : null;
+    const mediaType: MediaType | null = (typeof options?.type === "string") ? MediaType.fromString(options.type) : null;
 
     return new Blob([ this.#buffer ], {
       type: mediaType ? mediaType.toString() : undefined,
@@ -1206,7 +1206,7 @@ class ByteSequence {
   toDataURL(options?: BlobPropertyBag): URL {
     // FileReaderの仕様に倣い、テキストかどうかに関係なく常時Base64エンコードする仕様
     // XXX Base64なしも対応する
-    const mediaType: MediaType | null = (options?.type === "string") ? MediaType.fromString(options.type) : null;
+    const mediaType: MediaType | null = (typeof options?.type === "string") ? MediaType.fromString(options.type) : null;
     if (mediaType) {
       // let encoding = "";
       // let dataEncoded: string;
