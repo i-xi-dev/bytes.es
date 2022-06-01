@@ -1693,7 +1693,73 @@ describe("ByteSequence.fromStream", () => {
 
 });
 
-//TODO fromRequestOrResponse
+describe("ByteSequence.fromRequestOrResponse", () => {
+  it("fromRequestOrResponse(Response)", async () => {
+    const res1 = new Response(Uint8Array.of(255,254,253,252));
+    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    expect(b1.byteLength).to.equal(4);
+    expect(meta1).to.equal(undefined);
+
+    // 読み取り済みのを再度読もうとした
+    try {
+      await ByteSequence.fromRequestOrResponse(res1);
+      throw new Error();
+    }
+    catch (e) {
+      expect(e?.name).to.equal("InvalidStateError");
+      expect(e?.message).to.equal("bodyUsed:true");
+    }
+
+  });
+
+  it("fromRequestOrResponse(Response)", async () => {
+    const headers1 = new Headers();
+    headers1.append("content-type", "text/plain");
+    const res1 = new Response(Uint8Array.of(255,254,253,252), {headers:headers1});
+    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    expect(b1.byteLength).to.equal(4);
+    expect(meta1.type).to.equal("text/plain");
+
+  });
+
+  it("fromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
+    const options1 = {
+      verifyHeaders: (h) => {
+        const verified = h.get("Content-Type") === "text/plain";
+        return [verified];
+      },
+    };
+    const headers1 = new Headers();
+    headers1.append("content-type", "text/plain");
+    const res1 = new Response(Uint8Array.of(255,254,253,252), {headers:headers1});
+    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1, options1);
+    expect(b1.byteLength).to.equal(4);
+    expect(meta1.type).to.equal("text/plain");
+
+  });
+
+  it("fromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
+    const options1 = {
+      verifyHeaders: (h) => {
+        const verified = h.get("Content-Type") === "text/csv";
+        return [verified, verified === true ? undefined : "err1"];
+      },
+    };
+    const headers1 = new Headers();
+    headers1.append("content-type", "text/plain");
+    const res1 = new Response(Uint8Array.of(255,254,253,252), {headers:headers1});
+    try {
+      await ByteSequence.fromRequestOrResponse(res1, options1);
+      throw new Error();
+    }
+    catch (e) {
+      expect(e?.name).to.equal("Error");
+      expect(e?.message).to.equal("err1");
+    }
+
+  });
+
+});
 
 //TODO toRequest
 

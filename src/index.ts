@@ -1293,7 +1293,7 @@ class ByteSequence {
   /**
    * @experimental
    */
-  static async fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions): Promise<ByteSequence.BlobComponents> {
+  static async fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions = {}): Promise<ByteSequence.BlobComponents> {
     let mediaType: MediaType | null = null;
     try {
       mediaType = _extractContentType(reqOrRes.headers);
