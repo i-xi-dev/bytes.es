@@ -170,7 +170,7 @@ export function _extractContentType(headers: Headers): MediaType {
   }
 }
 
-function _createHeaders(init?: HeadersInit): Headers {
+function _createHeaders(init?: HeadersInit): HeadersInit {
   const headers = new Headers(init);
 
   // Content-Type
@@ -187,7 +187,7 @@ function _createHeaders(init?: HeadersInit): Headers {
   // Content-Length
   // 何もしない
 
-  return headers;
+  return [ ...headers.entries() ]; // Node.jsの HeadersInitにHeadersは含まれない
 }
 
 /**
@@ -1319,7 +1319,7 @@ class ByteSequence {
   toRequest(url: string, options: RequestInit): Request {
     const headers = _createHeaders(options?.headers);
     const method = options.method ?? Http.Method.GET;
-    if (([ Http.Method.GET, Http.Method.HEAD ] as string[]).includes(method.toUpperCase()) !== true) {
+    if (([ Http.Method.GET, Http.Method.HEAD ] as string[]).includes(method.toUpperCase()) === true) {
       throw new TypeError("options.method");
     }
     return new Request(url, {
