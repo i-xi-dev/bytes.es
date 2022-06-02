@@ -1798,4 +1798,23 @@ describe("ByteSequence.prototype.toRequest", () => {
 
 });
 
-//TODO toResponse
+describe("ByteSequence.prototype.toResponse", () => {
+  it("toResponse({})", async () => {
+    const bb1 = ByteSequence.of(1,2,3);
+    const res1 = bb1.toResponse({});
+    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    expect(b1.byteLength).to.equal(3);
+    expect(meta1).to.equal(undefined);
+
+  });
+
+  it("toResponse({})", async () => {
+    const bb1 = ByteSequence.of(1,2,3);
+    const res1 = bb1.toResponse({headers:{"content-type":"image/png"}});
+    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    expect(b1.byteLength).to.equal(3);
+    expect(meta1?.type).to.equal("image/png");
+
+  });
+
+});
