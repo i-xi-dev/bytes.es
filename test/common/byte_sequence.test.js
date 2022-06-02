@@ -1764,6 +1764,14 @@ describe("ByteSequence.fromStream", () => {
 
 describe("ByteSequence.fromRequestOrResponse", () => {
   it("fromRequestOrResponse(Response)", async () => {
+    const res1 = new Response();
+    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    expect(b1.byteLength).to.equal(0);
+    expect(meta1).to.equal(undefined);
+
+  });
+
+  it("fromRequestOrResponse(Response)", async () => {
     const res1 = new Response(Uint8Array.of(255,254,253,252));
     const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
     expect(b1.byteLength).to.equal(4);
@@ -1830,6 +1838,33 @@ describe("ByteSequence.fromRequestOrResponse", () => {
 
 });
 
-//TODO toRequest
+describe("ByteSequence.prototype.toRequest", () => {
+  it("toRequest(string, {})", async () => {
+    const bb1 = ByteSequence.of(1,2,3);
+    const req1 = bb1.toRequest("http://example.com/t1", {method:"post"});
+    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(req1);
+    expect(b1.byteLength).to.equal(3);
+    expect(meta1).to.equal(undefined);
+
+    expect(() => {
+      bb1.toRequest("http://example.com/t1", {method:"get"});
+    }).to.throw(TypeError, "options.method").with.property("name", "TypeError");
+
+    expect(() => {
+      bb1.toRequest("", {method:"post"});
+    }).to.throw(TypeError, "url").with.property("name", "TypeError");
+
+  });
+
+  it("toRequest(string, {})", async () => {
+    const bb1 = ByteSequence.of(1,2,3);
+    const req1 = bb1.toRequest("http://example.com/t1", {method:"post",headers:{"Content-Type":"image/png"}});
+    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(req1);
+    expect(b1.byteLength).to.equal(3);
+    expect(meta1?.type).to.equal("image/png");
+
+  });
+
+});
 
 //TODO toResponse

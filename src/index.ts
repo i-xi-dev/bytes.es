@@ -1322,6 +1322,13 @@ class ByteSequence {
     if (([ Http.Method.GET, Http.Method.HEAD ] as string[]).includes(method.toUpperCase()) === true) {
       throw new TypeError("options.method");
     }
+    try {
+      const urltest = new URL(url);
+      void urltest;
+    }
+    catch (exception) {
+      throw new TypeError("url");
+    }
     return new Request(url, {
       method,
       headers,
