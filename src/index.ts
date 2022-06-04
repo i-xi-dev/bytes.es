@@ -1616,10 +1616,11 @@ class ByteSequence {
   }
 
   /**
+   * @experimental
+   * 
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * 
-   * @experimental
    * @see [https://fetch.spec.whatwg.org/#data-urls](https://fetch.spec.whatwg.org/#data-urls)
    * @param dataUrl The data URL
    * @returns A new `ByteSequence` object.
@@ -1695,8 +1696,23 @@ class ByteSequence {
 
   /**
    * @experimental
-   * @param streamLike 
-   * @param options 
+   * 
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of `Uint8Array`.
+   * 
+   * If you want to read [Node.js Readable stream](https://nodejs.org/api/stream.html#stream_readable_streams) of [`Buffer`](https://nodejs.org/api/buffer.html#buffer_class_buffer), you can use [`stream.Readable.toWeb`](https://nodejs.org/dist/latest-v17.x/docs/api/stream.html#streamreadabletowebstreamreadable) method (Node.js 17.0.0+)
+   * 
+   * @param streamLike The `ReadableStream` of `Uint8Array` or the async iterator of `Uint8Array`.
+   * @param options The `ByteSequence.StreamReadingOptions` object.
+   * @returns The `Promise` that fulfills with a new `ByteSequence` object.
+   * @example
+   * ```javascript
+   * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]);
+   * const stream = blob.stream();
+   * const bytes = await ByteSequence.fromStream(stream);
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static async fromStream(streamLike: ByteSequence.StreamLike, options?: ByteSequence.StreamReadingOptions): Promise<ByteSequence> {
     const reader = new ByteStream.Reader();
@@ -2156,6 +2172,8 @@ namespace ByteSequence {
 
   /**
    * @experimental
+   * 
+   * The [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of `Uint8Array` or the async iterator of `Uint8Array`.
    */
   export type StreamLike = AsyncIterable<Uint8Array> | ReadableStream<Uint8Array> | Iterable<Uint8Array>;
   // XXX ReadableStreamは、そのうちAsyncIterableになる

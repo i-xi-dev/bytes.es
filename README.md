@@ -67,6 +67,7 @@ Creates an instance with a new underlying buffer
 - [ByteSequence.textEncodeFrom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#textEncodeFrom)
 - [ByteSequence.fromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBlob)
 - [ByteSequence.fromDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromDataURL)
+- [ByteSequence.fromStream()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromStream)
 
 - [ByteSequence.describedFromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFromBlob)
 - [ByteSequence.describedFromDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFromDataURL)
@@ -152,6 +153,9 @@ Node.js not support the `File` object
 
 
 
+
+---
+
 ---
 
 #### Generating a digest of the instance
@@ -171,18 +175,7 @@ Node.js not support the `File` object
 
 ---
 
-#### Creating an instance by reading the [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of `Uint8Array`
-```javascript
-// stream: ReadableStream<Uint8Array>
-const bytesFromStream = await ByteSequence.fromStream(stream);
-```
 
-If you want to read [Node.js Readable stream](https://nodejs.org/api/stream.html#stream_readable_streams) of [`Buffer`](https://nodejs.org/api/buffer.html#buffer_class_buffer), you can use [`stream.Readable.toWeb`](https://nodejs.org/dist/latest-v17.x/docs/api/stream.html#streamreadabletowebstreamreadable) method (Node.js 17.0.0+)
-```javascript
-import { Readable } from "node:stream";
-
-const bytesFromStream = await ByteSequence.fromStream(Readable.toWeb(nodeJsStream));
-```
 
 
 #### Editing the byte sequence
