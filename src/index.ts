@@ -77,9 +77,23 @@ const {
   ASCII_WHITESPACE,
 } = HttpUtils.CodePointRange;
 
-const utf8TextEncoder = new TextEncoder();
+let _utf8TextEncoder: TextEncoder;
 
-const utf8TextDecoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
+function _getUtf8TextEncoder(): TextEncoder {
+  if ((_utf8TextEncoder instanceof TextEncoder) !== true) {
+    _utf8TextEncoder = new TextEncoder();
+  }
+  return _utf8TextEncoder;
+}
+
+let _utf8TextDecoder: TextDecoder;
+
+function _getUtf8TextDecoder(): TextDecoder {
+  if ((_utf8TextDecoder instanceof TextDecoder) !== true) {
+    _utf8TextDecoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
+  }
+  return _utf8TextDecoder;
+}
 
 function _isTypedArrayConstructor(value: unknown): value is (Uint8ArrayConstructor | Uint8ClampedArrayConstructor | Int8ArrayConstructor | Uint16ArrayConstructor | Int16ArrayConstructor | Uint32ArrayConstructor | Int32ArrayConstructor | Float32ArrayConstructor | Float64ArrayConstructor | BigUint64ArrayConstructor | BigInt64ArrayConstructor) {
   return ((value === Uint8Array) || (value === Uint8ClampedArray) || (value === Int8Array) || (value === Uint16Array) || (value === Int16Array) || (value === Uint32Array) || (value === Int32Array) || (value === Float32Array) || (value === Float64Array) || (value === BigUint64Array) || (value === BigInt64Array));
@@ -110,7 +124,7 @@ function _iterableToArray<T>(iterable: Iterable<T>): Array<T> {
  * @param headers ヘッダー
  * @returns Content-Typeの値から生成したMediaTypeインスタンス
  */
-export function _extractContentType(headers: Headers): MediaType {
+function _extractContentType(headers: Headers): MediaType {
   // 5.
   if (headers.has("Content-Type") !== true) {
     throw new Error("Content-Type field not found");
@@ -637,6 +651,21 @@ class ByteSequence {
    * @param bufferView The object that represents a byte sequence.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `bufferView` is not type of `ArrayBufferView`.
+   * @example
+   * ```javascript
+   * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const bytes = ByteSequence.fromArrayBufferView(uint8Array);
+   * bytes.getUint8View();
+   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   * @example
+   * ```javascript
+   * const buffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
+   * const dataView = new DataView(buffer);
+   * const bytes = ByteSequence.fromArrayBufferView(dataView);
+   * bytes.getUint8View();
+   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static fromArrayBufferView(bufferView: ArrayBufferView): ByteSequence {
     if (ArrayBuffer.isView(bufferView)) {
@@ -968,7 +997,7 @@ class ByteSequence {
    * @returns A new `ByteSequence` object.
    */
   static utf8EncodeFrom(text: string): ByteSequence {
-    const encoded = utf8TextEncoder.encode(text);
+    const encoded = _getUtf8TextEncoder().encode(text);
     return new ByteSequence(encoded.buffer);
   }
 
@@ -979,7 +1008,7 @@ class ByteSequence {
    * @returns A string decoded in UTF-8.
    */
   utf8DecodeTo(): string {
-    return utf8TextDecoder.decode(this.#view);
+    return _getUtf8TextDecoder().decode(this.#view);
   }
 
   /**
@@ -990,7 +1019,7 @@ class ByteSequence {
    * @param encoder The text encoder, for example `TextEncoder`.
    * @returns A new `ByteSequence` object.
    */
-  static textEncodeFrom(text: string, encoder: { encode: (input?: string) => Uint8Array } = utf8TextEncoder): ByteSequence {
+  static textEncodeFrom(text: string, encoder: { encode: (input?: string) => Uint8Array } = _getUtf8TextEncoder()): ByteSequence {
     const encoded = encoder.encode(text);
     // return new ByteSequence(encoded.buffer);// Node.jsのBufferを返すエンコーダーだとプールが余計
     return ByteSequence.fromArrayBufferView(encoded);
@@ -1002,7 +1031,7 @@ class ByteSequence {
    * @param decoder The text decoder, for example `TextDecoder`.
    * @returns A string decoded in the specified text encoding.
    */
-  textDecodeTo(decoder: { decode: (input?: Uint8Array) => string } = utf8TextDecoder): string {
+  textDecodeTo(decoder: { decode: (input?: Uint8Array) => string } = _getUtf8TextDecoder()): string {
     return decoder.decode(this.#view);
   }
 
@@ -1225,7 +1254,7 @@ class ByteSequence {
    * @param streamLike 
    * @param options 
    */
-  static async fromStream(streamLike: ByteSequence.StreamLike, options?: ByteSequence.AsyncReadingOptions): Promise<ByteSequence> {
+  static async fromStream(streamLike: ByteSequence.StreamLike, options?: ByteSequence.StreamReadingOptions): Promise<ByteSequence> {
     const reader = new ByteStream.Reader();
 
     const listenerOptions = {
@@ -1681,7 +1710,7 @@ namespace ByteSequence {
   /**
    * @experimental
    */
-  export type AsyncReadingOptions = {
+  export type StreamReadingOptions = {
     /**
      * The total number of bytes in the byte stream.
      */
@@ -1734,7 +1763,9 @@ namespace ByteSequence {
   /**
    * @experimental
    */
-  export type RequestOrResponseReadingOptions = AsyncReadingOptions & {
+  export type RequestOrResponseReadingOptions = StreamReadingOptions & {
+    // TODO verifyContentType
+
     verifyHeaders?: (headers: Headers) => [ verified: boolean, message?: string ],
   };
 }
