@@ -791,6 +791,12 @@ class ByteSequence {
    * @param byteArray The 8-bit unsigned integer `Array` represents a byte sequence.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `byteArray` is not an 8-bit unsigned integer `Array`.
+   * @example
+   * ```javascript
+   * const array = [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ];
+   * const bytes = ByteSequence.fromArray(array);
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
     if (_Uint8Utils.isArrayOfUint8(byteArray)) {
