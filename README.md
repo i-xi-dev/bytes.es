@@ -69,7 +69,7 @@ Creates an instance with a new underlying buffer
 - [ByteSequence.fromDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromDataURL)
 
 - [ByteSequence.describedFromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFromBlob)
-- [ByteSequence.describedFrommDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFrommDataURL)
+- [ByteSequence.describedFromDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFromDataURL)
 
 Creates an instance with the specified underlying buffer
 
