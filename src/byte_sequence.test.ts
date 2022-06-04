@@ -996,34 +996,28 @@ describe("ByteSequence.prototype.toFile", () => {
 describe("ByteSequence.fromDataURL", () => {
   it("fromDataURL(string)", async () => {
 
-    const {data:b0, options:meta0} = ByteSequence.fromDataURL("data:text/plain,");
+    const b0 = ByteSequence.fromDataURL("data:text/plain,");
     expect(b0.byteLength).to.equal(0);
-    expect(JSON.stringify(meta0)).to.equal( `{"type":"text/plain"}`);
 
-    const {data:b0b, options:meta0b} = ByteSequence.fromDataURL("data:text/plain;base64,");
+    const b0b = ByteSequence.fromDataURL("data:text/plain;base64,");
     expect(b0b.byteLength).to.equal(0);
-    expect(JSON.stringify(meta0b)).to.equal(`{"type":"text/plain"}`);
 
-    const {data:b0c, options:meta0c} = ByteSequence.fromDataURL("data: ,");
+    const b0c = ByteSequence.fromDataURL("data: ,");
     expect(b0c.byteLength).to.equal(0);
-    expect(JSON.stringify(meta0c)).to.equal(`{"type":"text/plain;charset=US-ASCII"}`);
 
-    const {data:b0d, options:meta0d} = ByteSequence.fromDataURL("data: ; ,");
+    const b0d = ByteSequence.fromDataURL("data: ; ,");
     expect(b0d.byteLength).to.equal(0);
-    expect(JSON.stringify(meta0d)).to.equal(`{"type":"text/plain"}`);
 
-    const {data:b0e, options:meta0e} = ByteSequence.fromDataURL("data: ; x=y ,");
+    const b0e = ByteSequence.fromDataURL("data: ; x=y ,");
     expect(b0e.byteLength).to.equal(0);
-    expect(JSON.stringify(meta0e)).to.equal(`{"type":"text/plain;x=y"}`);
 
-    const {data:b11, options:meta11} = ByteSequence.fromDataURL("data:text/plain,a1");
+    const b11 = ByteSequence.fromDataURL("data:text/plain,a1");
     const b11v = b11.getView(Uint8Array);
     expect(b11v[0]).to.equal(97);
     expect(b11v[1]).to.equal(49);
     expect(b11.byteLength).to.equal(2);
-    expect(JSON.stringify(meta11)).to.equal(`{"type":"text/plain"}`);
 
-    const {data:b12, options:meta12} = ByteSequence.fromDataURL("data:application/octet-stream;base64,AwIBAP/+/fw=");
+    const b12 = ByteSequence.fromDataURL("data:application/octet-stream;base64,AwIBAP/+/fw=");
     const b12v = b12.getView(Uint8Array);
     expect(b12v[0]).to.equal(3);
     expect(b12v[1]).to.equal(2);
@@ -1034,16 +1028,14 @@ describe("ByteSequence.fromDataURL", () => {
     expect(b12v[6]).to.equal(253);
     expect(b12v[7]).to.equal(252);
     expect(b12.byteLength).to.equal(8);
-    expect(JSON.stringify(meta12)).to.equal(`{"type":"application/octet-stream"}`);
 
-    const {data:b21, options:meta21} = ByteSequence.fromDataURL("data:text/plain; p1=a,a1");
+    const b21 = ByteSequence.fromDataURL("data:text/plain; p1=a,a1");
     const b21v = b21.getView(Uint8Array);
     expect(b21v[0]).to.equal(97);
     expect(b21v[1]).to.equal(49);
     expect(b21.byteLength).to.equal(2);
-    expect(JSON.stringify(meta21)).to.equal(`{"type":"text/plain;p1=a"}`);
 
-    const {data:b22, options:meta22} = ByteSequence.fromDataURL("data:text/plain; p1=a;p2=\"b,c\",a1");
+    const b22 = ByteSequence.fromDataURL("data:text/plain; p1=a;p2=\"b,c\",a1");
     const b22v = b22.getView(Uint8Array);
     expect(b22v[0]).to.equal(99);
     expect(b22v[1]).to.equal(34);
@@ -1051,23 +1043,20 @@ describe("ByteSequence.fromDataURL", () => {
     expect(b22v[3]).to.equal(97);
     expect(b22v[4]).to.equal(49);
     expect(b22.byteLength).to.equal(5);
-    expect(JSON.stringify(meta22)).to.equal(`{"type":"text/plain;p1=a;p2=b"}`);
 
-    const {data:b31, options:meta31} = ByteSequence.fromDataURL("data:text/plain,%FF%");
+    const b31 = ByteSequence.fromDataURL("data:text/plain,%FF%");
     const b31v = b31.getView(Uint8Array);
     expect(b31v[0]).to.equal(255);
     expect(b31v[1]).to.equal(0x25);
     expect(b31.byteLength).to.equal(2);
-    expect(JSON.stringify(meta31)).to.equal(`{"type":"text/plain"}`);
 
-    const {data:b32, options:meta32} = ByteSequence.fromDataURL("data:text/plain,%fff");
+    const b32 = ByteSequence.fromDataURL("data:text/plain,%fff");
     const b32v = b32.getView(Uint8Array);
     expect(b32v[0]).to.equal(255);
     expect(b32v[1]).to.equal(0x66);
     expect(b32.byteLength).to.equal(2);
-    expect(JSON.stringify(meta32)).to.equal(`{"type":"text/plain"}`);
 
-    const {data:b33, options:meta33} = ByteSequence.fromDataURL("data:text/plain,a?a=2");
+    const b33 = ByteSequence.fromDataURL("data:text/plain,a?a=2");
     const b33v = b33.getView(Uint8Array);
     expect(b33v[0]).to.equal(0x61);
     expect(b33v[1]).to.equal(0x3F);
@@ -1075,7 +1064,6 @@ describe("ByteSequence.fromDataURL", () => {
     expect(b33v[3]).to.equal(0x3D);
     expect(b33v[4]).to.equal(0x32);
     expect(b33.byteLength).to.equal(5);
-    expect(JSON.stringify(meta33)).to.equal(`{"type":"text/plain"}`);
 
     expect(() => {
       ByteSequence.fromDataURL("data:text/plain");
@@ -1092,7 +1080,116 @@ describe("ByteSequence.fromDataURL", () => {
   });
 
   it("fromDataURL(URL)", async () => {
-    const {data:b11, options:meta11} = ByteSequence.fromDataURL(new URL("data:text/plain,a1"));
+    const b11 = ByteSequence.fromDataURL(new URL("data:text/plain,a1"));
+    const b11v = b11.getView(Uint8Array);
+    expect(b11v[0]).to.equal(97);
+    expect(b11v[1]).to.equal(49);
+    expect(b11.byteLength).to.equal(2);
+
+  });
+
+});
+
+describe("ByteSequence.describedFromDataURL", () => {
+  it("describedFromDataURL(string)", async () => {
+
+    const {data:b0, options:meta0} = ByteSequence.describedFromDataURL("data:text/plain,");
+    expect(b0.byteLength).to.equal(0);
+    expect(JSON.stringify(meta0)).to.equal( `{"type":"text/plain"}`);
+
+    const {data:b0b, options:meta0b} = ByteSequence.describedFromDataURL("data:text/plain;base64,");
+    expect(b0b.byteLength).to.equal(0);
+    expect(JSON.stringify(meta0b)).to.equal(`{"type":"text/plain"}`);
+
+    const {data:b0c, options:meta0c} = ByteSequence.describedFromDataURL("data: ,");
+    expect(b0c.byteLength).to.equal(0);
+    expect(JSON.stringify(meta0c)).to.equal(`{"type":"text/plain;charset=US-ASCII"}`);
+
+    const {data:b0d, options:meta0d} = ByteSequence.describedFromDataURL("data: ; ,");
+    expect(b0d.byteLength).to.equal(0);
+    expect(JSON.stringify(meta0d)).to.equal(`{"type":"text/plain"}`);
+
+    const {data:b0e, options:meta0e} = ByteSequence.describedFromDataURL("data: ; x=y ,");
+    expect(b0e.byteLength).to.equal(0);
+    expect(JSON.stringify(meta0e)).to.equal(`{"type":"text/plain;x=y"}`);
+
+    const {data:b11, options:meta11} = ByteSequence.describedFromDataURL("data:text/plain,a1");
+    const b11v = b11.getView(Uint8Array);
+    expect(b11v[0]).to.equal(97);
+    expect(b11v[1]).to.equal(49);
+    expect(b11.byteLength).to.equal(2);
+    expect(JSON.stringify(meta11)).to.equal(`{"type":"text/plain"}`);
+
+    const {data:b12, options:meta12} = ByteSequence.describedFromDataURL("data:application/octet-stream;base64,AwIBAP/+/fw=");
+    const b12v = b12.getView(Uint8Array);
+    expect(b12v[0]).to.equal(3);
+    expect(b12v[1]).to.equal(2);
+    expect(b12v[2]).to.equal(1);
+    expect(b12v[3]).to.equal(0);
+    expect(b12v[4]).to.equal(255);
+    expect(b12v[5]).to.equal(254);
+    expect(b12v[6]).to.equal(253);
+    expect(b12v[7]).to.equal(252);
+    expect(b12.byteLength).to.equal(8);
+    expect(JSON.stringify(meta12)).to.equal(`{"type":"application/octet-stream"}`);
+
+    const {data:b21, options:meta21} = ByteSequence.describedFromDataURL("data:text/plain; p1=a,a1");
+    const b21v = b21.getView(Uint8Array);
+    expect(b21v[0]).to.equal(97);
+    expect(b21v[1]).to.equal(49);
+    expect(b21.byteLength).to.equal(2);
+    expect(JSON.stringify(meta21)).to.equal(`{"type":"text/plain;p1=a"}`);
+
+    const {data:b22, options:meta22} = ByteSequence.describedFromDataURL("data:text/plain; p1=a;p2=\"b,c\",a1");
+    const b22v = b22.getView(Uint8Array);
+    expect(b22v[0]).to.equal(99);
+    expect(b22v[1]).to.equal(34);
+    expect(b22v[2]).to.equal(44);
+    expect(b22v[3]).to.equal(97);
+    expect(b22v[4]).to.equal(49);
+    expect(b22.byteLength).to.equal(5);
+    expect(JSON.stringify(meta22)).to.equal(`{"type":"text/plain;p1=a;p2=b"}`);
+
+    const {data:b31, options:meta31} = ByteSequence.describedFromDataURL("data:text/plain,%FF%");
+    const b31v = b31.getView(Uint8Array);
+    expect(b31v[0]).to.equal(255);
+    expect(b31v[1]).to.equal(0x25);
+    expect(b31.byteLength).to.equal(2);
+    expect(JSON.stringify(meta31)).to.equal(`{"type":"text/plain"}`);
+
+    const {data:b32, options:meta32} = ByteSequence.describedFromDataURL("data:text/plain,%fff");
+    const b32v = b32.getView(Uint8Array);
+    expect(b32v[0]).to.equal(255);
+    expect(b32v[1]).to.equal(0x66);
+    expect(b32.byteLength).to.equal(2);
+    expect(JSON.stringify(meta32)).to.equal(`{"type":"text/plain"}`);
+
+    const {data:b33, options:meta33} = ByteSequence.describedFromDataURL("data:text/plain,a?a=2");
+    const b33v = b33.getView(Uint8Array);
+    expect(b33v[0]).to.equal(0x61);
+    expect(b33v[1]).to.equal(0x3F);
+    expect(b33v[2]).to.equal(0x61);
+    expect(b33v[3]).to.equal(0x3D);
+    expect(b33v[4]).to.equal(0x32);
+    expect(b33.byteLength).to.equal(5);
+    expect(JSON.stringify(meta33)).to.equal(`{"type":"text/plain"}`);
+
+    expect(() => {
+      ByteSequence.describedFromDataURL("data:text/plain");
+    }).to.throw(TypeError, "U+002C not found").with.property("name", "TypeError");
+
+    expect(() => {
+      ByteSequence.describedFromDataURL("data2:text/plain");
+    }).to.throw(TypeError, `URL scheme is not "data"`).with.property("name", "TypeError");
+
+    expect(() => {
+      ByteSequence.describedFromDataURL("");
+    }).to.throw(TypeError, "dataUrl parse error").with.property("name", "TypeError");
+
+  });
+
+  it("describedFromDataURL(URL)", async () => {
+    const {data:b11, options:meta11} = ByteSequence.describedFromDataURL(new URL("data:text/plain,a1"));
     const b11v = b11.getView(Uint8Array);
     expect(b11v[0]).to.equal(97);
     expect(b11v[1]).to.equal(49);

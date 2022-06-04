@@ -1507,7 +1507,10 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * const file = bytes.toFile("samp.dat", { type: "application/octet-stream", lastModified: 1640995200000 });
+   * const file = bytes.toFile("samp.dat", {
+   *   type: "application/octet-stream",
+   *   lastModified: 1640995200000,
+   * });
    * // new Uint8Array(await file.arrayBuffer())
    * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * // file.name
@@ -1594,6 +1597,28 @@ class ByteSequence {
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * 
+   * @see [https://fetch.spec.whatwg.org/#data-urls](https://fetch.spec.whatwg.org/#data-urls)
+   * @param dataUrl The data URL
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `dataUrl` parsing is failed.
+   * @throws {TypeError} The URL scheme of the `dataUrl` is not "data".
+   * @throws {TypeError} The `dataUrl` does not contain `","`.
+   * @example
+   * ```javascript
+   * const bytes = await ByteSequence.fromDataURL("data:application/octet-stream;base64,5a+M5aOr5bGx");
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   */
+  static fromDataURL(dataUrl: URL | string): ByteSequence {
+    const [ bytes ] = ByteSequence.#fromDataURL(dataUrl);
+    return bytes;
+  }
+
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
+   * 
    * @experimental
    * @see [https://fetch.spec.whatwg.org/#data-urls](https://fetch.spec.whatwg.org/#data-urls)
    * @param dataUrl The data URL
@@ -1601,8 +1626,16 @@ class ByteSequence {
    * @throws {TypeError} The `dataUrl` parsing is failed.
    * @throws {TypeError} The URL scheme of the `dataUrl` is not "data".
    * @throws {TypeError} The `dataUrl` does not contain `","`.
+   * @example
+   * ```javascript
+   * const { data, options } = await ByteSequence.describedFromDataURL("data:application/octet-stream;base64,5a+M5aOr5bGx");
+   * // data.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // options.type
+   * //   → "application/octet-stream"
+   * ```
    */
-  static fromDataURL(dataUrl: URL | string): ByteSequence.Described {
+  static describedFromDataURL(dataUrl: URL | string): ByteSequence.Described {
     const [ bytes, mediaTypeSrc ] = ByteSequence.#fromDataURL(dataUrl);
     let mediaTypeWork = mediaTypeSrc;
 
@@ -1635,6 +1668,13 @@ class ByteSequence {
    * @param options The `BlobPropertyBag` object, but `endings` property is ignored.
    * @returns The [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * @throws {TypeError}
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const dataUrl = bytes.toDataURL({ type: "application/octet-stream" });
+   * // dataUrl.toString()
+   * //   → "data:application/octet-stream;base64,5a+M5aOr5bGx"
+   * ```
    */
   toDataURL(options?: BlobPropertyBag): URL {
     // FileReaderの仕様に倣い、テキストかどうかに関係なく常時Base64エンコードする仕様

@@ -66,8 +66,10 @@ Creates an instance with a new underlying buffer
 - [ByteSequence.utf8EncodeFrom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#utf8EncodeFrom)
 - [ByteSequence.textEncodeFrom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#textEncodeFrom)
 - [ByteSequence.fromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBlob)
+- [ByteSequence.fromDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromDataURL)
 
 - [ByteSequence.describedFromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFromBlob)
+- [ByteSequence.describedFrommDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFrommDataURL)
 
 Creates an instance with the specified underlying buffer
 
@@ -142,34 +144,12 @@ Node.js not support the `File` object
 
 ---
 
-
-
-
-
-
-
 #### Converting the instance to a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
-```javascript
-const dataUrl = bytes1.toDataURL();
-// dataUrl.toString() → "data:text/plain;charset=US-ASCII;base64,5a+M5aOr5bGx"
 
-const bytesFromDataUrl = ByteSequence.fromDataURL(dataUrl);
-bytesFromDataUrl.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+- [ByteSequence.prototype.toDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toDataURL)
 
-##### Data URL options
-```javascript
-const dataUrlOptions = {
-  type: "text/plain; charset=UTF-8",
-};
-const dataUrl2 = bytes1.toDataURL(dataUrlOptions);
-// dataUrl2.toString() → "data:text/plain;charset=UTF-8;base64,5a+M5aOr5bGx"
+---
 
-const bytesFromDataUrl2 = ByteSequence.fromDataURL(dataUrl2);
-bytesFromDataUrl2.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
 
 
 ---
