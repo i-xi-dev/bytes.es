@@ -60,6 +60,7 @@ Creates an instance with a new underlying buffer
 - [ByteSequence.fromBinaryString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBinaryString)
 - [ByteSequence.fromBase64Encoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBase64Encoded)
 - [ByteSequence.fromPercentEncoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromPercentEncoded)
+- [ByteSequence.parse](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#parse)
 
 Creates an instance with the specified underlying buffer
 
@@ -107,38 +108,11 @@ Creates an instance with the specified underlying buffer
 ---
 
 #### Converting the instance to a string based on the specified format
-```javascript
-const formatted = bytes1.format();
-// → "E5AF8CE5A3ABE5B1B1"
 
-const formatted2 = bytes1.toString();
-// → "E5AF8CE5A3ABE5B1B1"
+- [ByteSequence.prototype.format](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#format)
+- [ByteSequence.prototype.toString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toString)
 
-const bytesFromFormatted = ByteSequence.parse(formatted);
-bytesFromFormatted.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
-
-##### Format options
-[`ByteFormatOptions`](https://i-xi-dev.github.io/bytes.es/index.html#ByteFormatOptions)
-
-Example
-```javascript
-const formatOptions = {
-  lowerCase: true,
-};
-const formatted2 = bytes1.format(formatOptions);
-// → "e5af8ce5a3abe5b1b1"
-
-// toString method has no arguments
-const formatted2 = bytes1.toString(formatOptions);
-// → "E5AF8CE5A3ABE5B1B1"
-
-const bytesFromFormatted2 = ByteSequence.parse(formatted2, formatOptions);
-bytesFromFormatted2.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
-
+---
 
 #### Converting the instance to a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
 ```javascript

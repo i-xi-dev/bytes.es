@@ -928,6 +928,19 @@ class ByteSequence {
    * @throws {TypeError} The `options.paddedLength` is not positive integer.
    * @throws {RangeError} The `options.paddedLength` is below the lower limit.
    * @throws {TypeError} The `formattedBytes` contains the character sequence that does not match the specified format.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.parse("E5AF8CE5A3ABE5B1B1");
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   * @example
+   * ```javascript
+   * const options = {
+   *   lowerCase: true,
+   * };
+   * const bytes = ByteSequence.parse("e5af8ce5a3abe5b1b1", options);
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static parse(formattedBytes: string, options?: ByteSequence.Format.Options): ByteSequence {
     const resolvedOptions = _resolveFormatOptions(options);
@@ -944,6 +957,19 @@ class ByteSequence {
    * @throws {TypeError} The `options.radix` is not 2, 8, 10, or 16.
    * @throws {TypeError} The `options.paddedLength` is not positive integer.
    * @throws {RangeError} The `options.paddedLength` is below the lower limit.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * // bytes.format() → "E5AF8CE5A3ABE5B1B1"
+   * ```
+   * @example
+   * ```javascript
+   * const options = {
+   *   lowerCase: true,
+   * };
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * // bytes.format(options) → "e5af8ce5a3abe5b1b1"
+   * ```
    */
   format(options?: ByteSequence.Format.Options): string {
     const resolvedOptions = _resolveFormatOptions(options);
