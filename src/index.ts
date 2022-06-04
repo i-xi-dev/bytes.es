@@ -809,6 +809,12 @@ class ByteSequence {
    * Returns the 8-bit unsigned integer `Array` representing this byte sequence.
    * 
    * @returns The `Array` of 8-bit unsigned integers.
+   * @example
+   * ```javascript
+   * const array = [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ];
+   * const bytes = ByteSequence.fromArray(array);
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   toArray(): Array<number> {
     return [ ...this.#view ] as Array<uint8>;
