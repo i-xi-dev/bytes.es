@@ -1400,6 +1400,13 @@ class ByteSequence {
    * // bytes.toArray()
    * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
+   * @example
+   * ```javascript
+   * const file = new File([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ], "samp.dat");
+   * const bytes = await ByteSequence.fromBlob(file);
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static async fromBlob(blob: Blob): Promise<ByteSequence> {
     try {
@@ -1497,6 +1504,19 @@ class ByteSequence {
    * @param fileName The file name.
    * @param options The `FilePropertyBag` object, but `endings` property is ignored.
    * @returns The `File` object.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const file = bytes.toFile("samp.dat", { type: "application/octet-stream", lastModified: 1640995200000 });
+   * // new Uint8Array(await file.arrayBuffer())
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // file.name
+   * //   → "samp.dat"
+   * // file.type
+   * //   → "application/octet-stream"
+   * // file.lastModified
+   * //   → 1640995200000
+   * ```
    */
   toFile(fileName: string, options?: FilePropertyBag): File {
     if ((typeof fileName === "string") && (fileName.length > 0)) {

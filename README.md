@@ -138,30 +138,14 @@ Creates an instance with the specified underlying buffer
 
 Node.js not support the `File` object
 
-```javascript
-const file = bytes1.toFile();
-// new Uint8Array(await file.arrayBuffer()) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+- [ByteSequence.prototype.toFile()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toFile)
 
-const bytesFromFile = await ByteSequence.fromBlob(file);
-bytesFromFile.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+---
 
-##### File options
-```javascript
-const fileOptions = {
-  type: "text/plain; charset=UTF-8",
-  lastModified: 1640995200000,
-};
-const file2 = bytes1.toFile(fileOptions);
-// new Uint8Array(await file2.arrayBuffer()) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-// file2.type → "text/plain;charset=UTF-8"
-// file2.lastModified → 1640995200000
 
-const bytesFromFile2 = await ByteSequence.fromBlob(file2);
-bytesFromFile2.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+
+
+
 
 
 #### Converting the instance to a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)
