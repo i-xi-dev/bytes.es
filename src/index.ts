@@ -868,6 +868,11 @@ class ByteSequence {
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `byteLength` is not non-negative integer.
    * @throws {RangeError} The `byteLength` is greater than 65536.
+   * @example
+   * ```javascript
+   * const randomBytes = ByteSequence.generateRandom(1024);
+   * // randomBytes.byteLength → 1024
+   * ```
    */
   static generateRandom(byteLength: number): ByteSequence {
     if (Integer.isNonNegativeInteger(byteLength) !== true) {

@@ -52,11 +52,13 @@ const zeroFilledBytes = ByteSequence.allocate(1024);
 // zeroFilledBytes.byteLength → 1024
 ```
 
+---
+
 Creates an instance filled with random bytes
-```javascript
-const randomBytes = ByteSequence.generateRandom(1024);
-// randomBytes.byteLength → 1024
-```
+
+Use the [ByteSequence.generateRandom](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#generateRandom) method.
+
+---
 
 Creates an instance with a new underlying buffer
 ```javascript
