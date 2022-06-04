@@ -47,42 +47,21 @@ import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
 
 #### Creating an instance
 
----
-
 Creates an instance with a new underlying buffer
 
 - [ByteSequence.allocate](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#allocate)
 - [ByteSequence.generateRandom](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#generateRandom)
+- [ByteSequence.fromArrayBuffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArrayBuffer)
+- [ByteSequence.fromArrayBufferView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArrayBufferView)
+- [ByteSequence.fromBufferSource](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBufferSource)
+- [ByteSequence.fromArray](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArray)
+- [ByteSequence.from](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#from)
+- [ByteSequence.of](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#of)
 - [ByteSequence.fromBinaryString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBinaryString)
 
-```javascript
-const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-const buffer = uint8Array.buffer;
-
-// The following represents the same sequence.
-const bytes1 = ByteSequence.fromArrayBufferView(uint8Array);
-const bytes2 = ByteSequence.fromArrayBuffer(buffer);
-const bytes3 = ByteSequence.fromBufferSource(uint8Array);
-const bytes4 = ByteSequence.fromBufferSource(buffer);
-```
-
 Creates an instance with the specified underlying buffer
-```javascript
-const bytes5 = ByteSequence.wrapArrayBuffer(buffer);
-```
 
-#### Converting the instance to a number array
-```javascript
-const numberArray = bytes1.toArray();
-// → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-
-const numberArray2 = bytes1.toJSON();
-// → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-
-const bytesFromNumberArray = ByteSequence.fromArray(numberArray);
-bytesFromNumberArray.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+- [ByteSequence.wrapArrayBuffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#wrapArrayBuffer)
 
 ---
 
@@ -92,15 +71,18 @@ bytesFromNumberArray.getUint8View();
 
 ---
 
-#### Converting the instance to an `Uint8Array`
+#### Converting the instance to an [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView)
 
 - [ByteSequence.prototype.toUint8Array](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toUint8Array)
+- [ByteSequence.prototype.toDataView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toDataView)
+- [ByteSequence.prototype.toArrayBufferView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBufferView)
 
 ---
 
-#### Converting the instance to an [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView)
+#### Converting the instance to a number array
 
-- [ByteSequence.prototype.toArrayBufferView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBufferView)
+- [ByteSequence.prototype.toArray](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArray)
+- [ByteSequence.prototype.toJSON](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toJSON)
 
 ---
 
