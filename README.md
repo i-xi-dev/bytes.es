@@ -59,6 +59,7 @@ Creates an instance with a new underlying buffer
 - [ByteSequence.of](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#of)
 - [ByteSequence.fromBinaryString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBinaryString)
 - [ByteSequence.fromBase64Encoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBase64Encoded)
+- [ByteSequence.fromPercentEncoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromPercentEncoded)
 
 Creates an instance with the specified underlying buffer
 
@@ -100,48 +101,10 @@ Creates an instance with the specified underlying buffer
 ---
 
 #### Converting the instance to a string containing percent encoded bytes
-```javascript
-const percentEncoded = bytes1.toPercentEncoded();
-// → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
 
-const bytesFromPercentEncoded = ByteSequence.fromPercentEncoded(percentEncoded);
-bytesFromPercentEncoded.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+- [ByteSequence.prototype.toPercentEncoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toPercentEncoded)
 
-##### Percent encoding options
-[`PercentOptions`](https://i-xi-dev.github.io/bytes.es/index.html#PercentOptions)
-
-Example: URL component encoding
-```javascript
-const percentOptions = {
-  encodeSet: [ 0x20, 0x22, 0x23, 0x24, 0x26, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ],
-};
-const percentEncoded2 = bytes1.toPercentEncoded(percentOptions);
-// → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
-//   This result is match to the result of (globalThis.encodeURIComponent("富士山"))
-
-const bytesFromPercentEncoded2 = ByteSequence.fromPercentEncoded(percentEncoded2, percentOptions);
-bytesFromPercentEncoded2.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
-
-Example: Percent encode for the value of application/x-www-form-urlencoded
-```javascript
-const percentOptions2 = {
-  encodeSet: [ 0x20, 0x22, 0x23, 0x24, 0x26, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ],
-  spaceAsPlus: true,
-};
-const percentEncoded3 = bytes1.toPercentEncoded(percentOptions2);
-// → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
-//   This result is match to the result of (globalThis.encodeURIComponent("富士山").replaceAll(/[!'()~]/g, (c) => `%${ c.charCodeAt(0).toString(16).toUpperCase() }`))
-//   And also, this result is match to the result of (const url = new URL("http://example.com/"); url.searchParams.set("p1", "富士山"); url.search.replace("?p1=", ""));
-
-const bytesFromPercentEncoded3 = ByteSequence.fromPercentEncoded(percentEncoded3, percentOptions2);
-bytesFromPercentEncoded3.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
-
+---
 
 #### Converting the instance to a string based on the specified format
 ```javascript
@@ -319,35 +282,16 @@ bytesFromUtf8Text2.getUint8View();
 // → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
 
+---
 
 #### Generating a digest of the instance
-```javascript
-const sha256DigestBytes = await bytes1.toSha256Digest();
-// sha256DigestBytes is also a ByteSequence object.
-// sha256DigestBytes.format() → "E294AB9D429F9A9A2678D996E5DBD40CBF62363A5ED417F654C5F0BA861E4200"
 
-// also supports SHA-384 and SHA-512
-const sha384DigestBytes = await bytes1.toSha384Digest();
-const sha512DigestBytes = await bytes1.toSha512Digest();
-```
+- [ByteSequence.prototype.toSha256Digest](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toSha256Digest)
+- [ByteSequence.prototype.toSha384Digest](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toSha384Digest)
+- [ByteSequence.prototype.toSha512Digest](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toSha512Digest)
+- [ByteSequence.prototype.toDigest](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toDigest)
 
-##### Other digest algorithm
-Example in Node.js
-```javascript
-import { createHash } from "node:crypto";
-const md5 = {
-  // compute: (input: Uint8Array) => Promise<Uint8Array>
-  async compute(input) {
-    const hash = createHash("md5");
-    hash.update(input);
-    return hash.digest();
-  }
-};
-
-const md5DigestBytes = await bytes1.toDigest(md5);
-// md5DigestBytes.format() → "52A6AD27415BD86EC64B57EFBEA27F98"
-```
-
+---
 
 #### Generating a [subresource integrity](https://www.w3.org/TR/SRI/) value of the instance
 ```javascript

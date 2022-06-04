@@ -964,6 +964,8 @@ class ByteSequence {
    * ```
    * @example
    * ```javascript
+   * // Base64 URL (https://datatracker.ietf.org/doc/html/rfc4648#section-5) decoding
+   * 
    * const base64Url = {
    *   table: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ],
    *   noPadding: true,
@@ -990,6 +992,8 @@ class ByteSequence {
    * ```
    * @example
    * ```javascript
+   * // Base64 URL (https://datatracker.ietf.org/doc/html/rfc4648#section-5) encoding
+   * 
    * const base64Url = {
    *   table: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ],
    *   noPadding: true,
@@ -1009,17 +1013,74 @@ class ByteSequence {
    * @param percentEncoded The string to decode.
    * @param options The [`Percent.Options`](https://i-xi-dev.github.io/percent.es/modules/Percent.html#Options-1) dictionary.
    * @returns A new `ByteSequence` object.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.fromPercentEncoded("%E5%AF%8C%E5%A3%AB%E5%B1%B1");
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   * @example
+   * ```javascript
+   * // URL component decoding
+   * 
+   * const urlComponent = {
+   *   encodeSet: [ 0x20, 0x22, 0x23, 0x24, 0x26, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ],
+   * };
+   * const bytes = ByteSequence.fromPercentEncoded("%E5%AF%8C%E5%A3%AB%E5%B1%B1", urlComponent);
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.utf8DecodeTo() → "富士山"
+   * ```
+   * @example
+   * ```javascript
+   * // decoding for the value of application/x-www-form-urlencoded
+   * 
+   * const formUrlEnc = {
+   *   encodeSet: [ 0x20, 0x22, 0x23, 0x24, 0x26, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ],
+   *   spaceAsPlus: true,
+   * };
+   * const bytes = ByteSequence.fromPercentEncoded("%E5%AF%8C%E5%A3%AB%E5%B1%B1", formUrlEnc);
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.utf8DecodeTo() → "富士山"
+   * ```
    */
   static fromPercentEncoded(percentEncoded: string, options?: Percent.Options): ByteSequence {
     const decoded = Percent.decode(percentEncoded, options);
     return new ByteSequence(decoded.buffer);
   }
+  // TODO Percent.Optionsの定数
 
   /**
    * Returns the string contains Percent-encoded bytes of this byte sequence.
    * 
    * @param options The [`Percent.Options`](https://i-xi-dev.github.io/percent.es/modules/Percent.html#Options-1) dictionary.
    * @returns The string contains Percent-encoded bytes.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * // bytes.toPercentEncoded() → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
+   * ```
+   * @example
+   * ```javascript
+   * // URL component encoding
+   * 
+   * const urlComponent = {
+   *   encodeSet: [ 0x20, 0x22, 0x23, 0x24, 0x26, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ],
+   * };
+   * const bytes = ByteSequence.utf8EncodeFrom("富士山");
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toPercentEncoded(urlComponent) → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
+   * ```
+   * @example
+   * ```javascript
+   * // encoding for the value of application/x-www-form-urlencoded
+   * 
+   * const formUrlEnc = {
+   *   encodeSet: [ 0x20, 0x22, 0x23, 0x24, 0x26, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ],
+   *   spaceAsPlus: true,
+   * };
+   * const bytes = ByteSequence.utf8EncodeFrom("富士山");
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toPercentEncoded(formUrlEnc) → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
+   * ```
    */
   toPercentEncoded(options?: Percent.Options): string {
     return Percent.encode(this.#view, options);
@@ -1029,6 +1090,12 @@ class ByteSequence {
    * Computes the SHA-256 digest for this byte sequence.
    * 
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-256 digest.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const digestBytes = await bytes.toSha256Digest();
+   * // digestBytes.format() → "E294AB9D429F9A9A2678D996E5DBD40CBF62363A5ED417F654C5F0BA861E4200"
+   * ```
    */
   async toSha256Digest(): Promise<ByteSequence> {
     return this.toDigest(_DigestImpl.Sha256);
@@ -1057,6 +1124,23 @@ class ByteSequence {
    * 
    * @param algorithm The digest algorithm.
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the digest.
+   * @example
+   * ```javascript
+   * // Node.js
+   * 
+   * import { createHash } from "node:crypto";
+   * const md5 = {
+   *   // compute: (input: Uint8Array) => Promise<Uint8Array>
+   *   async compute(input) {
+   *     const hash = createHash("md5");
+   *     hash.update(input);
+   *     return hash.digest();
+   *   }
+   * };
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const digestBytes = await bytes.toDigest(md5);
+   * // digestBytes.format() → "52A6AD27415BD86EC64B57EFBEA27F98"
+   * ```
    */
   async toDigest(algorithm: ByteSequence.DigestAlgorithm): Promise<ByteSequence> {
     const digest = await algorithm.compute(this.#view);
