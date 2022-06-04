@@ -957,17 +957,46 @@ class ByteSequence {
    * @param base64Encoded The string to decode.
    * @param options The [`Base64.Options`](https://i-xi-dev.github.io/base64.es/modules/Base64.html#Options-1) dictionary.
    * @returns A new `ByteSequence` object.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.fromBase64Encoded("5a+M5aOr5bGx");
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   * @example
+   * ```javascript
+   * const base64Url = {
+   *   table: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ],
+   *   noPadding: true,
+   * };
+   * const bytes = ByteSequence.fromBase64Encoded("5a-M5aOr5bGx", base64Url);
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static fromBase64Encoded(base64Encoded: string, options?: Base64.Options): ByteSequence {
     const decoded = Base64.decode(base64Encoded, options);
     return new ByteSequence(decoded.buffer);
   }
+  // TODO Base64.Optionsの定数
 
   /**
    * Returns the string contains Base64-encoded bytes of this byte sequence.
    * 
    * @param options The [`Base64.Options`](https://i-xi-dev.github.io/base64.es/modules/Base64.html#Options-1) dictionary.
    * @returns The string contains Base64-encoded bytes.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * // bytes.toBase64Encoded() → "5a+M5aOr5bGx"
+   * ```
+   * @example
+   * ```javascript
+   * const base64Url = {
+   *   table: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ],
+   *   noPadding: true,
+   * };
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * // bytes.toBase64Encoded(base64Url) → "5a-M5aOr5bGx"
+   * ```
    */
   toBase64Encoded(options?: Base64.Options): string {
     return Base64.encode(this.#view, options);

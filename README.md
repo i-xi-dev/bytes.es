@@ -58,6 +58,7 @@ Creates an instance with a new underlying buffer
 - [ByteSequence.from](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#from)
 - [ByteSequence.of](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#of)
 - [ByteSequence.fromBinaryString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBinaryString)
+- [ByteSequence.fromBase64Encoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBase64Encoded)
 
 Creates an instance with the specified underlying buffer
 
@@ -93,32 +94,10 @@ Creates an instance with the specified underlying buffer
 ---
 
 #### Converting the instance to a string containing Base64 encoded bytes
-```javascript
-const base64Encoded = bytes1.toBase64Encoded();
-// → "5a+M5aOr5bGx"
 
-const bytesFromBase64Encoded = ByteSequence.fromBase64Encoded(base64Encoded);
-bytesFromBase64Encoded.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+- [ByteSequence.prototype.toBase64Encoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toBase64Encoded)
 
-##### Base64 options
-[`Base64Options`](https://i-xi-dev.github.io/bytes.es/index.html#Base64Options)
-
-Example: [Base64 URL encoding](https://datatracker.ietf.org/doc/html/rfc4648#section-5)
-```javascript
-const base64Options = {
-  table: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ],
-  noPadding: true,
-};
-const base64Encoded2 = bytes1.toBase64Encoded(base64Options);
-// → "5a-M5aOr5bGx"
-
-const bytesFromBase64Encoded2 = ByteSequence.fromBase64Encoded(base64Encoded2, base64Options);
-bytesFromBase64Encoded2.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
-
+---
 
 #### Converting the instance to a string containing percent encoded bytes
 ```javascript
