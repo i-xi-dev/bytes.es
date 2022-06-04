@@ -1971,11 +1971,11 @@ class ByteSequence {
    * const uint8ViewPart = bytes.getUint8View(6, 3);
    * // uint8ViewPart
    * //   → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
+   * 
    * uint8ViewPart.fill(0);
    * 
-   * const uint8View = bytes.getUint8View();
-   * // uint8View
-   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
    * ```
    */
   getUint8View(byteOffset?: number, byteLength?: number): Uint8Array {
@@ -1988,6 +1988,20 @@ class ByteSequence {
    * @param byteOffset The offset, in bytes.
    * @param byteLength The length of the `ArrayBufferView`, in bytes.
    * @returns The `DataView`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const dataViewPart = bytes.getDataView(6, 3);
+   * // dataViewPart
+   * //   → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
+   * 
+   * dataViewPart.setUint8(0, 0);
+   * dataViewPart.setUint8(1, 0);
+   * dataViewPart.setUint8(2, 0);
+   * 
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
+   * ```
    */
   getDataView(byteOffset?: number, byteLength?: number): DataView {
     return this.getView(DataView, byteOffset, byteLength);
@@ -1997,6 +2011,7 @@ class ByteSequence {
    * Returns the `ArrayBufferView` that views the underlying `ArrayBuffer` of this instance.
    * 
    * @param ctor The constructor of `ArrayBufferView`.
+   *    The default is `Uint8Array`.
    * @param byteOffset The offset, in bytes.
    * @param byteLength The length of the `ArrayBufferView`, in bytes.
    * @returns The `ArrayBufferView`.
@@ -2007,6 +2022,18 @@ class ByteSequence {
    * @throws {TypeError} The `byteLength` is not non-negative integer.
    * @throws {RangeError} The `byteLength` is greater than the result of subtracting `byteOffset` from the `byteLength` of this.
    * @throws {RangeError} The `byteLength` is not divisible by `viewConstructor.BYTES_PER_ELEMENT`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const uint8ViewPart = bytes.getView(Uint8Array, 6, 3);
+   * // uint8ViewPart
+   * //   → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
+   * 
+   * uint8ViewPart.fill(0);
+   * 
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
+   * ```
    */
   getView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>, byteOffset = 0, byteLength: number = (this.byteLength - byteOffset)): T {
     let bytesPerElement: number;
