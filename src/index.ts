@@ -594,6 +594,7 @@ class ByteSequence {
    * const bytes = ByteSequence.wrapArrayBuffer(srcBuffer);
    * const dstBuffer = bytes.buffer;
    * // (dstBuffer === srcBuffer) → true
+   * // new Uint8Array(dstBuffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static wrapArrayBuffer(buffer: ArrayBuffer): ByteSequence {
@@ -617,7 +618,8 @@ class ByteSequence {
    * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
    * const bytes = ByteSequence.fromArrayBuffer(srcBuffer);
    * const dstBuffer = bytes.buffer;
-   * // (dstBuffer !== srcBuffer) → true
+   * // (dstBuffer === srcBuffer) → false
+   * // new Uint8Array(dstBuffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static fromArrayBuffer(buffer: ArrayBuffer): ByteSequence {
@@ -655,16 +657,14 @@ class ByteSequence {
    * ```javascript
    * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const bytes = ByteSequence.fromArrayBufferView(uint8Array);
-   * bytes.toArray();
-   * // → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    * @example
    * ```javascript
    * const buffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
    * const dataView = new DataView(buffer);
    * const bytes = ByteSequence.fromArrayBufferView(dataView);
-   * bytes.toArray();
-   * // → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static fromArrayBufferView(bufferView: ArrayBufferView): ByteSequence {
@@ -683,13 +683,12 @@ class ByteSequence {
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const uint8Array = bytes.toUint8Array();
-   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // uint8Array → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * 
    * uint8Array.fill(0);
-   * // → Uint8Array[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+   * // uint8Array → Uint8Array[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
    * 
-   * bytes.toUint8Array();
-   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toUint8Array() → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   toUint8Array(): Uint8Array {
@@ -704,18 +703,15 @@ class ByteSequence {
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const dataView = bytes.toDataView();
-   * new Uint8Array(dataView.buffer);
-   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // new Uint8Array(dataView.buffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * 
    * dataView.setUint8(0, 0);
    * dataView.setUint8(1, 0);
    * dataView.setUint8(2, 0);
    * dataView.setUint8(3, 0);
-   * new Uint8Array(dataView.buffer);
-   * // → Uint8Array[ 0, 0, 0, 0, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // new Uint8Array(dataView.buffer) → Uint8Array[ 0, 0, 0, 0, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * 
-   * new Uint8Array(bytes.toDataView().buffer);
-   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // new Uint8Array(bytes.toDataView().buffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   toDataView(): DataView {
@@ -732,13 +728,12 @@ class ByteSequence {
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const uint8Array = bytes.toArrayBufferView(Uint8ClampedArray);
-   * // → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // uint8Array → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * 
    * uint8Array.fill(0);
-   * // → Uint8ClampedArray[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+   * // uint8Array → Uint8ClampedArray[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
    * 
-   * bytes.toArrayBufferView(Uint8ClampedArray);
-   * // → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArrayBufferView(Uint8ClampedArray) → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   toArrayBufferView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>): T {
@@ -759,11 +754,26 @@ class ByteSequence {
   // TODO byteOffset
   // TODO byteLength
   /**
-   * The alias for the `fromArrayBuffer` and `fromArrayBufferView` methods.
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * that duplicates the underlying `ArrayBuffer` of the specified [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource).
    * 
    * @param bufferSource The object that represents a byte sequence.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `bufferSource` is not type of [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource).
+   * @throws {TypeError} The `bufferSource` is not type of `BufferSource`.
+   * @example
+   * ```javascript
+   * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
+   * const bytes = ByteSequence.fromBufferSource(srcBuffer);
+   * const dstBuffer = bytes.buffer;
+   * // (dstBuffer !== srcBuffer) → true
+   * // new Uint8Array(dstBuffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   * @example
+   * ```javascript
+   * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const bytes = ByteSequence.fromBufferSource(uint8Array);
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static fromBufferSource(bufferSource: BufferSource): ByteSequence {
     if (bufferSource instanceof ArrayBuffer) {
