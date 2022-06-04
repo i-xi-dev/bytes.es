@@ -88,42 +88,25 @@ bytesFromNumberArray.getUint8View();
 // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 ```
 
+---
+
 #### Converting the instance to an `ArrayBuffer`
 
 Use the [ByteSequence.prototype.toArrayBuffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBuffer) method.
 
+---
 
 #### Converting the instance to an `Uint8Array`
-```javascript
-const uint8Array = bytes1.toUint8Array();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 
-const bytesFromUint8Array = ByteSequence.fromArrayBufferView(uint8Array);
-bytesFromUint8Array.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+Use the [ByteSequence.prototype.toUint8Array](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toUint8Array) method.
+
+---
 
 #### Converting the instance to an [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView)
-```javascript
-const uint8Array2 = bytes1.toArrayBufferView(Uint8Array);
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 
-const int8Array = bytes1.toArrayBufferView(Int8Array);
-const uint8ClampedArray = bytes1.toArrayBufferView(Uint8ClampedArray);
-const int16Array = bytes1.toArrayBufferView(Int16Array);
-const uint16Array = bytes1.toArrayBufferView(Uint16Array);
-const int32Array = bytes1.toArrayBufferView(Int32Array);
-const uint32Array = bytes1.toArrayBufferView(Uint32Array);
-const float32Array = bytes1.toArrayBufferView(Float32Array);
-const float64Array = bytes1.toArrayBufferView(Float64Array);
-const bigInt64Array = bytes1.toArrayBufferView(BigInt64Array);
-const bigUint64Array = bytes1.toArrayBufferView(BigUint64Array);
-const dataView = bytes1.toArrayBufferView(DataView);
+Use the [ByteSequence.prototype.toArrayBufferView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBufferView) method.
 
-const bytesFromInt8Array = ByteSequence.fromArrayBufferView(int8Array);
-bytesFromInt8Array.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+---
 
 #### Converting the instance to a [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
 ```javascript
