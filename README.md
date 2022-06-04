@@ -153,10 +153,15 @@ Node.js not support the `File` object
 
 ---
 
+#### Converting the instance to a [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request)
 
-
+- [ByteSequence.prototype.toRequest()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toRequest)
 
 ---
+
+#### Converting the instance to a [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+
+- [ByteSequence.prototype.toResponse()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toResponse)
 
 ---
 
@@ -177,53 +182,22 @@ Node.js not support the `File` object
 
 ---
 
-
-
-
 #### Editing the byte sequence
+
 Gets the underlying `ArrayBuffer`
-```javascript
-const bytes1c = bytes1.duplicate();
-const bytes1Buffer = bytes1c.buffer;
-
-const bytes1BufferView = new Uint8Array(bytes1Buffer);
-
-bytes1BufferView[0] = 0;
-bytes1BufferView[1] = 0;
-bytes1BufferView[2] = 0;
-
-bytes1c.getUint8View();
-// → Uint8Array[ 0x00, 0x00, 0x00, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+- [ByteSequence.prototype.buffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#buffer)
 
 Gets the `ArrayBufferView` that views the underlying `ArrayBuffer`
-```javascript
-const bytes1c2 = bytes1.duplicate();
+- [ByteSequence.prototype.getUint8View()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#getUint8View)
+- [ByteSequence.prototype.getDataView()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#getDataView)
+- [ByteSequence.prototype.getView()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#getView)
 
-const uint8ViewPart = bytes1c2.getUint8View(6, 3);
-// → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
+---
 
-uint8ViewPart[0] = 0;
-uint8ViewPart[1] = 0;
-uint8ViewPart[2] = 0;
 
-bytes1c2.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
-```
 
-```javascript
-const bytes1c3 = bytes1.duplicate();
 
-const int8ViewPart = bytes1c3.getView(Int8Array, 0, 3);
-// → Int8Array[ -27, -81, -116 ]
 
-int8ViewPart[0] = 0;
-int8ViewPart[1] = 0;
-int8ViewPart[2] = 0;
-
-bytes1c3.getView(Uint8Array);
-// → Uint8Array[ 0x00, 0x00, 0x00, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
 
 #### Duplicating the byte sequence
 Duplicates with the new underlying `ArrayBuffer`

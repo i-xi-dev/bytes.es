@@ -527,9 +527,9 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * const bufferRef = bytes.buffer;
+   * const bufferRef = new Uint8Array(bytes.buffer);
    * bufferRef[0] = 0x0;
-   * // new Uint8Array(bufferRef)
+   * // bufferRef
    * //   → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * 
    * // new Uint8Array(bytes.buffer)
@@ -600,8 +600,8 @@ class ByteSequence {
    * ```javascript
    * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
    * const bytes = ByteSequence.wrapArrayBuffer(srcBuffer);
-   * const bufferRef = bytes.buffer;
-   * // (bufferRef === srcBuffer)
+   * const srcBufferRef = bytes.buffer;
+   * // (srcBufferRef === srcBuffer)
    * //   → true
    * ```
    */
@@ -1753,10 +1753,9 @@ class ByteSequence {
    * @experimental
    * @example
    * ```javascript
-   * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]);
    * const request = new Request("http://example.com/foo", {
    *   method: "POST",
-   *   body: blob,
+   *   body: new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]),
    * });
    * const bytes = await ByteSequence.fromRequestOrResponse(request);
    * // bytes.toArray()
@@ -1798,13 +1797,12 @@ class ByteSequence {
    * @experimental
    * @example
    * ```javascript
-   * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]);
    * const request = new Request("http://example.com/foo", {
    *   method: "POST",
    *   headers: new Headers({
    *     "Content-Type": "application/octet-stream",
    *   }),
-   *   body: blob,
+   *   body: new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]),
    * });
    * const { data, options } = await ByteSequence.describedFromRequestOrResponse(request);
    * // data.toArray()
@@ -1849,6 +1847,20 @@ class ByteSequence {
 
   /**
    * @experimental
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const request = bytes.toRequest("http://example.com/foo", {
+   *   method: "POST",
+   *   headers: new Headers({
+   *     "Content-Type": "application/octet-stream",
+   *   }),
+   * });
+   * // new Uint8Array(await request.arrayBuffer())
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // request.headers.get("Content-Type")
+   * //   → "application/octet-stream"
+   * ```
    */
   toRequest(url: string, options: RequestInit): Request {
     const headers = _createHeaders(options?.headers);
@@ -1882,6 +1894,19 @@ class ByteSequence {
 
   /**
    * @experimental
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const response = bytes.toResponse({
+   *   headers: new Headers({
+   *     "Content-Type": "application/octet-stream",
+   *   }),
+   * });
+   * // new Uint8Array(await response.arrayBuffer())
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // response.headers.get("Content-Type")
+   * //   → "application/octet-stream"
+   * ```
    */
   toResponse(options: ResponseInit): Response {
     const headers = _createHeaders(options?.headers);
@@ -1940,6 +1965,18 @@ class ByteSequence {
    * @param byteOffset The offset, in bytes.
    * @param byteLength The length of the `ArrayBufferView`, in bytes.
    * @returns The `Uint8Array`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const uint8ViewPart = bytes.getUint8View(6, 3);
+   * // uint8ViewPart
+   * //   → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
+   * uint8ViewPart.fill(0);
+   * 
+   * const uint8View = bytes.getUint8View();
+   * // uint8View
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
+   * ```
    */
   getUint8View(byteOffset?: number, byteLength?: number): Uint8Array {
     return this.getView(Uint8Array, byteOffset, byteLength);
