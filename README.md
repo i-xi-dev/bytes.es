@@ -46,21 +46,15 @@ import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
 ![Conversion](assets/conversion.svg)
 
 #### Creating an instance
-Creates an instance filled with zeros
-```javascript
-const zeroFilledBytes = ByteSequence.allocate(1024);
-// zeroFilledBytes.byteLength → 1024
-```
-
----
-
-Creates an instance filled with random bytes
-
-Use the [ByteSequence.generateRandom](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#generateRandom) method.
 
 ---
 
 Creates an instance with a new underlying buffer
+
+- [ByteSequence.allocate](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#allocate)
+- [ByteSequence.generateRandom](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#generateRandom)
+- [ByteSequence.fromBinaryString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBinaryString)
+
 ```javascript
 const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
 const buffer = uint8Array.buffer;
@@ -94,31 +88,27 @@ bytesFromNumberArray.getUint8View();
 
 #### Converting the instance to an `ArrayBuffer`
 
-Use the [ByteSequence.prototype.toArrayBuffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBuffer) method.
+- [ByteSequence.prototype.toArrayBuffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBuffer)
 
 ---
 
 #### Converting the instance to an `Uint8Array`
 
-Use the [ByteSequence.prototype.toUint8Array](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toUint8Array) method.
+- [ByteSequence.prototype.toUint8Array](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toUint8Array)
 
 ---
 
 #### Converting the instance to an [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView)
 
-Use the [ByteSequence.prototype.toArrayBufferView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBufferView) method.
+- [ByteSequence.prototype.toArrayBufferView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBufferView)
 
 ---
 
 #### Converting the instance to a [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
-```javascript
-const binaryString = bytes1.toBinaryString();
-// → "å¯\u{8C}å£«å±±"
 
-const bytesFromBinaryString = ByteSequence.fromBinaryString(binaryString);
-bytesFromBinaryString.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+- [ByteSequence.prototype.toBinaryString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toBinaryString)
+
+---
 
 #### Converting the instance to a string containing Base64 encoded bytes
 ```javascript

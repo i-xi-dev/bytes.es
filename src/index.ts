@@ -892,6 +892,11 @@ class ByteSequence {
    * 
    * @param binaryString The [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary).
    * @returns A new `ByteSequence` object.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.fromBinaryString("å¯\u{8C}å£«å±±");
+   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static fromBinaryString(binaryString: string): ByteSequence {
     const bytes = IsomorphicEncoding.encode(binaryString);
@@ -902,6 +907,11 @@ class ByteSequence {
    * Returns the [isomorphic decoded](https://infra.spec.whatwg.org/#isomorphic-decode) string of this byte sequence.
    * 
    * @returns The [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary).
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * // bytes.toBinaryString() → "å¯\u{8C}å£«å±±"
+   * ```
    */
   toBinaryString(): string {
     return IsomorphicEncoding.decode(this.#buffer);
