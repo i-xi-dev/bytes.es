@@ -537,10 +537,8 @@ class ByteSequence {
    * 
    * @example
    * ```javascript
-   * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * const bytes = ByteSequence.fromArrayBufferView(uint8Array);
-   * 
-   * const sha256Integrity = await bytes.sha256Integrity;
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const integrity = await bytes.sha256Integrity;
    * // → "sha256-4pSrnUKfmpomeNmW5dvUDL9iNjpe1Bf2VMXwuoYeQgA="
    * ```
    */

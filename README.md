@@ -268,14 +268,12 @@ bytesFromUtf8Text2.getUint8View();
 ---
 
 #### Generating a [subresource integrity](https://www.w3.org/TR/SRI/) value of the instance
-```javascript
-const sha256Integrity = await bytes1.sha256Integrity;
-// → "sha256-4pSrnUKfmpomeNmW5dvUDL9iNjpe1Bf2VMXwuoYeQgA="
 
-// also supports SHA-384 and SHA-512
-const sha384Integrity = await bytes1.sha384Integrity;
-const sha512Integrity = await bytes1.sha512Integrity;
-```
+- [ByteSequence.prototype.sha256Integrity](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#sha256Integrity)
+- [ByteSequence.prototype.sha384Integrity](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#sha384Integrity)
+- [ByteSequence.prototype.sha512Integrity](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#sha512Integrity)
+
+---
 
 #### Creating an instance by reading the [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of `Uint8Array`
 ```javascript
