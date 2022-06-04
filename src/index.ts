@@ -1441,36 +1441,36 @@ class ByteSequence {
    */
   static async describedFromBlob(blob: Blob): Promise<ByteSequence.Described> {
     const data = await ByteSequence.fromBlob(blob);
-    try {
-      let mediaType: MediaType | null = null;
-      if (blob.type) {
-        mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
-      }
-
-      let fileName: string | undefined = undefined;
-      let fileLastModified: number | undefined = undefined;
-      if (globalThis.File && (blob instanceof File)) {
-        fileName = blob.name;
-        fileLastModified = blob.lastModified;
-      }
-
-      const options = (mediaType || fileLastModified) ? {
-        type: mediaType?.toString(),
-        lastModified: fileLastModified,
-      } : undefined;
-
-      return {
-        data,
-        fileName,
-        options,
-      };
+    // try {
+    let mediaType: MediaType | null = null;
+    if (blob.type) {
+      mediaType = MediaType.fromString(blob.type); // パース失敗で例外になる場合あり
     }
-    catch (exception) {
-      // MediaTypeのパース失敗
 
-      // XXX throw new Error("reading failed", { cause: exception });
-      throw exception;
+    let fileName: string | undefined = undefined;
+    let fileLastModified: number | undefined = undefined;
+    if (globalThis.File && (blob instanceof File)) {
+      fileName = blob.name;
+      fileLastModified = blob.lastModified;
     }
+
+    const options = (mediaType || fileLastModified) ? {
+      type: mediaType?.toString(),
+      lastModified: fileLastModified,
+    } : undefined;
+
+    return {
+      data,
+      fileName,
+      options,
+    };
+    // }
+    // catch (exception) {
+    //   // MediaTypeのパース失敗
+
+    //   // XXX throw new Error("reading failed", { cause: exception });
+    //   throw exception;
+    // }
   }
 
   /**
@@ -1922,6 +1922,18 @@ class ByteSequence {
    * duplicated from the underlying `ArrayBuffer` of this instance.
    * 
    * @returns A new `ByteSequence` object.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const clone = bytes.duplicate();
+   * 
+   * clone.getUint8View()[0] = 0;
+   * // clone.toArray()
+   * //   → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * 
+   * // bytes.toArray()
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   duplicate(): ByteSequence {
     return new ByteSequence(this.toArrayBuffer());
@@ -1938,6 +1950,18 @@ class ByteSequence {
    * @throws {RangeError} The `start` is greater than the `byteLength` of this.
    * @throws {TypeError} The `end` is not non-negative integer.
    * @throws {RangeError} The `end` is less than the `start`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const subsequenceClone = bytes.subsequence(6, 9);
+   * 
+   * subsequenceClone.getUint8View()[0] = 0;
+   * // subsequenceClone.toArray()
+   * //   → Uint8Array[ 0x0, 0xB1, 0xB1 ]
+   * 
+   * // bytes.toArray()
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   subsequence(start: number, end?: number): ByteSequence {
     if (Integer.isNonNegativeInteger(start) !== true) {
@@ -1960,6 +1984,42 @@ class ByteSequence {
   }
 
   /**
+   * Returns a new iterator that contains byte sequences divided by the specified length.
+   * 
+   * @param segmentByteLength The segment length, in bytes.
+   * @returns A new iterator.
+   * @throws {TypeError} The `segmentByteLength` is not non-negative integer.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const subsequenceClones = [ ...bytes.segment(3) ];
+   * // subsequenceClones[0]
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C ]
+   * // subsequenceClones[1]
+   * //   → Uint8Array[ 0xE5, 0xA3, 0xAB ]
+   * // subsequenceClones[2]
+   * //   → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
+   * ```
+   */
+  segment(segmentByteLength: number): IterableIterator<ByteSequence> {
+    if (Integer.isPositiveInteger(segmentByteLength) !== true) {
+      throw new TypeError("segmentByteLength");
+    }
+
+    return (function*(bytes: ByteSequence): Generator<ByteSequence, void, void> {
+      let i = 0;
+      let itemLength = segmentByteLength;
+      while (i < bytes.byteLength) {
+        if ((i + segmentByteLength) > bytes.byteLength) {
+          itemLength = bytes.byteLength - i;
+        }
+        yield bytes.subsequence(i, i + itemLength);
+        i = i + segmentByteLength;
+      }
+    })(this);
+  }
+
+  /**
    * Returns the `Uint8Array` that views the underlying `ArrayBuffer` of this instance.
    * 
    * @param byteOffset The offset, in bytes.
@@ -1975,7 +2035,7 @@ class ByteSequence {
    * uint8ViewPart.fill(0);
    * 
    * // bytes.toArray()
-   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x0, 0x0, 0x0 ]
    * ```
    */
   getUint8View(byteOffset?: number, byteLength?: number): Uint8Array {
@@ -2000,7 +2060,7 @@ class ByteSequence {
    * dataViewPart.setUint8(2, 0);
    * 
    * // bytes.toArray()
-   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x0, 0x0, 0x0 ]
    * ```
    */
   getDataView(byteOffset?: number, byteLength?: number): DataView {
@@ -2032,7 +2092,7 @@ class ByteSequence {
    * uint8ViewPart.fill(0);
    * 
    * // bytes.toArray()
-   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x0, 0x0, 0x0 ]
    * ```
    */
   getView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>, byteOffset = 0, byteLength: number = (this.byteLength - byteOffset)): T {
@@ -2147,31 +2207,6 @@ class ByteSequence {
     }
 
     throw new TypeError("otherBytes");
-  }
-
-  /**
-   * Returns a new iterator that contains byte sequences divided by the specified length.
-   * 
-   * @param segmentByteLength The segment length, in bytes.
-   * @returns A new iterator.
-   * @throws {TypeError} The `segmentByteLength` is not non-negative integer.
-   */
-  segment(segmentByteLength: number): IterableIterator<ByteSequence> {
-    if (Integer.isPositiveInteger(segmentByteLength) !== true) {
-      throw new TypeError("segmentByteLength");
-    }
-
-    return (function*(bytes: ByteSequence): Generator<ByteSequence, void, void> {
-      let i = 0;
-      let itemLength = segmentByteLength;
-      while (i < bytes.byteLength) {
-        if ((i + segmentByteLength) > bytes.byteLength) {
-          itemLength = bytes.byteLength - i;
-        }
-        yield bytes.subsequence(i, i + itemLength);
-        i = i + segmentByteLength;
-      }
-    })(this);
   }
 
   // XXX at(): Uint8Arrayで出来る

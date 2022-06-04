@@ -194,34 +194,19 @@ Gets the `ArrayBufferView` that views the underlying `ArrayBuffer`
 
 ---
 
-
-
-
-
-
 #### Duplicating the byte sequence
+
 Duplicates with the new underlying `ArrayBuffer`
-```javascript
-const bytes1d = bytes1.duplicate();
-
-bytes1d.getUint8View()[0] = 0;
-bytes1d.toUint8Array();
-// → Uint8Array[ 0x00, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-
-bytes1.toUint8Array();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+- [ByteSequence.prototype.duplicate()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#duplicate)
 
 Duplicates the subsequence with the new underlying `ArrayBuffer`
-```javascript
-const bytes1d2 = bytes1.subsequence(6, 9);
+- [ByteSequence.prototype.subsequence()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#subsequence)
+- [ByteSequence.prototype.segment()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#segment)
 
-bytes1d2.getUint8View()[0] = 0;
-bytes1d2.getUint8View()[1] = 0;
-bytes1d2.getUint8View()[2] = 0;
-bytes1d2.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x00, 0x00, 0x00 ]
+---
 
-bytes1.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+#### Comparing the byte sequence
+
+- [ByteSequence.prototype.equals()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#equals)
+- [ByteSequence.prototype.startsWith()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#startsWith)
+
