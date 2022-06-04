@@ -504,12 +504,17 @@ class ByteSequence {
    * 
    * @example
    * ```javascript
-   * const bytesA = ByteSequence.allocate(1024);
-   * // bytesA.byteLength → 1024
-   * 
-   * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * const bytesB = ByteSequence.fromArrayBufferView(uint8Array);
-   * // bytesB.byteLength → 8
+   * const bytes = ByteSequence.allocate(1024);
+   * const byteCount = bytes.byteLength;
+   * // byteCount
+   * //   → 1024
+   * ```
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const byteCount = bytes.byteLength;
+   * // byteCount
+   * //   → 8
    * ```
    */
   get byteLength(): number {
@@ -521,11 +526,14 @@ class ByteSequence {
    * 
    * @example
    * ```javascript
-   * const bytes = ByteSequence.fromArray([ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]);
-   * const dstBuffer = bytes.buffer;
-   * dstBuffer[0] = 0x0;
-   * // new Uint8Array(bytes.buffer) → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * // new Uint8Array(dstBuffer) → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const bufferRef = bytes.buffer;
+   * bufferRef[0] = 0x0;
+   * // new Uint8Array(bufferRef)
+   * //   → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * 
+   * // new Uint8Array(bytes.buffer)
+   * //   → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   get buffer(): ArrayBuffer {
@@ -539,7 +547,8 @@ class ByteSequence {
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const integrity = await bytes.sha256Integrity;
-   * // → "sha256-4pSrnUKfmpomeNmW5dvUDL9iNjpe1Bf2VMXwuoYeQgA="
+   * // integrity
+   * //   → "sha256-4pSrnUKfmpomeNmW5dvUDL9iNjpe1Bf2VMXwuoYeQgA="
    * ```
    */
   get sha256Integrity(): Promise<string> {
@@ -570,7 +579,8 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.allocate(1024);
-   * // bytes.byteLength → 1024
+   * // bytes.byteLength
+   * //   → 1024
    * ```
    */
   static allocate(byteLength: number): ByteSequence {
@@ -590,9 +600,9 @@ class ByteSequence {
    * ```javascript
    * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
    * const bytes = ByteSequence.wrapArrayBuffer(srcBuffer);
-   * const dstBuffer = bytes.buffer;
-   * // (dstBuffer === srcBuffer) → true
-   * // new Uint8Array(dstBuffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * const bufferRef = bytes.buffer;
+   * // (bufferRef === srcBuffer)
+   * //   → true
    * ```
    */
   static wrapArrayBuffer(buffer: ArrayBuffer): ByteSequence {
@@ -616,8 +626,8 @@ class ByteSequence {
    * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
    * const bytes = ByteSequence.fromArrayBuffer(srcBuffer);
    * const dstBuffer = bytes.buffer;
-   * // (dstBuffer === srcBuffer) → false
-   * // new Uint8Array(dstBuffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // (dstBuffer === srcBuffer)
+   * //   → false
    * ```
    */
   static fromArrayBuffer(buffer: ArrayBuffer): ByteSequence {
@@ -633,11 +643,16 @@ class ByteSequence {
    * @returns The `ArrayBuffer`.
    * @example
    * ```javascript
-   * const bytes = ByteSequence.fromArray([ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]);
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const dstBuffer = bytes.toArrayBuffer();
    * dstBuffer[0] = 0x0;
-   * // new Uint8Array(bytes.buffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * // new Uint8Array(dstBuffer) → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * const dstView = new Uint8Array(dstBuffer);
+   * // dstView
+   * //   → Uint8Array[ 0x0, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * 
+   * const srcView = new Uint8Array(bytes.buffer);
+   * // srcView
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   toArrayBuffer(): ArrayBuffer {
@@ -655,14 +670,16 @@ class ByteSequence {
    * ```javascript
    * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const bytes = ByteSequence.fromArrayBufferView(uint8Array);
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    * @example
    * ```javascript
    * const buffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
    * const dataView = new DataView(buffer);
    * const bytes = ByteSequence.fromArrayBufferView(dataView);
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static fromArrayBufferView(bufferView: ArrayBufferView): ByteSequence {
@@ -681,12 +698,14 @@ class ByteSequence {
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const uint8Array = bytes.toUint8Array();
-   * // uint8Array → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * 
+   * // uint8Array
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * uint8Array.fill(0);
-   * // uint8Array → Uint8Array[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+   * // uint8Array
+   * //   → Uint8Array[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
    * 
-   * // bytes.toUint8Array() → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toUint8Array()
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   toUint8Array(): Uint8Array {
@@ -701,15 +720,18 @@ class ByteSequence {
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const dataView = bytes.toDataView();
-   * // new Uint8Array(dataView.buffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // new Uint8Array(dataView.buffer)
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * 
    * dataView.setUint8(0, 0);
    * dataView.setUint8(1, 0);
    * dataView.setUint8(2, 0);
    * dataView.setUint8(3, 0);
-   * // new Uint8Array(dataView.buffer) → Uint8Array[ 0, 0, 0, 0, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // new Uint8Array(dataView.buffer)
+   * //   → Uint8Array[ 0, 0, 0, 0, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * 
-   * // new Uint8Array(bytes.toDataView().buffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // new Uint8Array(bytes.toDataView().buffer)
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   toDataView(): DataView {
@@ -726,12 +748,15 @@ class ByteSequence {
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const uint8Array = bytes.toArrayBufferView(Uint8ClampedArray);
-   * // uint8Array → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // uint8Array
+   * //   → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * 
    * uint8Array.fill(0);
-   * // uint8Array → Uint8ClampedArray[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+   * // uint8Array
+   * //   → Uint8ClampedArray[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
    * 
-   * // bytes.toArrayBufferView(Uint8ClampedArray) → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArrayBufferView(Uint8ClampedArray)
+   * //   → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   toArrayBufferView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>): T {
@@ -763,14 +788,17 @@ class ByteSequence {
    * const srcBuffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
    * const bytes = ByteSequence.fromBufferSource(srcBuffer);
    * const dstBuffer = bytes.buffer;
-   * // (dstBuffer !== srcBuffer) → true
-   * // new Uint8Array(dstBuffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // (dstBuffer === srcBuffer)
+   * //   → false
+   * // new Uint8Array(dstBuffer)
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    * @example
    * ```javascript
    * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const bytes = ByteSequence.fromBufferSource(uint8Array);
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static fromBufferSource(bufferSource: BufferSource): ByteSequence {
@@ -793,7 +821,8 @@ class ByteSequence {
    * ```javascript
    * const array = [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ];
    * const bytes = ByteSequence.fromArray(array);
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
@@ -809,9 +838,10 @@ class ByteSequence {
    * @returns The `Array` of 8-bit unsigned integers.
    * @example
    * ```javascript
-   * const array = [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ];
-   * const bytes = ByteSequence.fromArray(array);
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const array = bytes.toArray();
+   * // array
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   toArray(): Array<number> {
@@ -869,7 +899,8 @@ class ByteSequence {
    * @example
    * ```javascript
    * const randomBytes = ByteSequence.generateRandom(1024);
-   * // randomBytes.byteLength → 1024
+   * // randomBytes.byteLength
+   * //   → 1024
    * ```
    */
   static generateRandom(byteLength: number): ByteSequence {
@@ -893,7 +924,8 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.fromBinaryString("å¯\u{8C}å£«å±±");
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static fromBinaryString(binaryString: string): ByteSequence {
@@ -908,7 +940,9 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * // bytes.toBinaryString() → "å¯\u{8C}å£«å±±"
+   * const binaryString = bytes.toBinaryString();
+   * // binaryString
+   * //   → "å¯\u{8C}å£«å±±"
    * ```
    */
   toBinaryString(): string {
@@ -929,7 +963,8 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.parse("E5AF8CE5A3ABE5B1B1");
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    * @example
    * ```javascript
@@ -937,7 +972,8 @@ class ByteSequence {
    *   lowerCase: true,
    * };
    * const bytes = ByteSequence.parse("e5af8ce5a3abe5b1b1", options);
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static parse(formattedBytes: string, options?: ByteSequence.Format.Options): ByteSequence {
@@ -958,7 +994,9 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * // bytes.format() → "E5AF8CE5A3ABE5B1B1"
+   * const str = bytes.format();
+   * // str
+   * //   → "E5AF8CE5A3ABE5B1B1"
    * ```
    * @example
    * ```javascript
@@ -966,7 +1004,9 @@ class ByteSequence {
    *   lowerCase: true,
    * };
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * // bytes.format(options) → "e5af8ce5a3abe5b1b1"
+   * const str = bytes.format(options);
+   * // str
+   * //   → "e5af8ce5a3abe5b1b1"
    * ```
    */
   format(options?: ByteSequence.Format.Options): string {
@@ -984,7 +1024,8 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.fromBase64Encoded("5a+M5aOr5bGx");
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    * @example
    * ```javascript
@@ -995,7 +1036,8 @@ class ByteSequence {
    *   noPadding: true,
    * };
    * const bytes = ByteSequence.fromBase64Encoded("5a-M5aOr5bGx", base64Url);
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static fromBase64Encoded(base64Encoded: string, options?: Base64.Options): ByteSequence {
@@ -1012,7 +1054,9 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * // bytes.toBase64Encoded() → "5a+M5aOr5bGx"
+   * const encoded = bytes.toBase64Encoded();
+   * // encoded
+   * //   → "5a+M5aOr5bGx"
    * ```
    * @example
    * ```javascript
@@ -1023,7 +1067,9 @@ class ByteSequence {
    *   noPadding: true,
    * };
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * // bytes.toBase64Encoded(base64Url) → "5a-M5aOr5bGx"
+   * const encoded = bytes.toBase64Encoded(base64Url);
+   * // encoded
+   * //   → "5a-M5aOr5bGx"
    * ```
    */
   toBase64Encoded(options?: Base64.Options): string {
@@ -1040,7 +1086,8 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.fromPercentEncoded("%E5%AF%8C%E5%A3%AB%E5%B1%B1");
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    * @example
    * ```javascript
@@ -1050,8 +1097,8 @@ class ByteSequence {
    *   encodeSet: [ 0x20, 0x22, 0x23, 0x24, 0x26, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ],
    * };
    * const bytes = ByteSequence.fromPercentEncoded("%E5%AF%8C%E5%A3%AB%E5%B1%B1", urlComponent);
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * // bytes.utf8DecodeTo() → "富士山"
+   * // bytes.utf8DecodeTo()
+   * //   → "富士山"
    * ```
    * @example
    * ```javascript
@@ -1063,7 +1110,8 @@ class ByteSequence {
    * };
    * const bytes = ByteSequence.fromPercentEncoded("%E5%AF%8C%E5%A3%AB%E5%B1%B1", formUrlEnc);
    * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * // bytes.utf8DecodeTo() → "富士山"
+   * // bytes.utf8DecodeTo()
+   * //   → "富士山"
    * ```
    */
   static fromPercentEncoded(percentEncoded: string, options?: Percent.Options): ByteSequence {
@@ -1080,7 +1128,8 @@ class ByteSequence {
    * @example
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * // bytes.toPercentEncoded() → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
+   * const encoded = bytes.toPercentEncoded();
+   * // encoded → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
    * ```
    * @example
    * ```javascript
@@ -1090,8 +1139,11 @@ class ByteSequence {
    *   encodeSet: [ 0x20, 0x22, 0x23, 0x24, 0x26, 0x2B, 0x2C, 0x2F, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x5B, 0x5C, 0x5D, 0x5E, 0x60, 0x7B, 0x7C, 0x7D ],
    * };
    * const bytes = ByteSequence.utf8EncodeFrom("富士山");
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * // bytes.toPercentEncoded(urlComponent) → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * const encoded = bytes.toPercentEncoded(urlComponent);
+   * // encoded
+   * //   → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
    * ```
    * @example
    * ```javascript
@@ -1102,8 +1154,11 @@ class ByteSequence {
    *   spaceAsPlus: true,
    * };
    * const bytes = ByteSequence.utf8EncodeFrom("富士山");
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * // bytes.toPercentEncoded(formUrlEnc) → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * const encoded = bytes.toPercentEncoded(formUrlEnc);
+   * // encoded
+   * //   → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
    * ```
    */
   toPercentEncoded(options?: Percent.Options): string {
@@ -1118,7 +1173,8 @@ class ByteSequence {
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const digestBytes = await bytes.toSha256Digest();
-   * // digestBytes.format() → "E294AB9D429F9A9A2678D996E5DBD40CBF62363A5ED417F654C5F0BA861E4200"
+   * // digestBytes.format()
+   * //   → "E294AB9D429F9A9A2678D996E5DBD40CBF62363A5ED417F654C5F0BA861E4200"
    * ```
    */
   async toSha256Digest(): Promise<ByteSequence> {
@@ -1163,7 +1219,8 @@ class ByteSequence {
    * };
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const digestBytes = await bytes.toDigest(md5);
-   * // digestBytes.format() → "52A6AD27415BD86EC64B57EFBEA27F98"
+   * // digestBytes.format()
+   * //   → "52A6AD27415BD86EC64B57EFBEA27F98"
    * ```
    */
   async toDigest(algorithm: ByteSequence.DigestAlgorithm): Promise<ByteSequence> {
@@ -1211,6 +1268,12 @@ class ByteSequence {
    * 
    * @param text The string.
    * @returns A new `ByteSequence` object.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.utf8EncodeFrom("富士山");
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static utf8EncodeFrom(text: string): ByteSequence {
     const encoded = _getUtf8TextEncoder().encode(text);
@@ -1222,6 +1285,13 @@ class ByteSequence {
    * Neither adds nor removes BOM.
    * 
    * @returns A string decoded in UTF-8.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const text = bytes.utf8DecodeTo();
+   * // text
+   * //   → "富士山"
+   * ```
    */
   utf8DecodeTo(): string {
     return _getUtf8TextDecoder().decode(this.#view);
@@ -1234,6 +1304,37 @@ class ByteSequence {
    * @param text The string.
    * @param encoder The text encoder, for example `TextEncoder`.
    * @returns A new `ByteSequence` object.
+   * @example
+   * ```javascript
+   * // EUC-JP encoding (Node.js)
+   * 
+   * import iconv from "iconv-lite";
+   * const eucJp = {
+   *   // encode: (toEncode: string) => Uint8Array
+   *   encode(toEncode) {
+   *     return iconv.encode(toEncode, "EUC-JP");
+   *   },
+   * };
+   * const bytes = ByteSequence.textEncodeFrom("富士山", eucJp);
+   * // bytes.toArray()
+   * //   → [ 0xC9, 0xD9, 0xBB, 0xCE, 0xBB, 0xB3 ]
+   * ```
+   * @example
+   * ```javascript
+   * // UTF-8 encoding (add the BOM)
+   * 
+   * const encoder = new TextEncoder();
+   * const utf8 = {
+   *   // encode: (toEncode: string) => Uint8Array
+   *   encode(toEncode) {
+   *     const prepend = toEncode.startsWith("\uFEFF") ? "" : "\uFEFF";
+   *     return encoder.encode(prepend + toEncode);
+   *   },
+   * };
+   * const bytes = ByteSequence.textEncodeFrom("富士山", utf8);
+   * // bytes.toArray()
+   * //   → [ 0xEF, 0xBB, 0xBF, 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   static textEncodeFrom(text: string, encoder: { encode: (input?: string) => Uint8Array } = _getUtf8TextEncoder()): ByteSequence {
     const encoded = encoder.encode(text);
@@ -1246,6 +1347,38 @@ class ByteSequence {
    * 
    * @param decoder The text decoder, for example `TextDecoder`.
    * @returns A string decoded in the specified text encoding.
+   * @example
+   * ```javascript
+   * // EUC-JP decoding (Node.js)
+   * 
+   * import iconv from "iconv-lite";
+   * const eucJp = {
+   *   // decode: (encoded: Uint8Array) => string
+   *   decode(encoded) {
+   *     return iconv.decode(Buffer.from(encoded), "EUC-JP");
+   *   },
+   * };
+   * const bytes = ByteSequence.of(0xC9, 0xD9, 0xBB, 0xCE, 0xBB, 0xB3);
+   * const text = bytes.textDecodeTo(eucJp);
+   * // text
+   * //   → "富士山"
+   * ```
+   * @example
+   * ```javascript
+   * // UTF-8 decoding (remove the BOM)
+   * 
+   * const decoder = new TextDecoder("utf-8", { ignoreBOM: false });
+   * const utf8 = {
+   *   // decode: (encoded: Uint8Array) => string
+   *   decode(encoded) {
+   *     return decoder.decode(encoded);
+   *   },
+   * };
+   * const bytes = ByteSequence.of(0xEF, 0xBB, 0xBF, 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const text = bytes.textDecodeTo(utf8);
+   * // text
+   * //   → "富士山"
+   * ```
    */
   textDecodeTo(decoder: { decode: (input?: Uint8Array) => string } = _getUtf8TextDecoder()): string {
     return decoder.decode(this.#view);

@@ -49,70 +49,89 @@ import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
 
 Creates an instance with a new underlying buffer
 
-- [ByteSequence.allocate](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#allocate)
-- [ByteSequence.generateRandom](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#generateRandom)
-- [ByteSequence.fromArrayBuffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArrayBuffer)
-- [ByteSequence.fromArrayBufferView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArrayBufferView)
-- [ByteSequence.fromBufferSource](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBufferSource)
-- [ByteSequence.fromArray](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArray)
-- [ByteSequence.from](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#from)
-- [ByteSequence.of](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#of)
-- [ByteSequence.fromBinaryString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBinaryString)
-- [ByteSequence.fromBase64Encoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBase64Encoded)
-- [ByteSequence.fromPercentEncoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromPercentEncoded)
-- [ByteSequence.parse](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#parse)
+- [ByteSequence.allocate()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#allocate)
+- [ByteSequence.generateRandom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#generateRandom)
+- [ByteSequence.fromArrayBuffer()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArrayBuffer)
+- [ByteSequence.fromArrayBufferView()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArrayBufferView)
+- [ByteSequence.fromBufferSource()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBufferSource)
+- [ByteSequence.fromArray()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArray)
+- [ByteSequence.from()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#from)
+- [ByteSequence.of()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#of)
+- [ByteSequence.fromBinaryString()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBinaryString)
+- [ByteSequence.fromBase64Encoded()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBase64Encoded)
+- [ByteSequence.fromPercentEncoded()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromPercentEncoded)
+- [ByteSequence.parse()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#parse)
+- [ByteSequence.utf8EncodeFrom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#utf8EncodeFrom)
+- [ByteSequence.textEncodeFrom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#textEncodeFrom)
 
 Creates an instance with the specified underlying buffer
 
-- [ByteSequence.wrapArrayBuffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#wrapArrayBuffer)
+- [ByteSequence.wrapArrayBuffer()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#wrapArrayBuffer)
 
 ---
 
 #### Converting the instance to an `ArrayBuffer`
 
-- [ByteSequence.prototype.toArrayBuffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBuffer)
+- [ByteSequence.prototype.toArrayBuffer()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBuffer)
 
 ---
 
 #### Converting the instance to an [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView)
 
-- [ByteSequence.prototype.toUint8Array](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toUint8Array)
-- [ByteSequence.prototype.toDataView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toDataView)
-- [ByteSequence.prototype.toArrayBufferView](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBufferView)
+- [ByteSequence.prototype.toUint8Array()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toUint8Array)
+- [ByteSequence.prototype.toDataView()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toDataView)
+- [ByteSequence.prototype.toArrayBufferView()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBufferView)
 
 ---
 
 #### Converting the instance to a number array
 
-- [ByteSequence.prototype.toArray](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArray)
-- [ByteSequence.prototype.toJSON](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toJSON)
+- [ByteSequence.prototype.toArray()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArray)
+- [ByteSequence.prototype.toJSON()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toJSON)
 
 ---
 
 #### Converting the instance to a [binary string](https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary)
 
-- [ByteSequence.prototype.toBinaryString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toBinaryString)
+- [ByteSequence.prototype.toBinaryString()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toBinaryString)
 
 ---
 
 #### Converting the instance to a string containing Base64 encoded bytes
 
-- [ByteSequence.prototype.toBase64Encoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toBase64Encoded)
+- [ByteSequence.prototype.toBase64Encoded()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toBase64Encoded)
 
 ---
 
 #### Converting the instance to a string containing percent encoded bytes
 
-- [ByteSequence.prototype.toPercentEncoded](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toPercentEncoded)
+- [ByteSequence.prototype.toPercentEncoded()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toPercentEncoded)
 
 ---
 
 #### Converting the instance to a string based on the specified format
 
-- [ByteSequence.prototype.format](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#format)
-- [ByteSequence.prototype.toString](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toString)
+- [ByteSequence.prototype.format()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#format)
+- [ByteSequence.prototype.toString()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toString)
 
 ---
+
+#### Converting the instance to a text
+
+- [ByteSequence.prototype.utf8DecodeTo()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#utf8DecodeTo)
+- [ByteSequence.prototype.textDecodeTo()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#textDecodeTo)
+
+
+
+
+
+
+
+
+
+
+
+
 
 #### Converting the instance to a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
 ```javascript
@@ -193,77 +212,14 @@ bytesFromDataUrl2.getUint8View();
 ```
 
 
-#### Converting the instance to a text
-UTF-8 encoding (does not add or remove the BOM)
-```javascript
-// UTF-8 decode
-const utf8Text = bytes1.utf8DecodeTo();
-// → "富士山"
-
-// UTF-8 encode
-const bytesFromUtf8Text = ByteSequence.utf8EncodeFrom(utf8Text);
-bytesFromUtf8Text.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
-
-##### Other text encodings
-
-Example in Node.js: EUC-JP encoding
-```javascript
-import iconv from "iconv-lite";
-const bytes1X = ByteSequence.fromArray([ 0xC9, 0xD9, 0xBB, 0xCE, 0xBB, 0xB3 ]);
-
-const eucJpText = bytes1X.textDecodeTo({
-  // decode: (encoded: Uint8Array) => string
-  decode(encoded) {
-    return iconv.decode(Buffer.from(encoded), "EUC-JP");
-  },
-});
-// → "富士山"
-
-const bytesFromEucJpText = ByteSequence.textEncodeFrom(eucJpText, {
-  // encode: (toEncode: string) => Uint8Array
-  encode(toEncode) {
-    return iconv.encode(toEncode, "EUC-JP");
-  },
-});
-bytesFromEucJpText.getUint8View();
-// → Uint8Array[ 0xC9, 0xD9, 0xBB, 0xCE, 0xBB, 0xB3 ]
-```
-
-Example: UTF-8 encoding (add or remove the BOM)
-```javascript
-const utf8Decoder = new TextDecoder("utf-8", { ignoreBOM: false });
-const utf8Encoder = new TextEncoder();
-const bytes1Y = ByteSequence.fromArray([ 0xEF, 0xBB, 0xBF, 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]);
-
-const utf8Text2 = bytes1.textDecodeTo({
-  // decode: (encoded: Uint8Array) => string
-  decode(encoded) {
-    return utf8Decoder.decode(encoded);
-  },
-});
-// → "富士山"
-
-const bytesFromUtf8Text2 = ByteSequence.textEncodeFrom(utf8Text2, {
-  // encode: (toEncode: string) => Uint8Array
-  encode(toEncode) {
-    const prepend = toEncode.startsWith("\uFEFF") ? "" : "\uFEFF";
-    return utf8Encoder.encode(prepend + toEncode);
-  },
-});
-bytesFromUtf8Text2.getUint8View();
-// → Uint8Array[ 0xEF, 0xBB, 0xBF, 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
-
 ---
 
 #### Generating a digest of the instance
 
-- [ByteSequence.prototype.toSha256Digest](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toSha256Digest)
-- [ByteSequence.prototype.toSha384Digest](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toSha384Digest)
-- [ByteSequence.prototype.toSha512Digest](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toSha512Digest)
-- [ByteSequence.prototype.toDigest](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toDigest)
+- [ByteSequence.prototype.toSha256Digest()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toSha256Digest)
+- [ByteSequence.prototype.toSha384Digest()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toSha384Digest)
+- [ByteSequence.prototype.toSha512Digest()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toSha512Digest)
+- [ByteSequence.prototype.toDigest()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toDigest)
 
 ---
 
