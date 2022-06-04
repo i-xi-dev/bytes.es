@@ -655,16 +655,16 @@ class ByteSequence {
    * ```javascript
    * const uint8Array = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const bytes = ByteSequence.fromArrayBufferView(uint8Array);
-   * bytes.getUint8View();
-   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * bytes.toArray();
+   * // → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    * @example
    * ```javascript
    * const buffer = Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1).buffer;
    * const dataView = new DataView(buffer);
    * const bytes = ByteSequence.fromArrayBufferView(dataView);
-   * bytes.getUint8View();
-   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * bytes.toArray();
+   * // → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * ```
    */
   static fromArrayBufferView(bufferView: ArrayBufferView): ByteSequence {
@@ -679,6 +679,18 @@ class ByteSequence {
    * Returns the `Uint8Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    * 
    * @returns The `Uint8Array`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const uint8Array = bytes.toUint8Array();
+   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * 
+   * uint8Array.fill(0);
+   * // → Uint8Array[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+   * 
+   * bytes.toUint8Array();
+   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   toUint8Array(): Uint8Array {
     return this.toArrayBufferView(Uint8Array);
@@ -688,6 +700,23 @@ class ByteSequence {
    * Returns the `DataView` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    * 
    * @returns The `DataView`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const dataView = bytes.toDataView();
+   * new Uint8Array(dataView.buffer);
+   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * 
+   * dataView.setUint8(0, 0);
+   * dataView.setUint8(1, 0);
+   * dataView.setUint8(2, 0);
+   * dataView.setUint8(3, 0);
+   * new Uint8Array(dataView.buffer);
+   * // → Uint8Array[ 0, 0, 0, 0, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * 
+   * new Uint8Array(bytes.toDataView().buffer);
+   * // → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   toDataView(): DataView {
     return this.toArrayBufferView(DataView);
@@ -697,7 +726,20 @@ class ByteSequence {
    * Returns the [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView) that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    * 
    * @param ctor The `ArrayBufferView`s constructor.
+   *    The default is `Uint8Array`.
    * @returns The `ArrayBufferView`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const uint8Array = bytes.toArrayBufferView(Uint8ClampedArray);
+   * // → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * 
+   * uint8Array.fill(0);
+   * // → Uint8ClampedArray[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+   * 
+   * bytes.toArrayBufferView(Uint8ClampedArray);
+   * // → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   toArrayBufferView<T extends ArrayBufferView>(ctor: ArrayBufferViewConstructor<T> = Uint8Array as unknown as ArrayBufferViewConstructor<T>): T {
     let bytesPerElement: number;
