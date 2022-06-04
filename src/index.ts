@@ -1385,16 +1385,25 @@ class ByteSequence {
   }
 
   /**
+   * @experimental
+   * 
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object.
    * 
    * @param blob The `Blob` object (including `File` object).
    * @returns The `Promise` that fulfills with a new `ByteSequence` object.
    * @throws {Error} `blob.arrayBuffer()` is failed.
+   * @example
+   * ```javascript
+   * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]);
+   * const bytes = await ByteSequence.fromBlob(blob);
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
-  static async #fromBlob(blob: Blob): Promise<ByteSequence> {
+  static async fromBlob(blob: Blob): Promise<ByteSequence> {
     try {
-      const buffer = await blob.arrayBuffer(); // XXX Node.jsでもstream()を取得できるようになった
+      const buffer = await blob.arrayBuffer(); // TODO Node.jsでもstream()を取得できるようになったのでstreamの方を読む？
       return ByteSequence.wrapArrayBuffer(buffer);
     }
     catch (exception) {
@@ -1407,9 +1416,26 @@ class ByteSequence {
 
   /**
    * @experimental
+   * 
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object.
+   * 
+   * @param blob The `Blob` object (including `File` object).
+   * @returns The `Promise` that fulfills with a new `ByteSequence` and a [`BlobPropertyBag`](https://www.w3.org/TR/FileAPI/#dfn-BlobPropertyBag).
+   * @throws {Error} `blob.arrayBuffer()` is failed.
+   * @throws {TypeError} `blob.type` parsing is failed.
+   * @example
+   * ```javascript
+   * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ], { type: "application/octet-stream" });
+   * const { data, options } = await ByteSequence.describedFromBlob(blob);
+   * // data.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // options.type
+   * //   → "application/octet-stream"
+   * ```
    */
-  static async fromBlob(blob: Blob): Promise<ByteSequence.BlobComponents | ByteSequence.FileComponents> {
-    const data = await ByteSequence.#fromBlob(blob);
+  static async describedFromBlob(blob: Blob): Promise<ByteSequence.Described> {
+    const data = await ByteSequence.fromBlob(blob);
     try {
       let mediaType: MediaType | null = null;
       if (blob.type) {
@@ -1438,15 +1464,24 @@ class ByteSequence {
       // MediaTypeのパース失敗
 
       // XXX throw new Error("reading failed", { cause: exception });
-      throw new Error("reading failed");
+      throw exception;
     }
   }
 
   /**
    * Returns the [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object representing this byte sequence.
    * 
-   * @param options The `BlobPropertyBag` object, but `endings` property is ignored.
+   * @param options The [`BlobPropertyBag`](https://www.w3.org/TR/FileAPI/#dfn-BlobPropertyBag) object, but `endings` property is ignored.
    * @returns The `Blob` object.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const blob = bytes.toBlob({ type: "application/octet-stream" });
+   * // new Uint8Array(await blob.arrayBuffer())
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // blob.type
+   * //   → "application/octet-stream"
+   * ```
    */
   toBlob(options?: BlobPropertyBag): Blob {
     const mediaType: MediaType | null = (typeof options?.type === "string") ? MediaType.fromString(options.type) : null;
@@ -1547,7 +1582,7 @@ class ByteSequence {
    * @throws {TypeError} The URL scheme of the `dataUrl` is not "data".
    * @throws {TypeError} The `dataUrl` does not contain `","`.
    */
-  static fromDataURL(dataUrl: URL | string): ByteSequence.BlobComponents {
+  static fromDataURL(dataUrl: URL | string): ByteSequence.Described {
     const [ bytes, mediaTypeSrc ] = ByteSequence.#fromDataURL(dataUrl);
     let mediaTypeWork = mediaTypeSrc;
 
@@ -1671,7 +1706,7 @@ class ByteSequence {
   /**
    * @experimental
    */
-  static async fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions = {}): Promise<ByteSequence.BlobComponents> {
+  static async fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions = {}): Promise<ByteSequence.Described> {
     let mediaType: MediaType | null = null;
     try {
       mediaType = _extractContentType(reqOrRes.headers);
@@ -1983,15 +2018,24 @@ namespace ByteSequence {
     compute: (input: Uint8Array) => Promise<Uint8Array>;
   }
 
-  export type BlobComponents = {
+  /**
+   * @experimental
+   */
+  export type Described = {
+    /**
+     * A byte sequence.
+     */
     data: ByteSequence,
-    options?: BlobPropertyBag,
-  };
 
-  export type FileComponents = {
-    data: ByteSequence,
     fileName?: string,
-    options?: FilePropertyBag,
+
+    /**
+     * A [`BlobPropertyBag`](https://www.w3.org/TR/FileAPI/#dfn-BlobPropertyBag)
+     * or a [`FilePropertyBag`](https://www.w3.org/TR/FileAPI/#dfn-FilePropertyBag).
+     * 
+     * The `endings` property is always omitted.
+     */
+    options?: BlobPropertyBag | FilePropertyBag,
   };
 
   export namespace Format {

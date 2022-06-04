@@ -45,6 +45,8 @@ import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
 
 ![Conversion](assets/conversion.svg)
 
+---
+
 #### Creating an instance
 
 Creates an instance with a new underlying buffer
@@ -63,6 +65,9 @@ Creates an instance with a new underlying buffer
 - [ByteSequence.parse()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#parse)
 - [ByteSequence.utf8EncodeFrom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#utf8EncodeFrom)
 - [ByteSequence.textEncodeFrom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#textEncodeFrom)
+- [ByteSequence.fromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBlob)
+
+- [ByteSequence.describedFromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFromBlob)
 
 Creates an instance with the specified underlying buffer
 
@@ -121,42 +126,13 @@ Creates an instance with the specified underlying buffer
 - [ByteSequence.prototype.utf8DecodeTo()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#utf8DecodeTo)
 - [ByteSequence.prototype.textDecodeTo()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#textDecodeTo)
 
-
-
-
-
-
-
-
-
-
-
-
+---
 
 #### Converting the instance to a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
-```javascript
-const blob = bytes1.toBlob();
-// new Uint8Array(await blob.arrayBuffer()) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 
-const bytesFromBlob = await ByteSequence.fromBlob(blob);
-bytesFromBlob.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+- [ByteSequence.prototype.toBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toBlob)
 
-##### Blob options
-```javascript
-const blobOptions = {
-  type: "text/plain; charset=UTF-8",
-};
-const blob = bytes1.toBlob(blobOptions);
-// new Uint8Array(await blob.arrayBuffer()) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-// blob.type → "text/plain;charset=UTF-8"
-
-const bytesFromBlob = await ByteSequence.fromBlob(blob);
-bytesFromBlob.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
-
+---
 
 #### Converting the instance to a [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File)
 

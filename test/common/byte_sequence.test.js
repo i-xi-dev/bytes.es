@@ -71,7 +71,7 @@ describe("ByteSequence.prototype.sha256Integrity", () => {
   it("sha256Integrity", async () => {
     const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
 
-    const {data:b11} = await ByteSequence.fromBlob(b1);
+    const b11 = await ByteSequence.fromBlob(b1);
     const i11a = await b11.sha256Integrity;
     expect(i11a).to.equal("sha256-IIm8EKKH9DeP2uG3Kn/lD4bbs5lgbsIi/L8hAswrj/w=");
 
@@ -83,7 +83,7 @@ describe("ByteSequence.prototype.sha384Integrity", () => {
   it("sha384Integrity", async () => {
     const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
 
-    const {data:b11} = await ByteSequence.fromBlob(b1);
+    const b11 = await ByteSequence.fromBlob(b1);
     const i11b = await b11.sha384Integrity;
     expect(i11b).to.equal("sha384-0uhOVMndkWKKHtfDkQSsXCcT4r7Xr5Q2bcQ/uczTl2WivQ5094ZFIZZut1y32IsF");
 
@@ -95,7 +95,7 @@ describe("ByteSequence.prototype.sha512Integrity", () => {
   it("sha512Integrity", async () => {
     const b1 = new Blob([ `*{color:red}` ], { type: "text/css" });
 
-    const {data:b11} = await ByteSequence.fromBlob(b1);
+    const b11 = await ByteSequence.fromBlob(b1);
     const i11c = await b11.sha512Integrity;
     expect(i11c).to.equal("sha512-lphfU9I644pv1b+t8yZp7b+kg+lFD+WcIeTqhWieCTRZJ4wWOxTAJxSk9rWrOmVb+TFJ2HfaKIBRFqQ0OOxyAw==");
 
@@ -872,7 +872,34 @@ describe("ByteSequence.fromBlob", () => {
   it("fromBlob(blob)", async () => {
     const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
 
-    const {data:b11, options:meta11} = await ByteSequence.fromBlob(b1);
+    const b11 = await ByteSequence.fromBlob(b1);
+    const b11v = b11.getView(Uint8Array);
+    expect(b11v[0]).to.equal(255);
+    expect(b11v[1]).to.equal(0);
+    expect(b11v[2]).to.equal(1);
+    expect(b11v[3]).to.equal(127);
+    expect(b11.byteLength).to.equal(4);
+
+    const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
+
+    const b21 = await ByteSequence.fromBlob(b2);
+    const b21v = b21.getView(Uint8Array);
+    expect(b21v[0]).to.equal(255);
+    expect(b21v[1]).to.equal(0);
+    expect(b21v[2]).to.equal(1);
+    expect(b21v[3]).to.equal(127);
+    expect(b21.byteLength).to.equal(4);
+
+  });
+
+});
+
+
+describe("ByteSequence.describedFromBlob", () => {
+  it("describedFromBlob(blob)", async () => {
+    const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
+
+    const {data:b11, options:meta11} = await ByteSequence.describedFromBlob(b1);
     const b11v = b11.getView(Uint8Array);
     expect(b11v[0]).to.equal(255);
     expect(b11v[1]).to.equal(0);
@@ -883,7 +910,7 @@ describe("ByteSequence.fromBlob", () => {
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
 
-    const {data:b21, options:meta21} = await ByteSequence.fromBlob(b2);
+    const {data:b21, options:meta21} = await ByteSequence.describedFromBlob(b2);
     const b21v = b21.getView(Uint8Array);
     expect(b21v[0]).to.equal(255);
     expect(b21v[1]).to.equal(0);
@@ -900,7 +927,7 @@ describe("ByteSequence.prototype.toBlob", () => {
   it("toBlob()", async () => {
     const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
 
-    const {data:b11, options:meta11} = await ByteSequence.fromBlob(b1);
+    const {data:b11, options:meta11} = await ByteSequence.describedFromBlob(b1);
     const b11b = b11.toBlob(meta11);
     const b11r = await b11b.arrayBuffer();
     expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
@@ -908,7 +935,7 @@ describe("ByteSequence.prototype.toBlob", () => {
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
 
-    const {data:b21} = await ByteSequence.fromBlob(b2);
+    const {data:b21} = await ByteSequence.describedFromBlob(b2);
     const b21b = b21.toBlob();
     const b21r = await b21b.arrayBuffer();
     expect([ ...new Uint8Array(b21r) ].join(",")).to.equal("255,0,1,127");
@@ -919,7 +946,7 @@ describe("ByteSequence.prototype.toBlob", () => {
   it("toBlob({})", async () => {
     const b1 = new Blob([ Uint8Array.of(255,0,1,127) ], { type: "text/plain" });
 
-    const {data:b11} = await ByteSequence.fromBlob(b1);
+    const {data:b11} = await ByteSequence.describedFromBlob(b1);
     const b11b = b11.toBlob({type:"application/pdf"});
     const b11r = await b11b.arrayBuffer();
     expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
@@ -927,7 +954,7 @@ describe("ByteSequence.prototype.toBlob", () => {
 
     const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
 
-    const {data:b21} = await ByteSequence.fromBlob(b2);
+    const {data:b21} = await ByteSequence.describedFromBlob(b2);
     const b21b = b21.toBlob({type:"text/html; charset=utf-8"});
     const b21r = await b21b.arrayBuffer();
     expect([ ...new Uint8Array(b21r) ].join(",")).to.equal("255,0,1,127");
@@ -942,7 +969,7 @@ describe("ByteSequence.prototype.toFile", () => {
     if (globalThis.File) {
       const b1 = new File([ Uint8Array.of(255,0,1,127) ], "test.txt", { type: "text/plain" });
 
-      const {data:b11} = await ByteSequence.fromBlob(b1);
+      const {data:b11} = await ByteSequence.describedFromBlob(b1);
       const b11b = b11.toFile("test.txt");
       const b11r = await b11b.arrayBuffer();
       expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
@@ -950,7 +977,7 @@ describe("ByteSequence.prototype.toFile", () => {
       expect(b11b.name).to.equal("test.txt");
 
       const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
-      const {data:b21} = await ByteSequence.fromBlob(b2);
+      const {data:b21} = await ByteSequence.describedFromBlob(b2);
 
       expect(() => {
         b21.toFile();
@@ -963,7 +990,7 @@ describe("ByteSequence.prototype.toFile", () => {
     if (globalThis.File) {
       const b1 = new File([ Uint8Array.of(255,0,1,127) ], "test.txt", { type: "text/plain" });
 
-      const {data:b11} = await ByteSequence.fromBlob(b1);
+      const {data:b11} = await ByteSequence.describedFromBlob(b1);
       const b11b = b11.toFile("a.xml");
       const b11r = await b11b.arrayBuffer();
       expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
@@ -971,7 +998,7 @@ describe("ByteSequence.prototype.toFile", () => {
       expect(b11b.name).to.equal("a.xml");
 
       const b2 = new Blob([ Uint8Array.of(255,0,1,127) ]);
-      const {data:b21} = await ByteSequence.fromBlob(b2);
+      const {data:b21} = await ByteSequence.describedFromBlob(b2);
       const b21b = b21.toFile("a.xml");
       const b21r = await b21b.arrayBuffer();
       expect([ ...new Uint8Array(b21r) ].join(",")).to.equal("255,0,1,127");
@@ -985,7 +1012,7 @@ describe("ByteSequence.prototype.toFile", () => {
     if (globalThis.File) {
       const b1 = new File([ Uint8Array.of(255,0,1,127) ], "test.txt", { type: "text/plain" });
 
-      const {data:b11} = await ByteSequence.fromBlob(b1);
+      const {data:b11} = await ByteSequence.describedFromBlob(b1);
       const b11b = b11.toFile("a.xml", {type:"application/xml",lastModified:Date.parse("2021-02-03T04:05:06Z")});
       const b11r = await b11b.arrayBuffer();
       expect([ ...new Uint8Array(b11r) ].join(",")).to.equal("255,0,1,127");
@@ -1111,13 +1138,13 @@ describe("ByteSequence.fromDataURL", () => {
 describe("ByteSequence.prototype.toDataURL", () => {
   it("toDataURL()", async () => {
     const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
-    const {data:b11, options:meta11} = await ByteSequence.fromBlob(b1);
+    const {data:b11, options:meta11} = await ByteSequence.describedFromBlob(b1);
     const b11b = b11.toDataURL(meta11);
 
     expect(b11b.toString()).to.equal("data:text/plain;base64,QQABfw==");
 
     const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
-    const {data:b21} = await ByteSequence.fromBlob(b2);
+    const {data:b21} = await ByteSequence.describedFromBlob(b2);
     expect(() => {
       b21.toDataURL();
     }).to.throw(TypeError, "MIME type not resolved").with.property("name", "TypeError");
@@ -1126,13 +1153,13 @@ describe("ByteSequence.prototype.toDataURL", () => {
 
   it("toDataURL({})", async () => {
     const b1 = new Blob([ Uint8Array.of(65,0,1,127) ], { type: "text/plain" });
-    const {data:b11} = await ByteSequence.fromBlob(b1);
+    const {data:b11} = await ByteSequence.describedFromBlob(b1);
     const b11b = b11.toDataURL({type:"application/pdf"});
 
     expect(b11b.toString()).to.equal("data:application/pdf;base64,QQABfw==");
 
     const b2 = new Blob([ Uint8Array.of(65,0,1,127) ]);
-    const {data:b21} = await ByteSequence.fromBlob(b2);
+    const {data:b21} = await ByteSequence.describedFromBlob(b2);
     const b21b = b21.toDataURL({type:"application/pdf"});
     expect(b21b.toString()).to.equal("data:application/pdf;base64,QQABfw==");
 
