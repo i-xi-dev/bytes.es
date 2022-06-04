@@ -1385,11 +1385,10 @@ class ByteSequence {
   }
 
   /**
-   * @experimental
-   * 
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object.
    * 
+   * @experimental
    * @param blob The `Blob` object (including `File` object).
    * @returns The `Promise` that fulfills with a new `ByteSequence` object.
    * @throws {Error} `blob.arrayBuffer()` is failed.
@@ -1422,11 +1421,10 @@ class ByteSequence {
   }
 
   /**
-   * @experimental
-   * 
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object.
    * 
+   * @experimental
    * @param blob The `Blob` object (including `File` object).
    * @returns The `Promise` that fulfills with a new `ByteSequence` and a [`BlobPropertyBag`](https://www.w3.org/TR/FileAPI/#dfn-BlobPropertyBag).
    * @throws {Error} `blob.arrayBuffer()` is failed.
@@ -1616,11 +1614,10 @@ class ByteSequence {
   }
 
   /**
-   * @experimental
-   * 
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * 
+   * @experimental
    * @see [https://fetch.spec.whatwg.org/#data-urls](https://fetch.spec.whatwg.org/#data-urls)
    * @param dataUrl The data URL
    * @returns A new `ByteSequence` object.
@@ -1695,13 +1692,12 @@ class ByteSequence {
   }
 
   /**
-   * @experimental
-   * 
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of `Uint8Array`.
    * 
    * If you want to read [Node.js Readable stream](https://nodejs.org/api/stream.html#stream_readable_streams) of [`Buffer`](https://nodejs.org/api/buffer.html#buffer_class_buffer), you can use [`stream.Readable.toWeb`](https://nodejs.org/dist/latest-v17.x/docs/api/stream.html#streamreadabletowebstreamreadable) method (Node.js 17.0.0+)
    * 
+   * @experimental
    * @param streamLike The `ReadableStream` of `Uint8Array` or the async iterator of `Uint8Array`.
    * @param options The `ByteSequence.StreamReadingOptions` object.
    * @returns The `Promise` that fulfills with a new `ByteSequence` object.
@@ -1755,8 +1751,27 @@ class ByteSequence {
 
   /**
    * @experimental
+   * @example
+   * ```javascript
+   * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]);
+   * const request = new Request("http://example.com/foo", {
+   *   method: "POST",
+   *   body: blob,
+   * });
+   * const bytes = await ByteSequence.fromRequestOrResponse(request);
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   * @example
+   * ```javascript
+   * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]);
+   * const response = new Response(blob);
+   * const bytes = await ByteSequence.fromRequestOrResponse(response);
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
-  static async #fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions): Promise<ByteSequence> {
+  static async fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions = {}): Promise<ByteSequence> {
     if (typeof options?.verifyHeaders === "function") {
       const [ verified, message ] = options.verifyHeaders(reqOrRes.headers);
       if (verified !== true) {
@@ -1781,8 +1796,38 @@ class ByteSequence {
 
   /**
    * @experimental
+   * @example
+   * ```javascript
+   * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]);
+   * const request = new Request("http://example.com/foo", {
+   *   method: "POST",
+   *   headers: new Headers({
+   *     "Content-Type": "application/octet-stream",
+   *   }),
+   *   body: blob,
+   * });
+   * const { data, options } = await ByteSequence.describedFromRequestOrResponse(request);
+   * // data.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // options.type
+   * //   → "application/octet-stream"
+   * ```
+   * @example
+   * ```javascript
+   * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]);
+   * const response = new Response(blob, {
+   *   headers: new Headers({
+   *     "Content-Type": "application/octet-stream",
+   *   }),
+   * });
+   * const { data, options } = await ByteSequence.describedFromRequestOrResponse(response);
+   * // data.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // options.type
+   * //   → "application/octet-stream"
+   * ```
    */
-  static async fromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions = {}): Promise<ByteSequence.Described> {
+  static async describedFromRequestOrResponse(reqOrRes: Request | Response, options: ByteSequence.RequestOrResponseReadingOptions = {}): Promise<ByteSequence.Described> {
     let mediaType: MediaType | null = null;
     try {
       mediaType = _extractContentType(reqOrRes.headers);
@@ -1795,7 +1840,7 @@ class ByteSequence {
       type: mediaType.toString(),
     } : undefined;
 
-    const data = await ByteSequence.#fromRequestOrResponse(reqOrRes, options);
+    const data = await ByteSequence.fromRequestOrResponse(reqOrRes, options);
     return {
       data,
       options: properties,
@@ -2171,9 +2216,9 @@ namespace ByteSequence {
   }
 
   /**
-   * @experimental
-   * 
    * The [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) of `Uint8Array` or the async iterator of `Uint8Array`.
+   * 
+   * @experimental
    */
   export type StreamLike = AsyncIterable<Uint8Array> | ReadableStream<Uint8Array> | Iterable<Uint8Array>;
   // XXX ReadableStreamは、そのうちAsyncIterableになる

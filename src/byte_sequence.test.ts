@@ -1819,17 +1819,15 @@ describe("ByteSequence.fromStream", () => {
 describe("ByteSequence.fromRequestOrResponse", () => {
   it("fromRequestOrResponse(Response)", async () => {
     const res1 = new Response();
-    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    const b1 = await ByteSequence.fromRequestOrResponse(res1);
     expect(b1.byteLength).to.equal(0);
-    expect(meta1).to.equal(undefined);
 
   });
 
   it("fromRequestOrResponse(Response)", async () => {
     const res1 = new Response(Uint8Array.of(255,254,253,252));
-    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    const b1 = await ByteSequence.fromRequestOrResponse(res1);
     expect(b1.byteLength).to.equal(4);
-    expect(meta1).to.equal(undefined);
 
     // 読み取り済みのを再度読もうとした
     try {
@@ -1847,9 +1845,8 @@ describe("ByteSequence.fromRequestOrResponse", () => {
     const headers1 = new Headers();
     headers1.append("content-type", "text/plain");
     const res1 = new Response(Uint8Array.of(255,254,253,252), {headers:headers1});
-    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    const b1 = await ByteSequence.fromRequestOrResponse(res1);
     expect(b1.byteLength).to.equal(4);
-    expect(meta1.type).to.equal("text/plain");
 
   });
 
@@ -1863,9 +1860,8 @@ describe("ByteSequence.fromRequestOrResponse", () => {
     const headers1 = new Headers();
     headers1.append("content-type", "text/plain");
     const res1 = new Response(Uint8Array.of(255,254,253,252), {headers:headers1});
-    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1, options1);
+    const b1 = await ByteSequence.fromRequestOrResponse(res1, options1);
     expect(b1.byteLength).to.equal(4);
-    expect(meta1.type).to.equal("text/plain");
 
   });
 
@@ -1892,11 +1888,87 @@ describe("ByteSequence.fromRequestOrResponse", () => {
 
 });
 
+describe("ByteSequence.describedFromRequestOrResponse", () => {
+  it("describedFromRequestOrResponse(Response)", async () => {
+    const res1 = new Response();
+    const {data:b1, options:meta1} = await ByteSequence.describedFromRequestOrResponse(res1);
+    expect(b1.byteLength).to.equal(0);
+    expect(meta1).to.equal(undefined);
+
+  });
+
+  it("describedFromRequestOrResponse(Response)", async () => {
+    const res1 = new Response(Uint8Array.of(255,254,253,252));
+    const {data:b1, options:meta1} = await ByteSequence.describedFromRequestOrResponse(res1);
+    expect(b1.byteLength).to.equal(4);
+    expect(meta1).to.equal(undefined);
+
+    // 読み取り済みのを再度読もうとした
+    try {
+      await ByteSequence.describedFromRequestOrResponse(res1);
+      throw new Error();
+    }
+    catch (e) {
+      expect(e?.name).to.equal("InvalidStateError");
+      expect(e?.message).to.equal("bodyUsed:true");
+    }
+
+  });
+
+  it("describedFromRequestOrResponse(Response)", async () => {
+    const headers1 = new Headers();
+    headers1.append("content-type", "text/plain");
+    const res1 = new Response(Uint8Array.of(255,254,253,252), {headers:headers1});
+    const {data:b1, options:meta1} = await ByteSequence.describedFromRequestOrResponse(res1);
+    expect(b1.byteLength).to.equal(4);
+    expect(meta1.type).to.equal("text/plain");
+
+  });
+
+  it("describedFromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
+    const options1 = {
+      verifyHeaders: (h: Headers): [boolean, string] | [boolean] => {
+        const verified = h.get("Content-Type") === "text/plain";
+        return [verified];
+      },
+    };
+    const headers1 = new Headers();
+    headers1.append("content-type", "text/plain");
+    const res1 = new Response(Uint8Array.of(255,254,253,252), {headers:headers1});
+    const {data:b1, options:meta1} = await ByteSequence.describedFromRequestOrResponse(res1, options1);
+    expect(b1.byteLength).to.equal(4);
+    expect(meta1.type).to.equal("text/plain");
+
+  });
+
+  it("describedFromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
+    const options1 = {
+      verifyHeaders: (h: Headers): [boolean, string] | [boolean] => {
+        const verified = h.get("Content-Type") === "text/csv";
+        return [verified, verified === true ? undefined : "err1"];
+      },
+    };
+    const headers1 = new Headers();
+    headers1.append("content-type", "text/plain");
+    const res1 = new Response(Uint8Array.of(255,254,253,252), {headers:headers1});
+    try {
+      await ByteSequence.describedFromRequestOrResponse(res1, options1);
+      throw new Error();
+    }
+    catch (e) {
+      expect(e?.name).to.equal("Error");
+      expect(e?.message).to.equal("err1");
+    }
+
+  });
+
+});
+
 describe("ByteSequence.prototype.toRequest", () => {
   it("toRequest(string, {})", async () => {
     const bb1 = ByteSequence.of(1,2,3);
     const req1 = bb1.toRequest("http://example.com/t1", {method:"post"});
-    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(req1);
+    const {data:b1, options:meta1} = await ByteSequence.describedFromRequestOrResponse(req1);
     expect(b1.byteLength).to.equal(3);
     expect(meta1).to.equal(undefined);
 
@@ -1913,7 +1985,7 @@ describe("ByteSequence.prototype.toRequest", () => {
   it("toRequest(string, {})", async () => {
     const bb1 = ByteSequence.of(1,2,3);
     const req1 = bb1.toRequest("http://example.com/t1", {method:"post",headers:{"Content-Type":"image/png"}});
-    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(req1);
+    const {data:b1, options:meta1} = await ByteSequence.describedFromRequestOrResponse(req1);
     expect(b1.byteLength).to.equal(3);
     expect(meta1?.type).to.equal("image/png");
 
@@ -1925,7 +1997,7 @@ describe("ByteSequence.prototype.toResponse", () => {
   it("toResponse({})", async () => {
     const bb1 = ByteSequence.of(1,2,3);
     const res1 = bb1.toResponse({});
-    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    const {data:b1, options:meta1} = await ByteSequence.describedFromRequestOrResponse(res1);
     expect(b1.byteLength).to.equal(3);
     expect(meta1).to.equal(undefined);
 
@@ -1934,7 +2006,7 @@ describe("ByteSequence.prototype.toResponse", () => {
   it("toResponse({})", async () => {
     const bb1 = ByteSequence.of(1,2,3);
     const res1 = bb1.toResponse({headers:{"content-type":"image/png"}});
-    const {data:b1, options:meta1} = await ByteSequence.fromRequestOrResponse(res1);
+    const {data:b1, options:meta1} = await ByteSequence.describedFromRequestOrResponse(res1);
     expect(b1.byteLength).to.equal(3);
     expect(meta1?.type).to.equal("image/png");
 

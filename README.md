@@ -68,9 +68,11 @@ Creates an instance with a new underlying buffer
 - [ByteSequence.fromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBlob)
 - [ByteSequence.fromDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromDataURL)
 - [ByteSequence.fromStream()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromStream)
+- [ByteSequence.fromRequestOrResponse()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromRequestOrResponse)
 
 - [ByteSequence.describedFromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFromBlob)
 - [ByteSequence.describedFromDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFromDataURL)
+- [ByteSequence.describedFromRequestOrResponse()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#describedFromRequestOrResponse)
 
 Creates an instance with the specified underlying buffer
 
