@@ -89,14 +89,9 @@ bytesFromNumberArray.getUint8View();
 ```
 
 #### Converting the instance to an `ArrayBuffer`
-```javascript
-const arrayBuffer = bytes1.toArrayBuffer();
-// new Uint8Array(arrayBuffer) → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
 
-const bytesFromArrayBuffer = ByteSequence.fromArrayBuffer(arrayBuffer);
-bytesFromArrayBuffer.getUint8View();
-// → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-```
+Use the [ByteSequence.prototype.toArrayBuffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toArrayBuffer) method.
+
 
 #### Converting the instance to an `Uint8Array`
 ```javascript

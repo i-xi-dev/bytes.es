@@ -1732,7 +1732,7 @@ describe("ByteSequence.fromRequestOrResponse", () => {
 
   it("fromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
     const options1 = {
-      verifyHeaders: (h) => {
+      verifyHeaders: (h: Headers): [boolean, string] | [boolean] => {
         const verified = h.get("Content-Type") === "text/plain";
         return [verified];
       },
@@ -1748,7 +1748,7 @@ describe("ByteSequence.fromRequestOrResponse", () => {
 
   it("fromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
     const options1 = {
-      verifyHeaders: (h) => {
+      verifyHeaders: (h: Headers): [boolean, string] | [boolean] => {
         const verified = h.get("Content-Type") === "text/csv";
         return [verified, verified === true ? undefined : "err1"];
       },
