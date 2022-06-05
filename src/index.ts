@@ -1109,7 +1109,8 @@ class ByteSequence {
    *   spaceAsPlus: true,
    * };
    * const bytes = ByteSequence.fromPercentEncoded("%E5%AF%8C%E5%A3%AB%E5%B1%B1", formUrlEnc);
-   * // bytes.toArray() → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * // bytes.utf8DecodeTo()
    * //   → "富士山"
    * ```
@@ -1129,7 +1130,8 @@ class ByteSequence {
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
    * const encoded = bytes.toPercentEncoded();
-   * // encoded → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
+   * // encoded
+   * //   → "%E5%AF%8C%E5%A3%AB%E5%B1%B1"
    * ```
    * @example
    * ```javascript
