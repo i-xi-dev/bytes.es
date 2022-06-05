@@ -2213,6 +2213,15 @@ class ByteSequence {
 
   // XXX at(): Uint8Arrayで出来る
   // XXX [Symbol.iterator](): Uint8Arrayで出来る
+  // XXX every()
+  // XXX some()
+
+  // XXX forEach()
+  // XXX map()
+  // XXX reduce()
+
+  // XXX fill()
+  // XXX set()
 
 }
 

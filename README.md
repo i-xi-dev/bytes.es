@@ -153,13 +153,13 @@ Node.js not support the `File` object
 
 ---
 
-#### Converting the instance to a [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request)
+#### Converting the instance to a [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request)
 
 - [ByteSequence.prototype.toRequest()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toRequest)
 
 ---
 
-#### Converting the instance to a [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+#### Converting the instance to a [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response)
 
 - [ByteSequence.prototype.toResponse()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#toResponse)
 
