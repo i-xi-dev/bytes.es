@@ -1081,7 +1081,7 @@ class ByteSequence {
    * created from the string contains Percent-encoded bytes.
    * 
    * @param percentEncoded The string to decode.
-   * @param options The [`Percent.Options`](https://i-xi-dev.github.io/percent.es/modules/Percent.html#Options-1) dictionary.
+   * @param options The [`Percent.Options`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/percent.es/main/mod.ts/~/Percent.Options) dictionary.
    * @returns A new `ByteSequence` object.
    * @example
    * ```javascript
@@ -1124,7 +1124,7 @@ class ByteSequence {
   /**
    * Returns the string contains Percent-encoded bytes of this byte sequence.
    * 
-   * @param options The [`Percent.Options`](https://i-xi-dev.github.io/percent.es/modules/Percent.html#Options-1) dictionary.
+   * @param options The [`Percent.Options`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/percent.es/main/mod.ts/~/Percent.Options) dictionary.
    * @returns The string contains Percent-encoded bytes.
    * @example
    * ```javascript
@@ -1494,7 +1494,7 @@ class ByteSequence {
     const mediaType: MediaType | null = (typeof options?.type === "string") ? MediaType.fromString(options.type) : null;
 
     return new Blob([ this.#buffer ], {
-      type: mediaType ? mediaType.toString() : undefined,
+      type: mediaType?.toString(),
     });
   }
 
@@ -1665,7 +1665,7 @@ class ByteSequence {
   /**
    * Returns the [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs) representing this byte sequence.
    * 
-   * @param options The `BlobPropertyBag` object, but `endings` property is ignored.
+   * @param options The [`BlobPropertyBag`](https://www.w3.org/TR/FileAPI/#dfn-BlobPropertyBag) object, but `endings` property is ignored.
    * @returns The [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
    * @throws {TypeError}
    * @example
@@ -2211,8 +2211,15 @@ class ByteSequence {
     throw new TypeError("otherBytes");
   }
 
-  // XXX at(): Uint8Arrayで出来る
-  // XXX [Symbol.iterator](): Uint8Arrayで出来る
+  at(index: number): number | undefined {
+    return this.#view.at(index);
+  }
+
+  [Symbol.iterator](): IterableIterator<number> {
+    return this.#view[Symbol.iterator]();
+  }
+
+
   // XXX every()
   // XXX some()
 
