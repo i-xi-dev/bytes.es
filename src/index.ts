@@ -1081,7 +1081,7 @@ class ByteSequence {
    * created from the string contains Percent-encoded bytes.
    * 
    * @param percentEncoded The string to decode.
-   * @param options The [`Percent.Options`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/percent.es/main/mod.ts/~/Percent.Options) dictionary.
+   * @param options The [`Percent.Options`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/percent.es/4.0.5/mod.ts/~/Percent.Options) dictionary.
    * @returns A new `ByteSequence` object.
    * @example
    * ```javascript
@@ -1124,7 +1124,7 @@ class ByteSequence {
   /**
    * Returns the string contains Percent-encoded bytes of this byte sequence.
    * 
-   * @param options The [`Percent.Options`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/percent.es/main/mod.ts/~/Percent.Options) dictionary.
+   * @param options The [`Percent.Options`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/percent.es/4.0.5/mod.ts/~/Percent.Options) dictionary.
    * @returns The string contains Percent-encoded bytes.
    * @example
    * ```javascript
