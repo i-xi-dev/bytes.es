@@ -2,14 +2,15 @@
 
 A JavaScript byte array library for the browser, Deno and Node.js
 
-
 ## Documentation
 
 [https://i-xi-dev.github.io/bytes.es/](https://i-xi-dev.github.io/bytes.es/)
 
-
 ## Requirement
-`ByteSequence` requires [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream) and [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
+
+`ByteSequence` requires
+[`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream)
+and [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
 
 - Chrome
 - Edge
@@ -17,7 +18,6 @@ A JavaScript byte array library for the browser, Deno and Node.js
 - Safari
 - Deno
 - Node.js 16.5.0+
-
 
 ## Installation
 
@@ -34,10 +34,10 @@ import { ByteSequence } from "@i-xi-dev/bytes";
 ### CDN
 
 Example for Skypack
+
 ```javascript
 import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
 ```
-
 
 ## Usage
 
@@ -185,9 +185,11 @@ Node.js not support the `File` object
 #### Editing the byte sequence
 
 Gets the underlying `ArrayBuffer`
+
 - [ByteSequence.prototype.buffer](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#buffer)
 
 Gets the `ArrayBufferView` that views the underlying `ArrayBuffer`
+
 - [ByteSequence.prototype.getUint8View()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#getUint8View)
 - [ByteSequence.prototype.getDataView()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#getDataView)
 - [ByteSequence.prototype.getView()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#getView)
@@ -197,9 +199,11 @@ Gets the `ArrayBufferView` that views the underlying `ArrayBuffer`
 #### Duplicating the byte sequence
 
 Duplicates with the new underlying `ArrayBuffer`
+
 - [ByteSequence.prototype.duplicate()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#duplicate)
 
 Duplicates the subsequence with the new underlying `ArrayBuffer`
+
 - [ByteSequence.prototype.subsequence()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#subsequence)
 - [ByteSequence.prototype.segment()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#segment)
 
@@ -209,4 +213,3 @@ Duplicates the subsequence with the new underlying `ArrayBuffer`
 
 - [ByteSequence.prototype.equals()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#equals)
 - [ByteSequence.prototype.startsWith()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#startsWith)
-
