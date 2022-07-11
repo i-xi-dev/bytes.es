@@ -14,141 +14,20 @@ import {
   Percent,
   StringUtils,
 } from "./deps.ts";
-import { _Http, _HttpUtilsEx, _Uint8Utils, _Utf8 } from "./x.ts";
+import {
+  _ArrayBufferView,
+  _Http,
+  _HttpUtilsEx,
+  _Iterable,
+  _Uint8Utils,
+  _Utf8,
+} from "./x.ts";
 import { _DigestImpl } from "./digest.ts";
 import { ByteStream } from "./byte_stream.ts";
 
 const {
   ASCII_WHITESPACE,
 } = HttpUtils.Pattern;
-
-function _isTypedArrayConstructor(
-  value: unknown,
-): value is (
-  | Uint8ArrayConstructor
-  | Uint8ClampedArrayConstructor
-  | Int8ArrayConstructor
-  | Uint16ArrayConstructor
-  | Int16ArrayConstructor
-  | Uint32ArrayConstructor
-  | Int32ArrayConstructor
-  | Float32ArrayConstructor
-  | Float64ArrayConstructor
-  | BigUint64ArrayConstructor
-  | BigInt64ArrayConstructor
-) {
-  return ((value === Uint8Array) || (value === Uint8ClampedArray) ||
-    (value === Int8Array) || (value === Uint16Array) ||
-    (value === Int16Array) || (value === Uint32Array) ||
-    (value === Int32Array) || (value === Float32Array) ||
-    (value === Float64Array) || (value === BigUint64Array) ||
-    (value === BigInt64Array));
-}
-
-function _isDataViewConstructor(value: unknown): value is DataViewConstructor {
-  return value === DataView;
-}
-
-type ArrayBufferViewConstructor<T> = {
-  new (a: ArrayBuffer, b?: number, c?: number): T;
-};
-
-function _iterableToArray<T>(iterable: Iterable<T>): Array<T> {
-  if (Array.isArray(iterable)) {
-    return iterable as Array<T>;
-  }
-  if (iterable && iterable[Symbol.iterator]) {
-    return [...iterable];
-  }
-  throw new TypeError("iterable");
-}
-
-/**
- * RequestまたはResponseのヘッダーからContent-Typeの値を取得し返却する
- *
- * {@link https://fetch.spec.whatwg.org/#content-type-header Fetch standard}の仕様に合わせた
- * (await Body.blob()).type と同じになるはず？
- *
- * @param headers ヘッダー
- * @returns Content-Typeの値から生成したMediaTypeインスタンス
- */
-function _extractContentType(headers: Headers): MediaType {
-  // 5.
-  if (headers.has("Content-Type") !== true) {
-    throw new Error("Content-Type field not found");
-  }
-
-  // 4, 5.
-  const typesString = headers.get("Content-Type") as string;
-  const typeStrings = _HttpUtilsEx.splitHeaderValue(typesString);
-  if (typeStrings.length <= 0) {
-    throw new Error("Content-Type value not found");
-  }
-
-  // 1, 2, 3.
-  let textEncoding = "";
-  let mediaTypeEssence = "";
-  let mediaType: MediaType | null = null;
-  // 6.
-  for (const typeString of typeStrings) {
-    try {
-      // 6.1.
-      const tempMediaType = MediaType.fromString(typeString);
-
-      // 6.3.
-      mediaType = tempMediaType;
-
-      // 6.4.
-      if (mediaTypeEssence !== mediaType.essence) {
-        // 6.4.1.
-        textEncoding = "";
-        // 6.4.2.
-        if (mediaType.hasParameter("charset")) {
-          textEncoding = mediaType.getParameterValue("charset") as string;
-        }
-        // 6.4.3.
-        mediaTypeEssence = mediaType.essence;
-      } else {
-        // 6.5.
-        if (
-          (mediaType.hasParameter("charset") !== true) && (textEncoding !== "")
-        ) {
-          // TODO mediaType.withParameters()
-        }
-      }
-    } catch (exception) {
-      console.log(exception); // TODO 消す
-      // 6.2. "*/*"はMediaType.fromStringでエラーにしている
-      continue;
-    }
-  }
-
-  // 7, 8.
-  if (mediaType !== null) {
-    return mediaType;
-  } else {
-    throw new Error("extraction failure");
-  }
-}
-
-function _createHeaders(init?: HeadersInit): HeadersInit {
-  const headers = new Headers(init);
-
-  // Content-Type
-  // init.headersで指定されていれば、それを指定
-  try {
-    const mediaType = _extractContentType(headers);
-    headers.set(_Http.Header.CONTENT_TYPE, mediaType.toString());
-  } catch (exception) {
-    void exception;
-    headers.delete(_Http.Header.CONTENT_TYPE);
-  }
-
-  // Content-Length
-  // 何もしない
-
-  return [...headers.entries()]; // Node.jsの HeadersInitにHeadersは含まれない
-}
 
 /**
  * Byte sequence
@@ -443,13 +322,13 @@ class ByteSequence {
    * ```
    */
   toArrayBufferView<T extends ArrayBufferView>(
-    ctor: ArrayBufferViewConstructor<T> =
-      Uint8Array as unknown as ArrayBufferViewConstructor<T>,
+    ctor: _ArrayBufferView.Constructor<T> =
+      Uint8Array as unknown as _ArrayBufferView.Constructor<T>,
   ): T {
     let bytesPerElement: number;
-    if (_isTypedArrayConstructor(ctor)) {
+    if (_ArrayBufferView.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
-    } else if (_isDataViewConstructor(ctor)) {
+    } else if (_ArrayBufferView.isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
@@ -553,7 +432,7 @@ class ByteSequence {
       return ByteSequence.fromArrayBufferView(sourceBytes);
     }
 
-    const array = _iterableToArray(sourceBytes);
+    const array = _Iterable.toArray(sourceBytes);
     if (_Uint8Utils.isArrayOfUint8(array)) {
       return ByteSequence.fromArray([...sourceBytes]);
     }
@@ -1576,7 +1455,7 @@ class ByteSequence {
   ): Promise<ByteSequence.Described> {
     let mediaType: MediaType | null = null;
     try {
-      mediaType = _extractContentType(reqOrRes.headers);
+      mediaType = _HttpUtilsEx.extractContentType(reqOrRes.headers);
     } catch (exception) {
       void exception;
     }
@@ -1612,7 +1491,7 @@ class ByteSequence {
    * ```
    */
   toRequest(url: string, options: RequestInit): Request {
-    const headers = _createHeaders(options?.headers);
+    const headers = _HttpUtilsEx.createHeaders(options?.headers);
     const method = options.method ?? _Http.Method.GET;
     if (
       ([_Http.Method.GET, _Http.Method.HEAD] as string[]).includes(
@@ -1662,7 +1541,7 @@ class ByteSequence {
    * ```
    */
   toResponse(options: ResponseInit): Response {
-    const headers = _createHeaders(options?.headers);
+    const headers = _HttpUtilsEx.createHeaders(options?.headers);
     return new Response(this.#buffer, {
       status: options?.status,
       statusText: options?.statusText,
@@ -1851,16 +1730,16 @@ class ByteSequence {
    * ```
    */
   getView<T extends ArrayBufferView>(
-    ctor: ArrayBufferViewConstructor<T> =
-      Uint8Array as unknown as ArrayBufferViewConstructor<T>,
+    ctor: _ArrayBufferView.Constructor<T> =
+      Uint8Array as unknown as _ArrayBufferView.Constructor<T>,
     byteOffset = 0,
     byteLength: number = (this.byteLength - byteOffset),
   ): T {
     let bytesPerElement: number;
-    if (_isTypedArrayConstructor(ctor)) {
+    if (_ArrayBufferView.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
       new Uint8ClampedArray();
-    } else if (_isDataViewConstructor(ctor)) {
+    } else if (_ArrayBufferView.isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
@@ -1937,7 +1816,7 @@ class ByteSequence {
       return this.#startsWith(otherBytes);
     }
 
-    const array = _iterableToArray(otherBytes);
+    const array = _Iterable.toArray(otherBytes);
     if (_Uint8Utils.isArrayOfUint8(array)) {
       if (array.length !== this.byteLength) {
         return false;
@@ -1963,7 +1842,7 @@ class ByteSequence {
       return this.#startsWith(otherBytes);
     }
 
-    const array = _iterableToArray(otherBytes);
+    const array = _Iterable.toArray(otherBytes);
     if (_Uint8Utils.isArrayOfUint8(array)) {
       return this.#startsWith(array);
     }

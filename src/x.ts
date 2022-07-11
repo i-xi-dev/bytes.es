@@ -1,4 +1,4 @@
-import { Byte, type byte, HttpUtils, StringUtils } from "./deps.ts";
+import { Byte, type byte, HttpUtils, MediaType, StringUtils } from "./deps.ts";
 
 namespace _Http {
   export const Header = {
@@ -23,6 +23,42 @@ namespace _Http {
 }
 Object.freeze(_Http);
 
+namespace _ArrayBufferView {
+  export function isTypedArrayConstructor(
+    value: unknown,
+  ): value is (
+    | Uint8ArrayConstructor
+    | Uint8ClampedArrayConstructor
+    | Int8ArrayConstructor
+    | Uint16ArrayConstructor
+    | Int16ArrayConstructor
+    | Uint32ArrayConstructor
+    | Int32ArrayConstructor
+    | Float32ArrayConstructor
+    | Float64ArrayConstructor
+    | BigUint64ArrayConstructor
+    | BigInt64ArrayConstructor
+  ) {
+    return ((value === Uint8Array) || (value === Uint8ClampedArray) ||
+      (value === Int8Array) || (value === Uint16Array) ||
+      (value === Int16Array) || (value === Uint32Array) ||
+      (value === Int32Array) || (value === Float32Array) ||
+      (value === Float64Array) || (value === BigUint64Array) ||
+      (value === BigInt64Array));
+  }
+
+  export function isDataViewConstructor(
+    value: unknown,
+  ): value is DataViewConstructor {
+    return value === DataView;
+  }
+
+  export type Constructor<T> = {
+    new (a: ArrayBuffer, b?: number, c?: number): T;
+  };
+}
+Object.freeze(_ArrayBufferView);
+
 namespace _Uint8Utils {
   export function isArrayOfUint8(value: unknown): value is Array<byte> {
     if (Array.isArray(value)) {
@@ -32,6 +68,19 @@ namespace _Uint8Utils {
   }
 }
 Object.freeze(_Uint8Utils);
+
+namespace _Iterable {
+  export function toArray<T>(iterable: Iterable<T>): Array<T> {
+    if (Array.isArray(iterable)) {
+      return iterable as Array<T>;
+    }
+    if (iterable && iterable[Symbol.iterator]) {
+      return [...iterable];
+    }
+    throw new TypeError("iterable");
+  }
+}
+Object.freeze(_Iterable);
 
 let _utf8TextEncoder: TextEncoder;
 let _utf8TextDecoder: TextDecoder;
@@ -130,7 +179,95 @@ namespace _HttpUtilsEx {
 
     return values;
   }
+
+  /**
+   * RequestまたはResponseのヘッダーからContent-Typeの値を取得し返却する
+   *
+   * {@link https://fetch.spec.whatwg.org/#content-type-header Fetch standard}の仕様に合わせた
+   * (await Body.blob()).type と同じになるはず？
+   *
+   * @param headers ヘッダー
+   * @returns Content-Typeの値から生成したMediaTypeインスタンス
+   */
+  export function extractContentType(headers: Headers): MediaType {
+    // 5.
+    if (headers.has("Content-Type") !== true) {
+      throw new Error("Content-Type field not found");
+    }
+
+    // 4, 5.
+    const typesString = headers.get("Content-Type") as string;
+    const typeStrings = splitHeaderValue(typesString);
+    if (typeStrings.length <= 0) {
+      throw new Error("Content-Type value not found");
+    }
+
+    // 1, 2, 3.
+    let textEncoding = "";
+    let mediaTypeEssence = "";
+    let mediaType: MediaType | null = null;
+    // 6.
+    for (const typeString of typeStrings) {
+      try {
+        // 6.1.
+        const tempMediaType = MediaType.fromString(typeString);
+
+        // 6.3.
+        mediaType = tempMediaType;
+
+        // 6.4.
+        if (mediaTypeEssence !== mediaType.essence) {
+          // 6.4.1.
+          textEncoding = "";
+          // 6.4.2.
+          if (mediaType.hasParameter("charset")) {
+            textEncoding = mediaType.getParameterValue("charset") as string;
+          }
+          // 6.4.3.
+          mediaTypeEssence = mediaType.essence;
+        } else {
+          // 6.5.
+          if (
+            (mediaType.hasParameter("charset") !== true) &&
+            (textEncoding !== "")
+          ) {
+            // TODO mediaType.withParameters()
+          }
+        }
+      } catch (exception) {
+        console.log(exception); // TODO 消す
+        // 6.2. "*/*"はMediaType.fromStringでエラーにしている
+        continue;
+      }
+    }
+
+    // 7, 8.
+    if (mediaType !== null) {
+      return mediaType;
+    } else {
+      throw new Error("extraction failure");
+    }
+  }
+
+  export function createHeaders(init?: HeadersInit): HeadersInit {
+    const headers = new Headers(init);
+
+    // Content-Type
+    // init.headersで指定されていれば、それを指定
+    try {
+      const mediaType = extractContentType(headers);
+      headers.set(_Http.Header.CONTENT_TYPE, mediaType.toString());
+    } catch (exception) {
+      void exception;
+      headers.delete(_Http.Header.CONTENT_TYPE);
+    }
+
+    // Content-Length
+    // 何もしない
+
+    return [...headers.entries()]; // Node.jsの HeadersInitにHeadersは含まれない
+  }
 }
 Object.freeze(_HttpUtilsEx);
 
-export { _Http, _HttpUtilsEx, _Uint8Utils, _Utf8 };
+export { _ArrayBufferView, _Http, _HttpUtilsEx, _Iterable, _Uint8Utils, _Utf8 };
