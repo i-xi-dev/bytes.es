@@ -118,7 +118,7 @@ Deno.test("ByteSequence.wrapArrayBuffer(ArrayBuffer)", () => {
   const bs0 = ByteSequence.wrapArrayBuffer(bytes0.buffer);
   const bs1 = ByteSequence.wrapArrayBuffer(bytes1.buffer);
 
-  assertStrictEquals(bs0 instanceof ByteSequence, true);
+  assertStrictEquals(bs0 instanceof ByteSequence.$, true);
   assertStrictEquals(bs0.byteLength, 0);
   assertStrictEquals(bs1.byteLength, 5);
 });

@@ -41,7 +41,7 @@ import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
 
 ## Usage
 
-### [`ByteSequence`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/3.0.2/mod.ts) class
+### [`ByteSequence`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.0/mod.ts) class
 
 ![Conversion](assets/conversion.svg)
 
