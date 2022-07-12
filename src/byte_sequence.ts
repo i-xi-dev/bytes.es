@@ -203,6 +203,8 @@ namespace ByteSequence {
     verifyHeaders?: (headers: Headers) => [verified: boolean, message?: string];
   };
 
+  export type FormatOptions = BytesFormat.Options;
+
   /**
    * Byte sequence
    */
@@ -448,7 +450,7 @@ namespace ByteSequence {
     /**
      * Returns the string contains formatted bytes.
      *
-     * @param options The `BytesFormat.Options` dictionary.
+     * @param options The `ByteSequence.FormatOptions` dictionary.
      * @returns The string contains formatted bytes.
      * @throws {TypeError} The `options.radix` is not 2, 8, 10, or 16.
      * @throws {TypeError} The `options.paddedLength` is not positive integer.
@@ -471,7 +473,7 @@ namespace ByteSequence {
      * //   → "e5af8ce5a3abe5b1b1"
      * ```
      */
-    format(options?: BytesFormat.Options): string {
+    format(options?: ByteSequence.FormatOptions): string {
       return BytesFormat.format(this.#view, options);
     }
 
@@ -907,7 +909,7 @@ namespace ByteSequence {
      * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
      * ```
      */
-    duplicate(): $ {
+    duplicate(): ByteSequence.$ {
       return new $(this.toArrayBuffer());
     }
 
@@ -1465,7 +1467,7 @@ namespace ByteSequence {
    * created from the string contains formatted bytes.
    *
    * @param formattedBytes The string to parse.
-   * @param options The `BytesFormat.Options` dictionary.
+   * @param options The `ByteSequence.FormatOptions` dictionary.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `options.radix` is not 2, 8, 10, or 16.
    * @throws {TypeError} The `options.paddedLength` is not positive integer.
@@ -1489,7 +1491,7 @@ namespace ByteSequence {
    */
   export function parse(
     formattedBytes: string,
-    options?: BytesFormat.Options,
+    options?: ByteSequence.FormatOptions,
   ): $ {
     const parsed = BytesFormat.parse(formattedBytes, options);
     return new $(parsed.buffer);
