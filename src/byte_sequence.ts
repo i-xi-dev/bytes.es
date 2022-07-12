@@ -142,7 +142,7 @@ interface ByteSequence {
 /**
  * Byte sequence
  */
-export class $ implements ByteSequence {
+class $ implements ByteSequence {
   /**
    * 内部表現
    */
