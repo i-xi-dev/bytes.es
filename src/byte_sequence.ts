@@ -25,6 +25,8 @@ import {
 import { _DigestImpl } from "./digest.ts";
 import { ByteStream } from "./byte_stream.ts";
 
+type int = number;
+
 const {
   ASCII_WHITESPACE,
 } = HttpUtils.Pattern;
@@ -203,7 +205,61 @@ namespace ByteSequence {
     verifyHeaders?: (headers: Headers) => [verified: boolean, message?: string];
   };
 
-  export type FormatOptions = BytesFormat.Options;
+  /**
+   * 2, 8, 10, or 16.
+   */
+  export type FormatRadix = 2 | 8 | 10 | 16;
+  //XXX BytesFormat.Radix
+
+  /**
+   * The formatting options object with the following optional fields.
+   */
+  export type FormatOptions = {
+    /**
+     * The radix of the formatted string.
+     * 2, 8, 10, and 16 are available values.
+     * The default is `16`.
+     */
+     radix?: ByteSequence.FormatRadix;
+
+     /**
+      * The length of the `"0"` padded formatted string for each byte.
+      * The default is determined by `radix`.
+      *
+      * | `radix` | default of `paddedLength` |
+      * | ---: | ---: |
+      * | `16` | `2` |
+      * | `10` | `3` |
+      * | `8` | `3` |
+      * | `2` | `8` |
+      */
+     paddedLength?: int;
+ 
+     /**
+      * Whether the formatted string is lowercase or not.
+      * The default is `false`.
+      */
+     lowerCase?: boolean;
+ 
+     /**
+      * The prefix of the formatted string for each byte.
+      * The default is `""`.
+      */
+     prefix?: string;
+ 
+     /**
+      * The suffix of the formatted string for each byte.
+      * The default is `""`.
+      */
+     suffix?: string;
+ 
+     /**
+      * The separator between the formatted strings of each byte.
+      * The default is `""`.
+      */
+     separator?: string;
+  };
+  //XXX BytesFormat.Options
 
   /**
    * Byte sequence
