@@ -846,10 +846,12 @@ Deno.test("ByteSequence.prototype.toSha512Digest()", async () => {
 });
 
 const MD5 = {
-  async compute(input: Uint8Array): Promise<Uint8Array> {
-    const md5 = new Md5();
-    const digest = md5.update(input.buffer).digest();
-    return new Uint8Array(digest);
+  compute(input: Uint8Array): Promise<Uint8Array> {
+    return new Promise((resolve) => {
+      const md5 = new Md5();
+      const digest = md5.update(input.buffer).digest();
+      resolve(new Uint8Array(digest));
+    });
   },
 };
 
@@ -880,19 +882,6 @@ Deno.test("ByteSequence.prototype.toJSON()", () => {
   assertStrictEquals(JSON.stringify(a2), JSON.stringify(bs2.toJSON()));
 });
 
-Deno.test("ByteSequence.utf8EncodeFrom(string)", () => {
-  const bs1 = ByteSequence.utf8EncodeFrom("");
-  assertStrictEquals(bs1.byteLength, 0);
-
-  const bs2 = ByteSequence.utf8EncodeFrom("1あ3\u{A9}");
-  assertStrictEquals(bs2.toArray().join(","), "49,227,129,130,51,194,169");
-});
-
-Deno.test("ByteSequence.prototype.toText()", () => {
-  const bs1 = ByteSequence.fromArray([49, 227, 129, 130, 51, 194, 169]);
-  assertStrictEquals(bs1.toText(), "1あ3\u{A9}");
-});
-
 Deno.test("ByteSequence.fromText(string)", () => {
   const bs1 = ByteSequence.fromText("");
   assertStrictEquals(bs1.byteLength, 0);
@@ -902,7 +891,7 @@ Deno.test("ByteSequence.fromText(string)", () => {
 });
 
 const eucjp = {
-  encode(input: string = ""): Uint8Array {
+  encode(input = ""): Uint8Array {
     const utf8Bytes = new TextEncoder().encode(input);
     const eucjpBytes = encja.convert(utf8Bytes, {
       from: "UTF8",
@@ -969,12 +958,13 @@ Deno.test("ByteSequence.fromBlob(Blob)", async () => {
   assertStrictEquals(b21.byteLength, 4);
 });
 
-Deno.test("ByteSequence.describedFromBlob(Blob)", async () => {
+Deno.test("ByteSequence.withMetadataFromBlob(Blob)", async () => {
   const b1 = new Blob([Uint8Array.of(255, 0, 1, 127)], { type: "text/plain" });
 
-  const { data: b11, options: meta11 } = await ByteSequence.describedFromBlob(
-    b1,
-  );
+  const { data: b11, options: meta11 } = await ByteSequence
+    .withMetadataFromBlob(
+      b1,
+    );
   const b11v = b11.getView(Uint8Array);
   assertStrictEquals(b11v[0], 255);
   assertStrictEquals(b11v[1], 0);
@@ -985,9 +975,10 @@ Deno.test("ByteSequence.describedFromBlob(Blob)", async () => {
 
   const b2 = new Blob([Uint8Array.of(255, 0, 1, 127)]);
 
-  const { data: b21, options: meta21 } = await ByteSequence.describedFromBlob(
-    b2,
-  );
+  const { data: b21, options: meta21 } = await ByteSequence
+    .withMetadataFromBlob(
+      b2,
+    );
   const b21v = b21.getView(Uint8Array);
   assertStrictEquals(b21v[0], 255);
   assertStrictEquals(b21v[1], 0);
@@ -1000,9 +991,10 @@ Deno.test("ByteSequence.describedFromBlob(Blob)", async () => {
 Deno.test("ByteSequence.prototype.toBlob()", async () => {
   const b1 = new Blob([Uint8Array.of(255, 0, 1, 127)], { type: "text/plain" });
 
-  const { data: b11, options: meta11 } = await ByteSequence.describedFromBlob(
-    b1,
-  );
+  const { data: b11, options: meta11 } = await ByteSequence
+    .withMetadataFromBlob(
+      b1,
+    );
   const b11b = b11.toBlob(meta11);
   const b11r = await b11b.arrayBuffer();
   assertStrictEquals([...new Uint8Array(b11r)].join(","), "255,0,1,127");
@@ -1010,7 +1002,7 @@ Deno.test("ByteSequence.prototype.toBlob()", async () => {
 
   const b2 = new Blob([Uint8Array.of(255, 0, 1, 127)]);
 
-  const { data: b21 } = await ByteSequence.describedFromBlob(b2);
+  const { data: b21 } = await ByteSequence.withMetadataFromBlob(b2);
   const b21b = b21.toBlob();
   const b21r = await b21b.arrayBuffer();
   assertStrictEquals([...new Uint8Array(b21r)].join(","), "255,0,1,127");
@@ -1020,7 +1012,7 @@ Deno.test("ByteSequence.prototype.toBlob()", async () => {
 Deno.test("ByteSequence.prototype.toBlob({})", async () => {
   const b1 = new Blob([Uint8Array.of(255, 0, 1, 127)], { type: "text/plain" });
 
-  const { data: b11 } = await ByteSequence.describedFromBlob(b1);
+  const { data: b11 } = await ByteSequence.withMetadataFromBlob(b1);
   const b11b = b11.toBlob({ type: "application/pdf" });
   const b11r = await b11b.arrayBuffer();
   assertStrictEquals([...new Uint8Array(b11r)].join(","), "255,0,1,127");
@@ -1028,7 +1020,7 @@ Deno.test("ByteSequence.prototype.toBlob({})", async () => {
 
   const b2 = new Blob([Uint8Array.of(255, 0, 1, 127)]);
 
-  const { data: b21 } = await ByteSequence.describedFromBlob(b2);
+  const { data: b21 } = await ByteSequence.withMetadataFromBlob(b2);
   const b21b = b21.toBlob({ type: "text/html; charset=utf-8" });
   const b21r = await b21b.arrayBuffer();
   assertStrictEquals([...new Uint8Array(b21r)].join(","), "255,0,1,127");
@@ -1041,7 +1033,7 @@ Deno.test("ByteSequence.prototype.toFile(string)", async () => {
       type: "text/plain",
     });
 
-    const { data: b11 } = await ByteSequence.describedFromBlob(b1);
+    const { data: b11 } = await ByteSequence.withMetadataFromBlob(b1);
     const b11b = b11.toFile("test.txt");
     const b11r = await b11b.arrayBuffer();
     assertStrictEquals([...new Uint8Array(b11r)].join(","), "255,0,1,127");
@@ -1049,7 +1041,7 @@ Deno.test("ByteSequence.prototype.toFile(string)", async () => {
     assertStrictEquals(b11b.name, "test.txt");
 
     const b2 = new Blob([Uint8Array.of(255, 0, 1, 127)]);
-    const { data: b21 } = await ByteSequence.describedFromBlob(b2);
+    const { data: b21 } = await ByteSequence.withMetadataFromBlob(b2);
 
     assertThrows(
       () => {
@@ -1069,7 +1061,7 @@ Deno.test("ByteSequence.prototype.toFile(string)", async () => {
       type: "text/plain",
     });
 
-    const { data: b11 } = await ByteSequence.describedFromBlob(b1);
+    const { data: b11 } = await ByteSequence.withMetadataFromBlob(b1);
     const b11b = b11.toFile("a.xml");
     const b11r = await b11b.arrayBuffer();
     assertStrictEquals([...new Uint8Array(b11r)].join(","), "255,0,1,127");
@@ -1077,7 +1069,7 @@ Deno.test("ByteSequence.prototype.toFile(string)", async () => {
     assertStrictEquals(b11b.name, "a.xml");
 
     const b2 = new Blob([Uint8Array.of(255, 0, 1, 127)]);
-    const { data: b21 } = await ByteSequence.describedFromBlob(b2);
+    const { data: b21 } = await ByteSequence.withMetadataFromBlob(b2);
     const b21b = b21.toFile("a.xml");
     const b21r = await b21b.arrayBuffer();
     assertStrictEquals([...new Uint8Array(b21r)].join(","), "255,0,1,127");
@@ -1094,7 +1086,7 @@ Deno.test("ByteSequence.prototype.toFile(string, string)", async () => {
       type: "text/plain",
     });
 
-    const { data: b11 } = await ByteSequence.describedFromBlob(b1);
+    const { data: b11 } = await ByteSequence.withMetadataFromBlob(b1);
     const b11b = b11.toFile("a.xml", {
       type: "application/xml",
       lastModified: Date.parse("2021-02-03T04:05:06Z"),
@@ -1214,20 +1206,20 @@ Deno.test("ByteSequence.fromDataURL(URL)", () => {
   assertStrictEquals(b11.byteLength, 2);
 });
 
-Deno.test("ByteSequence.describedFromDataURL(string)", () => {
-  const { data: b0, options: meta0 } = ByteSequence.describedFromDataURL(
+Deno.test("ByteSequence.withMetadataFromDataURL(string)", () => {
+  const { data: b0, options: meta0 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain,",
   );
   assertStrictEquals(b0.byteLength, 0);
   assertStrictEquals(JSON.stringify(meta0), `{"type":"text/plain"}`);
 
-  const { data: b0b, options: meta0b } = ByteSequence.describedFromDataURL(
+  const { data: b0b, options: meta0b } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain;base64,",
   );
   assertStrictEquals(b0b.byteLength, 0);
   assertStrictEquals(JSON.stringify(meta0b), `{"type":"text/plain"}`);
 
-  const { data: b0c, options: meta0c } = ByteSequence.describedFromDataURL(
+  const { data: b0c, options: meta0c } = ByteSequence.withMetadataFromDataURL(
     "data: ,",
   );
   assertStrictEquals(b0c.byteLength, 0);
@@ -1236,19 +1228,19 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
     `{"type":"text/plain;charset=US-ASCII"}`,
   );
 
-  const { data: b0d, options: meta0d } = ByteSequence.describedFromDataURL(
+  const { data: b0d, options: meta0d } = ByteSequence.withMetadataFromDataURL(
     "data: ; ,",
   );
   assertStrictEquals(b0d.byteLength, 0);
   assertStrictEquals(JSON.stringify(meta0d), `{"type":"text/plain"}`);
 
-  const { data: b0e, options: meta0e } = ByteSequence.describedFromDataURL(
+  const { data: b0e, options: meta0e } = ByteSequence.withMetadataFromDataURL(
     "data: ; x=y ,",
   );
   assertStrictEquals(b0e.byteLength, 0);
   assertStrictEquals(JSON.stringify(meta0e), `{"type":"text/plain;x=y"}`);
 
-  const { data: b11, options: meta11 } = ByteSequence.describedFromDataURL(
+  const { data: b11, options: meta11 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain,a1",
   );
   const b11v = b11.getView(Uint8Array);
@@ -1257,7 +1249,7 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
   assertStrictEquals(b11.byteLength, 2);
   assertStrictEquals(JSON.stringify(meta11), `{"type":"text/plain"}`);
 
-  const { data: b12, options: meta12 } = ByteSequence.describedFromDataURL(
+  const { data: b12, options: meta12 } = ByteSequence.withMetadataFromDataURL(
     "data:application/octet-stream;base64,AwIBAP/+/fw=",
   );
   const b12v = b12.getView(Uint8Array);
@@ -1275,7 +1267,7 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
     `{"type":"application/octet-stream"}`,
   );
 
-  const { data: b21, options: meta21 } = ByteSequence.describedFromDataURL(
+  const { data: b21, options: meta21 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain; p1=a,a1",
   );
   const b21v = b21.getView(Uint8Array);
@@ -1284,7 +1276,7 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
   assertStrictEquals(b21.byteLength, 2);
   assertStrictEquals(JSON.stringify(meta21), `{"type":"text/plain;p1=a"}`);
 
-  const { data: b22, options: meta22 } = ByteSequence.describedFromDataURL(
+  const { data: b22, options: meta22 } = ByteSequence.withMetadataFromDataURL(
     'data:text/plain; p1=a;p2="b,c",a1',
   );
   const b22v = b22.getView(Uint8Array);
@@ -1296,7 +1288,7 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
   assertStrictEquals(b22.byteLength, 5);
   assertStrictEquals(JSON.stringify(meta22), `{"type":"text/plain;p1=a;p2=b"}`);
 
-  const { data: b31, options: meta31 } = ByteSequence.describedFromDataURL(
+  const { data: b31, options: meta31 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain,%FF%",
   );
   const b31v = b31.getView(Uint8Array);
@@ -1305,7 +1297,7 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
   assertStrictEquals(b31.byteLength, 2);
   assertStrictEquals(JSON.stringify(meta31), `{"type":"text/plain"}`);
 
-  const { data: b32, options: meta32 } = ByteSequence.describedFromDataURL(
+  const { data: b32, options: meta32 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain,%fff",
   );
   const b32v = b32.getView(Uint8Array);
@@ -1314,7 +1306,7 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
   assertStrictEquals(b32.byteLength, 2);
   assertStrictEquals(JSON.stringify(meta32), `{"type":"text/plain"}`);
 
-  const { data: b33, options: meta33 } = ByteSequence.describedFromDataURL(
+  const { data: b33, options: meta33 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain,a?a=2",
   );
   const b33v = b33.getView(Uint8Array);
@@ -1328,7 +1320,7 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
 
   assertThrows(
     () => {
-      ByteSequence.describedFromDataURL("data:text/plain");
+      ByteSequence.withMetadataFromDataURL("data:text/plain");
     },
     TypeError,
     "U+002C not found",
@@ -1336,7 +1328,7 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
 
   assertThrows(
     () => {
-      ByteSequence.describedFromDataURL("data2:text/plain");
+      ByteSequence.withMetadataFromDataURL("data2:text/plain");
     },
     TypeError,
     `URL scheme is not "data"`,
@@ -1344,15 +1336,15 @@ Deno.test("ByteSequence.describedFromDataURL(string)", () => {
 
   assertThrows(
     () => {
-      ByteSequence.describedFromDataURL("");
+      ByteSequence.withMetadataFromDataURL("");
     },
     TypeError,
     "dataUrl parse error",
   );
 });
 
-Deno.test("ByteSequence.describedFromDataURL(URL)", () => {
-  const { data: b11, options: meta11 } = ByteSequence.describedFromDataURL(
+Deno.test("ByteSequence.withMetadataFromDataURL(URL)", () => {
+  const { data: b11, options: meta11 } = ByteSequence.withMetadataFromDataURL(
     new URL("data:text/plain,a1"),
   );
   const b11v = b11.getView(Uint8Array);
@@ -1364,15 +1356,16 @@ Deno.test("ByteSequence.describedFromDataURL(URL)", () => {
 
 Deno.test("ByteSequence.prototype.toDataURL()", async () => {
   const b1 = new Blob([Uint8Array.of(65, 0, 1, 127)], { type: "text/plain" });
-  const { data: b11, options: meta11 } = await ByteSequence.describedFromBlob(
-    b1,
-  );
+  const { data: b11, options: meta11 } = await ByteSequence
+    .withMetadataFromBlob(
+      b1,
+    );
   const b11b = b11.toDataURL(meta11);
 
   assertStrictEquals(b11b.toString(), "data:text/plain;base64,QQABfw==");
 
   const b2 = new Blob([Uint8Array.of(65, 0, 1, 127)]);
-  const { data: b21 } = await ByteSequence.describedFromBlob(b2);
+  const { data: b21 } = await ByteSequence.withMetadataFromBlob(b2);
   assertThrows(
     () => {
       b21.toDataURL();
@@ -1384,13 +1377,13 @@ Deno.test("ByteSequence.prototype.toDataURL()", async () => {
 
 Deno.test("ByteSequence.prototype.toDataURL({})", async () => {
   const b1 = new Blob([Uint8Array.of(65, 0, 1, 127)], { type: "text/plain" });
-  const { data: b11 } = await ByteSequence.describedFromBlob(b1);
+  const { data: b11 } = await ByteSequence.withMetadataFromBlob(b1);
   const b11b = b11.toDataURL({ type: "application/pdf" });
 
   assertStrictEquals(b11b.toString(), "data:application/pdf;base64,QQABfw==");
 
   const b2 = new Blob([Uint8Array.of(65, 0, 1, 127)]);
-  const { data: b21 } = await ByteSequence.describedFromBlob(b2);
+  const { data: b21 } = await ByteSequence.withMetadataFromBlob(b2);
   const b21b = b21.toDataURL({ type: "application/pdf" });
   assertStrictEquals(b21b.toString(), "data:application/pdf;base64,QQABfw==");
 });
@@ -1793,6 +1786,7 @@ Deno.test("ByteSequence.prototype.startsWith(Iterable<number>)", () => {
 
   const bs1 = ByteSequence.fromArrayBufferView(Uint8Array.of(255, 0, 127, 1));
 
+  // deno-lint-ignore require-yield
   const a = function* () {
     return;
   };
@@ -1919,20 +1913,20 @@ Deno.test("ByteSequence.fromStream(ReadableStream)", async () => {
   assertStrictEquals(r.byteLength, 128);
 });
 
-Deno.test("ByteSequence.fromStream(ReadableStream, {totalByteLength:number})", async () => {
+Deno.test("ByteSequence.fromStream(ReadableStream, {total:number})", async () => {
   const fsfile1 = await Deno.open("./tests/_data/128.txt");
   const stream: ReadableStream<Uint8Array> = fsfile1.readable;
-  const r = await ByteSequence.fromStream(stream, { totalByteLength: 128 });
+  const r = await ByteSequence.fromStream(stream, { total: 128 });
   assertStrictEquals(r.byteLength, 128);
 
   const fsfile2 = await Deno.open("./tests/_data/128.txt");
   const stream2: ReadableStream<Uint8Array> = fsfile2.readable;
-  const r2 = await ByteSequence.fromStream(stream2, { totalByteLength: 64 });
+  const r2 = await ByteSequence.fromStream(stream2, { total: 64 });
   assertStrictEquals(r2.byteLength, 128);
 
   const fsfile3 = await Deno.open("./tests/_data/128.txt");
   const stream3: ReadableStream<Uint8Array> = fsfile3.readable;
-  const r3 = await ByteSequence.fromStream(stream3, { totalByteLength: 512 });
+  const r3 = await ByteSequence.fromStream(stream3, { total: 512 });
   assertStrictEquals(r3.byteLength, 128);
 });
 
@@ -1952,14 +1946,14 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { on*: function })", async ()
     data.lengthComputable = evt.lengthComputable;
   };
   const r = await ByteSequence.fromStream(stream, {
-    onloadstart: listener,
-    onloadend: listener,
-    onprogress: listener,
-    onabort: listener,
-    ontimeout: listener,
-    onerror: listener,
-    onload: listener,
-  });
+    //onloadstart: listener,
+    //onloadend: listener,
+    //onprogress: listener,
+    //onabort: listener,
+    //ontimeout: listener,
+    //onerror: listener,
+    //onload: listener,
+  }, listener); //onProgressChange
   assertStrictEquals(r.byteLength, 128);
   assertStrictEquals(evtNames.filter((n) => n === "loadstart").length, 1);
   assertStrictEquals(evtNames.filter((n) => n === "loadend").length, 1);
@@ -1967,16 +1961,16 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { on*: function })", async ()
     evtNames.filter((n) => n === "progress").length >= 1,
     true,
   );
-  assertStrictEquals(evtNames.filter((n) => n === "abort").length, 0);
-  assertStrictEquals(evtNames.filter((n) => n === "timeout").length, 0);
-  assertStrictEquals(evtNames.filter((n) => n === "error").length, 0);
-  assertStrictEquals(evtNames.filter((n) => n === "load").length, 1);
+  //assertStrictEquals(evtNames.filter((n) => n === "abort").length, 0);
+  //assertStrictEquals(evtNames.filter((n) => n === "timeout").length, 0);
+  //assertStrictEquals(evtNames.filter((n) => n === "error").length, 0);
+  //assertStrictEquals(evtNames.filter((n) => n === "load").length, 1);
   assertStrictEquals(data.total, 0);
   assertStrictEquals(data.loaded, 128);
   assertStrictEquals(data.lengthComputable, false);
 });
 
-Deno.test("ByteSequence.fromStream(ReadableStream, { totalByteLength:number, on*: function })", async () => {
+Deno.test("ByteSequence.fromStream(ReadableStream, { total:number, on*: function })", async () => {
   const fsfile = await Deno.open("./tests/_data/128.txt");
   const stream: ReadableStream<Uint8Array> = fsfile.readable;
   const evtNames: string[] = [];
@@ -1992,15 +1986,15 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { totalByteLength:number, on*
     data.lengthComputable = evt.lengthComputable;
   };
   const r = await ByteSequence.fromStream(stream, {
-    totalByteLength: 128,
-    onloadstart: listener,
-    onloadend: listener,
-    onprogress: listener,
-    onabort: listener,
-    ontimeout: listener,
-    onerror: listener,
-    onload: listener,
-  });
+    total: 128,
+    //onloadstart: listener,
+    //onloadend: listener,
+    //onprogress: listener,
+    //onabort: listener,
+    //ontimeout: listener,
+    //onerror: listener,
+    //onload: listener,
+  }, listener); // onProgressChange
   assertStrictEquals(r.byteLength, 128);
   assertStrictEquals(evtNames.filter((n) => n === "loadstart").length, 1);
   assertStrictEquals(evtNames.filter((n) => n === "loadend").length, 1);
@@ -2008,16 +2002,16 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { totalByteLength:number, on*
     evtNames.filter((n) => n === "progress").length >= 1,
     true,
   );
-  assertStrictEquals(evtNames.filter((n) => n === "abort").length, 0);
-  assertStrictEquals(evtNames.filter((n) => n === "timeout").length, 0);
-  assertStrictEquals(evtNames.filter((n) => n === "error").length, 0);
-  assertStrictEquals(evtNames.filter((n) => n === "load").length, 1);
+  //assertStrictEquals(evtNames.filter((n) => n === "abort").length, 0);
+  //assertStrictEquals(evtNames.filter((n) => n === "timeout").length, 0);
+  //assertStrictEquals(evtNames.filter((n) => n === "error").length, 0);
+  //assertStrictEquals(evtNames.filter((n) => n === "load").length, 1);
   assertStrictEquals(data.total, 128);
   assertStrictEquals(data.loaded, 128);
   assertStrictEquals(data.lengthComputable, true);
 });
 
-Deno.test("ByteSequence.fromStream(ReadableStream, { totalByteLength:number, signal: AbortSignal, on*: function })", async () => {
+Deno.test("ByteSequence.fromStream(ReadableStream, { total:number, signal: AbortSignal, on*: function })", async () => {
   const fsfile = await Deno.open("./tests/_data/large.txt");
   const stream: ReadableStream<Uint8Array> = fsfile.readable;
   const evtNames: string[] = [];
@@ -2035,19 +2029,19 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { totalByteLength:number, sig
   const ac = new AbortController();
   setTimeout(() => {
     ac.abort();
-  }, 5);
+  }, 1);
   try {
-    const r = await ByteSequence.fromStream(stream, {
-      totalByteLength: 4096,
+    await ByteSequence.fromStream(stream, {
+      total: 4096,
       signal: ac.signal,
-      onloadstart: listener,
-      onloadend: listener,
-      onprogress: listener,
-      onabort: listener,
-      ontimeout: listener,
-      onerror: listener,
-      onload: listener,
-    });
+      //onloadstart: listener,
+      //onloadend: listener,
+      //onprogress: listener,
+      //onabort: listener,
+      //ontimeout: listener,
+      //onerror: listener,
+      //onload: listener,
+    }, listener); // onProgressChange
     throw new Error();
   } catch (e) {
     assertStrictEquals((e as Error)?.name, "AbortError");
@@ -2058,10 +2052,10 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { totalByteLength:number, sig
     evtNames.filter((n) => n === "progress").length >= 1,
     true,
   );
-  assertStrictEquals(evtNames.filter((n) => n === "abort").length, 1);
-  assertStrictEquals(evtNames.filter((n) => n === "timeout").length, 0);
-  assertStrictEquals(evtNames.filter((n) => n === "error").length, 0);
-  assertStrictEquals(evtNames.filter((n) => n === "load").length, 0);
+  //assertStrictEquals(evtNames.filter((n) => n === "abort").length, 1);
+  //assertStrictEquals(evtNames.filter((n) => n === "timeout").length, 0);
+  //assertStrictEquals(evtNames.filter((n) => n === "error").length, 0);
+  //assertStrictEquals(evtNames.filter((n) => n === "load").length, 0);
   assertStrictEquals(data.total, 4096);
   assertStrictEquals(data.loaded >= 1, true);
   assertStrictEquals(data.lengthComputable, true);
@@ -2138,24 +2132,24 @@ Deno.test("ByteSequence.fromRequestOrResponse(Response, {verifyHeaders:function}
   }
 });
 
-Deno.test("ByteSequence.describedFromRequestOrResponse(Response)", async () => {
+Deno.test("ByteSequence.withMetadataFromRequestOrResponse(Response)", async () => {
   const res1 = new Response();
   const { data: b1, options: meta1 } = await ByteSequence
-    .describedFromRequestOrResponse(res1);
+    .withMetadataFromRequestOrResponse(res1);
   assertStrictEquals(b1.byteLength, 0);
   assertStrictEquals(meta1, undefined);
 });
 
-Deno.test("ByteSequence.describedFromRequestOrResponse(Response)", async () => {
+Deno.test("ByteSequence.withMetadataFromRequestOrResponse(Response)", async () => {
   const res1 = new Response(Uint8Array.of(255, 254, 253, 252));
   const { data: b1, options: meta1 } = await ByteSequence
-    .describedFromRequestOrResponse(res1);
+    .withMetadataFromRequestOrResponse(res1);
   assertStrictEquals(b1.byteLength, 4);
   assertStrictEquals(meta1, undefined);
 
   // 読み取り済みのを再度読もうとした
   try {
-    await ByteSequence.describedFromRequestOrResponse(res1);
+    await ByteSequence.withMetadataFromRequestOrResponse(res1);
     throw new Error();
   } catch (e) {
     assertStrictEquals(e?.name, "InvalidStateError");
@@ -2163,19 +2157,19 @@ Deno.test("ByteSequence.describedFromRequestOrResponse(Response)", async () => {
   }
 });
 
-Deno.test("ByteSequence.describedFromRequestOrResponse(Response)", async () => {
+Deno.test("ByteSequence.withMetadataFromRequestOrResponse(Response)", async () => {
   const headers1 = new Headers();
   headers1.append("content-type", "text/plain");
   const res1 = new Response(Uint8Array.of(255, 254, 253, 252), {
     headers: headers1,
   });
   const { data: b1, options: meta1 } = await ByteSequence
-    .describedFromRequestOrResponse(res1);
+    .withMetadataFromRequestOrResponse(res1);
   assertStrictEquals(b1.byteLength, 4);
   assertStrictEquals(meta1?.type, "text/plain");
 });
 
-Deno.test("ByteSequence.describedFromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
+Deno.test("ByteSequence.withMetadataFromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
   const options1 = {
     verifyHeaders: (h: Headers): [boolean, string] | [boolean] => {
       const verified = h.get("Content-Type") === "text/plain";
@@ -2188,12 +2182,12 @@ Deno.test("ByteSequence.describedFromRequestOrResponse(Response, {verifyHeaders:
     headers: headers1,
   });
   const { data: b1, options: meta1 } = await ByteSequence
-    .describedFromRequestOrResponse(res1, options1);
+    .withMetadataFromRequestOrResponse(res1, options1);
   assertStrictEquals(b1.byteLength, 4);
   assertStrictEquals(meta1?.type, "text/plain");
 });
 
-Deno.test("ByteSequence.describedFromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
+Deno.test("ByteSequence.withMetadataFromRequestOrResponse(Response, {verifyHeaders:function})", async () => {
   const options1 = {
     verifyHeaders: (h: Headers): [boolean, string] | [boolean] => {
       const verified = h.get("Content-Type") === "text/csv";
@@ -2209,7 +2203,7 @@ Deno.test("ByteSequence.describedFromRequestOrResponse(Response, {verifyHeaders:
     headers: headers1,
   });
   try {
-    await ByteSequence.describedFromRequestOrResponse(res1, options1);
+    await ByteSequence.withMetadataFromRequestOrResponse(res1, options1);
     throw new Error();
   } catch (e) {
     assertStrictEquals(e?.name, "Error");
@@ -2221,7 +2215,7 @@ Deno.test("ByteSequence.prototype.toRequest(string, {})", async () => {
   const bb1 = ByteSequence.of(1, 2, 3);
   const req1 = bb1.toRequest("http://example.com/t1", { method: "post" });
   const { data: b1, options: meta1 } = await ByteSequence
-    .describedFromRequestOrResponse(req1);
+    .withMetadataFromRequestOrResponse(req1);
   assertStrictEquals(b1.byteLength, 3);
   assertStrictEquals(meta1, undefined);
 
@@ -2249,7 +2243,7 @@ Deno.test("ByteSequence.prototype.toRequest(string, {})", async () => {
     headers: { "Content-Type": "image/png" },
   });
   const { data: b1, options: meta1 } = await ByteSequence
-    .describedFromRequestOrResponse(req1);
+    .withMetadataFromRequestOrResponse(req1);
   assertStrictEquals(b1.byteLength, 3);
   assertStrictEquals(meta1?.type, "image/png");
 });
@@ -2258,7 +2252,7 @@ Deno.test("ByteSequence.prototype.toResponse({})", async () => {
   const bb1 = ByteSequence.of(1, 2, 3);
   const res1 = bb1.toResponse({});
   const { data: b1, options: meta1 } = await ByteSequence
-    .describedFromRequestOrResponse(res1);
+    .withMetadataFromRequestOrResponse(res1);
   assertStrictEquals(b1.byteLength, 3);
   assertStrictEquals(meta1, undefined);
 });
@@ -2267,7 +2261,7 @@ Deno.test("ByteSequence.prototype.toResponse({})", async () => {
   const bb1 = ByteSequence.of(1, 2, 3);
   const res1 = bb1.toResponse({ headers: { "content-type": "image/png" } });
   const { data: b1, options: meta1 } = await ByteSequence
-    .describedFromRequestOrResponse(res1);
+    .withMetadataFromRequestOrResponse(res1);
   assertStrictEquals(b1.byteLength, 3);
   assertStrictEquals(meta1?.type, "image/png");
 });

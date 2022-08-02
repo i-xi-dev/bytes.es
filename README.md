@@ -2,10 +2,6 @@
 
 A JavaScript byte array library for the browser, Deno and Node.js
 
-## Documentation
-
-[https://i-xi-dev.github.io/bytes.es/](https://i-xi-dev.github.io/bytes.es/)
-
 ## Requirement
 
 `ByteSequence` requires
@@ -24,7 +20,7 @@ and [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
 ### npm
 
 ```console
-$ npm i @i-xi-dev/bytes
+$ npm i @i-xi-dev/bytes@4.0.2-alpha1
 ```
 
 ```javascript
@@ -36,12 +32,12 @@ import { ByteSequence } from "@i-xi-dev/bytes";
 Example for Skypack
 
 ```javascript
-import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
+import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes@4.0.2-alpha1";
 ```
 
 ## Usage
 
-### [`ByteSequence`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.0/mod.ts) class
+### [`ByteSequence`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.2-alpha1/mod.ts) class
 
 ![Conversion](assets/conversion.svg)
 
@@ -51,19 +47,19 @@ import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes";
 
 Creates an instance with a new underlying buffer
 
-- [ByteSequence.allocate()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#allocate)
-- [ByteSequence.generateRandom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#generateRandom)
-- [ByteSequence.fromArrayBuffer()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArrayBuffer)
-- [ByteSequence.fromArrayBufferView()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArrayBufferView)
-- [ByteSequence.fromBufferSource()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBufferSource)
-- [ByteSequence.fromArray()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromArray)
-- [ByteSequence.from()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#from)
+- [ByteSequence.allocate()](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.2/mod.ts/~/ByteSequence.allocate)
+- [ByteSequence.generateRandom()](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.2/mod.ts/~/ByteSequence.generateRandom)
+- [ByteSequence.fromArrayBuffer()](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.2/mod.ts/~/ByteSequence.fromArrayBuffer)
+- [ByteSequence.fromArrayBufferView()](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.2/mod.ts/~/ByteSequence.fromArrayBufferView)
+- [ByteSequence.fromBufferSource()](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.2/mod.ts/~/ByteSequence.fromBufferSource)
+- [ByteSequence.fromArray()](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.2/mod.ts/~/ByteSequence.fromArray)
+- [ByteSequence.from()](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.0.2/mod.ts/~/ByteSequence.from)
 - [ByteSequence.of()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#of)
 - [ByteSequence.fromBinaryString()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBinaryString)
 - [ByteSequence.fromBase64Encoded()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBase64Encoded)
 - [ByteSequence.fromPercentEncoded()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromPercentEncoded)
 - [ByteSequence.parse()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#parse)
-- [ByteSequence.utf8EncodeFrom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#utf8EncodeFrom)
+- [ByteSequence.fromText()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromText)
 - [ByteSequence.textEncodeFrom()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#textEncodeFrom)
 - [ByteSequence.fromBlob()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromBlob)
 - [ByteSequence.fromDataURL()](https://i-xi-dev.github.io/bytes.es/classes/ByteSequence.html#fromDataURL)

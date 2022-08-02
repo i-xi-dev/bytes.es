@@ -1,8 +1,11 @@
-import { build, emptyDir } from "https://deno.land/x/dnt@0.23.0/mod.ts";
+import { build, emptyDir } from "https://deno.land/x/dnt@0.29.0/mod.ts";
 
 await emptyDir("./npm");
 
 await build({
+  compilerOptions: {
+    lib: ["esnext", "dom"],
+  },
   entryPoints: ["./mod.ts"],
   outDir: "./npm",
   shims: {
@@ -25,7 +28,7 @@ await build({
   rootTestDir: "./tests",
   package: {
     name: "@i-xi-dev/bytes",
-    version: "4.0.0",
+    version: "4.0.2-alpha1",
     description:
       "A JavaScript byte array library for the browser, Deno and Node.js",
     license: "MIT",

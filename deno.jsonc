@@ -1,7 +1,7 @@
 {
   "lint": {
     "files": {
-      "include": ["src/"]
+      "exclude": ["npm/"]
     },
     "rules": {
       "tags": ["recommended"],
@@ -9,6 +9,9 @@
     }
   },
   "fmt": {
+    "files": {
+      "exclude": ["npm/", "README.md"]
+    }
   },
   "compilerOptions": {
     "removeComments": true,
