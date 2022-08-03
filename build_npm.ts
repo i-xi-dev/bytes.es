@@ -28,7 +28,7 @@ await build({
   rootTestDir: "./tests",
   package: {
     name: "@i-xi-dev/bytes",
-    version: "4.0.2-alpha1",
+    version: "4.0.2-alpha2",
     description:
       "A JavaScript byte array library for the browser, Deno and Node.js",
     license: "MIT",

@@ -470,17 +470,26 @@ const _BYTES: Record<ByteUnit, int> = {
 class ByteCount {
   #byteCount: int;
 
-  private constructor(byteCount: int) {
+  constructor(byteCount: int) {
     this.#byteCount = byteCount;
     Object.freeze(this);
   }
 
-  static of(value: number, unit: ByteUnit = ByteUnit.B): ByteCount {
-    return new ByteCount(Math.ceil(value * _BYTES[unit]));
-  }
+  // static of(value: number, unit: string = ByteUnit.B): ByteCount {
+  //   return new ByteCount(Math.ceil(value * _BYTES[unit]));
+  // }
 
-  to(unit: ByteUnit): number {
-    return this.#byteCount / _BYTES[unit];
+  to(unit: string): number {
+    if (typeof unit !== "string") {
+      throw new TypeError("unit is not type of string");
+    }
+
+    const lowerUnit = unit.toLowerCase();
+    const found = Object.values(ByteUnit).find(u => u.toLowerCase() === lowerUnit);
+    if (found) {
+      return this.#byteCount / _BYTES[found];
+    }
+    throw new RangeError("unknown unit");
   }
 
   valueOf(): int {
@@ -542,8 +551,47 @@ class ByteSequence {
     return this.#buffer.byteLength;
   }
 
+  /**
+   * Gets the number of bytes as `ByteCount`.
+   * 
+   * | parameter of `ByteCount.prototype.to()` | unit |
+   * | :--- | :--- |
+   * | `"B"` | byte |
+   * | `"kB"` | kilobyte |
+   * | `"KiB"` | kibibyte |
+   * | `"MB"` | megabyte |
+   * | `"MiB"` | mebibyte |
+   * | `"GB"` | gigabyte |
+   * | `"GiB"` | gibibyte |
+   * | `"TB"` | terabyte |
+   * | `"TiB"` | tebibyte |
+   * | `"PB"` | petabyte |
+   * | `"PiB"` | pebibyte |
+   * 
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.allocate(1024);
+   * const kib = bytes.size.to("KiB");
+   * // kib
+   * //   → 1
+   * ```
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.allocate(5_120_000);
+   * const kib = bytes.size.to("KiB");
+   * // (new Intl.NumberFormat("en")).format(kib) + " KiB"
+   * //   → "5,000 KiB"
+   * ```
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.allocate(5_000_000);
+   * const kb = bytes.size.to("kB");
+   * // (new Intl.NumberFormat("en", { style: "unit", unit: "kilobyte" })).format(kb)
+   * //   → "5,000 kB"
+   * ```
+   */
   get size(): ByteCount {
-    return ByteCount.of(this.#buffer.byteLength);
+    return new ByteCount(this.#buffer.byteLength);
   }
 
   /**
