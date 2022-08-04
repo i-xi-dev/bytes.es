@@ -18,6 +18,7 @@ import {
   _ProgressEvent,
 } from "https://raw.githubusercontent.com/i-xi-dev/compat.es/1.1.2/mod.ts";
 import { StringUtils } from "https://raw.githubusercontent.com/i-xi-dev/str.es/1.0.5/mod.ts";
+import { Http } from "https://raw.githubusercontent.com/i-xi-dev/http.es/1.0.0/mod.ts";
 import { HttpUtils } from "https://raw.githubusercontent.com/i-xi-dev/http-utils.es/2.0.3/mod.ts";
 import { Reading } from "https://raw.githubusercontent.com/i-xi-dev/reading.es/1.0.2/mod.ts";
 import { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.2/mod.ts";
@@ -90,29 +91,6 @@ Object.freeze(_DigestImpl);
 const {
   ASCII_WHITESPACE,
 } = HttpUtils.Pattern;
-
-namespace _Http {
-  export const Header = {
-    CONTENT_ENCODING: "Content-Encoding",
-    CONTENT_LANGUAGE: "Content-Language",
-    CONTENT_LENGTH: "Content-Length",
-    CONTENT_LOCATION: "Content-Location",
-    CONTENT_TYPE: "Content-Type",
-  } as const;
-
-  export const Method = {
-    CONNECT: "CONNECT",
-    DELETE: "DELETE",
-    GET: "GET",
-    HEAD: "HEAD",
-    OPTIONS: "OPTIONS",
-    PATCH: "PATCH",
-    POST: "POST",
-    PUT: "PUT",
-    TRACE: "TRACE",
-  } as const;
-}
-Object.freeze(_Http);
 
 namespace _ArrayBufferView {
   export function isTypedArrayConstructor(
@@ -346,10 +324,10 @@ namespace _HttpUtilsEx {
     // init.headersで指定されていれば、それを指定
     try {
       const mediaType = extractContentType(headers);
-      headers.set(_Http.Header.CONTENT_TYPE, mediaType.toString());
+      headers.set(Http.Header.CONTENT_TYPE, mediaType.toString());
     } catch (exception) {
       void exception;
-      headers.delete(_Http.Header.CONTENT_TYPE);
+      headers.delete(Http.Header.CONTENT_TYPE);
     }
 
     // Content-Length
@@ -485,7 +463,9 @@ class ByteCount {
     }
 
     const lowerUnit = unit.toLowerCase();
-    const found = Object.values(ByteUnit).find(u => u.toLowerCase() === lowerUnit);
+    const found = Object.values(ByteUnit).find((u) =>
+      u.toLowerCase() === lowerUnit
+    );
     if (found) {
       return this.#byteCount / _BYTES[found];
     }
@@ -553,7 +533,7 @@ class ByteSequence {
 
   /**
    * Gets the number of bytes as `ByteCount`.
-   * 
+   *
    * | parameter of `ByteCount.prototype.to()` | unit |
    * | :--- | :--- |
    * | `"B"` | byte |
@@ -567,7 +547,7 @@ class ByteSequence {
    * | `"TiB"` | tebibyte |
    * | `"PB"` | petabyte |
    * | `"PiB"` | pebibyte |
-   * 
+   *
    * @example
    * ```javascript
    * const bytes = ByteSequence.allocate(1024);
@@ -1753,9 +1733,9 @@ class ByteSequence {
    */
   toRequest(url: string, options: RequestInit): Request {
     const headers = _HttpUtilsEx.createHeaders(options?.headers);
-    const method = options.method ?? _Http.Method.GET;
+    const method = options.method ?? Http.Method.GET;
     if (
-      ([_Http.Method.GET, _Http.Method.HEAD] as string[]).includes(
+      ([Http.Method.GET, Http.Method.HEAD] as string[]).includes(
         method.toUpperCase(),
       ) === true
     ) {

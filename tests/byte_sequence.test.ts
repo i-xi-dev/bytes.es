@@ -15,6 +15,21 @@ Deno.test("ByteSequence.prototype.byteLength", () => {
   assertStrictEquals(bs1.byteLength, 1000);
 });
 
+Deno.test("ByteSequence.prototype.size", () => {
+  const bs0 = ByteSequence.allocate(0);
+  const bs1 = ByteSequence.allocate(1000);
+  const bs1b = ByteSequence.allocate(1024);
+
+  assertStrictEquals(bs0.size.valueOf(), 0);
+  assertStrictEquals(bs0.size.to("kb"), 0);
+  assertStrictEquals(bs1.size.valueOf(), 1000);
+  assertStrictEquals(bs1.size.to("kb"), 1);
+  assertStrictEquals(bs1.size.to("b"), 1000);
+  assertStrictEquals(bs1b.size.valueOf(), 1024);
+  assertStrictEquals(bs1b.size.to("kib"), 1);
+  assertStrictEquals(bs1b.size.to("b"), 1024);
+});
+
 Deno.test("ByteSequence.prototype.buffer", () => {
   const a0 = new ArrayBuffer(0);
   const bs0 = ByteSequence.wrapArrayBuffer(a0);
