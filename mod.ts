@@ -22,71 +22,9 @@ import { Http } from "https://raw.githubusercontent.com/i-xi-dev/http.es/1.0.0/m
 import { HttpUtils } from "https://raw.githubusercontent.com/i-xi-dev/http-utils.es/2.0.3/mod.ts";
 import { Reading } from "https://raw.githubusercontent.com/i-xi-dev/reading.es/1.0.2/mod.ts";
 import { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.2/mod.ts";
+import { Digest } from "https://raw.githubusercontent.com/i-xi-dev/digest.es/1.0.0/mod.ts";
 
 type int = number;
-
-/**
- * Digest algorithm
- */
-interface DigestAlgorithm {
-  /**
-   * Computes the digest for the byte sequence.
-   *
-   * @param input The input to compute the digest.
-   * @returns The `Promise` that fulfills with a computed digest.
-   */
-  compute: (input: Uint8Array) => Promise<Uint8Array>;
-}
-
-/**
- * @internal
- */
-namespace _DigestImpl {
-  /**
-   * SHA-256 digest algorithm
-   */
-  export const Sha256 = Object.freeze({
-    /**
-     * Computes the SHA-256 digest for the byte sequence.
-     */
-    async compute(input: Uint8Array): Promise<Uint8Array> {
-      const bytes = await _crypto.subtle.digest("SHA-256", input);
-      return new Uint8Array(bytes);
-    },
-  });
-  Object.freeze(Sha256);
-
-  /**
-   * SHA-384 digest algorithm
-   */
-  export const Sha384 = Object.freeze({
-    /**
-     * Computes the SHA-384 digest for the byte sequence.
-     */
-    async compute(input: Uint8Array): Promise<Uint8Array> {
-      const bytes = await _crypto.subtle.digest("SHA-384", input);
-      return new Uint8Array(bytes);
-    },
-  });
-  Object.freeze(Sha384);
-
-  /**
-   * SHA-512 digest algorithm
-   */
-  export const Sha512 = Object.freeze({
-    /**
-     * Computes the SHA-512 digest for the byte sequence.
-     *
-     * @see {@link Algorithm.compute}
-     */
-    async compute(input: Uint8Array): Promise<Uint8Array> {
-      const bytes = await _crypto.subtle.digest("SHA-512", input);
-      return new Uint8Array(bytes);
-    },
-  });
-  Object.freeze(Sha512);
-}
-Object.freeze(_DigestImpl);
 
 const {
   ASCII_WHITESPACE,
@@ -605,21 +543,21 @@ class ByteSequence {
    * ```
    */
   get sha256Integrity(): Promise<string> {
-    return this.#integrity(_DigestImpl.Sha256, "sha256-");
+    return this.#integrity(Digest.Sha256, "sha256-");
   }
 
   /**
    * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-384 digest for this byte sequence.
    */
   get sha384Integrity(): Promise<string> {
-    return this.#integrity(_DigestImpl.Sha384, "sha384-");
+    return this.#integrity(Digest.Sha384, "sha384-");
   }
 
   /**
    * Returns the `Promise` that fulfills with a [SRI integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) string with Base64-encoded SHA-512 digest for this byte sequence.
    */
   get sha512Integrity(): Promise<string> {
-    return this.#integrity(_DigestImpl.Sha512, "sha512-");
+    return this.#integrity(Digest.Sha512, "sha512-");
   }
 
   /**
@@ -1257,7 +1195,7 @@ class ByteSequence {
    * ```
    */
   async toDigest(
-    algorithm: DigestAlgorithm,
+    algorithm: Digest.Algorithm,
   ): Promise<ByteSequence> {
     const digest = await algorithm.compute(this.#view);
     return new ByteSequence(digest.buffer);
@@ -1276,7 +1214,7 @@ class ByteSequence {
    * ```
    */
   toSha256Digest(): Promise<ByteSequence> {
-    return this.toDigest(_DigestImpl.Sha256);
+    return this.toDigest(Digest.Sha256);
   }
 
   /**
@@ -1285,7 +1223,7 @@ class ByteSequence {
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-384 digest.
    */
   toSha384Digest(): Promise<ByteSequence> {
-    return this.toDigest(_DigestImpl.Sha384);
+    return this.toDigest(Digest.Sha384);
   }
 
   /**
@@ -1294,7 +1232,7 @@ class ByteSequence {
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-512 digest.
    */
   toSha512Digest(): Promise<ByteSequence> {
-    return this.toDigest(_DigestImpl.Sha512);
+    return this.toDigest(Digest.Sha512);
   }
 
   /**
@@ -1305,7 +1243,7 @@ class ByteSequence {
    * @see [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
    */
   async #integrity(
-    algorithm: DigestAlgorithm,
+    algorithm: Digest.Algorithm,
     prefix: string,
   ): Promise<string> {
     // algorithmは2021-12時点でSHA-256,SHA-384,SHA-512のどれか
