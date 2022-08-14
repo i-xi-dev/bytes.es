@@ -301,7 +301,7 @@ class ByteCount {
 
   /**
    * 
-   * @param unit The following units are supported. Units are case insensitive.
+   * @param unit The following units are supported. Units are case sensitive.
    * - `"byte"`
    * - `"kilobyte"`
    * - `"kibibyte"`
@@ -315,9 +315,14 @@ class ByteCount {
    * - `"pebibyte"`
    * @returns The byte count expressed in specified unit.
    */
-  to(unit: string): number {
-    if (typeof unit !== "string") {
-      throw new TypeError("unit is not type of string");
+  to(unit: ByteUnit): number {
+    if (typeof unit === "string") {
+      if (Object.values(ByteUnit).includes(unit) !== true) {
+        throw new RangeError("unit");
+      }
+    }
+    else {
+      throw new TypeError("unit");
     }
 
     const lowerUnit = unit.toLowerCase();
@@ -327,7 +332,7 @@ class ByteCount {
     if (found) {
       return this.#byteCount / _BYTES[found];
     }
-    throw new RangeError("unknown unit");
+    return undefined as never;
   }
 
   valueOf(): number {

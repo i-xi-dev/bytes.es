@@ -5,7 +5,7 @@ import {
 } from "std/testing/asserts";
 import { Md5 } from "https://deno.land/std@0.140.0/hash/md5.ts";
 import encja from "https://cdn.skypack.dev/encoding-japanese@2.0.0?dts";
-import { ByteSequence } from "../mod.ts";
+import { ByteSequence, ByteUnit } from "../mod.ts";
 
 Deno.test("ByteSequence.prototype.byteLength", () => {
   const bs0 = ByteSequence.allocate(0);
@@ -21,13 +21,13 @@ Deno.test("ByteSequence.prototype.size", () => {
   const bs1b = ByteSequence.allocate(1024);
 
   assertStrictEquals(bs0.size.valueOf(), 0);
-  assertStrictEquals(bs0.size.to("kb"), 0);
+  assertStrictEquals(bs0.size.to(ByteUnit.KB), 0);
   assertStrictEquals(bs1.size.valueOf(), 1000);
-  assertStrictEquals(bs1.size.to("kb"), 1);
-  assertStrictEquals(bs1.size.to("b"), 1000);
+  assertStrictEquals(bs1.size.to(ByteUnit.KB), 1);
+  assertStrictEquals(bs1.size.to(ByteUnit.B), 1000);
   assertStrictEquals(bs1b.size.valueOf(), 1024);
-  assertStrictEquals(bs1b.size.to("kib"), 1);
-  assertStrictEquals(bs1b.size.to("b"), 1024);
+  assertStrictEquals(bs1b.size.to(ByteUnit.KIB), 1);
+  assertStrictEquals(bs1b.size.to(ByteUnit.B), 1024);
 });
 
 Deno.test("ByteSequence.prototype.buffer", () => {
