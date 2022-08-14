@@ -10,7 +10,7 @@ import {
   type uint8,
 } from "https://raw.githubusercontent.com/i-xi-dev/int.es/1.1.1/mod.ts";
 import { Isomorphic } from "https://raw.githubusercontent.com/i-xi-dev/isomorphic.es/2.0.1/mod.ts";
-import { MediaType } from "https://raw.githubusercontent.com/i-xi-dev/mimetype.es/1.1.9/mod.ts";
+import { MediaType } from "https://raw.githubusercontent.com/i-xi-dev/mimetype.es/1.2.0/mod.ts";
 import { Percent } from "https://raw.githubusercontent.com/i-xi-dev/percent.es/4.0.12/mod.ts";
 import {
   _Blob,
@@ -112,82 +112,13 @@ namespace _Utf8 {
 Object.freeze(_Utf8);
 
 namespace _HttpUtilsEx {
-  /**
-   * RequestまたはResponseのヘッダーからContent-Typeの値を取得し返却する
-   *
-   * {@link https://fetch.spec.whatwg.org/#content-type-header Fetch standard}の仕様に合わせた
-   * (await Body.blob()).type と同じになるはず？
-   *
-   * @param headers ヘッダー
-   * @returns Content-Typeの値から生成したMediaTypeインスタンス
-   */
-  export function extractContentType(headers: Headers): MediaType {
-    // 5.
-    if (headers.has("Content-Type") !== true) {
-      throw new Error("Content-Type field not found");
-    }
-
-    // 4, 5.
-    const typesString = headers.get("Content-Type") as string;
-    const typeStrings = HttpUtils.valuesOfHeaderFieldValue(typesString);
-    if (typeStrings.length <= 0) {
-      throw new Error("Content-Type value not found");
-    }
-
-    // 1, 2, 3.
-    let textEncoding = "";
-    let mediaTypeEssence = "";
-    let mediaType: MediaType | null = null;
-    // 6.
-    for (const typeString of typeStrings) {
-      try {
-        // 6.1.
-        const tempMediaType = MediaType.fromString(typeString);
-
-        // 6.3.
-        mediaType = tempMediaType;
-
-        // 6.4.
-        if (mediaTypeEssence !== mediaType.essence) {
-          // 6.4.1.
-          textEncoding = "";
-          // 6.4.2.
-          if (mediaType.hasParameter("charset")) {
-            textEncoding = mediaType.getParameterValue("charset") as string;
-          }
-          // 6.4.3.
-          mediaTypeEssence = mediaType.essence;
-        } else {
-          // 6.5.
-          if (
-            (mediaType.hasParameter("charset") !== true) &&
-            (textEncoding !== "")
-          ) {
-            // TODO mediaType.withParameters()
-          }
-        }
-      } catch (exception) {
-        console.log(exception); // TODO 消す
-        // 6.2. "*/*"はMediaType.fromStringでエラーにしている
-        continue;
-      }
-    }
-
-    // 7, 8.
-    if (mediaType !== null) {
-      return mediaType;
-    } else {
-      throw new Error("extraction failure");
-    }
-  }
-
   export function createHeaders(init?: HeadersInit): HeadersInit {
     const headers = new Headers(init);
 
     // Content-Type
     // init.headersで指定されていれば、それを指定
     try {
-      const mediaType = extractContentType(headers);
+      const mediaType = MediaType.fromHeaders(headers);
       headers.set(Http.Header.CONTENT_TYPE, mediaType.toString());
     } catch (exception) {
       void exception;
@@ -2134,7 +2065,7 @@ class ByteSequence {
   }> {
     let mediaType: MediaType | null = null;
     try {
-      mediaType = _HttpUtilsEx.extractContentType(reqOrRes.headers);
+      mediaType = MediaType.fromHeaders(reqOrRes.headers);
     } catch (exception) {
       void exception;
     }
