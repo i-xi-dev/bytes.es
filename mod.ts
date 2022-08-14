@@ -19,7 +19,7 @@ import {
 } from "https://raw.githubusercontent.com/i-xi-dev/compat.es/1.1.2/mod.ts";
 import { StringUtils } from "https://raw.githubusercontent.com/i-xi-dev/str.es/1.0.5/mod.ts";
 import { Http } from "https://raw.githubusercontent.com/i-xi-dev/http.es/1.0.0/mod.ts";
-import { HttpUtils } from "https://raw.githubusercontent.com/i-xi-dev/http-utils.es/2.0.3/mod.ts";
+import { HttpUtils } from "https://raw.githubusercontent.com/i-xi-dev/http-utils.es/2.1.0/mod.ts";
 import { Reading } from "https://raw.githubusercontent.com/i-xi-dev/reading.es/1.0.2/mod.ts";
 import { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.2/mod.ts";
 import { Digest } from "https://raw.githubusercontent.com/i-xi-dev/digest.es/1.0.0/mod.ts";
@@ -113,80 +113,6 @@ Object.freeze(_Utf8);
 
 namespace _HttpUtilsEx {
   /**
-   * Headers#getで取得した値を分割する
-   * （複数ヘッダーだった場合、","で連結されているので分割する）
-   *
-   * かつてはHeaders#getAllすれば良かったが、それは廃止されたので。
-   *  → Headers#getは引用符を問答無用で消してしまう（","が引用符の中にあったのか外にあったのか不明になる）
-   *    ので、元の値は取得不能ですね…（getAllの再現は不可能）
-   *
-   * {@link https://fetch.spec.whatwg.org/#concept-header-list-get-decode-split} のsplitの部分の仕様で分割する
-   *
-   * @param value Headers#getで取得した値
-   * @returns 分割結果
-   */
-  export function splitHeaderValue(value: string): Array<string> {
-    const u0022OrU002C = "[\\u{22}\\u{2C}]+";
-    const values: Array<string> = [];
-
-    if (/[\u0022\u002C]/.test(value) !== true) {
-      const trimmed = StringUtils.trim(
-        value,
-        HttpUtils.Pattern.HTTP_TAB_OR_SPACE,
-      );
-      if (trimmed.length > 0) {
-        return [trimmed];
-      } else {
-        return [];
-      }
-    }
-
-    let i = 0;
-    let vEnd = false;
-    let cc = 0;
-    let v = "";
-    while (i < value.length) {
-      const collected = StringUtils.collectStart(
-        value.substring(i),
-        u0022OrU002C,
-      );
-      i = i + collected.length;
-      v = v + collected;
-      const remains = value.substring(i);
-      if (remains.startsWith("\u0022")) {
-        const result = HttpUtils.collectHttpQuotedString(remains);
-        v = v + remains.substring(0, result.progression);
-        i = i + result.progression;
-        if (result.following === true) {
-          continue;
-        }
-      } else {
-        //  または ","始まり
-        i = i + 1;
-        vEnd = true;
-        if (remains.startsWith("\u002C")) {
-          cc = cc + 1;
-        }
-      }
-
-      if (vEnd === true) {
-        values.push(StringUtils.trim(v, HttpUtils.Pattern.HTTP_TAB_OR_SPACE));
-        v = "";
-        vEnd = false;
-      }
-    }
-    if (v !== "") {
-      values.push(StringUtils.trim(v, HttpUtils.Pattern.HTTP_TAB_OR_SPACE));
-    }
-    if (values.length < (cc + 1)) {
-      // 末尾が","だった場合 //XXX スマートに（cc不要に）できるのでは？
-      values.push("");
-    }
-
-    return values;
-  }
-
-  /**
    * RequestまたはResponseのヘッダーからContent-Typeの値を取得し返却する
    *
    * {@link https://fetch.spec.whatwg.org/#content-type-header Fetch standard}の仕様に合わせた
@@ -203,7 +129,7 @@ namespace _HttpUtilsEx {
 
     // 4, 5.
     const typesString = headers.get("Content-Type") as string;
-    const typeStrings = splitHeaderValue(typesString);
+    const typeStrings = HttpUtils.valuesOfHeaderFieldValue(typesString);
     if (typeStrings.length <= 0) {
       throw new Error("Content-Type value not found");
     }
