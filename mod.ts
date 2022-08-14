@@ -200,25 +200,63 @@ namespace _DataURL {
 }
 
 const ByteUnit = {
-  B: "B",
-  KB: "kB",
-  KIB: "KiB",
-  MB: "MB",
-  MIB: "MiB",
-  GB: "GB",
-  GIB: "GiB",
-  TB: "TB",
-  TIB: "TiB",
-  PB: "PB",
-  PIB: "PiB",
-  // EB: "EB",
-  // EIB: "EiB",
-  // ZB: "ZB",
-  // ZIB: "ZiB",
-  // YB: "YB",
-  // YIB: "YiB",
+  /**
+   * B (byte)
+   */
+  B: "byte",
+
+  /**
+   * kB (kilobyte)
+   */
+  KB: "kilobyte",
+
+  /**
+   * KiB (kibibyte)
+   */
+  KIB: "kibibyte",
+
+  /**
+   * MB (megabyte)
+   */
+  MB: "megabyte",
+
+  /**
+   * MiB (mebibyte)
+   */
+  MIB: "mebibyte",
+
+  /**
+   * GB (gigabyte)
+   */
+  GB: "gigabyte",
+
+  /**
+   * GiB (gibibyte)
+   */
+  GIB: "gibibyte",
+
+  /**
+   * TB (terabyte)
+   */
+  TB: "terabyte",
+
+  /**
+   * TiB (tebibyte)
+   */
+  TIB: "tebibyte",
+
+  /**
+   * PB (petabyte)
+   */
+  PB: "petabyte",
+
+  /**
+   * PiB (pebibyte)
+   */
+  PIB: "pebibyte",
 } as const;
 type ByteUnit = typeof ByteUnit[keyof typeof ByteUnit];
+Object.freeze(ByteUnit);
 
 const _BYTES: Record<ByteUnit, int> = {
   [ByteUnit.B]: 1,
@@ -227,24 +265,33 @@ const _BYTES: Record<ByteUnit, int> = {
   [ByteUnit.GB]: 1_000_000_000, // 10 ** 9
   [ByteUnit.TB]: 1_000_000_000_000, // 10 ** 12
   [ByteUnit.PB]: 1_000_000_000_000_000, // 10 ** 15
-  // [ByteUnit.EB]: 1_000_000_000_000_000_000n, // 10 ** 18
-  // [ByteUnit.ZB]: 1_000_000_000_000_000_000_000n, // 10 ** 21
-  // [ByteUnit.YB]: 1_000_000_000_000_000_000_000_000n, // 10 ** 24
   [ByteUnit.KIB]: 1_024, // 2 ** 10
   [ByteUnit.MIB]: 1_048_576, // 2 ** 20
   [ByteUnit.GIB]: 1_073_741_824, // 2 ** 30
   [ByteUnit.TIB]: 1_099_511_627_776, // 2 ** 40
   [ByteUnit.PIB]: 1_125_899_906_842_624, // 2 ** 50
-  // [ByteUnit.EIB]: 1_152_921_504_606_846_976n, // 2 ** 60
-  // [ByteUnit.ZIB]: 1_180_591_620_717_411_303_424n, // 2 ** 70
-  // [ByteUnit.YIB]: 1_208_925_819_614_629_174_706_176n, // 2 ** 80
 } as const;
 
 class ByteCount {
   #byteCount: int;
 
-  constructor(byteCount: int) {
-    this.#byteCount = byteCount;
+  constructor(byteCount: int | bigint) {
+    if (typeof byteCount === "bigint") {
+      if ((byteCount >= 0) && (byteCount <= Number.MAX_SAFE_INTEGER)) {
+        this.#byteCount = Number(byteCount);
+      } else {
+        throw new RangeError("byteCount");
+      }
+    } else if (typeof byteCount === "number") {
+      if (Integer.isNonNegativeInteger(byteCount) === true) {
+        this.#byteCount = byteCount;
+      } else {
+        throw new RangeError("byteCount");
+      }
+    } else {
+      throw new TypeError("byteCount");
+    }
+
     Object.freeze(this);
   }
 
@@ -252,6 +299,22 @@ class ByteCount {
   //   return new ByteCount(Math.ceil(value * _BYTES[unit]));
   // }
 
+  /**
+   * 
+   * @param unit The following units are supported. Units are case insensitive.
+   * - `"byte"`
+   * - `"kilobyte"`
+   * - `"kibibyte"`
+   * - `"megabyte"`
+   * - `"mebibyte"`
+   * - `"gigabyte"`
+   * - `"gibibyte"`
+   * - `"terabyte"`
+   * - `"tebibyte"`
+   * - `"petabyte"`
+   * - `"pebibyte"`
+   * @returns The byte count expressed in specified unit.
+   */
   to(unit: string): number {
     if (typeof unit !== "string") {
       throw new TypeError("unit is not type of string");
@@ -267,7 +330,7 @@ class ByteCount {
     throw new RangeError("unknown unit");
   }
 
-  valueOf(): int {
+  valueOf(): number {
     return this.#byteCount;
   }
 }
@@ -329,38 +392,24 @@ class ByteSequence {
   /**
    * Gets the number of bytes as `ByteCount`.
    *
-   * | parameter of `ByteCount.prototype.to()` | unit |
-   * | :--- | :--- |
-   * | `"B"` | byte |
-   * | `"kB"` | kilobyte |
-   * | `"KiB"` | kibibyte |
-   * | `"MB"` | megabyte |
-   * | `"MiB"` | mebibyte |
-   * | `"GB"` | gigabyte |
-   * | `"GiB"` | gibibyte |
-   * | `"TB"` | terabyte |
-   * | `"TiB"` | tebibyte |
-   * | `"PB"` | petabyte |
-   * | `"PiB"` | pebibyte |
-   *
    * @example
    * ```javascript
    * const bytes = ByteSequence.allocate(1024);
-   * const kib = bytes.size.to("KiB");
+   * const kib = bytes.size.to("kibibyte");
    * // kib
    * //   → 1
    * ```
    * @example
    * ```javascript
    * const bytes = ByteSequence.allocate(5_120_000);
-   * const kib = bytes.size.to("KiB");
+   * const kib = bytes.size.to("kibibyte");
    * // (new Intl.NumberFormat("en")).format(kib) + " KiB"
    * //   → "5,000 KiB"
    * ```
    * @example
    * ```javascript
    * const bytes = ByteSequence.allocate(5_000_000);
-   * const kb = bytes.size.to("kB");
+   * const kb = bytes.size.to("kilobyte");
    * // (new Intl.NumberFormat("en", { style: "unit", unit: "kilobyte" })).format(kb)
    * //   → "5,000 kB"
    * ```
@@ -2107,4 +2156,4 @@ type RequestOrResponseReadingOptions = Reading.Options & {
   verifyHeaders?: (headers: Headers) => [verified: boolean, message?: string];
 };
 
-export { ByteSequence };
+export { ByteCount, ByteSequence, ByteUnit };
