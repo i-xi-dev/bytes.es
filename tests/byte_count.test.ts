@@ -1,7 +1,4 @@
-import {
-  assertStrictEquals,
-  assertThrows,
-} from "std/testing/asserts";
+import { assertStrictEquals, assertThrows } from "std/testing/asserts";
 import { ByteCount, ByteUnit } from "../mod.ts";
 
 Deno.test("new ByteCount(number)", () => {
@@ -93,7 +90,6 @@ Deno.test("ByteCount.prototype.to(string)", () => {
     RangeError,
     "unit",
   );
-
 });
 
 Deno.test("ByteCount.prototype.to(any)", () => {
@@ -116,7 +112,4 @@ Deno.test("ByteCount.prototype.valueOf()", () => {
 
   const bc1i = new ByteCount(1024);
   assertStrictEquals(bc1i.valueOf(), 1024);
-
 });
-
-

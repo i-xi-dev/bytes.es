@@ -1209,7 +1209,7 @@ Deno.test("ByteSequence.fromDataURL(string)", () => {
       ByteSequence.fromDataURL("");
     },
     TypeError,
-    "dataUrl parse error",
+    "dataUrlStr does not reperesent URL",
   );
 });
 
@@ -1354,7 +1354,7 @@ Deno.test("ByteSequence.withMetadataFromDataURL(string)", () => {
       ByteSequence.withMetadataFromDataURL("");
     },
     TypeError,
-    "dataUrl parse error",
+    "dataUrlStr does not reperesent URL",
   );
 });
 

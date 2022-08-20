@@ -17,18 +17,13 @@ import {
   _crypto,
   _ProgressEvent,
 } from "https://raw.githubusercontent.com/i-xi-dev/compat.es/1.1.2/mod.ts";
-import { StringUtils } from "https://raw.githubusercontent.com/i-xi-dev/str.es/1.0.5/mod.ts";
 import { Http } from "https://raw.githubusercontent.com/i-xi-dev/http.es/1.0.0/mod.ts";
-import { HttpUtils } from "https://raw.githubusercontent.com/i-xi-dev/http-utils.es/2.1.0/mod.ts";
 import { Reading } from "https://raw.githubusercontent.com/i-xi-dev/reading.es/1.0.2/mod.ts";
 import { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.2/mod.ts";
 import { Digest } from "https://raw.githubusercontent.com/i-xi-dev/digest.es/1.0.0/mod.ts";
+import { DataURL } from "https://raw.githubusercontent.com/i-xi-dev/dataurl.es/1.1.0/mod.ts";
 
 type int = number;
-
-const {
-  ASCII_WHITESPACE,
-} = HttpUtils.Pattern;
 
 namespace _ArrayBufferView {
   export function isTypedArrayConstructor(
@@ -133,72 +128,6 @@ namespace _HttpUtilsEx {
 }
 Object.freeze(_HttpUtilsEx);
 
-namespace _DataURL {
-  export function parse(dataUrl: URL | string): {
-    data: Uint8Array;
-    type: string;
-  } {
-    let parsed: URL;
-    try {
-      parsed = (dataUrl instanceof URL)
-        ? new URL(dataUrl.toString())
-        : new URL(dataUrl);
-    } catch (exception) {
-      void exception;
-      throw new TypeError("dataUrl parse error");
-    }
-
-    // 1
-    if (parsed.protocol !== "data:") {
-      throw new TypeError(`URL scheme is not "data"`);
-    }
-
-    // 2
-    // https://fetch.spec.whatwg.org/#data-urls に従い、フラグメントは無視する
-    parsed.hash = "";
-
-    // 3, 4
-    let bodyStringWork = parsed.toString().substring(5);
-
-    // 5, 6, 7
-    if (bodyStringWork.includes(",") !== true) {
-      throw new TypeError("U+002C not found");
-    }
-
-    // 最初に出現した","をメディアタイプとデータの区切りとみなす。
-    // https://fetch.spec.whatwg.org/#data-urls に従い
-    // ・メディアタイプのquotedなパラメーター値に含まれた","とみなせる場合であっても区切りとする
-    // ・クエリはデータの一部とみなす
-    const mediaTypeOriginal = bodyStringWork.split(",")[0] as string;
-    let mediaTypeStr = StringUtils.trim(mediaTypeOriginal, ASCII_WHITESPACE);
-
-    // 8, 9
-    bodyStringWork = bodyStringWork.substring(mediaTypeOriginal.length + 1);
-
-    // 10
-    let bytes = Percent.decode(bodyStringWork);
-
-    // 11
-    const base64Indicator = /;[\u0020]*base64$/i;
-    const base64: boolean = base64Indicator.test(mediaTypeStr);
-    if (base64 === true) {
-      // 11.1
-      bodyStringWork = Isomorphic.decode(bytes);
-
-      // 11.2, 11.3
-      bytes = Base64.decode(bodyStringWork);
-
-      // 11.4, 11.5, 11.6
-      mediaTypeStr = mediaTypeStr.replace(base64Indicator, "");
-    }
-
-    return {
-      data: bytes,
-      type: mediaTypeStr,
-    };
-  }
-}
-
 const ByteUnit = {
   /**
    * B (byte)
@@ -300,7 +229,6 @@ class ByteCount {
   // }
 
   /**
-   * 
    * @param unit The following units are supported. Units are case sensitive.
    * - `"byte"`
    * - `"kilobyte"`
@@ -320,8 +248,7 @@ class ByteCount {
       if (Object.values(ByteUnit).includes(unit) !== true) {
         throw new RangeError("unit");
       }
-    }
-    else {
+    } else {
       throw new TypeError("unit");
     }
 
@@ -1412,8 +1339,8 @@ class ByteSequence {
    * ```
    */
   static fromDataURL(dataUrl: URL | string): ByteSequence {
-    const { data } = _DataURL.parse(dataUrl);
-    return new ByteSequence(data.buffer);
+    const { data } = DataURL.Resource.from(dataUrl);
+    return new ByteSequence(data);
   }
 
   /**
@@ -1431,22 +1358,17 @@ class ByteSequence {
    * ```
    */
   toDataURL(options?: BlobPropertyBag): URL {
-    // FileReaderの仕様に倣い、テキストかどうかに関係なく常時Base64エンコードする仕様
     // XXX Base64なしも対応する
     const mediaType: MediaType | null = (typeof options?.type === "string")
       ? MediaType.fromString(options.type)
       : null;
-    if (mediaType) {
-      // let encoding = "";
-      // let dataEncoded: string;
-      // if (base64) {
-      const encoding = ";base64";
-      const dataEncoded = this.toBase64Encoded();
-      // }
 
-      return new URL(
-        "data:" + mediaType.toString() + encoding + "," + dataEncoded,
+    if (mediaType) {
+      const resource = DataURL.Resource.fromUint8Array(
+        this.toUint8Array(),
+        mediaType.toString(),
       );
+      return resource.toURL();
     }
     throw new TypeError("MIME type not resolved");
   }
@@ -2052,27 +1974,11 @@ class ByteSequence {
     options?: BlobPropertyBag | FilePropertyBag;
     //fileName?: string
   } {
-    const { data, type } = _DataURL.parse(dataUrl);
-    let mediaTypeWork = type;
-
-    // 12
-    if (mediaTypeWork.startsWith(";")) {
-      mediaTypeWork = "text/plain" + mediaTypeWork;
-    }
-
-    // 13, 14
-    let mediaType: MediaType;
-    try {
-      mediaType = MediaType.fromString(mediaTypeWork);
-    } catch (exception) {
-      void exception;
-      mediaType = MediaType.fromString("text/plain;charset=US-ASCII");
-    }
-
+    const resource = DataURL.Resource.from(dataUrl);
     return {
-      data: ByteSequence.wrapArrayBuffer(data.buffer),
+      data: ByteSequence.wrapArrayBuffer(resource.data),
       options: {
-        type: mediaType.toString(),
+        type: resource.type,
       },
     };
   }
