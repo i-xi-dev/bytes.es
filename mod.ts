@@ -78,7 +78,13 @@ namespace _HttpUtilsEx {
     // Content-Length
     // 何もしない
 
-    return [...headers.entries()]; // Node.jsの HeadersInitにHeadersは含まれない
+    //return [...headers.entries()]; // Node.jsの HeadersInitにHeadersは含まれない
+    // dntでbuildできないので
+    return [
+      ...(headers as unknown as {
+        entries: () => IterableIterator<[string, string]>;
+      }).entries(),
+    ];
   }
 }
 Object.freeze(_HttpUtilsEx);
