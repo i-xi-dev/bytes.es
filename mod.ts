@@ -21,7 +21,7 @@ import { Http } from "https://raw.githubusercontent.com/i-xi-dev/http.es/1.0.0/m
 import { Reading } from "https://raw.githubusercontent.com/i-xi-dev/reading.es/1.0.2/mod.ts";
 import { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.2/mod.ts";
 import { Digest } from "https://raw.githubusercontent.com/i-xi-dev/digest.es/1.0.0/mod.ts";
-import { DataURL } from "https://raw.githubusercontent.com/i-xi-dev/dataurl.es/1.1.0/mod.ts";
+import { DataURL } from "https://raw.githubusercontent.com/i-xi-dev/dataurl.es/2.0.0/mod.ts";
 
 type int = number;
 
@@ -1359,14 +1359,10 @@ class ByteSequence {
    */
   toDataURL(options?: BlobPropertyBag): URL {
     // XXX Base64なしも対応する
-    const mediaType: MediaType | null = (typeof options?.type === "string")
-      ? MediaType.fromString(options.type)
-      : null;
-
-    if (mediaType) {
-      const resource = DataURL.Resource.fromUint8Array(
-        this.toUint8Array(),
-        mediaType.toString(),
+    if (options?.type) {
+      const resource = DataURL.Resource.create(
+        options.type,
+        this.toArrayBuffer(),
       );
       return resource.toURL();
     }
