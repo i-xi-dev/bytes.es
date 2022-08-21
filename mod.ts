@@ -6,9 +6,9 @@ import { Base64 } from "https://raw.githubusercontent.com/i-xi-dev/base64.es/3.0
 import { BytesFormat } from "https://raw.githubusercontent.com/i-xi-dev/bytes-format.es/1.0.5/mod.ts";
 import {
   Integer,
-  Uint8,
   type uint8,
 } from "https://raw.githubusercontent.com/i-xi-dev/int.es/1.1.1/mod.ts";
+import { BufferUtils } from "https://raw.githubusercontent.com/i-xi-dev/buffer-utils.es/1.1.0/mod.ts";
 import { Isomorphic } from "https://raw.githubusercontent.com/i-xi-dev/isomorphic.es/2.0.1/mod.ts";
 import { MediaType } from "https://raw.githubusercontent.com/i-xi-dev/mimetype.es/1.2.0/mod.ts";
 import { Percent } from "https://raw.githubusercontent.com/i-xi-dev/percent.es/4.0.12/mod.ts";
@@ -24,51 +24,6 @@ import { Digest } from "https://raw.githubusercontent.com/i-xi-dev/digest.es/1.0
 import { DataURL } from "https://raw.githubusercontent.com/i-xi-dev/dataurl.es/2.0.0/mod.ts";
 
 type int = number;
-
-namespace _ArrayBufferView {
-  export function isTypedArrayConstructor(
-    value: unknown,
-  ): value is
-    | Uint8ArrayConstructor
-    | Uint8ClampedArrayConstructor
-    | Int8ArrayConstructor
-    | Uint16ArrayConstructor
-    | Int16ArrayConstructor
-    | Uint32ArrayConstructor
-    | Int32ArrayConstructor
-    | Float32ArrayConstructor
-    | Float64ArrayConstructor
-    | BigUint64ArrayConstructor
-    | BigInt64ArrayConstructor {
-    return ((value === Uint8Array) || (value === Uint8ClampedArray) ||
-      (value === Int8Array) || (value === Uint16Array) ||
-      (value === Int16Array) || (value === Uint32Array) ||
-      (value === Int32Array) || (value === Float32Array) ||
-      (value === Float64Array) || (value === BigUint64Array) ||
-      (value === BigInt64Array));
-  }
-
-  export function isDataViewConstructor(
-    value: unknown,
-  ): value is DataViewConstructor {
-    return value === DataView;
-  }
-
-  export type Constructor<T> = {
-    new (a: ArrayBuffer, b?: number, c?: number): T;
-  };
-}
-Object.freeze(_ArrayBufferView);
-
-namespace _Uint8Utils {
-  export function isArrayOfUint8(value: unknown): value is Array<uint8> {
-    if (Array.isArray(value)) {
-      return value.every((i) => Uint8.isUint8(i));
-    }
-    return false;
-  }
-}
-Object.freeze(_Uint8Utils);
 
 namespace _Iterable {
   export function toArray<T>(iterable: Iterable<T>): Array<T> {
@@ -544,13 +499,13 @@ class ByteSequence {
    * ```
    */
   toArrayBufferView<T extends ArrayBufferView>(
-    ctor: _ArrayBufferView.Constructor<T> =
-      Uint8Array as unknown as _ArrayBufferView.Constructor<T>,
+    ctor: BufferUtils.ArrayBufferViewConstructor<T> =
+      Uint8Array as unknown as BufferUtils.ArrayBufferViewConstructor<T>,
   ): T {
     let bytesPerElement: number;
-    if (_ArrayBufferView.isTypedArrayConstructor(ctor)) {
+    if (BufferUtils.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
-    } else if (_ArrayBufferView.isDataViewConstructor(ctor)) {
+    } else if (BufferUtils.isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
@@ -663,7 +618,7 @@ class ByteSequence {
    * ```
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
-    if (_Uint8Utils.isArrayOfUint8(byteArray)) {
+    if (BufferUtils.isArrayOfUint8(byteArray)) {
       return ByteSequence.fromArrayBufferView(Uint8Array.from(byteArray));
     }
     throw new TypeError("byteArray");
@@ -707,7 +662,7 @@ class ByteSequence {
     }
 
     const array = _Iterable.toArray(sourceBytes);
-    if (_Uint8Utils.isArrayOfUint8(array)) {
+    if (BufferUtils.isArrayOfUint8(array)) {
       return ByteSequence.fromArray([...sourceBytes]);
     }
     throw new TypeError("sourceBytes");
@@ -1690,16 +1645,16 @@ class ByteSequence {
    * ```
    */
   getView<T extends ArrayBufferView>(
-    ctor: _ArrayBufferView.Constructor<T> =
-      Uint8Array as unknown as _ArrayBufferView.Constructor<T>,
+    ctor: BufferUtils.ArrayBufferViewConstructor<T> =
+      Uint8Array as unknown as BufferUtils.ArrayBufferViewConstructor<T>,
     byteOffset = 0,
     byteLength: number = (this.byteLength - byteOffset),
   ): T {
     let bytesPerElement: number;
-    if (_ArrayBufferView.isTypedArrayConstructor(ctor)) {
+    if (BufferUtils.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
       new Uint8ClampedArray();
-    } else if (_ArrayBufferView.isDataViewConstructor(ctor)) {
+    } else if (BufferUtils.isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
@@ -1793,7 +1748,7 @@ class ByteSequence {
         }
       }
       return true;
-    } else if (_Uint8Utils.isArrayOfUint8(otherBytes)) {
+    } else if (BufferUtils.isArrayOfUint8(otherBytes)) {
       for (let i = 0; i < otherBytes.length; i++) {
         if (otherBytes[i] !== thisView[i]) {
           return false;
@@ -1829,7 +1784,7 @@ class ByteSequence {
     }
 
     const array = _Iterable.toArray(otherBytes);
-    if (_Uint8Utils.isArrayOfUint8(array)) {
+    if (BufferUtils.isArrayOfUint8(array)) {
       if (array.length !== this.byteLength) {
         return false;
       }
@@ -1857,7 +1812,7 @@ class ByteSequence {
     }
 
     const array = _Iterable.toArray(otherBytes);
-    if (_Uint8Utils.isArrayOfUint8(array)) {
+    if (BufferUtils.isArrayOfUint8(array)) {
       return this.#startsWith(array);
     }
 
