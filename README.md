@@ -4,16 +4,51 @@ A JavaScript byte array library for the browser, Deno and Node.js
 
 ## Requirement
 
-`ByteSequence` requires
-[`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream)
-and [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
+### `ByteSequence.fromBlob` and `ByteSequence.prototype.toBlob` methods
 
-- Chrome
-- Edge
-- Firefox
-- Safari
-- Deno
-- Node.js 16.5.0+
+These require [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
+
+| Chrome | Edge | Firefox | Safari | Deno | Node.js |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ✅ | ✅<br />15.7+ |
+
+###  `ByteSequence.prototype.toFile` method
+
+This requires [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File).
+
+| Chrome | Edge | Firefox | Safari | Deno | Node.js |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+
+### `ByteSequence.fromStream` method
+
+This requires [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream).
+
+| Chrome | Edge | Firefox | Safari | Deno | Node.js |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ✅ | ✅<br />16.5+ |
+
+### `ByteSequence.fromRequestOrResponse`, `ByteSequence.prototype.toRequest` and `ByteSequence.prototype.toResponse` methods
+
+These require [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) and [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response).
+
+| Chrome | Edge | Firefox | Safari | Deno | Node.js |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ✅ | ✅<br />18.0+ |
+
+### `ByteSequence.generateRandom`, `ByteSequence.prototype.toSha256Digest`, `ByteSequence.prototype.toSha384Digest` and `ByteSequence.prototype.toSha512Digest` methods, `ByteSequence.prototype.sha256Integrity`, `ByteSequence.prototype.sha384Integrity` and `ByteSequence.prototype.sha512Integrity` properties
+
+These require [`Crypto`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto).
+
+| Chrome | Edge | Firefox | Safari | Deno | Node.js |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ✅ | ✅<br />15.0+ |
+
+### Other than above
+
+| Chrome | Edge | Firefox | Safari | Deno | Node.js |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Installation
 
