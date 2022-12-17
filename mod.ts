@@ -1,27 +1,20 @@
 import {
   // AbortError,
   InvalidStateError,
-} from "https://raw.githubusercontent.com/i-xi-dev/exception.es/1.0.0/mod.ts";
-import { Base64 } from "https://raw.githubusercontent.com/i-xi-dev/base64.es/3.0.6/mod.ts";
-import { BytesFormat } from "https://raw.githubusercontent.com/i-xi-dev/bytes-format.es/1.0.5/mod.ts";
-import {
-  Integer,
-  type uint8,
-} from "https://raw.githubusercontent.com/i-xi-dev/int.es/1.1.1/mod.ts";
-import { BufferUtils } from "https://raw.githubusercontent.com/i-xi-dev/buffer-utils.es/1.1.0/mod.ts";
-import { Isomorphic } from "https://raw.githubusercontent.com/i-xi-dev/isomorphic.es/2.0.1/mod.ts";
-import { MediaType } from "https://raw.githubusercontent.com/i-xi-dev/mimetype.es/1.2.0/mod.ts";
-import { Percent } from "https://raw.githubusercontent.com/i-xi-dev/percent.es/4.0.12/mod.ts";
-import {
-  _Blob,
-  _crypto,
-  _ProgressEvent,
-} from "https://raw.githubusercontent.com/i-xi-dev/compat.es/1.1.2/mod.ts";
-import { Http } from "https://raw.githubusercontent.com/i-xi-dev/http.es/1.0.0/mod.ts";
-import { Reading } from "https://raw.githubusercontent.com/i-xi-dev/reading.es/1.0.2/mod.ts";
-import { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.2/mod.ts";
-import { Digest } from "https://raw.githubusercontent.com/i-xi-dev/digest.es/1.0.0/mod.ts";
-import { DataURL } from "https://raw.githubusercontent.com/i-xi-dev/dataurl.es/2.0.0/mod.ts";
+} from "i-xi-dev/exception.es";
+import { Base64 } from "i-xi-dev/base64.es";
+import { BytesFormat } from "i-xi-dev/bytes-format.es";
+import { Integer, type uint8 } from "i-xi-dev/int.es";
+import { BufferUtils } from "i-xi-dev/buffer-utils.es";
+import { Isomorphic } from "i-xi-dev/isomorphic.es";
+import { MediaType } from "i-xi-dev/mimetype.es";
+import { Percent } from "i-xi-dev/percent.es";
+import { _Blob, _crypto, _ProgressEvent } from "i-xi-dev/compat.es";
+import { Http } from "i-xi-dev/http.es";
+import { Reading } from "i-xi-dev/reading.es";
+import { BytesStream } from "i-xi-dev/bytes-stream.es";
+import { Digest } from "i-xi-dev/digest.es";
+import { DataURL } from "i-xi-dev/dataurl.es";
 
 type int = number;
 
