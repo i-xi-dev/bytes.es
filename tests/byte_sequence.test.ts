@@ -8,7 +8,7 @@ import encja from "https://cdn.skypack.dev/encoding-japanese@2.0.0?dts";
 import { ByteSequence, ByteUnit } from "../mod.ts";
 
 //const testFilesDir = Deno.cwd() + "/tests/_data/";
-const testFilesDir = "C:/_dev/i-xi-dev/bytes.es/tests/_data/";
+const testFilesDir = "C:/_dev/i-xi-dev/--+-bytes.es/tests/_data/";
 
 Deno.test("ByteSequence.prototype.byteLength", () => {
   const bs0 = ByteSequence.allocate(0);
