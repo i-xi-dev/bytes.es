@@ -1,20 +1,21 @@
 import {
-  // AbortError,
+  type uint8,
+  _Blob,
+  _crypto,
+  Base64,
+  BufferUtils,
+  BytesFormat,
+  BytesStream,
+  DataURL,
+  Digest,
+  Http,
+  Integer,
   InvalidStateError,
-} from "i-xi-dev/exception.es";
-import { Base64 } from "i-xi-dev/base64.es";
-import { BytesFormat } from "i-xi-dev/bytes-format.es";
-import { Integer, type uint8 } from "i-xi-dev/int.es";
-import { BufferUtils } from "i-xi-dev/buffer-utils.es";
-import { Isomorphic } from "i-xi-dev/isomorphic.es";
-import { MediaType } from "i-xi-dev/mimetype.es";
-import { Percent } from "i-xi-dev/percent.es";
-import { _Blob, _crypto } from "i-xi-dev/compat.es";
-import { Http } from "i-xi-dev/http.es";
-import { Reading } from "i-xi-dev/reading.es";
-import { BytesStream } from "i-xi-dev/bytes-stream.es";
-import { Digest } from "i-xi-dev/digest.es";
-import { DataURL } from "i-xi-dev/dataurl.es";
+  Isomorphic,
+  MediaType,
+  Percent,
+  Reading,
+} from "../deps.ts";
 import { ByteCount } from "./byte_count.ts";
 import { _HttpUtilsEx, _Iterable, _Utf8 } from "./utils.ts";
 

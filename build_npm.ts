@@ -66,7 +66,6 @@ await build({
       "types",
     ],
   },
-  importMap: "./import_map.json",
   mappings: {
     "https://cdn.skypack.dev/encoding-japanese@2.0.0?dts": {
       name: "encoding-japanese",

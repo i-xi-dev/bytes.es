@@ -1,6 +1,10 @@
-import { MediaType } from "i-xi-dev/mimetype.es";
-import { _Blob, _crypto, _ProgressEvent } from "i-xi-dev/compat.es";
-import { Http } from "i-xi-dev/http.es";
+import {
+  _Blob,
+  _crypto,
+  _ProgressEvent,
+  Http,
+  MediaType,
+} from "../deps.ts";
 
 namespace _Iterable {
   export function toArray<T>(iterable: Iterable<T>): Array<T> {

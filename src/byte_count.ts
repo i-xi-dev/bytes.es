@@ -1,4 +1,4 @@
-import { Integer } from "i-xi-dev/int.es";
+import { Integer } from "../deps.ts";
 import { ByteUnit } from "./byte_unit.ts";
 
 type int = number;

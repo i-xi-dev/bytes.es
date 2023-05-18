@@ -1,4 +1,4 @@
-import { assertStrictEquals, assertThrows } from "std/testing/asserts";
+import { assertStrictEquals, assertThrows } from "./deps.ts";
 import { ByteCount, ByteUnit } from "../mod.ts";
 
 Deno.test("new ByteCount(number)", () => {

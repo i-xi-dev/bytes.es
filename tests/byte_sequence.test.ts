@@ -2,8 +2,8 @@ import {
   assertNotStrictEquals,
   assertStrictEquals,
   assertThrows,
-} from "std/testing/asserts";
-import { Md5 } from "https://deno.land/std@0.140.0/hash/md5.ts";
+  Md5,
+} from "./deps.ts";
 import encja from "https://cdn.skypack.dev/encoding-japanese@2.0.0?dts";
 import { ByteSequence, ByteUnit } from "../mod.ts";
 
