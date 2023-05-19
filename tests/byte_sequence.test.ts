@@ -8,7 +8,7 @@ import encja from "https://cdn.skypack.dev/encoding-japanese@2.0.0?dts";
 import { ByteSequence, ByteUnit } from "../mod.ts";
 
 //const testFilesDir = Deno.cwd() + "/tests/_data/";
-const testFilesDir = "C:/_dev/i-xi-dev/--+-bytes.es/tests/_data/";
+const testFilesDir = "C:/_dev/i-xi-dev/-bytes.es/tests/_data/";
 
 Deno.test("ByteSequence.prototype.byteLength", () => {
   const bs0 = ByteSequence.allocate(0);
@@ -2097,6 +2097,56 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { total:number, signal: Abort
   assertStrictEquals(data.total, 4096);
   assertStrictEquals(data.loaded >= 1, true);
   assertStrictEquals(data.lengthComputable, true);
+});
+
+Deno.test("ByteSequence.prototype.toStream()", async () => {
+  const res1 = new Response(new Uint8Array(128));
+  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<Uint8Array>;
+  const r = await ByteSequence.fromStream(stream);
+  const s2 = r.toStream();
+  const r2 = await ByteSequence.fromStream(s2);
+  assertStrictEquals(r.equals(r2), true);
+});
+
+Deno.test("ByteSequence.prototype.toStream()", async () => {
+  const fsfile = await Deno.open(testFilesDir + "large.txt");
+  try {
+    fsfile.readable;
+    //XXX shimでNot implemented
+  }
+  catch {
+    return;
+  }
+
+  const stream: ReadableStream<Uint8Array> = fsfile.readable;
+  const evtNames: string[] = [];
+  const data: { total: number; loaded: number; lengthComputable?: boolean } = {
+    total: -1,
+    loaded: -1,
+    lengthComputable: undefined,
+  };
+  const listener = (evt: ProgressEvent) => {
+    evtNames.push(evt.type);
+    data.total = evt.total;
+    data.loaded = evt.loaded;
+    data.lengthComputable = evt.lengthComputable;
+  };
+
+  const bs1 = await ByteSequence.fromStream(stream, {
+    total: 4096,
+    //onloadstart: listener,
+    //onloadend: listener,
+    //onprogress: listener,
+    //onabort: listener,
+    //ontimeout: listener,
+    //onerror: listener,
+    //onload: listener,
+  }, listener); // onProgressChange
+
+  const s2 = bs1.toStream();
+  const bs2 = await ByteSequence.fromStream(s2);
+  assertStrictEquals(bs1.equals(bs2), true);
+
 });
 
 Deno.test("ByteSequence.fromRequestOrResponse(Response)", async () => {

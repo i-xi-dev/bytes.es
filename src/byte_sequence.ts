@@ -1188,6 +1188,19 @@ class ByteSequence {
 
   /**
    * @experimental
+   */
+  toStream(): ReadableStream<Uint8Array> {
+    return this.toBlob().stream();
+  }
+
+  // static async fromCompressed(): Promise<ByteSequence> {
+  // }
+
+  // async toCompressed(): Promise<ByteSequence> {
+  // }
+
+  /**
+   * @experimental
    * @example
    * ```javascript
    * const request = new Request("http://example.com/foo", {
