@@ -1150,40 +1150,46 @@ class ByteSequence {
     options?: Reading.Options,
     onProgressChange?: (event: ProgressEvent) => void,
   ): Promise<ByteSequence> {
-    const task = BytesStream.ReadingTask.create(source, options);
-
-    if (typeof onProgressChange === "function") {
-      const listenerOptions = {
-        once: true,
-        passive: true,
-      };
-      const progressListenerOptions = {
-        passive: true,
-      };
-
-      task.addEventListener(
-        "loadstart",
-        onProgressChange as EventListener,
-        listenerOptions,
-      );
-      task.addEventListener(
-        "progress",
-        onProgressChange as EventListener,
-        progressListenerOptions,
-      );
-      // "load"はない。resolveされたら完了なので不要。
-      // "abort"はない。reasonがAbortErrorでrejectされたらアボートなので不要。
-      // "timeout"はAbortSignal.timeoutが登場したので廃止した。
-      // "error"はない。reasonがAbortError以外でrejectされたら異常終了なので不要。
-      task.addEventListener(
-        "loadend",
-        onProgressChange as EventListener,
-        listenerOptions,
-      );
+    if ((source instanceof ReadableStream) && !options && !onProgressChange) {
+      const bytes = await (new Response(source)).arrayBuffer();
+      return new ByteSequence(bytes);
     }
+    else {
+      const task = BytesStream.ReadingTask.create(source, options);
 
-    const bytes = await task.run();
-    return new ByteSequence(bytes.buffer);
+      if (typeof onProgressChange === "function") {
+        const listenerOptions = {
+          once: true,
+          passive: true,
+        };
+        const progressListenerOptions = {
+          passive: true,
+        };
+
+        task.addEventListener(
+          "loadstart",
+          onProgressChange as EventListener,
+          listenerOptions,
+        );
+        task.addEventListener(
+          "progress",
+          onProgressChange as EventListener,
+          progressListenerOptions,
+        );
+        // "load"はない。resolveされたら完了なので不要。
+        // "abort"はない。reasonがAbortErrorでrejectされたらアボートなので不要。
+        // "timeout"はAbortSignal.timeoutが登場したので廃止した。
+        // "error"はない。reasonがAbortError以外でrejectされたら異常終了なので不要。
+        task.addEventListener(
+          "loadend",
+          onProgressChange as EventListener,
+          listenerOptions,
+        );
+      }
+
+      const bytes = await task.run();
+      return new ByteSequence(bytes.buffer);
+    }
   }
 
   /**
