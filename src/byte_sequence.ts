@@ -1150,7 +1150,7 @@ class ByteSequence {
     options?: Reading.Options,
     onProgressChange?: (event: ProgressEvent) => void,
   ): Promise<ByteSequence> {
-    if ((source instanceof ReadableStream) && !options && !onProgressChange) {
+    if (Response && (source instanceof ReadableStream) && !options && !onProgressChange) {
       const bytes = await (new Response(source)).arrayBuffer();
       return new ByteSequence(bytes);
     }
