@@ -1664,7 +1664,7 @@ class ByteSequence {
    * @example
    * ```javascript
    * const blob = new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ], { type: "application/octet-stream" });
-   * const { data, options } = await ByteSequence.describedFromBlob(blob);
+   * const { data, options } = await ByteSequence.withMetadataFromBlob(blob);
    * // data.toArray()
    * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * // options.type
@@ -1726,7 +1726,7 @@ class ByteSequence {
    * @throws {TypeError} The `dataUrl` does not contain `","`.
    * @example
    * ```javascript
-   * const { data, options } = await ByteSequence.describedFromDataURL("data:application/octet-stream;base64,5a+M5aOr5bGx");
+   * const { data, options } = await ByteSequence.withMetadataFromDataURL("data:application/octet-stream;base64,5a+M5aOr5bGx");
    * // data.toArray()
    * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * // options.type
@@ -1760,7 +1760,7 @@ class ByteSequence {
    *   }),
    *   body: new Blob([ Uint8Array.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1) ]),
    * });
-   * const { data, options } = await ByteSequence.describedFromRequestOrResponse(request);
+   * const { data, options } = await ByteSequence.withMetadataFromRequestOrResponse(request);
    * // data.toArray()
    * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * // options.type
@@ -1774,7 +1774,7 @@ class ByteSequence {
    *     "Content-Type": "application/octet-stream",
    *   }),
    * });
-   * const { data, options } = await ByteSequence.describedFromRequestOrResponse(response);
+   * const { data, options } = await ByteSequence.withMetadataFromRequestOrResponse(response);
    * // data.toArray()
    * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
    * // options.type
