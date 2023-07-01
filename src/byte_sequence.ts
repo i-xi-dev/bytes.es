@@ -5,6 +5,7 @@ import {
   Base64,
   BufferUtils,
   BytesFormat,
+  BytesSize,
   BytesStream,
   DataURL,
   Digest,
@@ -16,7 +17,6 @@ import {
   Percent,
   Reading,
 } from "../deps.ts";
-import { ByteCount } from "./byte_count.ts";
 import { _HttpUtilsEx, _Iterable, _Utf8 } from "./utils.ts";
 
 /**
@@ -73,7 +73,7 @@ class ByteSequence {
   }
 
   /**
-   * Gets the number of bytes as `ByteCount`.
+   * Gets the number of bytes as `BytesSize`.
    *
    * @example
    * ```javascript
@@ -97,8 +97,8 @@ class ByteSequence {
    * //   → "5,000 kB"
    * ```
    */
-  get size(): ByteCount {
-    return new ByteCount(this.#buffer.byteLength);
+  get size(): BytesSize {
+    return new BytesSize(this.#buffer.byteLength);
   }
 
   /**

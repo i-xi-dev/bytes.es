@@ -12,3 +12,4 @@ export { Base64 } from "https://raw.githubusercontent.com/i-xi-dev/base64.es/4.0
 export { Digest } from "https://raw.githubusercontent.com/i-xi-dev/digest.es/1.0.4/mod.ts";
 export { MediaType } from "https://raw.githubusercontent.com/i-xi-dev/mimetype.es/1.2.4/mod.ts";
 export { DataURL } from "https://raw.githubusercontent.com/i-xi-dev/dataurl.es/2.0.4/mod.ts";
+export { BytesSize } from "https://raw.githubusercontent.com/i-xi-dev/bytes-size.es/1.0.0/mod.ts";

@@ -2,10 +2,11 @@ import {
   assertNotStrictEquals,
   assertStrictEquals,
   assertThrows,
+  BytesUnit,
   Md5,
 } from "./deps.ts";
 import encja from "https://cdn.skypack.dev/encoding-japanese@2.0.0?dts";
-import { ByteSequence, ByteUnit } from "../mod.ts";
+import { ByteSequence } from "../mod.ts";
 
 //const testFilesDir = Deno.cwd() + "/tests/_data/";
 const testFilesDir = "C:/_dev/i-xi-dev/-bytes.es/tests/_data/";
@@ -24,13 +25,13 @@ Deno.test("ByteSequence.prototype.size", () => {
   const bs1b = ByteSequence.allocate(1024);
 
   assertStrictEquals(bs0.size.valueOf(), 0);
-  assertStrictEquals(bs0.size.to(ByteUnit.KB), 0);
+  assertStrictEquals(bs0.size.to(BytesUnit.KB), 0);
   assertStrictEquals(bs1.size.valueOf(), 1000);
-  assertStrictEquals(bs1.size.to(ByteUnit.KB), 1);
-  assertStrictEquals(bs1.size.to(ByteUnit.B), 1000);
+  assertStrictEquals(bs1.size.to(BytesUnit.KB), 1);
+  assertStrictEquals(bs1.size.to(BytesUnit.B), 1000);
   assertStrictEquals(bs1b.size.valueOf(), 1024);
-  assertStrictEquals(bs1b.size.to(ByteUnit.KIB), 1);
-  assertStrictEquals(bs1b.size.to(ByteUnit.B), 1024);
+  assertStrictEquals(bs1b.size.to(BytesUnit.KIB), 1);
+  assertStrictEquals(bs1b.size.to(BytesUnit.B), 1024);
 });
 
 Deno.test("ByteSequence.prototype.buffer", () => {
