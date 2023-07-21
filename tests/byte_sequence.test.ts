@@ -1929,7 +1929,9 @@ Deno.test("ByteSequence.fromStream(ReadableStream)", async () => {
   //const fsfile = await Deno.open(testFilesDir + "128.txt");
   //const stream: ReadableStream<Uint8Array> = fsfile.readable;
   const res1 = new Response(new Uint8Array(128));
-  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<Uint8Array>;
+  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<
+    Uint8Array
+  >;
   const r = await ByteSequence.fromStream(stream);
   assertStrictEquals(r.byteLength, 128);
 });
@@ -1938,21 +1940,27 @@ Deno.test("ByteSequence.fromStream(ReadableStream, {total:number})", async () =>
   //const fsfile1 = await Deno.open(testFilesDir + "128.txt");
   //const stream: ReadableStream<Uint8Array> = fsfile1.readable;
   const res1 = new Response(new Uint8Array(128));
-  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<Uint8Array>;
+  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<
+    Uint8Array
+  >;
   const r = await ByteSequence.fromStream(stream, { total: 128 });
   assertStrictEquals(r.byteLength, 128);
 
   //const fsfile2 = await Deno.open(testFilesDir + "128.txt");
   //const stream2: ReadableStream<Uint8Array> = fsfile2.readable;
   const res2 = new Response(new Uint8Array(128));
-  const stream2: ReadableStream<Uint8Array> = res2.body as ReadableStream<Uint8Array>;
+  const stream2: ReadableStream<Uint8Array> = res2.body as ReadableStream<
+    Uint8Array
+  >;
   const r2 = await ByteSequence.fromStream(stream2, { total: 64 });
   assertStrictEquals(r2.byteLength, 128);
 
   //const fsfile3 = await Deno.open(testFilesDir + "128.txt");
   //const stream3: ReadableStream<Uint8Array> = fsfile3.readable;
   const res3 = new Response(new Uint8Array(128));
-  const stream3: ReadableStream<Uint8Array> = res3.body as ReadableStream<Uint8Array>;
+  const stream3: ReadableStream<Uint8Array> = res3.body as ReadableStream<
+    Uint8Array
+  >;
   const r3 = await ByteSequence.fromStream(stream3, { total: 512 });
   assertStrictEquals(r3.byteLength, 128);
 });
@@ -1961,7 +1969,9 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { on*: function })", async ()
   //const fsfile = await Deno.open(testFilesDir + "128.txt");
   //const stream: ReadableStream<Uint8Array> = fsfile.readable;
   const res1 = new Response(new Uint8Array(128));
-  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<Uint8Array>;
+  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<
+    Uint8Array
+  >;
   const evtNames: string[] = [];
   const data: { total: number; loaded: number; lengthComputable?: boolean } = {
     total: -1,
@@ -2003,7 +2013,9 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { total:number, on*: function
   //const fsfile = await Deno.open(testFilesDir + "128.txt");
   //const stream: ReadableStream<Uint8Array> = fsfile.readable;
   const res1 = new Response(new Uint8Array(128));
-  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<Uint8Array>;
+  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<
+    Uint8Array
+  >;
   const evtNames: string[] = [];
   const data: { total: number; loaded: number; lengthComputable?: boolean } = {
     total: -1,
@@ -2047,8 +2059,7 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { total:number, signal: Abort
   try {
     fsfile.readable;
     //XXX shimでNot implemented
-  }
-  catch {
+  } catch {
     return;
   }
 
@@ -2102,7 +2113,9 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { total:number, signal: Abort
 
 Deno.test("ByteSequence.prototype.toStream()", async () => {
   const res1 = new Response(new Uint8Array(128));
-  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<Uint8Array>;
+  const stream: ReadableStream<Uint8Array> = res1.body as ReadableStream<
+    Uint8Array
+  >;
   const r = await ByteSequence.fromStream(stream);
   const s2 = r.toStream();
   const r2 = await ByteSequence.fromStream(s2);
@@ -2114,8 +2127,7 @@ Deno.test("ByteSequence.prototype.toStream()", async () => {
   try {
     fsfile.readable;
     //XXX shimでNot implemented
-  }
-  catch {
+  } catch {
     return;
   }
 
@@ -2147,7 +2159,6 @@ Deno.test("ByteSequence.prototype.toStream()", async () => {
   const s2 = bs1.toStream();
   const bs2 = await ByteSequence.fromStream(s2);
   assertStrictEquals(bs1.equals(bs2), true);
-
 });
 
 Deno.test("ByteSequence.fromRequestOrResponse(Response)", async () => {

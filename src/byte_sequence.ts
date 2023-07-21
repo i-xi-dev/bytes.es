@@ -1,5 +1,4 @@
 import {
-  type uint8,
   _Blob,
   _crypto,
   Base64,
@@ -16,6 +15,7 @@ import {
   MediaType,
   Percent,
   Reading,
+  type uint8,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Iterable, _Utf8 } from "./utils.ts";
 
@@ -1150,11 +1150,13 @@ class ByteSequence {
     options?: Reading.Options,
     onProgressChange?: (event: ProgressEvent) => void,
   ): Promise<ByteSequence> {
-    if (Response && (source instanceof ReadableStream) && !options && !onProgressChange) {
+    if (
+      Response && (source instanceof ReadableStream) && !options &&
+      !onProgressChange
+    ) {
       const bytes = await (new Response(source)).arrayBuffer();
       return new ByteSequence(bytes);
-    }
-    else {
+    } else {
       const task = BytesStream.ReadingTask.create(source, options);
 
       if (typeof onProgressChange === "function") {

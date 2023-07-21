@@ -1,10 +1,4 @@
-import {
-  _Blob,
-  _crypto,
-  _ProgressEvent,
-  Http,
-  MediaType,
-} from "../deps.ts";
+import { _Blob, _crypto, _ProgressEvent, Http, MediaType } from "../deps.ts";
 
 namespace _Iterable {
   export function toArray<T>(iterable: Iterable<T>): Array<T> {
