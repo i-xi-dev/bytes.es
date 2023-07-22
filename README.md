@@ -18,7 +18,7 @@ This requires [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File).
 
 | Chrome | Edge | Firefox | Safari | Deno | Node.js |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| ✅ | ✅ | ✅ | ✅ | ✅ | ✅<br />20.0+ |
+| ✅ | ✅ | ✅ | ✅ | ✅ | ✅<br />19.2+ |
 
 ### `ByteSequence.fromStream` method
 

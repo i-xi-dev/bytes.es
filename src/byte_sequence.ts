@@ -1,6 +1,7 @@
 import {
   _Blob,
   _crypto,
+  _File,
   Base64,
   BufferUtils,
   BytesFormat,
@@ -1066,7 +1067,7 @@ class ByteSequence {
       ? MediaType.fromString(options.type)
       : null;
 
-    return new File([this.#buffer], fileName, {
+    return new _File([this.#buffer], fileName, {
       type: mediaType ? mediaType.toString() : "",
       lastModified: options?.lastModified ? options.lastModified : Date.now(),
     });
@@ -1689,7 +1690,7 @@ class ByteSequence {
 
     let fileName: string | undefined = undefined;
     let fileLastModified: number | undefined = undefined;
-    if (("File" in globalThis) && (blob instanceof File)) {
+    if (("File" in globalThis) && (blob instanceof _File)) {
       fileName = blob.name;
       fileLastModified = blob.lastModified;
     }
