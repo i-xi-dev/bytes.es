@@ -16,7 +16,7 @@ import {
   MediaType,
   Percent,
   Reading,
-  type uint8,
+  Uint8,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Iterable, _Utf8 } from "./utils.ts";
 
@@ -434,7 +434,7 @@ class ByteSequence {
    * ```
    */
   toArray(): Array<number> {
-    return [...this.#view] as Array<uint8>;
+    return [...this.#view] as Array<Uint8>;
   }
 
   /**
@@ -1552,7 +1552,7 @@ class ByteSequence {
    * @param otherBytes - バイト列
    * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
    */
-  #startsWith(otherBytes: BufferSource | Array<uint8>): boolean {
+  #startsWith(otherBytes: BufferSource | Array<Uint8>): boolean {
     const thisView = this.#view;
     if (
       (otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)
