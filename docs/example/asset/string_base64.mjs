@@ -23,5 +23,3 @@ a1.addEventListener("click", (event) => {
 }, { passive: true });
 
 document.querySelector("*.progress").hidden = true;
-//https://www.unpkg.com/@i-xi-dev/bytes@4.1.3/esm/mod.js
-//https://cdn.skypack.dev/@i-xi-dev/bytes@4.1.3
