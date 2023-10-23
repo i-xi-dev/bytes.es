@@ -1,0 +1,18 @@
+*.progress {
+  align-items: center;
+  background-color: #ccc;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 10000;
+}
+
+*.progress[hidden] {
+  display: none;
+}
+
+textarea {
+  min-height: 5em;
+  width: 100%;
+}
