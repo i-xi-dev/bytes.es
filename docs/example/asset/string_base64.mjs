@@ -6,6 +6,7 @@ const ip11 = document.getElementById("ip11");
 const ip12 = document.getElementById("ip12");
 const a1 = document.getElementById("a1");
 const o1 = document.getElementById("o1");
+const o2 = document.getElementById("o2");
 
 a1.addEventListener("click", (event) => {
   const i = i1.value;
@@ -18,8 +19,10 @@ a1.addEventListener("click", (event) => {
     noPadding: (ip11.checked !== true),
     paddingChar: "=",
   };
-  const base64 = ByteSequence.fromText(i).toBase64Encoded(options);
-  o1.value = base64;
+  const bytes = ByteSequence.fromText(i);
+  o1.value = bytes.format({ separator: " " });
+  const base64 = bytes.toBase64Encoded(options);
+  o2.value = base64;
 }, { passive: true });
 
 document.querySelector("*.progress").hidden = true;

@@ -12,7 +12,14 @@
   display: none;
 }
 
+dd {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+}
+
 textarea {
+  display: block;
   min-height: 5em;
-  width: 100%;
+  resize: vertical;
 }
