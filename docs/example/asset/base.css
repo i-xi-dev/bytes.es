@@ -23,3 +23,7 @@ textarea {
   min-height: 5em;
   resize: vertical;
 }
+
+input[type="checkbox"] {
+  align-self: start;
+}

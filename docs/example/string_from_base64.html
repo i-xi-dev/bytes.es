@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Base64 Encode (from UTF-8 text)</title>
+    <title>Base64 Decode (to UTF-8 text)</title>
     <link href="./asset/base.css?4.1.9" rel="stylesheet" />
-    <script src="./asset/base64_from_string.mjs?4.1.9" type="module"></script>
+    <script src="./asset/string_from_base64.mjs?4.1.9" type="module"></script>
   </head>
 
   <body>
@@ -12,7 +12,7 @@
 
       <dl>
         <div>
-          <dt>[1] source string</dt>
+          <dt>[1] Base64 encoded</dt>
           <dd>
             <input id="i1" type="text" />
           </dd>
@@ -52,21 +52,21 @@
         </div>
       </details>
 
-      <button id="a1">Base64 Encode</button>
+      <button id="a1">Base64 Decode</button>
     </div>
 
     <section>
       <h1>Output</h1>
       <dl>
         <div>
-          <dt>[2] UTF-8 encoded from [1]</dt>
+          <dt>[2] Base64 decoded from [1]</dt>
           <dd>
             <textarea id="o1" readonly></textarea>
           </dd>
         </div>
 
         <div>
-          <dt>[3] Base64 encoded from [2]</dt>
+          <dt>[3] UTF-8 decoded from [2]</dt>
           <dd>
             <textarea id="o2" readonly></textarea>
           </dd>

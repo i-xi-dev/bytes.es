@@ -19,10 +19,11 @@ a1.addEventListener("click", (event) => {
     noPadding: (ip11.checked !== true),
     paddingChar: "=",
   };
-  const bytes = ByteSequence.fromText(i);
+
+  const bytes = ByteSequence.fromBase64Encoded(i, options);
   o1.value = bytes.format({ separator: " " });
-  const base64 = bytes.toBase64Encoded(options);
-  o2.value = base64;
+  const decoded = bytes.toText();
+  o2.value = decoded;
 }, { passive: true });
 
 document.querySelector("*.progress").hidden = true;
