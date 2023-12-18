@@ -13,10 +13,9 @@ import {
   InvalidStateError,
   Isomorphic,
   MediaType,
-  NonNegativeInteger,
   Percent,
-  PositiveInteger,
   Reading,
+  SafeInteger,
   Uint8,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Iterable, _Utf8 } from "./utils.ts";
@@ -166,7 +165,7 @@ class ByteSequence {
    * ```
    */
   static allocate(byteLength: number): ByteSequence {
-    if (NonNegativeInteger.isNonNegativeInteger(byteLength) !== true) {
+    if (SafeInteger.isNonNegative(byteLength) !== true) {
       throw new TypeError("byteLength");
     }
     return new ByteSequence(new ArrayBuffer(byteLength));
@@ -494,7 +493,7 @@ class ByteSequence {
    * ```
    */
   static generateRandom(byteLength: number): ByteSequence {
-    if (NonNegativeInteger.isNonNegativeInteger(byteLength) !== true) {
+    if (SafeInteger.isNonNegative(byteLength) !== true) {
       throw new TypeError("byteLength");
     }
     if (byteLength > 65536) { // XXX 連結すれば良いのでは
@@ -1378,7 +1377,7 @@ class ByteSequence {
    * ```
    */
   subsequence(start: number, end?: number): ByteSequence {
-    if (NonNegativeInteger.isNonNegativeInteger(start) !== true) {
+    if (SafeInteger.isNonNegative(start) !== true) {
       throw new TypeError("start");
     }
     if (start > this.byteLength) {
@@ -1386,7 +1385,7 @@ class ByteSequence {
     }
 
     if (typeof end === "number") {
-      if (NonNegativeInteger.isNonNegativeInteger(end) !== true) {
+      if (SafeInteger.isNonNegative(end) !== true) {
         throw new TypeError("end");
       }
       if (end < start) {
@@ -1416,7 +1415,7 @@ class ByteSequence {
    * ```
    */
   segment(segmentByteLength: number): IterableIterator<ByteSequence> {
-    if (PositiveInteger.isPositiveInteger(segmentByteLength) !== true) {
+    if (SafeInteger.isPositive(segmentByteLength) !== true) {
       throw new TypeError("segmentByteLength");
     }
 
@@ -1479,7 +1478,7 @@ class ByteSequence {
       throw new TypeError("ctor");
     }
 
-    if (NonNegativeInteger.isNonNegativeInteger(byteOffset) !== true) {
+    if (SafeInteger.isNonNegative(byteOffset) !== true) {
       throw new TypeError("byteOffset");
     } else if (
       (byteOffset > this.byteLength) || ((byteOffset % bytesPerElement) !== 0)
@@ -1487,7 +1486,7 @@ class ByteSequence {
       throw new RangeError("byteOffset");
     }
 
-    if (NonNegativeInteger.isNonNegativeInteger(byteLength) !== true) {
+    if (SafeInteger.isNonNegative(byteLength) !== true) {
       throw new TypeError("byteLength");
     } else if (
       ((byteOffset + byteLength) > this.byteLength) ||
