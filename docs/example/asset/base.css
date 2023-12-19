@@ -1,0 +1,34 @@
+*.progress {
+  align-items: center;
+  background-color: #ccc;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 10000;
+}
+
+*.progress[hidden] {
+  display: none;
+}
+
+dd {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+}
+
+output {
+  background-color: #eee;
+  display: block;
+  /*max-height: calc(100vh - 15em);*/
+  min-height: 5em;
+  /*overflow-y: scroll;*/
+  overflow-wrap: anywhere;
+  user-select: contain;
+  white-space: pre-wrap;
+}
+
+input[type="checkbox"] {
+  align-self: start;
+}
