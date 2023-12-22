@@ -1,5 +1,5 @@
-import { ByteSequence } from "https://www.unpkg.com/@i-xi-dev/bytes@4.1.3/esm/mod.js";
-// https://cdn.skypack.dev/@i-xi-dev/bytes@4.1.3
+import { ByteSequence } from "https://www.unpkg.com/@i-xi-dev/bytes@4.1.10/esm/mod.js";
+// https://cdn.skypack.dev/@i-xi-dev/bytes@4.1.10
 
 const i1 = document.getElementById("i1");
 const a1 = document.getElementById("a1");

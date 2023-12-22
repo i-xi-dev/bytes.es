@@ -64,10 +64,10 @@ import { ByteSequence } from "@i-xi-dev/bytes";
 
 ### CDN
 
-Example for Skypack
+Example for UNPKG
 
 ```javascript
-import { ByteSequence } from "https://cdn.skypack.dev/@i-xi-dev/bytes@4.1.10";
+import { ByteSequence } from "https://www.unpkg.com/@i-xi-dev/bytes@4.1.10/esm/mod.js";
 ```
 
 ## Usage
