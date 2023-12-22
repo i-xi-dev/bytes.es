@@ -25,7 +25,7 @@
     </div>
 
     <section>
-      <h1>Output</h1>
+      <h1>Output-1</h1>
       <dl>
         <div>
           <dt>[2]: UTF-8 encoded from [1]</dt>
@@ -33,10 +33,130 @@
             <output id="o1"></output>
           </dd>
         </div>
+
+        <div>
+          <dt>[3]: byte count of [2]</dt>
+          <dd>
+            <output class="single" id="o1_2"></output>
+          </dd>
+        </div>
       </dl>
     </section>
 
+    <div>
+      <button id="a2_1">Calculate SHA-256 hash</button>
+      <button id="a2_2">Calculate SHA-384 hash</button>
+      <button id="a2_3">Calculate SHA-512 hash</button>
 
+      <details>
+        <summary>Base64 Options</summary>
+
+        <div>
+          <fieldset>
+            <dl>
+              <div>
+                <dt>use padding "="</dt>
+                <dd>
+                  <input checked id="ip11" type="checkbox" />
+                </dd>
+              </div>
+      
+              <div>
+                <dt>62nd and 63rd encoding characters</dt>
+                <dd>
+                  <select id="ip12">
+                    <option label='[62]: "+", [63]: "/"' selected value="+/"></option>
+                    <option label='[62]: "-", [63]: "_"' value="-_"></option>
+                    <option label='[62]: ".", [63]: "-"' value=".-"></option>
+                    <option label='[62]: "_", [63]: ":"' value="_:"></option>
+                  </select>
+                </dd>
+              </div>
+            </dl>
+          </fieldset>
+        </div>
+      </details>
+
+      <button id="a2_4">Base64 Encode</button>
+
+      <details>
+        <summary>Percent Options</summary>
+
+        <div>
+          <fieldset>
+            TODO
+          </fieldset>
+        </div>
+      </details>
+
+      <button id="a2_5">Percent Encode</button>
+      <button id="a2_6">UTF-8 Decode</button>
+
+      <button id="a2_7">generate Data URL</button>
+      <button id="a2_8">generate Blob</button>
+    </div>
+
+    <section>
+      <h1>Output-2</h1>
+      <dl>
+        <div>
+          <dt>[4]: SHA-256 hash of [2]</dt>
+          <dd>
+            <output id="o2_1"></output>
+          </dd>
+        </div>
+
+        <div>
+          <dt>[5]: SHA-384 hash of [2]</dt>
+          <dd>
+            <output id="o2_2"></output>
+          </dd>
+        </div>
+
+        <div>
+          <dt>[6]: SHA-512 hash of [2]</dt>
+          <dd>
+            <output id="o2_3"></output>
+          </dd>
+        </div>
+
+        <div>
+          <dt>[7]: Base64 encoded from [2]</dt>
+          <dd>
+            <output id="o2_4"></output>
+          </dd>
+        </div>
+
+        <div>
+          <dt>[8]: Percent encoded from [2]</dt>
+          <dd>
+            <output id="o2_5"></output>
+          </dd>
+        </div>
+
+        <div>
+          <dt>[9]: UTF-8 decoded from [2]</dt>
+          <dd>
+            <output id="o2_6"></output>
+          </dd>
+        </div>
+
+        <div>
+          <dt>[10]: Data URL of [2] as plain text file</dt>
+          <dd>
+            <output class="single" id="o2_7a"></output>
+            <iframe id="o2_7b"></iframe>
+          </dd>
+        </div>
+
+        <div>
+          <dt>[11]: Blob of [2] as plain text file</dt>
+          <dd>
+            <iframe id="o2_8"></iframe>
+          </dd>
+        </div>
+      </dl>
+    </section>
 
     <div class="progress">
       <progress></progress>

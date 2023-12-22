@@ -29,6 +29,10 @@ output {
   white-space: pre-wrap;
 }
 
+output.single {
+  min-height: 1lh;
+}
+
 input[type="checkbox"] {
   align-self: start;
 }

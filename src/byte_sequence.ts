@@ -1813,7 +1813,6 @@ class ByteSequence {
     };
   }
 }
-Object.freeze(ByteSequence);
 
 type BytesSource = Iterable<number>;
 
