@@ -248,3 +248,8 @@ Duplicates the subsequence with the new underlying `ArrayBuffer`
 
 - [ByteSequence.prototype.equals()](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.1.10/mod.ts/~/ByteSequence#equals)
 - [ByteSequence.prototype.startsWith()](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/bytes.es/4.1.10/mod.ts/~/ByteSequence#startsWith)
+
+
+## Examples
+
+- [Convert from string](https://i-xi-dev.github.io/bytes.es/example/from_string.html)
