@@ -26,6 +26,8 @@ const o2_8 = document.getElementById("o2_8");
 
 const ip11 = document.getElementById("ip11");
 const ip12 = document.getElementById("ip12");
+const ip21 = document.getElementById("ip21");
+const ip22 = document.getElementById("ip22");
 
 const store = new WeakMap();
 
@@ -93,7 +95,111 @@ a2_5.addEventListener("click", () => {
     return;
   }
 
-  o2_5.value = bytes.toPercentEncoded();
+  let encodeSet;
+  switch (ip21.value) {
+    case "fragment":
+      encodeSet = [0x20, 0x22, 0x3C, 0x3E, 0x60];
+      break;
+    case "query":
+      encodeSet = [0x20, 0x22, 0x23, 0x3C, 0x3E];
+      break;
+    case "special-query":
+      encodeSet = [0x20, 0x22, 0x23, 0x27, 0x3C, 0x3E];
+      break;
+    case "path":
+      encodeSet = [0x20, 0x22, 0x23, 0x3C, 0x3E, 0x3F, 0x60, 0x7B, 0x7D];
+      break;
+    case "userinfo":
+      encodeSet = [
+        0x20,
+        0x22,
+        0x23,
+        0x2F,
+        0x3A,
+        0x3B,
+        0x3C,
+        0x3D,
+        0x3E,
+        0x3F,
+        0x40,
+        0x5B,
+        0x5C,
+        0x5D,
+        0x5E,
+        0x60,
+        0x7B,
+        0x7C,
+        0x7D,
+      ];
+      break;
+    case "component":
+      encodeSet = [
+        0x20,
+        0x22,
+        0x23,
+        0x24,
+        0x26,
+        0x2B,
+        0x2C,
+        0x2F,
+        0x3A,
+        0x3B,
+        0x3C,
+        0x3D,
+        0x3E,
+        0x3F,
+        0x40,
+        0x5B,
+        0x5C,
+        0x5D,
+        0x5E,
+        0x60,
+        0x7B,
+        0x7C,
+        0x7D,
+      ];
+      break;
+    case "form-urlencoded":
+      encodeSet = [
+        0x20,
+        0x21,
+        0x22,
+        0x23,
+        0x24,
+        0x26,
+        0x27,
+        0x28,
+        0x29,
+        0x2B,
+        0x2C,
+        0x2F,
+        0x3A,
+        0x3B,
+        0x3C,
+        0x3D,
+        0x3E,
+        0x3F,
+        0x40,
+        0x5B,
+        0x5C,
+        0x5D,
+        0x5E,
+        0x60,
+        0x7B,
+        0x7C,
+        0x7D,
+        0x7E,
+      ];
+      break;
+    default:
+      encodeSet = [];
+      break;
+  }
+  const options = {
+    encodeSet,
+    spaceAsPlus: ip22.checked === true,
+  };
+  o2_5.value = bytes.toPercentEncoded(options);
 }, { passive: true });
 
 a2_6.addEventListener("click", () => {

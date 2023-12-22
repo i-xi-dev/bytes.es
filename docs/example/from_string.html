@@ -3,7 +3,7 @@
   <head>
     <title></title>
     <link href="./asset/base.css?4.1.10" rel="stylesheet" />
-    <script src="./asset/from_string.mjs?4.1.10" type="module"></script>
+    <script src="./asset/from.mjs?4.1.10" type="module"></script>
   </head>
 
   <body>
@@ -84,7 +84,30 @@
 
         <div>
           <fieldset>
-            TODO
+            <dl>
+              <div>
+                <dt>Percent-encode set</dt>
+                <dd>
+                  <select id="ip21">
+                    <option label='C0 control percent-encode set' value="c0"></option>
+                    <option label='fragment percent-encode set' value="fragment"></option>
+                    <option label='query percent-encode set' value="query"></option>
+                    <option label='special-query percent-encode set' value="special-query"></option>
+                    <option label='path percent-encode set' value="path"></option>
+                    <option label='userinfo percent-encode set' value="userinfo"></option>
+                    <option label='component percent-encode set' selected value="component"></option>
+                    <option label='application/x-www-form-urlencoded percent-encode set' value="form-urlencoded"></option>
+                  </select>
+                </dd>
+              </div>
+
+              <div>
+                <dt>space as "+"</dt>
+                <dd>
+                  <input id="ip22" type="checkbox" />
+                </dd>
+              </div>
+            </dl>
           </fieldset>
         </div>
       </details>
