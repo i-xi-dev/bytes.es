@@ -16,7 +16,7 @@ export { Reading } from "https://raw.githubusercontent.com/i-xi-dev/reading.es/1
 export {
   ArrayBufferViewConstructor,
   TypedArrayConstructor,
-  uint8sToBytes, //TODO Uint8ArrayUtils.fromNumberArray(number[], (8 | 16 | 32), (BE | LE))とかにする
+  uint8sToBytes, //TODO Uint8ArrayUtils.fromNumberArray(number[], (8 | 16 | 32), (BE | LE))とかにする（逆変換も同じく）
 } from "https://raw.githubusercontent.com/i-xi-dev/buffer-utils.es/3.2.2/mod.ts";
 export { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.21/mod.ts";
 export { Percent } from "https://raw.githubusercontent.com/i-xi-dev/percent.es/4.0.29/mod.ts";

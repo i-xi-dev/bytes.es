@@ -20,7 +20,7 @@ import {
   Uint8,
   uint8sToBytes,
 } from "../deps.ts";
-import { _HttpUtilsEx, _Iterable, _Utf8 } from "./utils.ts";
+import { _HttpUtilsEx, _Utf8 } from "./utils.ts";
 
 /**
  * Byte sequence

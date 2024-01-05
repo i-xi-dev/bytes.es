@@ -1,18 +1,5 @@
 import { _Blob, _crypto, _ProgressEvent, Http, MediaType } from "../deps.ts";
 
-namespace _Iterable {
-  export function toArray<T>(iterable: Iterable<T>): Array<T> {
-    if (Array.isArray(iterable)) {
-      return iterable as Array<T>;
-    }
-    if (iterable && iterable[Symbol.iterator]) {
-      return [...iterable];
-    }
-    throw new TypeError("iterable");
-  }
-}
-Object.freeze(_Iterable);
-
 let _utf8TextEncoder: TextEncoder;
 let _utf8TextDecoder: TextDecoder;
 
@@ -64,4 +51,4 @@ namespace _HttpUtilsEx {
 }
 Object.freeze(_HttpUtilsEx);
 
-export { _HttpUtilsEx, _Iterable, _Utf8 };
+export { _HttpUtilsEx, _Utf8 };
