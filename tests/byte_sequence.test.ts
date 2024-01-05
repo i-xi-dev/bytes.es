@@ -486,12 +486,16 @@ Deno.test("ByteSequence.fromBinaryString(string)", () => {
   assertStrictEquals(bsa[3], 68);
 
   assertStrictEquals(ByteSequence.fromBinaryString("").byteLength, 0);
+  assertStrictEquals(
+    ByteSequence.fromBinaryString(undefined as unknown as string).byteLength,
+    0,
+  );
 
   assertThrows(
     () => {
       ByteSequence.fromBinaryString("あ");
     },
-    TypeError,
+    RangeError,
     "input",
   );
 
@@ -499,7 +503,7 @@ Deno.test("ByteSequence.fromBinaryString(string)", () => {
     () => {
       ByteSequence.fromBinaryString("\u0100");
     },
-    TypeError,
+    RangeError,
     "input",
   );
 });
@@ -834,42 +838,144 @@ Deno.test("ByteSequence.prototype.toPercentEncoded(Options)", () => {
   assertStrictEquals(s3b, ' !"#');
 });
 
+Deno.test("ByteSequence.prototype.toMd5Digest()", async () => {
+  const bs0 = ByteSequence.allocate(0);
+  const s1 = await bs0.toMd5Digest();
+  assertStrictEquals(
+    s1.format(),
+    "D41D8CD98F00B204E9800998ECF8427E",
+  );
+
+  const bs0b = ByteSequence.of(
+    0xE5,
+    0xAF,
+    0x8C,
+    0xE5,
+    0xA3,
+    0xAB,
+    0xE5,
+    0xB1,
+    0xB1,
+  );
+  const s1b = await bs0b.toMd5Digest();
+  assertStrictEquals(
+    s1b.format(),
+    "52A6AD27415BD86EC64B57EFBEA27F98",
+  );
+});
+
+Deno.test("ByteSequence.prototype.toSha1Digest()", async () => {
+  const bs0 = ByteSequence.allocate(0);
+  const s1 = await bs0.toSha1Digest();
+  assertStrictEquals(
+    s1.format(),
+    "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709",
+  );
+
+  const bs0b = ByteSequence.of(
+    0xE5,
+    0xAF,
+    0x8C,
+    0xE5,
+    0xA3,
+    0xAB,
+    0xE5,
+    0xB1,
+    0xB1,
+  );
+  const s1b = await bs0b.toSha1Digest();
+  assertStrictEquals(
+    s1b.format(),
+    "BD6691181693B56B7BC70FE5B4E603EAAA598538",
+  );
+});
+
 Deno.test("ByteSequence.prototype.toSha256Digest()", async () => {
   const bs0 = ByteSequence.allocate(0);
-
   const s1 = await bs0.toSha256Digest();
   assertStrictEquals(
     s1.format(),
     "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
   );
+
+  const bs0b = ByteSequence.of(
+    0xE5,
+    0xAF,
+    0x8C,
+    0xE5,
+    0xA3,
+    0xAB,
+    0xE5,
+    0xB1,
+    0xB1,
+  );
+  const s1b = await bs0b.toSha256Digest();
+  assertStrictEquals(
+    s1b.format(),
+    "E294AB9D429F9A9A2678D996E5DBD40CBF62363A5ED417F654C5F0BA861E4200",
+  );
 });
 
 Deno.test("ByteSequence.prototype.toSha384Digest()", async () => {
   const bs0 = ByteSequence.allocate(0);
-
   const s1 = await bs0.toSha384Digest();
   assertStrictEquals(
     s1.format(),
     "38B060A751AC96384CD9327EB1B1E36A21FDB71114BE07434C0CC7BF63F6E1DA274EDEBFE76F65FBD51AD2F14898B95B",
   );
+
+  const bs0b = ByteSequence.of(
+    0xE5,
+    0xAF,
+    0x8C,
+    0xE5,
+    0xA3,
+    0xAB,
+    0xE5,
+    0xB1,
+    0xB1,
+  );
+  const s1b = await bs0b.toSha384Digest();
+  assertStrictEquals(
+    s1b.format(),
+    "0DFB62B1F4A0DE2DE526E470CC00B654001B9D43012931466F049436C1C5CC13145972340B26D8F6A83C7FE2E942C3F3",
+  );
 });
 
 Deno.test("ByteSequence.prototype.toSha512Digest()", async () => {
   const bs0 = ByteSequence.allocate(0);
-
   const s1 = await bs0.toSha512Digest();
   assertStrictEquals(
     s1.format(),
     "CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E",
   );
+
+  const bs0b = ByteSequence.of(
+    0xE5,
+    0xAF,
+    0x8C,
+    0xE5,
+    0xA3,
+    0xAB,
+    0xE5,
+    0xB1,
+    0xB1,
+  );
+  const s1b = await bs0b.toSha512Digest();
+  assertStrictEquals(
+    s1b.format(),
+    "79DD60E264A2B6E763625B25A42CE21F3994F64423D779191878FF3D5D9ED597F663664A5411AF33FE48D9ED87E011ADDE6BCD412EA29AC6288E4AB1D8730847",
+  );
 });
 
 const MD5 = {
-  compute(input: Uint8Array): Promise<Uint8Array> {
+  compute(input: BufferSource): Promise<ArrayBuffer> {
     return new Promise((resolve) => {
       const md5 = new Md5();
-      const digest = md5.update(input.buffer).digest();
-      resolve(new Uint8Array(digest));
+      const digest = md5.update(
+        ArrayBuffer.isView(input) ? input.buffer : input,
+      ).digest();
+      resolve(digest);
     });
   },
 };
@@ -1845,7 +1951,7 @@ Deno.test("ByteSequence.prototype.startsWith(*)", () => {
       bs0.startsWith(null as unknown as Uint8Array);
     },
     TypeError,
-    "iterable",
+    "otherBytes",
   );
 
   assertThrows(
@@ -1853,7 +1959,7 @@ Deno.test("ByteSequence.prototype.startsWith(*)", () => {
       bs0.startsWith(undefined as unknown as Uint8Array);
     },
     TypeError,
-    "iterable",
+    "otherBytes",
   );
 
   assertThrows(

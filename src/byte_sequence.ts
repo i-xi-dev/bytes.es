@@ -2,8 +2,8 @@ import {
   _Blob,
   _crypto,
   _File,
+  ArrayBufferViewConstructor,
   Base64,
-  BufferUtils,
   BytesFormat,
   BytesSize,
   BytesStream,
@@ -16,7 +16,9 @@ import {
   Percent,
   Reading,
   SafeInteger,
+  TypedArrayConstructor,
   Uint8,
+  uint8sToBytes,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Iterable, _Utf8 } from "./utils.ts";
 
@@ -165,7 +167,7 @@ class ByteSequence {
    * ```
    */
   static allocate(byteLength: number): ByteSequence {
-    if (SafeInteger.isNonNegative(byteLength) !== true) {
+    if (SafeInteger.isNonNegativeSafeInteger(byteLength) !== true) {
       throw new TypeError("byteLength");
     }
     return new ByteSequence(new ArrayBuffer(byteLength));
@@ -296,13 +298,13 @@ class ByteSequence {
    * ```
    */
   toArrayBufferView<T extends ArrayBufferView>(
-    ctor: BufferUtils.ArrayBufferViewConstructor<T> =
-      Uint8Array as unknown as BufferUtils.ArrayBufferViewConstructor<T>,
+    ctor: ArrayBufferViewConstructor<T> =
+      Uint8Array as unknown as ArrayBufferViewConstructor<T>,
   ): T {
     let bytesPerElement: number;
-    if (BufferUtils.isTypedArrayConstructor(ctor)) {
+    if (TypedArrayConstructor.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
-    } else if (BufferUtils.isDataViewConstructor(ctor)) {
+    } else if (ArrayBufferViewConstructor.isArrayBufferViewConstructor(ctor)) { //isDataViewConstructor
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
@@ -415,10 +417,12 @@ class ByteSequence {
    * ```
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
-    if (BufferUtils.isArrayOfUint8(byteArray)) {
-      return ByteSequence.fromArrayBufferView(Uint8Array.from(byteArray));
+    try {
+      const bytes = uint8sToBytes(byteArray as Array<Uint8>);
+      return ByteSequence.fromArrayBufferView(bytes);
+    } catch (exception) {
+      throw new TypeError(`byteArray (${exception.message})`);
     }
-    throw new TypeError("byteArray");
   }
 
   /**
@@ -458,11 +462,12 @@ class ByteSequence {
       return ByteSequence.fromArrayBufferView(sourceBytes);
     }
 
-    const array = _Iterable.toArray(sourceBytes);
-    if (BufferUtils.isArrayOfUint8(array)) {
-      return ByteSequence.fromArray([...sourceBytes]);
+    try {
+      const bytes = uint8sToBytes(sourceBytes as Iterable<Uint8>);
+      return ByteSequence.fromArrayBufferView(bytes);
+    } catch (exception) {
+      throw new TypeError(`sourceBytes (${exception.message})`);
     }
-    throw new TypeError("sourceBytes");
   }
 
   /**
@@ -493,7 +498,7 @@ class ByteSequence {
    * ```
    */
   static generateRandom(byteLength: number): ByteSequence {
-    if (SafeInteger.isNonNegative(byteLength) !== true) {
+    if (SafeInteger.isNonNegativeSafeInteger(byteLength) !== true) {
       throw new TypeError("byteLength");
     }
     if (byteLength > 65536) { // XXX 連結すれば良いのでは
@@ -767,15 +772,10 @@ class ByteSequence {
    * @returns The `Promise` that fulfills with a `ByteSequence` object of the digest.
    * @example
    * ```javascript
-   * // Node.js
-   *
-   * import { createHash } from "node:crypto";
    * const md5 = {
-   *   // compute: (input: Uint8Array) => Promise<Uint8Array>
+   *   // compute: (input: BuuferSource) => Promise<ArrayBuffer>
    *   async compute(input) {
-   *     const hash = createHash("md5");
-   *     hash.update(input);
-   *     return hash.digest();
+   *     ...
    *   }
    * };
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
@@ -788,7 +788,7 @@ class ByteSequence {
     algorithm: Digest.Algorithm,
   ): Promise<ByteSequence> {
     const digest = await algorithm.compute(this.#view);
-    return new ByteSequence(digest.buffer);
+    return new ByteSequence(digest);
   }
 
   /**
@@ -823,6 +823,26 @@ class ByteSequence {
    */
   toSha512Digest(): Promise<ByteSequence> {
     return this.toDigest(Digest.Sha512);
+  }
+
+  /**
+   * Computes the SHA-1 digest for this byte sequence.
+   *
+   * @deprecated
+   * @returns The `Promise` that fulfills with a `ByteSequence` object of the SHA-1 digest.
+   */
+  toSha1Digest(): Promise<ByteSequence> {
+    return this.toDigest(Digest.Sha1);
+  }
+
+  /**
+   * Computes the MD5 digest for this byte sequence.
+   *
+   * @deprecated
+   * @returns The `Promise` that fulfills with a `ByteSequence` object of the MD5 digest.
+   */
+  toMd5Digest(): Promise<ByteSequence> {
+    return this.toDigest(Digest.Md5);
   }
 
   /**
@@ -1377,7 +1397,7 @@ class ByteSequence {
    * ```
    */
   subsequence(start: number, end?: number): ByteSequence {
-    if (SafeInteger.isNonNegative(start) !== true) {
+    if (SafeInteger.isNonNegativeSafeInteger(start) !== true) {
       throw new TypeError("start");
     }
     if (start > this.byteLength) {
@@ -1385,7 +1405,7 @@ class ByteSequence {
     }
 
     if (typeof end === "number") {
-      if (SafeInteger.isNonNegative(end) !== true) {
+      if (SafeInteger.isNonNegativeSafeInteger(end) !== true) {
         throw new TypeError("end");
       }
       if (end < start) {
@@ -1415,7 +1435,7 @@ class ByteSequence {
    * ```
    */
   segment(segmentByteLength: number): IterableIterator<ByteSequence> {
-    if (SafeInteger.isPositive(segmentByteLength) !== true) {
+    if (SafeInteger.isPositiveSafeInteger(segmentByteLength) !== true) {
       throw new TypeError("segmentByteLength");
     }
 
@@ -1463,22 +1483,22 @@ class ByteSequence {
    * ```
    */
   getView<T extends ArrayBufferView>(
-    ctor: BufferUtils.ArrayBufferViewConstructor<T> =
-      Uint8Array as unknown as BufferUtils.ArrayBufferViewConstructor<T>,
+    ctor: ArrayBufferViewConstructor<T> =
+      Uint8Array as unknown as ArrayBufferViewConstructor<T>,
     byteOffset = 0,
     byteLength: number = (this.byteLength - byteOffset),
   ): T {
     let bytesPerElement: number;
-    if (BufferUtils.isTypedArrayConstructor(ctor)) {
+    if (TypedArrayConstructor.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
       new Uint8ClampedArray();
-    } else if (BufferUtils.isDataViewConstructor(ctor)) {
+    } else if (ArrayBufferViewConstructor.isArrayBufferViewConstructor(ctor)) { //isDataViewConstructor
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
     }
 
-    if (SafeInteger.isNonNegative(byteOffset) !== true) {
+    if (SafeInteger.isNonNegativeSafeInteger(byteOffset) !== true) {
       throw new TypeError("byteOffset");
     } else if (
       (byteOffset > this.byteLength) || ((byteOffset % bytesPerElement) !== 0)
@@ -1486,7 +1506,7 @@ class ByteSequence {
       throw new RangeError("byteOffset");
     }
 
-    if (SafeInteger.isNonNegative(byteLength) !== true) {
+    if (SafeInteger.isNonNegativeSafeInteger(byteLength) !== true) {
       throw new TypeError("byteLength");
     } else if (
       ((byteOffset + byteLength) > this.byteLength) ||
@@ -1566,15 +1586,19 @@ class ByteSequence {
         }
       }
       return true;
-    } else if (BufferUtils.isArrayOfUint8(otherBytes)) {
-      for (let i = 0; i < otherBytes.length; i++) {
-        if (otherBytes[i] !== thisView[i]) {
-          return false;
+    } else {
+      try {
+        const bytes = uint8sToBytes(otherBytes);
+        for (let i = 0; i < bytes.length; i++) {
+          if (bytes[i] !== thisView[i]) {
+            return false;
+          }
         }
+        return true;
+      } catch {
+        return false;
       }
-      return true;
     }
-    return false;
   }
 
   /**
@@ -1601,14 +1625,15 @@ class ByteSequence {
       return this.#startsWith(otherBytes);
     }
 
-    const array = _Iterable.toArray(otherBytes);
-    if (BufferUtils.isArrayOfUint8(array)) {
-      if (array.length !== this.byteLength) {
+    try {
+      const bytes = uint8sToBytes(otherBytes as Iterable<Uint8>);
+      if (bytes.length !== this.byteLength) {
         return false;
       }
-      return this.#startsWith(array);
+      return this.#startsWith(bytes);
+    } catch (exception) {
+      throw new TypeError(`otherBytes (${exception.message})`);
     }
-    throw new TypeError("otherBytes");
   }
 
   /**
@@ -1629,12 +1654,12 @@ class ByteSequence {
       return this.#startsWith(otherBytes);
     }
 
-    const array = _Iterable.toArray(otherBytes);
-    if (BufferUtils.isArrayOfUint8(array)) {
-      return this.#startsWith(array);
+    try {
+      const bytes = uint8sToBytes(otherBytes as Iterable<Uint8>);
+      return this.#startsWith(bytes);
+    } catch (exception) {
+      throw new TypeError(`otherBytes (${exception.message})`);
     }
-
-    throw new TypeError("otherBytes");
   }
 
   at(index: number): number | undefined {
