@@ -1,5 +1,5 @@
-import { ByteSequence } from "https://www.unpkg.com/@i-xi-dev/bytes@4.1.10/esm/mod.js";
-// https://cdn.skypack.dev/@i-xi-dev/bytes@4.1.10
+import { ByteSequence } from "https://www.unpkg.com/@i-xi-dev/bytes@4.2.0/esm/mod.js";
+// https://cdn.skypack.dev/@i-xi-dev/bytes@4.2.0
 
 const i1 = document.getElementById("i1");
 const a1 = document.getElementById("a1");
@@ -12,6 +12,10 @@ const a2_2 = document.getElementById("a2_2");
 const o2_2 = document.getElementById("o2_2");
 const a2_3 = document.getElementById("a2_3");
 const o2_3 = document.getElementById("o2_3");
+const a2_x1 = document.getElementById("a2_x1");
+const o2_x1 = document.getElementById("o2_x1");
+const a2_x2 = document.getElementById("a2_x2");
+const o2_x2 = document.getElementById("o2_x2");
 const a2_4 = document.getElementById("a2_4");
 const o2_4 = document.getElementById("o2_4");
 const a2_5 = document.getElementById("a2_5");
@@ -72,6 +76,24 @@ a2_3.addEventListener("click", async () => {
   }
 
   o2_3.value = await bytes.toSha512Digest();
+}, { passive: true });
+
+a2_x1.addEventListener("click", async () => {
+  const bytes = store.get(o1);
+  if (!bytes) {
+    return;
+  }
+
+  o2_x1.value = await bytes.toSha1Digest();
+}, { passive: true });
+
+a2_x2.addEventListener("click", async () => {
+  const bytes = store.get(o1);
+  if (!bytes) {
+    return;
+  }
+
+  o2_x2.value = await bytes.toMd5Digest();
 }, { passive: true });
 
 a2_4.addEventListener("click", () => {

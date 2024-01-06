@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <title>Convert from string</title>
-    <link href="./asset/base.css?4.1.10" rel="stylesheet" />
-    <script src="./asset/from.mjs?4.1.10" type="module"></script>
+    <link href="./asset/base.css?4.2.0" rel="stylesheet" />
+    <script src="./asset/from.mjs?4.2.0" type="module"></script>
   </head>
 
   <body>
@@ -47,6 +47,8 @@
       <button id="a2_1">Calculate SHA-256 hash</button>
       <button id="a2_2">Calculate SHA-384 hash</button>
       <button id="a2_3">Calculate SHA-512 hash</button>
+      <button id="a2_x1">Calculate SHA-1 hash</button>
+      <button id="a2_x2">Calculate MD5 hash</button>
 
       <details>
         <summary>Base64 Options</summary>
@@ -144,28 +146,42 @@
         </div>
 
         <div>
-          <dt>[7]: Base64 encoded from [2]</dt>
+          <dt>[7]: SHA-1 hash of [2]</dt>
+          <dd>
+            <output id="o2_x1"></output>
+          </dd>
+        </div>
+
+        <div>
+          <dt>[8]: MD5 hash of [2]</dt>
+          <dd>
+            <output id="o2_x2"></output>
+          </dd>
+        </div>
+
+        <div>
+          <dt>[9]: Base64 encoded from [2]</dt>
           <dd>
             <output id="o2_4"></output>
           </dd>
         </div>
 
         <div>
-          <dt>[8]: Percent encoded from [2]</dt>
+          <dt>[10]: Percent encoded from [2]</dt>
           <dd>
             <output id="o2_5"></output>
           </dd>
         </div>
 
         <div>
-          <dt>[9]: UTF-8 decoded from [2]</dt>
+          <dt>[11]: UTF-8 decoded from [2]</dt>
           <dd>
             <output id="o2_6"></output>
           </dd>
         </div>
 
         <div>
-          <dt>[10]: Data URL of [2] as plain text file</dt>
+          <dt>[12]: Data URL of [2] as plain text file</dt>
           <dd>
             <output class="single" id="o2_7a"></output>
             <iframe id="o2_7b"></iframe>
@@ -173,7 +189,7 @@
         </div>
 
         <div>
-          <dt>[11]: Blob of [2] as plain text file</dt>
+          <dt>[13]: Blob of [2] as plain text file</dt>
           <dd>
             <iframe id="o2_8"></iframe>
           </dd>

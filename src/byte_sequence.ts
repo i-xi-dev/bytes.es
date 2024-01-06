@@ -2,8 +2,8 @@ import {
   _Blob,
   _crypto,
   _File,
-  ArrayBufferViewConstructor,
   Base64,
+  BufferUtils,
   BytesFormat,
   BytesSize,
   BytesStream,
@@ -16,11 +16,11 @@ import {
   Percent,
   Reading,
   SafeInteger,
-  TypedArrayConstructor,
   Uint8,
-  uint8sToBytes,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Utf8 } from "./utils.ts";
+
+const { Uint8ArrayUtils } = BufferUtils;
 
 /**
  * Byte sequence
@@ -38,7 +38,6 @@ class ByteSequence {
 
   // ArrayBufferをラップするインスタンスを生成
   // ※外部からのArrayBufferの変更は当インスタンスに影響する
-  //TODO private
   /**
    * @param bytes - An `ArrayBuffer` object.
    */
@@ -194,6 +193,7 @@ class ByteSequence {
     }
     throw new TypeError("buffer");
   }
+  //TODO ArrayBudderをresizeした場合のテスト
 
   // TODO byteOffset
   // TODO byteLength
@@ -276,6 +276,7 @@ class ByteSequence {
     throw new TypeError("bufferView");
   }
 
+  //TODO toUint8Arrayとかに分割し、deprecatedにする
   /**
    * Returns the [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView) that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
@@ -298,13 +299,13 @@ class ByteSequence {
    * ```
    */
   toArrayBufferView<T extends ArrayBufferView>(
-    ctor: ArrayBufferViewConstructor<T> =
-      Uint8Array as unknown as ArrayBufferViewConstructor<T>,
+    ctor: BufferUtils.ArrayBufferViewConstructor<T> =
+      Uint8Array as unknown as BufferUtils.ArrayBufferViewConstructor<T>,
   ): T {
     let bytesPerElement: number;
-    if (TypedArrayConstructor.isTypedArrayConstructor(ctor)) {
+    if (BufferUtils.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
-    } else if (ArrayBufferViewConstructor.isArrayBufferViewConstructor(ctor)) { //isDataViewConstructor
+    } else if (BufferUtils.isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
@@ -399,6 +400,7 @@ class ByteSequence {
     return ByteSequence.fromArrayBufferView(bufferSource);
   }
 
+  //TODO 配列要素をuint8とみなすかuint16とみなすかuint32とみなすかを指定できるメソッドを新設しfromArrayはdeprecatedにする（toArrayも同じく）
   // TODO offset
   // TODO length
   /**
@@ -418,7 +420,7 @@ class ByteSequence {
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
     try {
-      const bytes = uint8sToBytes(byteArray as Array<Uint8>);
+      const bytes = Uint8ArrayUtils.fromUint8s(byteArray);
       return ByteSequence.fromArrayBufferView(bytes);
     } catch (exception) {
       throw new TypeError(`byteArray (${exception.message})`);
@@ -463,7 +465,7 @@ class ByteSequence {
     }
 
     try {
-      const bytes = uint8sToBytes(sourceBytes as Iterable<Uint8>);
+      const bytes = Uint8ArrayUtils.fromUint8s(sourceBytes);
       return ByteSequence.fromArrayBufferView(bytes);
     } catch (exception) {
       throw new TypeError(`sourceBytes (${exception.message})`);
@@ -626,7 +628,7 @@ class ByteSequence {
    * // Base64 URL (https://datatracker.ietf.org/doc/html/rfc4648#section-5) decoding
    *
    * const base64Url = {
-   *   table: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ],
+   *   tableLastChars: ["-", "_"],
    *   noPadding: true,
    * };
    * const bytes = ByteSequence.fromBase64Encoded("5a-M5aOr5bGx", base64Url);
@@ -659,7 +661,7 @@ class ByteSequence {
    * // Base64 URL (https://datatracker.ietf.org/doc/html/rfc4648#section-5) encoding
    *
    * const base64Url = {
-   *   table: [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_" ],
+   *   tableLastChars: ["-", "_"],
    *   noPadding: true,
    * };
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
@@ -775,7 +777,7 @@ class ByteSequence {
    * const md5 = {
    *   // compute: (input: BuuferSource) => Promise<ArrayBuffer>
    *   async compute(input) {
-   *     ...
+   *     // ...
    *   }
    * };
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
@@ -938,6 +940,8 @@ class ByteSequence {
     // Node.jsのBufferを返すエンコーダーだとプールが余計
     return ByteSequence.fromArrayBufferView(encoded);
   }
+
+  //TODO utf16,utf32
 
   /**
    * Returns a decoded string by the specified text encoding of this bytes.
@@ -1483,16 +1487,16 @@ class ByteSequence {
    * ```
    */
   getView<T extends ArrayBufferView>(
-    ctor: ArrayBufferViewConstructor<T> =
-      Uint8Array as unknown as ArrayBufferViewConstructor<T>,
+    ctor: BufferUtils.ArrayBufferViewConstructor<T> =
+      Uint8Array as unknown as BufferUtils.ArrayBufferViewConstructor<T>,
     byteOffset = 0,
     byteLength: number = (this.byteLength - byteOffset),
   ): T {
     let bytesPerElement: number;
-    if (TypedArrayConstructor.isTypedArrayConstructor(ctor)) {
+    if (BufferUtils.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
       new Uint8ClampedArray();
-    } else if (ArrayBufferViewConstructor.isArrayBufferViewConstructor(ctor)) { //isDataViewConstructor
+    } else if (BufferUtils.isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
@@ -1588,7 +1592,7 @@ class ByteSequence {
       return true;
     } else {
       try {
-        const bytes = uint8sToBytes(otherBytes);
+        const bytes = Uint8ArrayUtils.fromUint8s(otherBytes);
         for (let i = 0; i < bytes.length; i++) {
           if (bytes[i] !== thisView[i]) {
             return false;
@@ -1626,7 +1630,7 @@ class ByteSequence {
     }
 
     try {
-      const bytes = uint8sToBytes(otherBytes as Iterable<Uint8>);
+      const bytes = Uint8ArrayUtils.fromUint8s(otherBytes);
       if (bytes.length !== this.byteLength) {
         return false;
       }
@@ -1655,7 +1659,7 @@ class ByteSequence {
     }
 
     try {
-      const bytes = uint8sToBytes(otherBytes as Iterable<Uint8>);
+      const bytes = Uint8ArrayUtils.fromUint8s(otherBytes);
       return this.#startsWith(bytes);
     } catch (exception) {
       throw new TypeError(`otherBytes (${exception.message})`);
