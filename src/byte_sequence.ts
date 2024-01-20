@@ -2,8 +2,8 @@ import {
   _Blob,
   _crypto,
   _File,
+  ArrayBufferViewConstructor,
   Base64,
-  BufferUtils,
   BytesFormat,
   BytesSize,
   BytesStream,
@@ -17,10 +17,9 @@ import {
   Reading,
   SafeInteger,
   Uint8,
+  Uint8ArrayUtils,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Utf8 } from "./utils.ts";
-
-const { Uint8ArrayUtils } = BufferUtils;
 
 /**
  * Byte sequence
@@ -299,13 +298,13 @@ class ByteSequence {
    * ```
    */
   toArrayBufferView<T extends ArrayBufferView>(
-    ctor: BufferUtils.ArrayBufferViewConstructor<T> =
-      Uint8Array as unknown as BufferUtils.ArrayBufferViewConstructor<T>,
+    ctor: ArrayBufferViewConstructor<T> =
+      Uint8Array as unknown as ArrayBufferViewConstructor<T>,
   ): T {
     let bytesPerElement: number;
-    if (BufferUtils.isTypedArrayConstructor(ctor)) {
+    if (ArrayBufferViewConstructor.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
-    } else if (BufferUtils.isDataViewConstructor(ctor)) {
+    } else if (ArrayBufferViewConstructor.isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
@@ -1487,16 +1486,16 @@ class ByteSequence {
    * ```
    */
   getView<T extends ArrayBufferView>(
-    ctor: BufferUtils.ArrayBufferViewConstructor<T> =
-      Uint8Array as unknown as BufferUtils.ArrayBufferViewConstructor<T>,
+    ctor: ArrayBufferViewConstructor<T> =
+      Uint8Array as unknown as ArrayBufferViewConstructor<T>,
     byteOffset = 0,
     byteLength: number = (this.byteLength - byteOffset),
   ): T {
     let bytesPerElement: number;
-    if (BufferUtils.isTypedArrayConstructor(ctor)) {
+    if (ArrayBufferViewConstructor.isTypedArrayConstructor(ctor)) {
       bytesPerElement = ctor.BYTES_PER_ELEMENT;
       new Uint8ClampedArray();
-    } else if (BufferUtils.isDataViewConstructor(ctor)) {
+    } else if (ArrayBufferViewConstructor.isDataViewConstructor(ctor)) {
       bytesPerElement = 1;
     } else {
       throw new TypeError("ctor");
