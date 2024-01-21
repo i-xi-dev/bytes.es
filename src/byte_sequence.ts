@@ -5,6 +5,7 @@ import {
   ArrayBufferViewConstructor,
   Base64,
   BufferUtils,
+  ByteOrder,
   BytesFormat,
   BytesSize,
   BytesStream,
@@ -535,9 +536,82 @@ class ByteSequence {
     return ByteSequence.fromArrayBufferView(bufferSource);
   }
 
+  //TODO fromInt8Iterable
+
+  //TODO コメントおよびテスト
+  static fromUint8Iterable(source: Iterable<number>): ByteSequence {
+    const bytes = BufferUtils.fromUint8Iterable(source);
+    return ByteSequence.wrapArrayBuffer(bytes);
+  }
+
+  //TODO fromAsyncInt8Iterable
+
+  //TODO コメントおよびテスト
+  static async fromAsyncUint8Iterable(
+    source: AsyncIterable<number>,
+  ): Promise<ByteSequence> {
+    const bytes = await BufferUtils.fromAsyncUint8Iterable(source);
+    return ByteSequence.wrapArrayBuffer(bytes);
+  }
+
+  //TODO fromInt16Iterable
+
+  //TODO コメントおよびテスト
+  static fromUint16Iterable(
+    source: Iterable<number>,
+    byteOrder?: ByteOrder,
+  ): ByteSequence {
+    const bytes = BufferUtils.fromUint16Iterable(source, byteOrder);
+    return ByteSequence.wrapArrayBuffer(bytes);
+  }
+
+  //TODO fromAsyncInt16Iterable
+
+  //TODO コメントおよびテスト
+  static async fromAsyncUint16Iterable(
+    source: AsyncIterable<number>,
+    byteOrder?: ByteOrder,
+  ): Promise<ByteSequence> {
+    const bytes = await BufferUtils.fromAsyncUint16Iterable(source, byteOrder);
+    return ByteSequence.wrapArrayBuffer(bytes);
+  }
+
+  //TODO fromInt32Iterable
+
+  //TODO コメントおよびテスト
+  static fromUint32Iterable(
+    source: Iterable<number>,
+    byteOrder?: ByteOrder,
+  ): ByteSequence {
+    const bytes = BufferUtils.fromUint32Iterable(source, byteOrder);
+    return ByteSequence.wrapArrayBuffer(bytes);
+  }
+
+  //TODO fromAsyncInt32Iterable
+
+  //TODO コメントおよびテスト
+  static async fromAsyncUint32Iterable(
+    source: AsyncIterable<number>,
+    byteOrder?: ByteOrder,
+  ): Promise<ByteSequence> {
+    const bytes = await BufferUtils.fromAsyncUint32Iterable(source, byteOrder);
+    return ByteSequence.wrapArrayBuffer(bytes);
+  }
+
+  /*TODO
+  fromBigInt64Iterable
+  fromAsyncBigInt64Iterable
+  fromBigUint64Iterable
+  fromAsyncBigUint64Iterable
+  fromFloat32Iterable
+  fromAsyncFloat32Iterable
+  fromFloat64Iterable
+  fromAsyncFloat64Iterable
+  */
+
   /*
 
-fromUint8Iterable
+
 
 
 
@@ -562,7 +636,7 @@ fromUint8Iterable
    * ```
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
-    try {
+    try { //TODO try いらないのでは
       const bytes = BufferUtils.fromUint8Iterable(byteArray);
       return ByteSequence.wrapArrayBuffer(bytes);
     } catch (exception) {
@@ -1735,7 +1809,7 @@ fromUint8Iterable
       return true;
     } else {
       try {
-        const bytes = new Uint8Array( BufferUtils.fromUint8Iterable(otherBytes));
+        const bytes = new Uint8Array(BufferUtils.fromUint8Iterable(otherBytes));
         for (let i = 0; i < bytes.length; i++) {
           if (bytes[i] !== thisView[i]) {
             return false;

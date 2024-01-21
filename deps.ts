@@ -16,6 +16,7 @@ export { Reading } from "https://raw.githubusercontent.com/i-xi-dev/reading.es/1
 export {
   ArrayBufferViewConstructor,
   BufferUtils,
+  ByteOrder,
 } from "https://raw.githubusercontent.com/i-xi-dev/buffer-utils.es/6.0.0/mod.ts";
 export { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.24/mod.ts";
 export { Percent } from "https://raw.githubusercontent.com/i-xi-dev/percent.es/4.0.32/mod.ts";
