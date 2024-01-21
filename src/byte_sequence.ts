@@ -538,7 +538,21 @@ class ByteSequence {
 
   //TODO fromInt8Iterable
 
-  //TODO コメントおよびテスト
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 8-bit unsigned integer `Iterable`.
+   *
+   * @param source - The 8-bit unsigned integer `Iterable` represents a byte sequence.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `source` is not an 8-bit unsigned integer `Iterable`.
+   * @example
+   * ```javascript
+   * const array = [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ];
+   * const bytes = ByteSequence.fromUint8Iterable(array);
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   */
   static fromUint8Iterable(source: Iterable<number>): ByteSequence {
     const bytes = BufferUtils.fromUint8Iterable(source);
     return ByteSequence.wrapArrayBuffer(bytes);
@@ -546,7 +560,14 @@ class ByteSequence {
 
   //TODO fromAsyncInt8Iterable
 
-  //TODO コメントおよびテスト
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 8-bit unsigned integer `AsyncIterable`.
+   *
+   * @param source - The 8-bit unsigned integer `AsyncIterable` represents a byte sequence.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `source` is not an 8-bit unsigned integer `AsyncIterable`.
+   */
   static async fromAsyncUint8Iterable(
     source: AsyncIterable<number>,
   ): Promise<ByteSequence> {

@@ -69,7 +69,8 @@ Deno.test("ByteSequence.fromUint8Iterable(Generator<number>)", () => {
   assertStrictEquals(bs0a[8], 0);
   assertStrictEquals(bs0a[9], 255);
 
-  const a1 = Uint8ClampedArray.of();
+  const a1 = (function* () {
+  })();
   const bs1 = ByteSequence.fromUint8Iterable(a1);
 
   assertStrictEquals(bs1.byteLength, 0);
