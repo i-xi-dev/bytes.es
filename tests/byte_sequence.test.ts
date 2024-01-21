@@ -303,8 +303,8 @@ Deno.test("ByteSequence.fromArray(Array<number>)", () => {
     () => {
       ByteSequence.fromArray(a2 as unknown as number[]);
     },
-    TypeError,
-    "byteArray",
+    RangeError,
+    "source[*]",
   );
 });
 

@@ -596,7 +596,15 @@ export class ByteSequence {
 
   //TODO fromAsyncInt16Iterable
 
-  //TODO コメントおよびテスト
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 16-bit unsigned integer `AsyncIterable`.
+   *
+   * @param source - The 16-bit unsigned integer `AsyncIterable` represents a byte sequence.
+   * @param byteOrder - The byte order. If omitted, write in the platform byte order.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `source` is not an 16-bit unsigned integer `AsyncIterable`.
+   */
   static async fromAsyncUint16Iterable(
     source: AsyncIterable<number>,
     byteOrder?: ByteOrder,
@@ -607,7 +615,15 @@ export class ByteSequence {
 
   //TODO fromInt32Iterable
 
-  //TODO コメントおよびテスト
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 32-bit unsigned integer `Iterable`.
+   *
+   * @param source - The 32-bit unsigned integer `Iterable` represents a byte sequence.
+   * @param byteOrder - The byte order. If omitted, write in the platform byte order.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `source` is not an 32-bit unsigned integer `Iterable`.
+   */
   static fromUint32Iterable(
     source: Iterable<number>,
     byteOrder?: ByteOrder,
@@ -618,7 +634,15 @@ export class ByteSequence {
 
   //TODO fromAsyncInt32Iterable
 
-  //TODO コメントおよびテスト
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 32-bit unsigned integer `AsyncIterable`.
+   *
+   * @param source - The 32-bit unsigned integer `AsyncIterable` represents a byte sequence.
+   * @param byteOrder - The byte order. If omitted, write in the platform byte order.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `source` is not an 32-bit unsigned integer `AsyncIterable`.
+   */
   static async fromAsyncUint32Iterable(
     source: AsyncIterable<number>,
     byteOrder?: ByteOrder,
@@ -638,40 +662,25 @@ export class ByteSequence {
   fromAsyncFloat64Iterable
   */
 
-  /*
-
-
-
-
-
-  */
-
-  //TODO 配列要素をuint8とみなすかuint16とみなすかuint32とみなすかを指定できるメソッドを新設しfromArrayはdeprecatedにする（toArrayも同じく）
-  // TODO offset
-  // TODO length
   /**
-   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
-   * created from the specified 8-bit unsigned integer `Array`.
+   * The alias for the `fromUint8Iterable` method.
    *
    * @param byteArray - The 8-bit unsigned integer `Array` represents a byte sequence.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `byteArray` is not an 8-bit unsigned integer `Array`.
-   * @example
-   * ```javascript
-   * const array = [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ];
-   * const bytes = ByteSequence.fromArray(array);
-   * // bytes.toArray()
-   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * ```
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
-    try { //TODO try いらないのでは
-      const bytes = BufferUtils.fromUint8Iterable(byteArray);
-      return ByteSequence.wrapArrayBuffer(bytes);
-    } catch (exception) {
-      throw new TypeError(`byteArray (${exception.message})`);
-    }
+    return this.fromUint8Iterable(byteArray);
   }
+
+  /*
+
+
+
+toUint8Iterable
+toUint16Iterable
+toUint32Iterable
+  */
 
   /**
    * Returns the 8-bit unsigned integer `Array` representing this byte sequence.
