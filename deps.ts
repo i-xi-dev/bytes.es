@@ -17,11 +17,11 @@ export {
   ArrayBufferViewConstructor,
   BufferUtils,
   ByteOrder,
-} from "https://raw.githubusercontent.com/i-xi-dev/buffer-utils.es/6.0.0/mod.ts";
-export { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.24/mod.ts";
+} from "https://raw.githubusercontent.com/i-xi-dev/buffer-utils.es/6.0.1/mod.ts";
+export { BytesStream } from "https://raw.githubusercontent.com/i-xi-dev/bytes-stream.es/3.0.25/mod.ts";
 export { Percent } from "https://raw.githubusercontent.com/i-xi-dev/percent.es/4.0.32/mod.ts";
 export { Base64 } from "https://raw.githubusercontent.com/i-xi-dev/base64.es/4.1.9/mod.ts";
-export { Digest } from "https://raw.githubusercontent.com/i-xi-dev/digest.es/3.0.4/mod.ts";
+export { Digest } from "https://raw.githubusercontent.com/i-xi-dev/digest.es/3.0.5/mod.ts";
 export { MediaType } from "https://raw.githubusercontent.com/i-xi-dev/mimetype.es/1.2.18/mod.ts";
 export { DataURL } from "https://raw.githubusercontent.com/i-xi-dev/dataurl.es/2.0.20/mod.ts";
 export { BytesSize } from "https://raw.githubusercontent.com/i-xi-dev/bytes-size.es/1.0.15/mod.ts";
