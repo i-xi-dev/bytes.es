@@ -25,7 +25,7 @@ import { _HttpUtilsEx, _Utf8 } from "./utils.ts";
 /**
  * Byte sequence
  */
-class ByteSequence {
+export class ByteSequence {
   /**
    * 内部表現
    */
@@ -577,7 +577,15 @@ class ByteSequence {
 
   //TODO fromInt16Iterable
 
-  //TODO コメントおよびテスト
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 16-bit unsigned integer `Iterable`.
+   *
+   * @param source - The 16-bit unsigned integer `Iterable` represents a byte sequence.
+   * @param byteOrder - The byte order. If omitted, write in the platform byte order.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `source` is not an 16-bit unsigned integer `Iterable`.
+   */
   static fromUint16Iterable(
     source: Iterable<number>,
     byteOrder?: ByteOrder,
@@ -2102,4 +2110,10 @@ type RequestOrResponseReadingOptions = Reading.Options & {
   verifyHeaders?: (headers: Headers) => [verified: boolean, message?: string];
 };
 
-export { ByteSequence };
+//TODO
+export { ByteOrder };
+export const Platform = {
+  BYTE_ORDER: BufferUtils.BYTE_ORDER,
+  isBigEndian: BufferUtils.isBigEndian,
+  isLittleEndian: BufferUtils.isLittleEndian,
+};

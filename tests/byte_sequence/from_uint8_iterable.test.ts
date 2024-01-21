@@ -1,7 +1,4 @@
-import {
-  assertStrictEquals,
-  assertThrows,
-} from "../deps.ts";
+import { assertStrictEquals, assertThrows } from "../deps.ts";
 import { ByteSequence } from "../../mod.ts";
 
 Deno.test("ByteSequence.fromUint8Iterable(Array<number>)", () => {

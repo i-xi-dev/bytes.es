@@ -1,8 +1,4 @@
-import {
-  assertRejects,
-  assertStrictEquals,
-  assertThrows,
-} from "../deps.ts";
+import { assertRejects, assertStrictEquals } from "../deps.ts";
 import { ByteSequence } from "../../mod.ts";
 
 Deno.test("ByteSequence.fromAsyncUint8Iterable(AsyncGenerator<number>)", async () => {
@@ -35,7 +31,9 @@ Deno.test("ByteSequence.fromAsyncUint8Iterable(AsyncGenerator<number>)", async (
 Deno.test("ByteSequence.fromAsyncUint8Iterable(any)", () => {
   assertRejects(
     async () => {
-      await ByteSequence.fromAsyncUint8Iterable(undefined as unknown as AsyncIterable<number>);
+      await ByteSequence.fromAsyncUint8Iterable(
+        undefined as unknown as AsyncIterable<number>,
+      );
     },
     TypeError,
     "source",
@@ -43,7 +41,9 @@ Deno.test("ByteSequence.fromAsyncUint8Iterable(any)", () => {
 
   assertRejects(
     async () => {
-      await ByteSequence.fromAsyncUint8Iterable(1 as unknown as AsyncIterable<number>);
+      await ByteSequence.fromAsyncUint8Iterable(
+        1 as unknown as AsyncIterable<number>,
+      );
     },
     TypeError,
     "source",
@@ -54,7 +54,9 @@ Deno.test("ByteSequence.fromAsyncUint8Iterable(any)", () => {
   })();
   assertRejects(
     async () => {
-      await ByteSequence.fromAsyncUint8Iterable(a1 as unknown as AsyncIterable<number>);
+      await ByteSequence.fromAsyncUint8Iterable(
+        a1 as unknown as AsyncIterable<number>,
+      );
     },
     RangeError,
     "source[*]",
