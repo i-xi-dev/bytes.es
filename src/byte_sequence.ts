@@ -4,6 +4,7 @@ import {
   _File,
   ArrayBufferViewConstructor,
   Base64,
+  BufferUtils,
   BytesFormat,
   BytesSize,
   BytesStream,
@@ -17,7 +18,6 @@ import {
   Reading,
   SafeInteger,
   Uint8,
-  Uint8ArrayUtils,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Utf8 } from "./utils.ts";
 
@@ -241,6 +241,8 @@ class ByteSequence {
     return this.#buffer.slice(0);
   }
 
+  // TODO byteOffset
+  // TODO byteLength
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * that duplicates the underlying `ArrayBuffer` of the specified [`ArrayBufferView`](https://webidl.spec.whatwg.org/#ArrayBufferView).
@@ -499,14 +501,6 @@ class ByteSequence {
     );
   }
 
-  /*
-
-
-
-
-
-  */
-
   // TODO byteOffset
   // TODO byteLength
   /**
@@ -541,6 +535,14 @@ class ByteSequence {
     return ByteSequence.fromArrayBufferView(bufferSource);
   }
 
+  /*
+
+fromUint8Iterable
+
+
+
+  */
+
   //TODO 配列要素をuint8とみなすかuint16とみなすかuint32とみなすかを指定できるメソッドを新設しfromArrayはdeprecatedにする（toArrayも同じく）
   // TODO offset
   // TODO length
@@ -561,8 +563,8 @@ class ByteSequence {
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
     try {
-      const bytes = Uint8ArrayUtils.fromUint8s(byteArray);
-      return ByteSequence.fromArrayBufferView(bytes);
+      const bytes = BufferUtils.fromUint8Iterable(byteArray);
+      return ByteSequence.wrapArrayBuffer(bytes);
     } catch (exception) {
       throw new TypeError(`byteArray (${exception.message})`);
     }
@@ -606,8 +608,8 @@ class ByteSequence {
     }
 
     try {
-      const bytes = Uint8ArrayUtils.fromUint8s(sourceBytes);
-      return ByteSequence.fromArrayBufferView(bytes);
+      const bytes = BufferUtils.fromUint8Iterable(sourceBytes);
+      return ByteSequence.wrapArrayBuffer(bytes);
     } catch (exception) {
       throw new TypeError(`sourceBytes (${exception.message})`);
     }
@@ -1733,7 +1735,7 @@ class ByteSequence {
       return true;
     } else {
       try {
-        const bytes = Uint8ArrayUtils.fromUint8s(otherBytes);
+        const bytes = new Uint8Array( BufferUtils.fromUint8Iterable(otherBytes));
         for (let i = 0; i < bytes.length; i++) {
           if (bytes[i] !== thisView[i]) {
             return false;
@@ -1771,8 +1773,8 @@ class ByteSequence {
     }
 
     try {
-      const bytes = Uint8ArrayUtils.fromUint8s(otherBytes);
-      if (bytes.length !== this.byteLength) {
+      const bytes = BufferUtils.fromUint8Iterable(otherBytes);
+      if (bytes.byteLength !== this.byteLength) {
         return false;
       }
       return this.#startsWith(bytes);
@@ -1800,7 +1802,7 @@ class ByteSequence {
     }
 
     try {
-      const bytes = Uint8ArrayUtils.fromUint8s(otherBytes);
+      const bytes = BufferUtils.fromUint8Iterable(otherBytes);
       return this.#startsWith(bytes);
     } catch (exception) {
       throw new TypeError(`otherBytes (${exception.message})`);
