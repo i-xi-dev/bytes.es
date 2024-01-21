@@ -275,10 +275,192 @@ class ByteSequence {
     throw new TypeError("bufferView");
   }
 
-  //TODO toUint8Arrayとかに分割し、deprecatedにする
+  /**
+   * Returns the `Int8Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `Int8Array`.
+   */
+  toInt8Array(): Int8Array {
+    return new Int8Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / Int8Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `Uint8Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `Uint8Array`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const uint8Array = bytes.toUint8Array();
+   * // uint8Array
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * uint8Array.fill(0);
+   * // uint8Array
+   * //   → Uint8Array[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+   *
+   * // bytes.toUint8Array()
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   */
+  toUint8Array(): Uint8Array {
+    return new Uint8Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / Uint8Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `Uint8ClampedArray` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `Uint8ClampedArray`.
+   */
+  toUint8ClampedArray(): Uint8ClampedArray {
+    return new Uint8ClampedArray(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / Uint8ClampedArray.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `Int16Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `Int16Array`.
+   */
+  toInt16Array(): Int16Array {
+    return new Int16Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / Int16Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `Uint16Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `Uint16Array`.
+   */
+  toUint16Array(): Uint16Array {
+    return new Uint16Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / Uint16Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `Int32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `Int32Array`.
+   */
+  toInt32Array(): Int32Array {
+    return new Int32Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / Int32Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `Uint32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `Uint32Array`.
+   */
+  toUint32Array(): Uint32Array {
+    return new Uint32Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / Uint32Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `Float32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `Float32Array`.
+   */
+  toFloat32Array(): Float32Array {
+    return new Float32Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / Float32Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `Float64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `Float64Array`.
+   */
+  toFloat64Array(): Float64Array {
+    return new Float64Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / Float64Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `BigInt64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `BigInt64Array`.
+   */
+  toBigInt64Array(): BigInt64Array {
+    return new BigInt64Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / BigInt64Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `BigUint64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `BigUint64Array`.
+   */
+  toBigUint64Array(): BigUint64Array {
+    return new BigUint64Array(
+      this.toArrayBuffer(),
+      0,
+      this.byteLength / BigUint64Array.BYTES_PER_ELEMENT,
+    );
+  }
+
+  /**
+   * Returns the `DataView` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
+   *
+   * @returns The `DataView`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const dataView = bytes.toDataView();
+   * // new Uint8Array(dataView.buffer)
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   *
+   * dataView.setUint8(0, 0);
+   * dataView.setUint8(1, 0);
+   * dataView.setUint8(2, 0);
+   * dataView.setUint8(3, 0);
+   * // new Uint8Array(dataView.buffer)
+   * //   → Uint8Array[ 0, 0, 0, 0, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   *
+   * // new Uint8Array(bytes.toDataView().buffer)
+   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   */
+  toDataView(): DataView {
+    return new DataView(this.toArrayBuffer(), 0, this.byteLength);
+  }
+
   /**
    * Returns the [`ArrayBufferView`](https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView) that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
+   * @deprecated
    * @param ctor - The `ArrayBufferView`s constructor.
    *    The default is `Uint8Array`.
    * @returns The `ArrayBufferView`.
@@ -317,53 +499,13 @@ class ByteSequence {
     );
   }
 
-  /**
-   * Returns the `Uint8Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   *
-   * @returns The `Uint8Array`.
-   * @example
-   * ```javascript
-   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * const uint8Array = bytes.toUint8Array();
-   * // uint8Array
-   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * uint8Array.fill(0);
-   * // uint8Array
-   * //   → Uint8Array[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
-   *
-   * // bytes.toUint8Array()
-   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * ```
-   */
-  toUint8Array(): Uint8Array {
-    return this.toArrayBufferView(Uint8Array);
-  }
+  /*
 
-  /**
-   * Returns the `DataView` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
-   *
-   * @returns The `DataView`.
-   * @example
-   * ```javascript
-   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * const dataView = bytes.toDataView();
-   * // new Uint8Array(dataView.buffer)
-   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   *
-   * dataView.setUint8(0, 0);
-   * dataView.setUint8(1, 0);
-   * dataView.setUint8(2, 0);
-   * dataView.setUint8(3, 0);
-   * // new Uint8Array(dataView.buffer)
-   * //   → Uint8Array[ 0, 0, 0, 0, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   *
-   * // new Uint8Array(bytes.toDataView().buffer)
-   * //   → Uint8Array[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
-   * ```
-   */
-  toDataView(): DataView {
-    return this.toArrayBufferView(DataView);
-  }
+
+
+
+
+  */
 
   // TODO byteOffset
   // TODO byteLength
