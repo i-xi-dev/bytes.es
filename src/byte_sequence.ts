@@ -242,8 +242,6 @@ export class ByteSequence {
     return this.#buffer.slice(0);
   }
 
-  // TODO byteOffset
-  // TODO byteLength
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * that duplicates the underlying `ArrayBuffer` of the specified [`ArrayBufferView`](https://webidl.spec.whatwg.org/#ArrayBufferView).
@@ -282,6 +280,12 @@ export class ByteSequence {
    * Returns the `Int8Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `Int8Array`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const int8Array = bytes.toInt8Array();
+   * // int8Array
+   * //   → Int8Array[ -27, -81, -116, -27, -93, -85, -27, -79, -79 ]
    */
   toInt8Array(): Int8Array {
     return new Int8Array(
@@ -321,6 +325,13 @@ export class ByteSequence {
    * Returns the `Uint8ClampedArray` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `Uint8ClampedArray`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const uint8ClampedArray = bytes.toUint8ClampedArray();
+   * // uint8ClampedArray
+   * //   → Uint8ClampedArray[ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
    */
   toUint8ClampedArray(): Uint8ClampedArray {
     return new Uint8ClampedArray(
@@ -334,8 +345,23 @@ export class ByteSequence {
    * Returns the `Int16Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `Int16Array`.
+   * @throws {RangeError} This `byteLength` is not a multiple of 2.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0);
+   * const int16Array = bytes.toInt16Array();
+   * // int16Array
+   * //   When the platform byte order is little-endian
+   * //   → Int16Array[ -20_507, -6_772, -21_597, -19_995, 177 ]
+   * //   When the platform byte order is big-endian
+   * //   → Int16Array[ -6_737, -29_467, -23_637, -6_735, -20_224 ]
+   * ```
    */
   toInt16Array(): Int16Array {
+    if (this.byteLength % Int16Array.BYTES_PER_ELEMENT !== 0) {
+      throw new RangeError("byteLength");
+    }
+
     return new Int16Array(
       this.toArrayBuffer(),
       0,
@@ -347,8 +373,23 @@ export class ByteSequence {
    * Returns the `Uint16Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `Uint16Array`.
+   * @throws {RangeError} This `byteLength` is not a multiple of 2.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0);
+   * const uint16Array = bytes.toUint16Array();
+   * // uint16Array
+   * //   When the platform byte order is little-endian
+   * //   → Uint16Array[ 0xAFE5, 0xE58C, 0xABA3, 0xB1E5, 0x00B1 ]
+   * //   When the platform byte order is big-endian
+   * //   → Uint16Array[ 0xE5AF, 0x8CE5, 0xA3AB, 0xE5B1, 0xB100 ]
+   * ```
    */
   toUint16Array(): Uint16Array {
+    if (this.byteLength % Uint16Array.BYTES_PER_ELEMENT !== 0) {
+      throw new RangeError("byteLength");
+    }
+
     return new Uint16Array(
       this.toArrayBuffer(),
       0,
@@ -360,8 +401,23 @@ export class ByteSequence {
    * Returns the `Int32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `Int32Array`.
+   * @throws {RangeError} This `byteLength` is not a multiple of 4.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0, 0, 0);
+   * const int32Array = bytes.toInt32Array();
+   * // int32Array
+   * //   When the platform byte order is little-endian
+   * //   → Int32Array[ -443_764_763, -1_310_348_381, 177 ]
+   * //   When the platform byte order is big-endian
+   * //   → Int32Array[ -441_479_963, -1_549_015_631, -1_325_400_064 ]
+   * ```
    */
   toInt32Array(): Int32Array {
+    if (this.byteLength % Int32Array.BYTES_PER_ELEMENT !== 0) {
+      throw new RangeError("byteLength");
+    }
+
     return new Int32Array(
       this.toArrayBuffer(),
       0,
@@ -373,8 +429,23 @@ export class ByteSequence {
    * Returns the `Uint32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `Uint32Array`.
+   * @throws {RangeError} This `byteLength` is not a multiple of 4.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0, 0, 0);
+   * const uint32Array = bytes.toUint32Array();
+   * // uint32Array
+   * //   When the platform byte order is little-endian
+   * //   → Uint32Array[ 0xE58CAFE5, 0xB1E5ABA3, 0x000000B1 ]
+   * //   When the platform byte order is big-endian
+   * //   → Uint32Array[ 0xE5AF8CE5, 0xA3ABE5B1, 0xB1000000 ]
+   * ```
    */
   toUint32Array(): Uint32Array {
+    if (this.byteLength % Uint32Array.BYTES_PER_ELEMENT !== 0) {
+      throw new RangeError("byteLength");
+    }
+
     return new Uint32Array(
       this.toArrayBuffer(),
       0,
@@ -386,8 +457,23 @@ export class ByteSequence {
    * Returns the `Float32Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `Float32Array`.
+   * @throws {RangeError} This `byteLength` is not a multiple of 4.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0, 0, 0);
+   * const float32Array = bytes.toFloat32Array();
+   * // float32Array
+   * //   When the platform byte order is little-endian
+   * //   → Float32Array[ -8.304699862546052e+22, -6.68429001038362e-9, 2.4802982818549262e-43 ]
+   * //   When the platform byte order is big-endian
+   * //   → Float32Array[ -1.0362664748269274e+23, -1.8637135243899587e-17, -1.862645149230957e-9 ]
+   * ```
    */
   toFloat32Array(): Float32Array {
+    if (this.byteLength % Float32Array.BYTES_PER_ELEMENT !== 0) {
+      throw new RangeError("byteLength");
+    }
+
     return new Float32Array(
       this.toArrayBuffer(),
       0,
@@ -399,8 +485,23 @@ export class ByteSequence {
    * Returns the `Float64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `Float64Array`.
+   * @throws {RangeError} This `byteLength` is not a multiple of 8.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0, 0, 0, 0, 0, 0, 0);
+   * const float64Array = bytes.toFloat64Array();
+   * // float64Array
+   * //   When the platform byte order is little-endian
+   * //   → Float64Array[ -2.5118824744887084e-68, 8.74e-322 ]
+   * //   When the platform byte order is big-endian
+   * //   → Float64Array[ -6.54593944702149e+181, -1.131959884853339e-72 ]
+   * ```
    */
   toFloat64Array(): Float64Array {
+    if (this.byteLength % Float64Array.BYTES_PER_ELEMENT !== 0) {
+      throw new RangeError("byteLength");
+    }
+
     return new Float64Array(
       this.toArrayBuffer(),
       0,
@@ -412,8 +513,23 @@ export class ByteSequence {
    * Returns the `BigInt64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `BigInt64Array`.
+   * @throws {RangeError} This `byteLength` is not a multiple of 8.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0, 0, 0, 0, 0, 0, 0);
+   * const int64Array = bytes.toBigInt64Array();
+   * // int64Array
+   * //   When the platform byte order is little-endian
+   * //   → BigInt64Array[ -5_627_903_438_910_345_243n, 177n ]
+   * //   When the platform byte order is big-endian
+   * //   → BigInt64Array[ -1_896_142_000_178_338_383n, -5_692_549_928_996_306_944n ]
+   * ```
    */
   toBigInt64Array(): BigInt64Array {
+    if (this.byteLength % BigInt64Array.BYTES_PER_ELEMENT !== 0) {
+      throw new RangeError("byteLength");
+    }
+
     return new BigInt64Array(
       this.toArrayBuffer(),
       0,
@@ -425,8 +541,23 @@ export class ByteSequence {
    * Returns the `BigUint64Array` that views a new `ArrayBuffer` duplicated from the underlying `ArrayBuffer` of this instance.
    *
    * @returns The `BigUint64Array`.
+   * @throws {RangeError} This `byteLength` is not a multiple of 8.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0, 0, 0, 0, 0, 0, 0);
+   * const uint64Array = bytes.toBigUint64Array();
+   * // uint64Array
+   * //   When the platform byte order is little-endian
+   * //   → BigUint64Array[ 0xB1E5ABA3E58CAFE5, 0x00000000000000B1 ]
+   * //   When the platform byte order is big-endian
+   * //   → BigUint64Array[ 0xE5AF8CE5A3ABE5B1, 0xB100000000000000 ]
+   * ```
    */
   toBigUint64Array(): BigUint64Array {
+    if (this.byteLength % BigUint64Array.BYTES_PER_ELEMENT !== 0) {
+      throw new RangeError("byteLength");
+    }
+
     return new BigUint64Array(
       this.toArrayBuffer(),
       0,
@@ -544,7 +675,8 @@ export class ByteSequence {
    *
    * @param source - The 8-bit unsigned integer `Iterable` represents a byte sequence.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `source` is not an 8-bit unsigned integer `Iterable`.
+   * @throws {TypeError} The `source` does not have `[Symbol.iterator]` method`.
+   * @throws {RangeError} The `source` is not an 8-bit unsigned integer `Iterable`.
    * @example
    * ```javascript
    * const array = [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ];
@@ -566,7 +698,8 @@ export class ByteSequence {
    *
    * @param source - The 8-bit unsigned integer `AsyncIterable` represents a byte sequence.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `source` is not an 8-bit unsigned integer `AsyncIterable`.
+   * @throws {TypeError} The `source` does not have `[Symbol.asyncIterator]` method`.
+   * @throws {RangeError} The `source` is not an 8-bit unsigned integer `AsyncIterable`.
    */
   static async fromAsyncUint8Iterable(
     source: AsyncIterable<number>,
@@ -584,7 +717,8 @@ export class ByteSequence {
    * @param source - The 16-bit unsigned integer `Iterable` represents a byte sequence.
    * @param byteOrder - The byte order. If omitted, write in the platform byte order.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `source` is not an 16-bit unsigned integer `Iterable`.
+   * @throws {TypeError} The `source` does not have `[Symbol.iterator]` method`.
+   * @throws {RangeError} The `source` is not an 16-bit unsigned integer `Iterable`.
    */
   static fromUint16Iterable(
     source: Iterable<number>,
@@ -603,7 +737,8 @@ export class ByteSequence {
    * @param source - The 16-bit unsigned integer `AsyncIterable` represents a byte sequence.
    * @param byteOrder - The byte order. If omitted, write in the platform byte order.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `source` is not an 16-bit unsigned integer `AsyncIterable`.
+   * @throws {TypeError} The `source` does not have `[Symbol.asyncIterator]` method`.
+   * @throws {RangeError} The `source` is not an 16-bit unsigned integer `AsyncIterable`.
    */
   static async fromAsyncUint16Iterable(
     source: AsyncIterable<number>,
@@ -622,7 +757,8 @@ export class ByteSequence {
    * @param source - The 32-bit unsigned integer `Iterable` represents a byte sequence.
    * @param byteOrder - The byte order. If omitted, write in the platform byte order.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `source` is not an 32-bit unsigned integer `Iterable`.
+   * @throws {TypeError} The `source` does not have `[Symbol.iterator]` method`.
+   * @throws {RangeError} The `source` is not an 32-bit unsigned integer `Iterable`.
    */
   static fromUint32Iterable(
     source: Iterable<number>,
@@ -641,7 +777,8 @@ export class ByteSequence {
    * @param source - The 32-bit unsigned integer `AsyncIterable` represents a byte sequence.
    * @param byteOrder - The byte order. If omitted, write in the platform byte order.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `source` is not an 32-bit unsigned integer `AsyncIterable`.
+   * @throws {TypeError} The `source` does not have `[Symbol.asyncIterator]` method`.
+   * @throws {RangeError} The `source` is not an 32-bit unsigned integer `AsyncIterable`.
    */
   static async fromAsyncUint32Iterable(
     source: AsyncIterable<number>,
@@ -667,19 +804,95 @@ export class ByteSequence {
    *
    * @param byteArray - The 8-bit unsigned integer `Array` represents a byte sequence.
    * @returns A new `ByteSequence` object.
-   * @throws {TypeError} The `byteArray` is not an 8-bit unsigned integer `Array`.
+   * @throws {TypeError} The `byteArray` is not `Array`.
+   * @throws {RangeError} The `byteArray` is not an 8-bit unsigned integer `Array`.
    */
   static fromArray(byteArray: Array<number>): ByteSequence {
     return this.fromUint8Iterable(byteArray);
   }
 
-  /*
+  /**
+   * Returns the 8-bit unsigned integer `Iterable` representing this byte sequence.
+   *
+   * @returns The `Iterable` of 8-bit unsigned integers.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const uint8s = bytes.toUint8Iterable();
+   * // [...uint8s]
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1 ]
+   * ```
+   */
+  toUint8Iterable(): Iterable<Uint8> {
+    //return BufferUtils.toUint8Iterable(this.#buffer);
+    return [...this.#view] as Iterable<Uint8>;
+  }
 
+  /**
+   * Returns a 16-bit unsigned integer `Iterable` represented by this byte sequence.
+   *
+   * @param byteOrder - The byte order. If omitted, the platform byte order is used.
+   * @returns The `Iterable` of 16-bit unsigned integers.
+   * @throws {RangeError} This `byteLength` is not a multiple of 2.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0);
+   * const uint16s = bytes.toUint16Iterable();
+   * // [...uint16s]
+   * //   When the platform byte order is little-endian
+   * //   → [ 0xAFE5, 0xE58C, 0xABA3, 0xB1E5, 0x00B1 ]
+   * //   When the platform byte order is big-endian
+   * //   → [ 0xE5AF, 0x8CE5, 0xA3AB, 0xE5B1, 0xB100 ]
+   * 
+   * const uint16sLe = bytes.toUint16Iterable(ByteOrder.LITTLE_ENDIAN);
+   * // [...uint16sLe]
+   * //   → [ 0xAFE5, 0xE58C, 0xABA3, 0xB1E5, 0x00B1 ]
+   * 
+   * const uint16sBe = bytes.toUint16Iterable(ByteOrder.BIG_ENDIAN);
+   * // [...uint16sBe]
+   * //   → [ 0xE5AF, 0x8CE5, 0xA3AB, 0xE5B1, 0xB100 ]
+   * ```
+   */
+  toUint16Iterable(byteOrder?: ByteOrder): Iterable<number> {
+    // BufferUtils.toUint16Iterableは読み取りしかしないので、this.#bufferをコピーせずに渡す
+    return BufferUtils.toUint16Iterable(this.#buffer, byteOrder);
+  }
 
+  /**
+   * Returns a 32-bit unsigned integer `Iterable` represented by this byte sequence.
+   *
+   * @param byteOrder - The byte order. If omitted, the platform byte order is used.
+   * @returns The `Iterable` of 32-bit unsigned integers.
+   * @throws {RangeError} This `byteLength` is not a multiple of 4.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1, 0, 0, 0);
+   * const uint32s = bytes.toUint32Iterable();
+   * // [...uint32s]
+   * //   When the platform byte order is little-endian
+   * //   → [ 0xE58CAFE5, 0xB1E5ABA3, 0x000000B1 ]
+   * //   When the platform byte order is big-endian
+   * //   → [ 0xE5AF8CE5, 0xA3ABE5B1, 0xB1000000 ]
+   * 
+   * const uint32sLe = bytes.toUint32Iterable(ByteOrder.LITTLE_ENDIAN);
+   * // [...uint32sLe]
+   * //   → [ 0xE58CAFE5, 0xB1E5ABA3, 0x000000B1 ]
+   * 
+   * const uint32sBe = bytes.toUint32Iterable(ByteOrder.BIG_ENDIAN);
+   * // [...uint32sBe]
+   * //   → [ 0xE5AF8CE5, 0xA3ABE5B1, 0xB1000000 ]
+   * ```
+   */
+  toUint32Iterable(byteOrder?: ByteOrder): Iterable<number> {
+    // BufferUtils.toUint32Iterableは読み取りしかしないので、this.#bufferをコピーせずに渡す
+    return BufferUtils.toUint32Iterable(this.#buffer, byteOrder);
+  }
 
-toUint8Iterable
-toUint16Iterable
-toUint32Iterable
+  /*TODO
+  toBigInt64Iterable
+  toBigUint64Iterable
+  toFloat32Iterable
+  toFloat64Iterable
   */
 
   /**
@@ -695,7 +908,7 @@ toUint32Iterable
    * ```
    */
   toArray(): Array<number> {
-    return [...this.#view] as Array<Uint8>;
+    return [...this.toUint8Iterable()] as Array<Uint8>;
   }
 
   /**
@@ -1137,6 +1350,17 @@ toUint32Iterable
   toJSON(): Array<number> {
     return this.toArray();
   }
+
+  //TODO
+
+  /*
+
+
+
+
+
+
+  */
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -2099,11 +2323,6 @@ toUint32Iterable
 }
 
 type BytesSource = Iterable<number>;
-
-// /**
-//  * @experimental
-//  */
-//   type AsyncBytesSource = AsyncIterable<number>;
 
 /**
  * A typedef that representing a `ByteSequence`, [`BufferSource`](https://developer.mozilla.org/en-US/docs/Web/API/BufferSource), or `Iterable` of 8-bit unsigned integers.

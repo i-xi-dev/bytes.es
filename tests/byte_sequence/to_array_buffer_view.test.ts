@@ -99,6 +99,23 @@ Deno.test("ByteSequence.prototype.toInt16Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
+  assertStrictEquals([].join(","), [...ByteSequence.of().toInt16Array()].join(","));
+
+  assertThrows(
+    () => {
+      ByteSequence.of(1).toInt16Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1).toInt16Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+
   // 返却値への操作は自身に影響しない
   c1[0] = 65535;
   assertStrictEquals([...a1].join(","), "3,2,1,0");
@@ -113,6 +130,23 @@ Deno.test("ByteSequence.prototype.toUint16Array()", () => {
   assertStrictEquals(c1 instanceof Uint16Array, true);
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
+
+  assertStrictEquals([].join(","), [...ByteSequence.of().toUint16Array()].join(","));
+
+  assertThrows(
+    () => {
+      ByteSequence.of(1).toUint16Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1).toUint16Array();
+    },
+    RangeError,
+    "byteLength",
+  );
 
   // 返却値への操作は自身に影響しない
   c1[0] = 65535;
@@ -129,6 +163,37 @@ Deno.test("ByteSequence.prototype.toInt32Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
+  assertStrictEquals([].join(","), [...ByteSequence.of().toInt32Array()].join(","));
+
+  assertThrows(
+    () => {
+      ByteSequence.of(1).toInt32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1).toInt32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1).toInt32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1).toInt32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+
   // 返却値への操作は自身に影響しない
   c1[0] = 4294967295;
   assertStrictEquals([...a1].join(","), "3,2,1,0");
@@ -143,6 +208,37 @@ Deno.test("ByteSequence.prototype.toUint32Array()", () => {
   assertStrictEquals(c1 instanceof Uint32Array, true);
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
+
+  assertStrictEquals([].join(","), [...ByteSequence.of().toUint32Array()].join(","));
+
+  assertThrows(
+    () => {
+      ByteSequence.of(1).toUint32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1).toUint32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1).toUint32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1).toUint32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
 
   // 返却値への操作は自身に影響しない
   c1[0] = 4294967295;
@@ -159,6 +255,37 @@ Deno.test("ByteSequence.prototype.toFloat32Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
+  assertStrictEquals([].join(","), [...ByteSequence.of().toFloat32Array()].join(","));
+
+  assertThrows(
+    () => {
+      ByteSequence.of(1).toFloat32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1).toFloat32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1).toFloat32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1).toFloat32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+
   // 返却値への操作は自身に影響しない
   c1[0] = 1.5;
   assertStrictEquals([...a1].join(","), "3,2,1,0");
@@ -173,6 +300,65 @@ Deno.test("ByteSequence.prototype.toFloat64Array()", () => {
   assertStrictEquals(c1 instanceof Float64Array, true);
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
+
+  assertStrictEquals([].join(","), [...ByteSequence.of().toFloat64Array()].join(","));
+
+  assertThrows(
+    () => {
+      ByteSequence.of(1).toFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1).toFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1).toFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1).toFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1).toFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1,1).toFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1,1,1).toFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1,1,1,1,1).toFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
 
   // 返却値への操作は自身に影響しない
   c1[0] = 1.5;
@@ -189,6 +375,65 @@ Deno.test("ByteSequence.prototype.toBigInt64Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
+  assertStrictEquals([].join(","), [...ByteSequence.of().toBigInt64Array()].join(","));
+
+  assertThrows(
+    () => {
+      ByteSequence.of(1).toBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1).toBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1).toBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1).toBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1).toBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1,1).toBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1,1,1).toBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1,1,1,1,1).toBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+
   // 返却値への操作は自身に影響しない
   c1[0] = 18446744073709551615n;
   assertStrictEquals([...a1].join(","), "3,2,1,0");
@@ -203,6 +448,65 @@ Deno.test("ByteSequence.prototype.toBigUint64Array()", () => {
   assertStrictEquals(c1 instanceof BigUint64Array, true);
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
+
+  assertStrictEquals([].join(","), [...ByteSequence.of().toBigUint64Array()].join(","));
+
+  assertThrows(
+    () => {
+      ByteSequence.of(1).toBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1).toBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1).toBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1).toBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1).toBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1,1).toBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1,1,1).toBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.of(1,1,1,1,1,1,1,1,1).toBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
 
   // 返却値への操作は自身に影響しない
   c1[0] = 18446744073709551615n;
