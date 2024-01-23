@@ -1,5 +1,5 @@
-import { assertStrictEquals, assertThrows } from "../deps.ts";
-import { ByteOrder, ByteSequence, Platform } from "../../mod.ts";
+import { assertStrictEquals, assertThrows, Platform } from "../deps.ts";
+import { ByteOrder, ByteSequence } from "../../mod.ts";
 
 Deno.test("ByteSequence.fromUint16Iterable(Array<number>, ByteOrder.BIG_ENDIAN)", () => {
   const a0 = [9, 8, 7, 6, 5, 4, 3, 2, 65535, 255];

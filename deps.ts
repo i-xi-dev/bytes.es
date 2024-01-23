@@ -10,7 +10,10 @@ export {
   _File,
   _ProgressEvent,
 } from "https://raw.githubusercontent.com/i-xi-dev/compat.es/1.2.14/mod.ts";
-export { Isomorphic } from "https://raw.githubusercontent.com/i-xi-dev/string.es/6.0.1/mod.ts";
+export {
+  Isomorphic,
+  StringEx,
+} from "https://raw.githubusercontent.com/i-xi-dev/string.es/6.0.1/mod.ts";
 export { BytesFormat } from "https://raw.githubusercontent.com/i-xi-dev/bytes-format.es/1.0.26/mod.ts";
 export { Reading } from "https://raw.githubusercontent.com/i-xi-dev/reading.es/1.0.22/mod.ts";
 export {

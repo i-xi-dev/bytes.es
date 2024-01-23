@@ -18,6 +18,7 @@ import {
   Percent,
   Reading,
   SafeInteger,
+  // StringEx,
   Uint8,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Utf8 } from "./utils.ts";
@@ -667,7 +668,7 @@ export class ByteSequence {
     return ByteSequence.fromArrayBufferView(bufferSource);
   }
 
-  //TODO fromInt8Iterable
+  //XXX fromInt8Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -690,7 +691,7 @@ export class ByteSequence {
     return ByteSequence.wrapArrayBuffer(bytes);
   }
 
-  //TODO fromAsyncInt8Iterable
+  //XXX fromAsyncInt8Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -708,7 +709,7 @@ export class ByteSequence {
     return ByteSequence.wrapArrayBuffer(bytes);
   }
 
-  //TODO fromInt16Iterable
+  //XXX fromInt16Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -728,7 +729,7 @@ export class ByteSequence {
     return ByteSequence.wrapArrayBuffer(bytes);
   }
 
-  //TODO fromAsyncInt16Iterable
+  //XXX fromAsyncInt16Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -748,7 +749,7 @@ export class ByteSequence {
     return ByteSequence.wrapArrayBuffer(bytes);
   }
 
-  //TODO fromInt32Iterable
+  //XXX fromInt32Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -768,7 +769,7 @@ export class ByteSequence {
     return ByteSequence.wrapArrayBuffer(bytes);
   }
 
-  //TODO fromAsyncInt32Iterable
+  //XXX fromAsyncInt32Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -788,16 +789,16 @@ export class ByteSequence {
     return ByteSequence.wrapArrayBuffer(bytes);
   }
 
-  /*TODO
-  fromBigInt64Iterable
-  fromAsyncBigInt64Iterable
-  fromBigUint64Iterable
-  fromAsyncBigUint64Iterable
-  fromFloat32Iterable
-  fromAsyncFloat32Iterable
-  fromFloat64Iterable
-  fromAsyncFloat64Iterable
-  */
+  //XXX fromBigInt64Iterable
+  //XXX fromAsyncBigInt64Iterable
+
+  //TODO fromBigUint64Iterable
+  //TODO fromAsyncBigUint64Iterable
+
+  //XXX fromFloat32Iterable
+  //XXX fromAsyncFloat32Iterable
+  //XXX fromFloat64Iterable
+  //XXX fromAsyncFloat64Iterable
 
   /**
    * The alias for the `fromUint8Iterable` method.
@@ -843,11 +844,11 @@ export class ByteSequence {
    * //   → [ 0xAFE5, 0xE58C, 0xABA3, 0xB1E5, 0x00B1 ]
    * //   When the platform byte order is big-endian
    * //   → [ 0xE5AF, 0x8CE5, 0xA3AB, 0xE5B1, 0xB100 ]
-   * 
+   *
    * const uint16sLe = bytes.toUint16Iterable(ByteOrder.LITTLE_ENDIAN);
    * // [...uint16sLe]
    * //   → [ 0xAFE5, 0xE58C, 0xABA3, 0xB1E5, 0x00B1 ]
-   * 
+   *
    * const uint16sBe = bytes.toUint16Iterable(ByteOrder.BIG_ENDIAN);
    * // [...uint16sBe]
    * //   → [ 0xE5AF, 0x8CE5, 0xA3AB, 0xE5B1, 0xB100 ]
@@ -873,11 +874,11 @@ export class ByteSequence {
    * //   → [ 0xE58CAFE5, 0xB1E5ABA3, 0x000000B1 ]
    * //   When the platform byte order is big-endian
    * //   → [ 0xE5AF8CE5, 0xA3ABE5B1, 0xB1000000 ]
-   * 
+   *
    * const uint32sLe = bytes.toUint32Iterable(ByteOrder.LITTLE_ENDIAN);
    * // [...uint32sLe]
    * //   → [ 0xE58CAFE5, 0xB1E5ABA3, 0x000000B1 ]
-   * 
+   *
    * const uint32sBe = bytes.toUint32Iterable(ByteOrder.BIG_ENDIAN);
    * // [...uint32sBe]
    * //   → [ 0xE5AF8CE5, 0xA3ABE5B1, 0xB1000000 ]
@@ -888,12 +889,10 @@ export class ByteSequence {
     return BufferUtils.toUint32Iterable(this.#buffer, byteOrder);
   }
 
-  /*TODO
-  toBigInt64Iterable
-  toBigUint64Iterable
-  toFloat32Iterable
-  toFloat64Iterable
-  */
+  //XXX toBigInt64Iterable
+  //TODO toBigUint64Iterable
+  //XXX toFloat32Iterable
+  //XXX toFloat64Iterable
 
   /**
    * Returns the 8-bit unsigned integer `Array` representing this byte sequence.
@@ -1351,17 +1350,6 @@ export class ByteSequence {
     return this.toArray();
   }
 
-  //TODO
-
-  /*
-
-
-
-
-
-
-  */
-
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * generated from the specified string by the specified text encoding.
@@ -1419,8 +1407,6 @@ export class ByteSequence {
     // Node.jsのBufferを返すエンコーダーだとプールが余計
     return ByteSequence.fromArrayBufferView(encoded);
   }
-
-  //TODO utf16,utf32
 
   /**
    * Returns a decoded string by the specified text encoding of this bytes.
@@ -2336,12 +2322,4 @@ type RequestOrResponseReadingOptions = Reading.Options & {
   // TODO verifyContentType
 
   verifyHeaders?: (headers: Headers) => [verified: boolean, message?: string];
-};
-
-//TODO
-export { ByteOrder };
-export const Platform = {
-  BYTE_ORDER: BufferUtils.BYTE_ORDER,
-  isBigEndian: BufferUtils.isBigEndian,
-  isLittleEndian: BufferUtils.isLittleEndian,
 };

@@ -1,5 +1,5 @@
-import { assertRejects, assertStrictEquals } from "../deps.ts";
-import { ByteOrder, ByteSequence, Platform } from "../../mod.ts";
+import { assertRejects, assertStrictEquals, Platform } from "../deps.ts";
+import { ByteOrder, ByteSequence } from "../../mod.ts";
 
 Deno.test("ByteSequence.fromAsyncUint16Iterable(AsyncGenerator<number>, ByteOrder.BIG_ENDIAN)", async () => {
   const a0 = (async function* () {

@@ -99,7 +99,10 @@ Deno.test("ByteSequence.prototype.toInt16Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
-  assertStrictEquals([].join(","), [...ByteSequence.of().toInt16Array()].join(","));
+  assertStrictEquals(
+    [].join(","),
+    [...ByteSequence.of().toInt16Array()].join(","),
+  );
 
   assertThrows(
     () => {
@@ -110,7 +113,7 @@ Deno.test("ByteSequence.prototype.toInt16Array()", () => {
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1).toInt16Array();
+      ByteSequence.of(1, 1, 1).toInt16Array();
     },
     RangeError,
     "byteLength",
@@ -131,7 +134,10 @@ Deno.test("ByteSequence.prototype.toUint16Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
-  assertStrictEquals([].join(","), [...ByteSequence.of().toUint16Array()].join(","));
+  assertStrictEquals(
+    [].join(","),
+    [...ByteSequence.of().toUint16Array()].join(","),
+  );
 
   assertThrows(
     () => {
@@ -142,7 +148,7 @@ Deno.test("ByteSequence.prototype.toUint16Array()", () => {
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1).toUint16Array();
+      ByteSequence.of(1, 1, 1).toUint16Array();
     },
     RangeError,
     "byteLength",
@@ -163,7 +169,10 @@ Deno.test("ByteSequence.prototype.toInt32Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
-  assertStrictEquals([].join(","), [...ByteSequence.of().toInt32Array()].join(","));
+  assertStrictEquals(
+    [].join(","),
+    [...ByteSequence.of().toInt32Array()].join(","),
+  );
 
   assertThrows(
     () => {
@@ -174,21 +183,21 @@ Deno.test("ByteSequence.prototype.toInt32Array()", () => {
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1).toInt32Array();
+      ByteSequence.of(1, 1).toInt32Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1).toInt32Array();
+      ByteSequence.of(1, 1, 1).toInt32Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1).toInt32Array();
+      ByteSequence.of(1, 1, 1, 1, 1).toInt32Array();
     },
     RangeError,
     "byteLength",
@@ -209,7 +218,10 @@ Deno.test("ByteSequence.prototype.toUint32Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
-  assertStrictEquals([].join(","), [...ByteSequence.of().toUint32Array()].join(","));
+  assertStrictEquals(
+    [].join(","),
+    [...ByteSequence.of().toUint32Array()].join(","),
+  );
 
   assertThrows(
     () => {
@@ -220,21 +232,21 @@ Deno.test("ByteSequence.prototype.toUint32Array()", () => {
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1).toUint32Array();
+      ByteSequence.of(1, 1).toUint32Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1).toUint32Array();
+      ByteSequence.of(1, 1, 1).toUint32Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1).toUint32Array();
+      ByteSequence.of(1, 1, 1, 1, 1).toUint32Array();
     },
     RangeError,
     "byteLength",
@@ -255,7 +267,10 @@ Deno.test("ByteSequence.prototype.toFloat32Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
-  assertStrictEquals([].join(","), [...ByteSequence.of().toFloat32Array()].join(","));
+  assertStrictEquals(
+    [].join(","),
+    [...ByteSequence.of().toFloat32Array()].join(","),
+  );
 
   assertThrows(
     () => {
@@ -266,21 +281,21 @@ Deno.test("ByteSequence.prototype.toFloat32Array()", () => {
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1).toFloat32Array();
+      ByteSequence.of(1, 1).toFloat32Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1).toFloat32Array();
+      ByteSequence.of(1, 1, 1).toFloat32Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1).toFloat32Array();
+      ByteSequence.of(1, 1, 1, 1, 1).toFloat32Array();
     },
     RangeError,
     "byteLength",
@@ -301,7 +316,10 @@ Deno.test("ByteSequence.prototype.toFloat64Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
-  assertStrictEquals([].join(","), [...ByteSequence.of().toFloat64Array()].join(","));
+  assertStrictEquals(
+    [].join(","),
+    [...ByteSequence.of().toFloat64Array()].join(","),
+  );
 
   assertThrows(
     () => {
@@ -312,49 +330,49 @@ Deno.test("ByteSequence.prototype.toFloat64Array()", () => {
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1).toFloat64Array();
+      ByteSequence.of(1, 1).toFloat64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1).toFloat64Array();
+      ByteSequence.of(1, 1, 1).toFloat64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1).toFloat64Array();
+      ByteSequence.of(1, 1, 1, 1).toFloat64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1).toFloat64Array();
+      ByteSequence.of(1, 1, 1, 1, 1).toFloat64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1,1).toFloat64Array();
+      ByteSequence.of(1, 1, 1, 1, 1, 1).toFloat64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1,1,1).toFloat64Array();
+      ByteSequence.of(1, 1, 1, 1, 1, 1, 1).toFloat64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1,1,1,1,1).toFloat64Array();
+      ByteSequence.of(1, 1, 1, 1, 1, 1, 1, 1, 1).toFloat64Array();
     },
     RangeError,
     "byteLength",
@@ -375,7 +393,10 @@ Deno.test("ByteSequence.prototype.toBigInt64Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
-  assertStrictEquals([].join(","), [...ByteSequence.of().toBigInt64Array()].join(","));
+  assertStrictEquals(
+    [].join(","),
+    [...ByteSequence.of().toBigInt64Array()].join(","),
+  );
 
   assertThrows(
     () => {
@@ -386,49 +407,49 @@ Deno.test("ByteSequence.prototype.toBigInt64Array()", () => {
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1).toBigInt64Array();
+      ByteSequence.of(1, 1).toBigInt64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1).toBigInt64Array();
+      ByteSequence.of(1, 1, 1).toBigInt64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1).toBigInt64Array();
+      ByteSequence.of(1, 1, 1, 1).toBigInt64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1).toBigInt64Array();
+      ByteSequence.of(1, 1, 1, 1, 1).toBigInt64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1,1).toBigInt64Array();
+      ByteSequence.of(1, 1, 1, 1, 1, 1).toBigInt64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1,1,1).toBigInt64Array();
+      ByteSequence.of(1, 1, 1, 1, 1, 1, 1).toBigInt64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1,1,1,1,1).toBigInt64Array();
+      ByteSequence.of(1, 1, 1, 1, 1, 1, 1, 1, 1).toBigInt64Array();
     },
     RangeError,
     "byteLength",
@@ -449,7 +470,10 @@ Deno.test("ByteSequence.prototype.toBigUint64Array()", () => {
   assertStrictEquals([...c1].join(","), "3,2,1,0");
   assertNotStrictEquals(a1, c1);
 
-  assertStrictEquals([].join(","), [...ByteSequence.of().toBigUint64Array()].join(","));
+  assertStrictEquals(
+    [].join(","),
+    [...ByteSequence.of().toBigUint64Array()].join(","),
+  );
 
   assertThrows(
     () => {
@@ -460,49 +484,49 @@ Deno.test("ByteSequence.prototype.toBigUint64Array()", () => {
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1).toBigUint64Array();
+      ByteSequence.of(1, 1).toBigUint64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1).toBigUint64Array();
+      ByteSequence.of(1, 1, 1).toBigUint64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1).toBigUint64Array();
+      ByteSequence.of(1, 1, 1, 1).toBigUint64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1).toBigUint64Array();
+      ByteSequence.of(1, 1, 1, 1, 1).toBigUint64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1,1).toBigUint64Array();
+      ByteSequence.of(1, 1, 1, 1, 1, 1).toBigUint64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1,1,1).toBigUint64Array();
+      ByteSequence.of(1, 1, 1, 1, 1, 1, 1).toBigUint64Array();
     },
     RangeError,
     "byteLength",
   );
   assertThrows(
     () => {
-      ByteSequence.of(1,1,1,1,1,1,1,1,1).toBigUint64Array();
+      ByteSequence.of(1, 1, 1, 1, 1, 1, 1, 1, 1).toBigUint64Array();
     },
     RangeError,
     "byteLength",
