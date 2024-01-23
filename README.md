@@ -59,7 +59,7 @@ $ npm i @i-xi-dev/bytes@4.3.0
 ```
 
 ```javascript
-import { ByteSequence } from "@i-xi-dev/bytes";
+import { ByteSequence, ByteOrder } from "@i-xi-dev/bytes";
 ```
 
 ### CDN
@@ -67,7 +67,7 @@ import { ByteSequence } from "@i-xi-dev/bytes";
 Example for UNPKG
 
 ```javascript
-import { ByteSequence } from "https://www.unpkg.com/@i-xi-dev/bytes@4.3.0/esm/mod.js";
+import { ByteSequence, ByteOrder } from "https://www.unpkg.com/@i-xi-dev/bytes@4.3.0/esm/mod.js";
 ```
 
 ## Usage
