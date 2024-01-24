@@ -549,9 +549,9 @@ export class ByteSequence {
    * const uint64Array = bytes.toBigUint64Array();
    * // uint64Array
    * //   When the platform byte order is little-endian
-   * //   → BigUint64Array[ 0xB1E5ABA3E58CAFE5, 0x00000000000000B1 ]
+   * //   → BigUint64Array[ 0xB1E5ABA3E58CAFE5n, 0x00000000000000B1n ]
    * //   When the platform byte order is big-endian
-   * //   → BigUint64Array[ 0xE5AF8CE5A3ABE5B1, 0xB100000000000000 ]
+   * //   → BigUint64Array[ 0xE5AF8CE5A3ABE5B1n, 0xB100000000000000n ]
    * ```
    */
   toBigUint64Array(): BigUint64Array {
