@@ -1,6 +1,7 @@
 export { InvalidStateError } from "https://raw.githubusercontent.com/i-xi-dev/exception.es/1.1.3/mod.ts";
 export {
   SafeInteger,
+  Uint64,
   Uint8,
 } from "https://raw.githubusercontent.com/i-xi-dev/number.es/7.0.0/mod.ts";
 export { Http } from "https://raw.githubusercontent.com/i-xi-dev/http.es/1.0.11/mod.ts";

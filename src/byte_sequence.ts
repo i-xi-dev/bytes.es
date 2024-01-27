@@ -19,6 +19,7 @@ import {
   Reading,
   SafeInteger,
   // StringEx,
+  Uint64,
   Uint8,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Utf8 } from "./utils.ts";
@@ -669,6 +670,7 @@ export class ByteSequence {
   }
 
   //XXX fromInt8Iterable
+  //XXX fromAsyncInt8Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -691,8 +693,6 @@ export class ByteSequence {
     return ByteSequence.wrapArrayBuffer(bytes);
   }
 
-  //XXX fromAsyncInt8Iterable
-
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified 8-bit unsigned integer `AsyncIterable`.
@@ -710,6 +710,7 @@ export class ByteSequence {
   }
 
   //XXX fromInt16Iterable
+  //XXX fromAsyncInt16Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -728,8 +729,6 @@ export class ByteSequence {
     const bytes = BufferUtils.fromUint16Iterable(source, byteOrder);
     return ByteSequence.wrapArrayBuffer(bytes);
   }
-
-  //XXX fromAsyncInt16Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -750,6 +749,7 @@ export class ByteSequence {
   }
 
   //XXX fromInt32Iterable
+  //XXX fromAsyncInt32Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -768,8 +768,6 @@ export class ByteSequence {
     const bytes = BufferUtils.fromUint32Iterable(source, byteOrder);
     return ByteSequence.wrapArrayBuffer(bytes);
   }
-
-  //XXX fromAsyncInt32Iterable
 
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
@@ -792,8 +790,43 @@ export class ByteSequence {
   //XXX fromBigInt64Iterable
   //XXX fromAsyncBigInt64Iterable
 
-  //TODO fromBigUint64Iterable
-  //TODO fromAsyncBigUint64Iterable
+  //TODO テスト
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 64-bit unsigned integer `Iterable`.
+   *
+   * @param source - The 64-bit unsigned integer `Iterable` represents a byte sequence.
+   * @param byteOrder - The byte order. If omitted, write in the platform byte order.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `source` does not have `[Symbol.iterator]` method`.
+   * @throws {RangeError} The `source` is not an 64-bit unsigned integer `Iterable`.
+   */
+  static fromBigUint64Iterable(
+    source: Iterable<bigint>,
+    byteOrder?: ByteOrder,
+  ): ByteSequence {
+    const bytes = BufferUtils.fromBigUint64Iterable(source, byteOrder);
+    return ByteSequence.wrapArrayBuffer(bytes);
+  }
+
+  //TODO テスト
+  /**
+   * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
+   * created from the specified 64-bit unsigned integer `AsyncIterable`.
+   *
+   * @param source - The 64-bit unsigned integer `AsyncIterable` represents a byte sequence.
+   * @param byteOrder - The byte order. If omitted, write in the platform byte order.
+   * @returns A new `ByteSequence` object.
+   * @throws {TypeError} The `source` does not have `[Symbol.asyncIterator]` method`.
+   * @throws {RangeError} The `source` is not an 64-bit unsigned integer `AsyncIterable`.
+   */
+  static async fromAsyncBigUint64Iterable(
+    source: AsyncIterable<bigint>,
+    byteOrder?: ByteOrder,
+  ): Promise<ByteSequence> {
+    const bytes = await BufferUtils.fromAsyncBigUint64Iterable(source, byteOrder);
+    return ByteSequence.wrapArrayBuffer(bytes);
+  }
 
   //XXX fromFloat32Iterable
   //XXX fromAsyncFloat32Iterable
@@ -889,8 +922,13 @@ export class ByteSequence {
     return BufferUtils.toUint32Iterable(this.#buffer, byteOrder);
   }
 
+  //TODO コメント・テスト
+  toBigUint64Iterable(byteOrder?: ByteOrder): Iterable<Uint64> {
+    // BufferUtils.toBigUint64Iterableは読み取りしかしないので、this.#bufferをコピーせずに渡す
+    return BufferUtils.toBigUint64Iterable(this.#buffer, byteOrder);
+  }
+
   //XXX toBigInt64Iterable
-  //TODO toBigUint64Iterable
   //XXX toFloat32Iterable
   //XXX toFloat64Iterable
 
