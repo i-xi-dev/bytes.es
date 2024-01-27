@@ -2036,41 +2036,6 @@ export class ByteSequence {
   }
 
   /**
-   * 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否かを返却
-   *
-   * @param otherBytes - バイト列
-   * @returns 自身のバイト列が、指定したバイト列と同じ並びで始まっているか否か
-   */
-  #startsWith(otherBytes: BufferSource | Array<Uint8>): boolean {
-    const thisView = this.#view;
-    if (
-      (otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)
-    ) {
-      const otherView = new Uint8Array(
-        (otherBytes instanceof ArrayBuffer) ? otherBytes : otherBytes.buffer,
-      );
-      for (let i = 0; i < otherView.byteLength; i++) {
-        if (otherView[i] !== thisView[i]) {
-          return false;
-        }
-      }
-      return true;
-    } else {
-      try {
-        const bytes = new Uint8Array(BufferUtils.fromUint8Iterable(otherBytes));
-        for (let i = 0; i < bytes.length; i++) {
-          if (bytes[i] !== thisView[i]) {
-            return false;
-          }
-        }
-        return true;
-      } catch {
-        return false;
-      }
-    }
-  }
-
-  /**
    * Determines whether this byte sequence is equal to the byte sequence represented by another object.
    *
    * @param otherBytes - The object that represents a byte sequence.
@@ -2079,27 +2044,20 @@ export class ByteSequence {
    */
   equals(otherBytes: Bytes): boolean {
     if (otherBytes instanceof ByteSequence) {
-      if (otherBytes.byteLength !== this.byteLength) {
-        return false;
-      }
-      return this.#startsWith(otherBytes.buffer);
-    }
-
-    if (
-      (otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)
+      return BufferUtils.bytesAEqualsBytesB(this.#view, otherBytes.#view);
+    } else if (
+      (otherBytes instanceof ArrayBuffer) ||
+      (otherBytes instanceof Uint8Array) ||
+      (otherBytes instanceof Uint8ClampedArray)
     ) {
-      if (otherBytes.byteLength !== this.byteLength) {
-        return false;
-      }
-      return this.#startsWith(otherBytes);
+      return BufferUtils.bytesAEqualsBytesB(this.#view, otherBytes);
+    } else if (ArrayBuffer.isView(otherBytes)) {
+      return BufferUtils.bytesAEqualsBytesB(this.#view, otherBytes.buffer);
     }
 
     try {
       const bytes = BufferUtils.fromUint8Iterable(otherBytes);
-      if (bytes.byteLength !== this.byteLength) {
-        return false;
-      }
-      return this.#startsWith(bytes);
+      return BufferUtils.bytesAEqualsBytesB(this.#view, bytes);
     } catch (exception) {
       throw new TypeError(`otherBytes (${exception.message})`);
     }
@@ -2114,18 +2072,20 @@ export class ByteSequence {
    */
   startsWith(otherBytes: Bytes): boolean {
     if (otherBytes instanceof ByteSequence) {
-      return this.#startsWith(otherBytes.buffer);
-    }
-
-    if (
-      (otherBytes instanceof ArrayBuffer) || ArrayBuffer.isView(otherBytes)
+      return BufferUtils.bytesAStartsWithBytesB(this.#view, otherBytes.#view);
+    } else if (
+      (otherBytes instanceof ArrayBuffer) ||
+      (otherBytes instanceof Uint8Array) ||
+      (otherBytes instanceof Uint8ClampedArray)
     ) {
-      return this.#startsWith(otherBytes);
+      return BufferUtils.bytesAStartsWithBytesB(this.#view, otherBytes);
+    } else if (ArrayBuffer.isView(otherBytes)) {
+      return BufferUtils.bytesAStartsWithBytesB(this.#view, otherBytes.buffer);
     }
 
     try {
       const bytes = BufferUtils.fromUint8Iterable(otherBytes);
-      return this.#startsWith(bytes);
+      return BufferUtils.bytesAStartsWithBytesB(this.#view, bytes);
     } catch (exception) {
       throw new TypeError(`otherBytes (${exception.message})`);
     }
