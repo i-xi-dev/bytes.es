@@ -169,7 +169,7 @@ Deno.test("ByteSequence.wrapArrayBuffer - x", () => {
   const nb1 = new Uint8Array(a1);
   nb1.set([1, 2, 3, 4]);
 
-  const bs1v = bs1.getView(Uint8Array);
+  const bs1v = bs1.asUint8Array();
   assertStrictEquals(bs1v[0], 1);
   assertStrictEquals(bs1v[1], 2);
   assertStrictEquals(bs1v[2], 3);
@@ -182,7 +182,7 @@ Deno.test("ByteSequence.fromArrayBuffer(ArrayBuffer)", () => {
   const bs0 = ByteSequence.fromArrayBuffer(a0.buffer);
 
   assertStrictEquals(bs0.byteLength, 10);
-  const bs0a = bs0.getView(Uint8Array);
+  const bs0a = bs0.asUint8Array();
   assertStrictEquals(bs0a[0], 9);
   assertStrictEquals(bs0a[9], 0);
 
@@ -234,7 +234,7 @@ Deno.test("ByteSequence.fromArrayBufferView(Uint8Array)", () => {
   const bs0 = ByteSequence.fromArrayBufferView(a0);
 
   assertStrictEquals(bs0.byteLength, 10);
-  const bs0a = bs0.getView(Uint8Array);
+  const bs0a = bs0.asUint8Array();
   assertStrictEquals(bs0a[0], 9);
   assertStrictEquals(bs0a[9], 0);
 
@@ -259,7 +259,7 @@ Deno.test("ByteSequence.fromBufferSource(ArrayBuffer)", () => {
   const bs0 = ByteSequence.fromBufferSource(a0.buffer);
 
   assertStrictEquals(bs0.byteLength, 10);
-  const bs0a = bs0.getView(Uint8Array);
+  const bs0a = bs0.asUint8Array();
   assertStrictEquals(bs0a[0], 9);
   assertStrictEquals(bs0a[9], 0);
 
@@ -274,7 +274,7 @@ Deno.test("ByteSequence.fromBufferSource(Uint8Array)", () => {
   const bs0 = ByteSequence.fromBufferSource(a0);
 
   assertStrictEquals(bs0.byteLength, 10);
-  const bs0a = bs0.getView(Uint8Array);
+  const bs0a = bs0.asUint8Array();
   assertStrictEquals(bs0a[0], 9);
   assertStrictEquals(bs0a[9], 0);
 
@@ -289,7 +289,7 @@ Deno.test("ByteSequence.fromArray(Array<number>)", () => {
   const bs0 = ByteSequence.fromArray(a0);
 
   assertStrictEquals(bs0.byteLength, 10);
-  const bs0a = bs0.getView(Uint8Array);
+  const bs0a = bs0.asUint8Array();
   assertStrictEquals(bs0a[8], 0);
   assertStrictEquals(bs0a[9], 255);
 
@@ -737,7 +737,7 @@ Deno.test("ByteSequence.fromPercentEncoded(string)", () => {
   assertStrictEquals(bs1.byteLength, 0);
 
   const bs2 = ByteSequence.fromPercentEncoded("%03");
-  assertStrictEquals(bs2.getView(Uint8Array)[0], 0x03);
+  assertStrictEquals(bs2.asUint8Array()[0], 0x03);
 });
 
 Deno.test("ByteSequence.fromPercentEncoded(string, Options)", () => {
@@ -1001,7 +1001,7 @@ Deno.test("ByteSequence.fromBlob(Blob)", async () => {
   const b1 = new Blob([Uint8Array.of(255, 0, 1, 127)], { type: "text/plain" });
 
   const b11 = await ByteSequence.fromBlob(b1);
-  const b11v = b11.getView(Uint8Array);
+  const b11v = b11.asUint8Array();
   assertStrictEquals(b11v[0], 255);
   assertStrictEquals(b11v[1], 0);
   assertStrictEquals(b11v[2], 1);
@@ -1011,7 +1011,7 @@ Deno.test("ByteSequence.fromBlob(Blob)", async () => {
   const b2 = new Blob([Uint8Array.of(255, 0, 1, 127)]);
 
   const b21 = await ByteSequence.fromBlob(b2);
-  const b21v = b21.getView(Uint8Array);
+  const b21v = b21.asUint8Array();
   assertStrictEquals(b21v[0], 255);
   assertStrictEquals(b21v[1], 0);
   assertStrictEquals(b21v[2], 1);
@@ -1026,7 +1026,7 @@ Deno.test("ByteSequence.withMetadataFromBlob(Blob)", async () => {
     .withMetadataFromBlob(
       b1,
     );
-  const b11v = b11.getView(Uint8Array);
+  const b11v = b11.asUint8Array();
   assertStrictEquals(b11v[0], 255);
   assertStrictEquals(b11v[1], 0);
   assertStrictEquals(b11v[2], 1);
@@ -1040,7 +1040,7 @@ Deno.test("ByteSequence.withMetadataFromBlob(Blob)", async () => {
     .withMetadataFromBlob(
       b2,
     );
-  const b21v = b21.getView(Uint8Array);
+  const b21v = b21.asUint8Array();
   assertStrictEquals(b21v[0], 255);
   assertStrictEquals(b21v[1], 0);
   assertStrictEquals(b21v[2], 1);
@@ -1179,7 +1179,7 @@ Deno.test("ByteSequence.fromDataURL(string)", () => {
   assertStrictEquals(b0e.byteLength, 0);
 
   const b11 = ByteSequence.fromDataURL("data:text/plain,a1");
-  const b11v = b11.getView(Uint8Array);
+  const b11v = b11.asUint8Array();
   assertStrictEquals(b11v[0], 97);
   assertStrictEquals(b11v[1], 49);
   assertStrictEquals(b11.byteLength, 2);
@@ -1187,7 +1187,7 @@ Deno.test("ByteSequence.fromDataURL(string)", () => {
   const b12 = ByteSequence.fromDataURL(
     "data:application/octet-stream;base64,AwIBAP/+/fw=",
   );
-  const b12v = b12.getView(Uint8Array);
+  const b12v = b12.asUint8Array();
   assertStrictEquals(b12v[0], 3);
   assertStrictEquals(b12v[1], 2);
   assertStrictEquals(b12v[2], 1);
@@ -1199,13 +1199,13 @@ Deno.test("ByteSequence.fromDataURL(string)", () => {
   assertStrictEquals(b12.byteLength, 8);
 
   const b21 = ByteSequence.fromDataURL("data:text/plain; p1=a,a1");
-  const b21v = b21.getView(Uint8Array);
+  const b21v = b21.asUint8Array();
   assertStrictEquals(b21v[0], 97);
   assertStrictEquals(b21v[1], 49);
   assertStrictEquals(b21.byteLength, 2);
 
   const b22 = ByteSequence.fromDataURL('data:text/plain; p1=a;p2="b,c",a1');
-  const b22v = b22.getView(Uint8Array);
+  const b22v = b22.asUint8Array();
   assertStrictEquals(b22v[0], 99);
   assertStrictEquals(b22v[1], 34);
   assertStrictEquals(b22v[2], 44);
@@ -1214,19 +1214,19 @@ Deno.test("ByteSequence.fromDataURL(string)", () => {
   assertStrictEquals(b22.byteLength, 5);
 
   const b31 = ByteSequence.fromDataURL("data:text/plain,%FF%");
-  const b31v = b31.getView(Uint8Array);
+  const b31v = b31.asUint8Array();
   assertStrictEquals(b31v[0], 255);
   assertStrictEquals(b31v[1], 0x25);
   assertStrictEquals(b31.byteLength, 2);
 
   const b32 = ByteSequence.fromDataURL("data:text/plain,%fff");
-  const b32v = b32.getView(Uint8Array);
+  const b32v = b32.asUint8Array();
   assertStrictEquals(b32v[0], 255);
   assertStrictEquals(b32v[1], 0x66);
   assertStrictEquals(b32.byteLength, 2);
 
   const b33 = ByteSequence.fromDataURL("data:text/plain,a?a=2");
-  const b33v = b33.getView(Uint8Array);
+  const b33v = b33.asUint8Array();
   assertStrictEquals(b33v[0], 0x61);
   assertStrictEquals(b33v[1], 0x3F);
   assertStrictEquals(b33v[2], 0x61);
@@ -1261,7 +1261,7 @@ Deno.test("ByteSequence.fromDataURL(string)", () => {
 
 Deno.test("ByteSequence.fromDataURL(URL)", () => {
   const b11 = ByteSequence.fromDataURL(new URL("data:text/plain,a1"));
-  const b11v = b11.getView(Uint8Array);
+  const b11v = b11.asUint8Array();
   assertStrictEquals(b11v[0], 97);
   assertStrictEquals(b11v[1], 49);
   assertStrictEquals(b11.byteLength, 2);
@@ -1304,7 +1304,7 @@ Deno.test("ByteSequence.withMetadataFromDataURL(string)", () => {
   const { data: b11, options: meta11 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain,a1",
   );
-  const b11v = b11.getView(Uint8Array);
+  const b11v = b11.asUint8Array();
   assertStrictEquals(b11v[0], 97);
   assertStrictEquals(b11v[1], 49);
   assertStrictEquals(b11.byteLength, 2);
@@ -1313,7 +1313,7 @@ Deno.test("ByteSequence.withMetadataFromDataURL(string)", () => {
   const { data: b12, options: meta12 } = ByteSequence.withMetadataFromDataURL(
     "data:application/octet-stream;base64,AwIBAP/+/fw=",
   );
-  const b12v = b12.getView(Uint8Array);
+  const b12v = b12.asUint8Array();
   assertStrictEquals(b12v[0], 3);
   assertStrictEquals(b12v[1], 2);
   assertStrictEquals(b12v[2], 1);
@@ -1331,7 +1331,7 @@ Deno.test("ByteSequence.withMetadataFromDataURL(string)", () => {
   const { data: b21, options: meta21 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain; p1=a,a1",
   );
-  const b21v = b21.getView(Uint8Array);
+  const b21v = b21.asUint8Array();
   assertStrictEquals(b21v[0], 97);
   assertStrictEquals(b21v[1], 49);
   assertStrictEquals(b21.byteLength, 2);
@@ -1340,7 +1340,7 @@ Deno.test("ByteSequence.withMetadataFromDataURL(string)", () => {
   const { data: b22, options: meta22 } = ByteSequence.withMetadataFromDataURL(
     'data:text/plain; p1=a;p2="b,c",a1',
   );
-  const b22v = b22.getView(Uint8Array);
+  const b22v = b22.asUint8Array();
   assertStrictEquals(b22v[0], 99);
   assertStrictEquals(b22v[1], 34);
   assertStrictEquals(b22v[2], 44);
@@ -1352,7 +1352,7 @@ Deno.test("ByteSequence.withMetadataFromDataURL(string)", () => {
   const { data: b31, options: meta31 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain,%FF%",
   );
-  const b31v = b31.getView(Uint8Array);
+  const b31v = b31.asUint8Array();
   assertStrictEquals(b31v[0], 255);
   assertStrictEquals(b31v[1], 0x25);
   assertStrictEquals(b31.byteLength, 2);
@@ -1361,7 +1361,7 @@ Deno.test("ByteSequence.withMetadataFromDataURL(string)", () => {
   const { data: b32, options: meta32 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain,%fff",
   );
-  const b32v = b32.getView(Uint8Array);
+  const b32v = b32.asUint8Array();
   assertStrictEquals(b32v[0], 255);
   assertStrictEquals(b32v[1], 0x66);
   assertStrictEquals(b32.byteLength, 2);
@@ -1370,7 +1370,7 @@ Deno.test("ByteSequence.withMetadataFromDataURL(string)", () => {
   const { data: b33, options: meta33 } = ByteSequence.withMetadataFromDataURL(
     "data:text/plain,a?a=2",
   );
-  const b33v = b33.getView(Uint8Array);
+  const b33v = b33.asUint8Array();
   assertStrictEquals(b33v[0], 0x61);
   assertStrictEquals(b33v[1], 0x3F);
   assertStrictEquals(b33v[2], 0x61);
@@ -1408,7 +1408,7 @@ Deno.test("ByteSequence.withMetadataFromDataURL(URL)", () => {
   const { data: b11, options: meta11 } = ByteSequence.withMetadataFromDataURL(
     new URL("data:text/plain,a1"),
   );
-  const b11v = b11.getView(Uint8Array);
+  const b11v = b11.asUint8Array();
   assertStrictEquals(b11v[0], 97);
   assertStrictEquals(b11v[1], 49);
   assertStrictEquals(b11.byteLength, 2);
@@ -1532,7 +1532,7 @@ Deno.test("ByteSequence.prototype.subsequence(number, number)", () => {
 
   assertStrictEquals(
     bs1.subsequence(100, 200).toString(),
-    ByteSequence.fromArrayBufferView(bs1.getView(Uint8Array, 100, 100))
+    ByteSequence.fromArrayBufferView(bs1.asUint8Array(100, 100))
       .toString(),
   );
 
@@ -1553,10 +1553,10 @@ Deno.test("ByteSequence.prototype.subsequence(number, number)", () => {
   );
 });
 
-Deno.test("ByteSequence.prototype.getUint8View()", () => {
+Deno.test("ByteSequence.prototype.asUint8Array()", () => {
   const bs1 = ByteSequence.allocate(1000);
-  const v1 = bs1.getUint8View();
-  const v2 = bs1.getUint8View();
+  const v1 = bs1.asUint8Array();
+  const v2 = bs1.asUint8Array();
   assertStrictEquals(v1.byteLength, 1000);
   assertStrictEquals(v1 instanceof Uint8Array, true);
   assertNotStrictEquals(v1, v2);
@@ -1565,25 +1565,25 @@ Deno.test("ByteSequence.prototype.getUint8View()", () => {
   assertStrictEquals(v2[0], 255);
 });
 
-Deno.test("ByteSequence.prototype.getUint8View(number)", () => {
+Deno.test("ByteSequence.prototype.asUint8Array(number)", () => {
   const bs1 = ByteSequence.allocate(1000);
-  const v1 = bs1.getUint8View(500);
+  const v1 = bs1.asUint8Array(500);
   assertStrictEquals(v1.byteLength, 500);
 
   v1[0] = 255;
-  assertStrictEquals(bs1.getUint8View()[500], 255);
+  assertStrictEquals(bs1.asUint8Array()[500], 255);
 });
 
-Deno.test("ByteSequence.prototype.getUint8View(number, number)", () => {
+Deno.test("ByteSequence.prototype.asUint8Array(number, number)", () => {
   const bs1 = ByteSequence.allocate(1000);
-  const v1 = bs1.getUint8View(500, 1);
+  const v1 = bs1.asUint8Array(500, 1);
   assertStrictEquals(v1.byteLength, 1);
 });
 
-Deno.test("ByteSequence.prototype.getDataView()", () => {
+Deno.test("ByteSequence.prototype.asDataView()", () => {
   const bs1 = ByteSequence.allocate(1000);
-  const v1 = bs1.getDataView();
-  const v2 = bs1.getDataView();
+  const v1 = bs1.asDataView();
+  const v2 = bs1.asDataView();
   assertStrictEquals(v1.byteLength, 1000);
   assertStrictEquals(v1 instanceof DataView, true);
   assertNotStrictEquals(v1, v2);
@@ -1592,18 +1592,18 @@ Deno.test("ByteSequence.prototype.getDataView()", () => {
   assertStrictEquals(v2.getUint8(0), 255);
 });
 
-Deno.test("ByteSequence.prototype.getDataView(number)", () => {
+Deno.test("ByteSequence.prototype.asDataView(number)", () => {
   const bs1 = ByteSequence.allocate(1000);
-  const v1 = bs1.getDataView(500);
+  const v1 = bs1.asDataView(500);
   assertStrictEquals(v1.byteLength, 500);
 
   v1.setUint8(0, 255);
-  assertStrictEquals(bs1.getDataView().getUint8(500), 255);
+  assertStrictEquals(bs1.asDataView().getUint8(500), 255);
 });
 
-Deno.test("ByteSequence.prototype.getDataView(number, number)", () => {
+Deno.test("ByteSequence.prototype.asDataView(number, number)", () => {
   const bs1 = ByteSequence.allocate(1000);
-  const v1 = bs1.getDataView(500, 1);
+  const v1 = bs1.asDataView(500, 1);
   assertStrictEquals(v1.byteLength, 1);
 });
 
@@ -1940,7 +1940,7 @@ Deno.test("ByteSequence.prototype.segment(number)", () => {
     assertStrictEquals(i1i.byteLength, 100);
     assertStrictEquals(
       JSON.stringify(i1i.toArray()),
-      JSON.stringify([...bs1.getView(Uint8Array, i, 100)]),
+      JSON.stringify([...bs1.asUint8Array(i, 100)]),
     );
     i = i + 100;
   }
@@ -1953,13 +1953,13 @@ Deno.test("ByteSequence.prototype.segment(number)", () => {
       assertStrictEquals(i1i.byteLength, 150);
       assertStrictEquals(
         JSON.stringify(i1i.toArray()),
-        JSON.stringify([...bs1.getView(Uint8Array, ib, 150)]),
+        JSON.stringify([...bs1.asUint8Array(ib, 150)]),
       );
     } else {
       assertStrictEquals(i1i.byteLength, 100);
       assertStrictEquals(
         JSON.stringify(i1i.toArray()),
-        JSON.stringify([...bs1.getView(Uint8Array, ib, 100)]),
+        JSON.stringify([...bs1.asUint8Array(ib, 100)]),
       );
     }
     ib = ib + 150;

@@ -1987,8 +1987,170 @@ export class ByteSequence {
   }
 
   /**
+   * Returns the `Int8Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `Int8Array`, in bytes.
+   * @returns The `Int8Array`.
+   */
+  asInt8Array(byteOffset?: number, byteLength?: number): Int8Array {
+    return this.getView(Int8Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `Uint8Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `Uint8Array`, in bytes.
+   * @returns The `Uint8Array`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const uint8ViewPart = bytes.asUint8Array(6, 3);
+   * // uint8ViewPart
+   * //   → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
+   *
+   * uint8ViewPart.fill(0);
+   *
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x0, 0x0, 0x0 ]
+   * ```
+   */
+  asUint8Array(byteOffset?: number, byteLength?: number): Uint8Array {
+    return this.getView(Uint8Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `Uint8ClampedArray` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `Uint8ClampedArray`, in bytes.
+   * @returns The `Uint8ClampedArray`.
+   */
+  asUint8ClampedArray(
+    byteOffset?: number,
+    byteLength?: number,
+  ): Uint8ClampedArray {
+    return this.getView(Uint8ClampedArray, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `Int16Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `Int16Array`, in bytes.
+   * @returns The `Int16Array`.
+   */
+  asInt16Array(byteOffset?: number, byteLength?: number): Int16Array {
+    return this.getView(Int16Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `Uint16Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `Uint16Array`, in bytes.
+   * @returns The `Uint16Array`.
+   */
+  asUint16Array(byteOffset?: number, byteLength?: number): Uint16Array {
+    return this.getView(Uint16Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `Int32Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `Int32Array`, in bytes.
+   * @returns The `Int32Array`.
+   */
+  asInt32Array(byteOffset?: number, byteLength?: number): Int32Array {
+    return this.getView(Int32Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `Uint32Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `Uint32Array`, in bytes.
+   * @returns The `Uint32Array`.
+   */
+  asUint32Array(byteOffset?: number, byteLength?: number): Uint32Array {
+    return this.getView(Uint32Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `Float32Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `Float32Array`, in bytes.
+   * @returns The `Float32Array`.
+   */
+  asFloat32Array(byteOffset?: number, byteLength?: number): Float32Array {
+    return this.getView(Float32Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `Float64Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `Float64Array`, in bytes.
+   * @returns The `Float64Array`.
+   */
+  asFloat64Array(byteOffset?: number, byteLength?: number): Float64Array {
+    return this.getView(Float64Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `BigInt64Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `BigInt64Array`, in bytes.
+   * @returns The `BigInt64Array`.
+   */
+  asBigInt64Array(byteOffset?: number, byteLength?: number): BigInt64Array {
+    return this.getView(BigInt64Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `BigUint64Array` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `BigUint64Array`, in bytes.
+   * @returns The `BigUint64Array`.
+   */
+  asBigUint64Array(byteOffset?: number, byteLength?: number): BigUint64Array {
+    return this.getView(BigUint64Array, byteOffset, byteLength);
+  }
+
+  /**
+   * Returns the `DataView` that views the underlying `ArrayBuffer` of this instance.
+   *
+   * @param byteOffset - The offset, in bytes.
+   * @param byteLength - The length of the `ArrayBufferView`, in bytes.
+   * @returns The `DataView`.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
+   * const dataViewPart = bytes.asDataView(6, 3);
+   * // dataViewPart
+   * //   → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
+   *
+   * dataViewPart.setUint8(0, 0);
+   * dataViewPart.setUint8(1, 0);
+   * dataViewPart.setUint8(2, 0);
+   *
+   * // bytes.toArray()
+   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x0, 0x0, 0x0 ]
+   * ```
+   */
+  asDataView(byteOffset?: number, byteLength?: number): DataView {
+    return this.getView(DataView, byteOffset, byteLength);
+  }
+
+  /**
    * Returns the `ArrayBufferView` that views the underlying `ArrayBuffer` of this instance.
    *
+   * @deprecated
    * @param ctor - The constructor of `ArrayBufferView`.
    *    The default is `Uint8Array`.
    * @param byteOffset - The offset, in bytes.
@@ -2051,48 +2213,18 @@ export class ByteSequence {
   }
 
   /**
-   * Returns the `Uint8Array` that views the underlying `ArrayBuffer` of this instance.
+   * The alias for the `asUint8Array` method.
    *
-   * @param byteOffset - The offset, in bytes.
-   * @param byteLength - The length of the `ArrayBufferView`, in bytes.
-   * @returns The `Uint8Array`.
-   * @example
-   * ```javascript
-   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * const uint8ViewPart = bytes.getUint8View(6, 3);
-   * // uint8ViewPart
-   * //   → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
-   *
-   * uint8ViewPart.fill(0);
-   *
-   * // bytes.toArray()
-   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x0, 0x0, 0x0 ]
-   * ```
+   * @deprecated
    */
   getUint8View(byteOffset?: number, byteLength?: number): Uint8Array {
     return this.getView(Uint8Array, byteOffset, byteLength);
   }
 
   /**
-   * Returns the `DataView` that views the underlying `ArrayBuffer` of this instance.
+   * The alias for the `asDataView` method.
    *
-   * @param byteOffset - The offset, in bytes.
-   * @param byteLength - The length of the `ArrayBufferView`, in bytes.
-   * @returns The `DataView`.
-   * @example
-   * ```javascript
-   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
-   * const dataViewPart = bytes.getDataView(6, 3);
-   * // dataViewPart
-   * //   → Uint8Array[ 0xE5, 0xB1, 0xB1 ]
-   *
-   * dataViewPart.setUint8(0, 0);
-   * dataViewPart.setUint8(1, 0);
-   * dataViewPart.setUint8(2, 0);
-   *
-   * // bytes.toArray()
-   * //   → [ 0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0x0, 0x0, 0x0 ]
-   * ```
+   * @deprecated
    */
   getDataView(byteOffset?: number, byteLength?: number): DataView {
     return this.getView(DataView, byteOffset, byteLength);
@@ -2161,13 +2293,6 @@ export class ByteSequence {
   [Symbol.iterator](): IterableIterator<number> {
     return this.#view[Symbol.iterator]();
   }
-
-  // XXX every()
-  // XXX some()
-
-  // XXX forEach()
-  // XXX map()
-  // XXX reduce()
 
   // XXX fill()
   // XXX set()
