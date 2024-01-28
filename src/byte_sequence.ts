@@ -790,7 +790,6 @@ export class ByteSequence {
   //XXX fromBigInt64Iterable
   //XXX fromAsyncBigInt64Iterable
 
-  //TODO テスト
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified 64-bit unsigned integer `Iterable`.
@@ -809,7 +808,6 @@ export class ByteSequence {
     return ByteSequence.wrapArrayBuffer(bytes);
   }
 
-  //TODO テスト
   /**
    * Creates a new instance of `ByteSequence` with new underlying `ArrayBuffer`
    * created from the specified 64-bit unsigned integer `AsyncIterable`.
@@ -824,7 +822,10 @@ export class ByteSequence {
     source: AsyncIterable<bigint>,
     byteOrder?: ByteOrder,
   ): Promise<ByteSequence> {
-    const bytes = await BufferUtils.fromAsyncBigUint64Iterable(source, byteOrder);
+    const bytes = await BufferUtils.fromAsyncBigUint64Iterable(
+      source,
+      byteOrder,
+    );
     return ByteSequence.wrapArrayBuffer(bytes);
   }
 
@@ -904,17 +905,17 @@ export class ByteSequence {
    * const uint32s = bytes.toUint32Iterable();
    * // [...uint32s]
    * //   When the platform byte order is little-endian
-   * //   → [ 0xE58CAFE5, 0xB1E5ABA3, 0x000000B1 ]
+   * //   → [ 0xE58C_AFE5, 0xB1E5_ABA3, 0x0000_00B1 ]
    * //   When the platform byte order is big-endian
-   * //   → [ 0xE5AF8CE5, 0xA3ABE5B1, 0xB1000000 ]
+   * //   → [ 0xE5AF_8CE5, 0xA3AB_E5B1, 0xB100_0000 ]
    *
    * const uint32sLe = bytes.toUint32Iterable(ByteOrder.LITTLE_ENDIAN);
    * // [...uint32sLe]
-   * //   → [ 0xE58CAFE5, 0xB1E5ABA3, 0x000000B1 ]
+   * //   → [ 0xE58C_AFE5, 0xB1E5_ABA3, 0x0000_00B1 ]
    *
    * const uint32sBe = bytes.toUint32Iterable(ByteOrder.BIG_ENDIAN);
    * // [...uint32sBe]
-   * //   → [ 0xE5AF8CE5, 0xA3ABE5B1, 0xB1000000 ]
+   * //   → [ 0xE5AF_8CE5, 0xA3AB_E5B1, 0xB100_0000 ]
    * ```
    */
   toUint32Iterable(byteOrder?: ByteOrder): Iterable<number> {
@@ -922,7 +923,31 @@ export class ByteSequence {
     return BufferUtils.toUint32Iterable(this.#buffer, byteOrder);
   }
 
-  //TODO コメント・テスト
+  /**
+   * Returns a 64-bit unsigned integer `Iterable` represented by this byte sequence.
+   *
+   * @param byteOrder - The byte order. If omitted, the platform byte order is used.
+   * @returns The `Iterable` of 64-bit unsigned integers.
+   * @throws {RangeError} This `byteLength` is not a multiple of 8.
+   * @example
+   * ```javascript
+   * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1);
+   * const uint64s = bytes.toBigUint64Iterable();
+   * // [...uint64s]
+   * //   When the platform byte order is little-endian
+   * //   → [ 0xB1E5_ABA3_E58C_AFE5n ]
+   * //   When the platform byte order is big-endian
+   * //   → [ 0xE5AF_8CE5_A3AB_E5B1n ]
+   *
+   * const uint64sLe = bytes.toBigUint64Iterable(ByteOrder.LITTLE_ENDIAN);
+   * // [...uint64sLe]
+   * //   → [ 0xB1E5_ABA3_E58C_AFE5n ]
+   *
+   * const uint64sBe = bytes.toBigUint64Iterable(ByteOrder.BIG_ENDIAN);
+   * // [...uint64sBe]
+   * //   → [ 0xE5AF_8CE5_A3AB_E5B1n ]
+   * ```
+   */
   toBigUint64Iterable(byteOrder?: ByteOrder): Iterable<Uint64> {
     // BufferUtils.toBigUint64Iterableは読み取りしかしないので、this.#bufferをコピーせずに渡す
     return BufferUtils.toBigUint64Iterable(this.#buffer, byteOrder);

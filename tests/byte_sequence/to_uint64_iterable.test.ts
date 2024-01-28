@@ -1,4 +1,4 @@
-import { assertStrictEquals } from "../deps.ts";
+import { assertStrictEquals, assertThrows } from "../deps.ts";
 import { ByteOrder, ByteSequence } from "../../mod.ts";
 
 Deno.test("ByteSequence.prototype.toBigUint64Iterable()", () => {
@@ -20,5 +20,24 @@ Deno.test("ByteSequence.prototype.toBigUint64Iterable()", () => {
   assertStrictEquals(
     [18374693098283532801n].join(""),
     [...bs2l.toBigUint64Iterable(ByteOrder.LITTLE_ENDIAN)].join(""),
+  );
+
+  assertThrows(
+    () => {
+      const a1 = [1, 2, 3, 4, 5, 6, 0];
+      const bs1 = ByteSequence.fromArray(a1);
+      bs1.toBigUint64Iterable();
+    },
+    RangeError,
+    "bytes",
+  );
+  assertThrows(
+    () => {
+      const a1 = [1, 2, 3, 4, 5, 6, 0, 0, 0];
+      const bs1 = ByteSequence.fromArray(a1);
+      bs1.toBigUint64Iterable();
+    },
+    RangeError,
+    "bytes",
   );
 });

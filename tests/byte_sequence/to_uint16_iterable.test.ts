@@ -1,4 +1,4 @@
-import { assertStrictEquals } from "../deps.ts";
+import { assertStrictEquals, assertThrows } from "../deps.ts";
 import { ByteOrder, ByteSequence } from "../../mod.ts";
 
 Deno.test("ByteSequence.prototype.toUint16Iterable()", () => {
@@ -20,5 +20,24 @@ Deno.test("ByteSequence.prototype.toUint16Iterable()", () => {
   assertStrictEquals(
     JSON.stringify([...a3]),
     JSON.stringify([...bs3.toUint16Iterable(ByteOrder.BIG_ENDIAN)]),
+  );
+
+  assertThrows(
+    () => {
+      const a1 = [1];
+      const bs1 = ByteSequence.fromArray(a1);
+      bs1.toUint16Iterable();
+    },
+    RangeError,
+    "bytes",
+  );
+  assertThrows(
+    () => {
+      const a1 = [1, 2, 3];
+      const bs1 = ByteSequence.fromArray(a1);
+      bs1.toUint16Iterable();
+    },
+    RangeError,
+    "bytes",
   );
 });
