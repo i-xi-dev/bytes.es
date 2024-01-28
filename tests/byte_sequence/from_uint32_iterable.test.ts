@@ -75,8 +75,8 @@ Deno.test("ByteSequence.fromUint32Iterable(Array<number>, auto)", () => {
   assertStrictEquals(bs1.byteLength, 0);
 });
 
-Deno.test("ByteSequence.fromUint32Iterable(Uint16Array, ByteOrder.BIG_ENDIAN)", () => {
-  const a0 = [9, 8, 7, 6, 5, 4, 3, 2, 253, 254, 0xFFFFFFFF, 255];
+Deno.test("ByteSequence.fromUint32Iterable(Uint32Array, ByteOrder.BIG_ENDIAN)", () => {
+  const a0 = Uint32Array.of(9, 8, 7, 6, 5, 4, 3, 2, 253, 254, 0xFFFFFFFF, 255);
   const bs0 = ByteSequence.fromUint32Iterable(a0, ByteOrder.BIG_ENDIAN);
 
   assertStrictEquals(bs0.byteLength, 48);
@@ -90,14 +90,14 @@ Deno.test("ByteSequence.fromUint32Iterable(Uint16Array, ByteOrder.BIG_ENDIAN)", 
   assertStrictEquals(bs0a[46], 0);
   assertStrictEquals(bs0a[47], 255);
 
-  const a1 = Uint8Array.of();
+  const a1 = Uint32Array.of();
   const bs1 = ByteSequence.fromUint32Iterable(a1, ByteOrder.BIG_ENDIAN);
 
   assertStrictEquals(bs1.byteLength, 0);
 });
 
-Deno.test("ByteSequence.fromUint32Iterable(Uint16Array, ByteOrder.LITTLE_ENDIAN)", () => {
-  const a0 = [9, 8, 7, 6, 5, 4, 3, 2, 253, 254, 0xFFFFFFFF, 255];
+Deno.test("ByteSequence.fromUint32Iterable(Uint32Array, ByteOrder.LITTLE_ENDIAN)", () => {
+  const a0 = Uint32Array.of(9, 8, 7, 6, 5, 4, 3, 2, 253, 254, 0xFFFFFFFF, 255);
   const bs0 = ByteSequence.fromUint32Iterable(a0, ByteOrder.LITTLE_ENDIAN);
 
   assertStrictEquals(bs0.byteLength, 48);
@@ -111,14 +111,14 @@ Deno.test("ByteSequence.fromUint32Iterable(Uint16Array, ByteOrder.LITTLE_ENDIAN)
   assertStrictEquals(bs0a[46], 0);
   assertStrictEquals(bs0a[47], 0);
 
-  const a1 = Uint8Array.of();
+  const a1 = Uint32Array.of();
   const bs1 = ByteSequence.fromUint32Iterable(a1, ByteOrder.LITTLE_ENDIAN);
 
   assertStrictEquals(bs1.byteLength, 0);
 });
 
-Deno.test("ByteSequence.fromUint32Iterable(Uint16Array, auto)", () => {
-  const a0 = [9, 8, 7, 6, 5, 4, 3, 2, 253, 254, 0xFFFFFFFF, 255];
+Deno.test("ByteSequence.fromUint32Iterable(Uint32Array, auto)", () => {
+  const a0 = Uint32Array.of(9, 8, 7, 6, 5, 4, 3, 2, 253, 254, 0xFFFFFFFF, 255);
   const bs0 = ByteSequence.fromUint32Iterable(a0);
 
   assertStrictEquals(bs0.byteLength, 48);
@@ -143,7 +143,7 @@ Deno.test("ByteSequence.fromUint32Iterable(Uint16Array, auto)", () => {
     assertStrictEquals(bs0a[47], 0);
   }
 
-  const a1 = Uint8Array.of();
+  const a1 = Uint32Array.of();
   const bs1 = ByteSequence.fromUint32Iterable(a1);
 
   assertStrictEquals(bs1.byteLength, 0);

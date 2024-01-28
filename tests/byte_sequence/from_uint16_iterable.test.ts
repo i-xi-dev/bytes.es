@@ -70,7 +70,7 @@ Deno.test("ByteSequence.fromUint16Iterable(Uint16Array, ByteOrder.BIG_ENDIAN)", 
   assertStrictEquals(bs0a[18], 0);
   assertStrictEquals(bs0a[19], 255);
 
-  const a1 = Uint8Array.of();
+  const a1 = Uint16Array.of();
   const bs1 = ByteSequence.fromUint16Iterable(a1, ByteOrder.BIG_ENDIAN);
 
   assertStrictEquals(bs1.byteLength, 0);
@@ -87,7 +87,7 @@ Deno.test("ByteSequence.fromUint16Iterable(Uint16Array, ByteOrder.LITTLE_ENDIAN)
   assertStrictEquals(bs0a[18], 255);
   assertStrictEquals(bs0a[19], 0);
 
-  const a1 = Uint8Array.of();
+  const a1 = Uint16Array.of();
   const bs1 = ByteSequence.fromUint16Iterable(a1, ByteOrder.LITTLE_ENDIAN);
 
   assertStrictEquals(bs1.byteLength, 0);
@@ -111,7 +111,7 @@ Deno.test("ByteSequence.fromUint16Iterable(Uint16Array, auto)", () => {
     assertStrictEquals(bs0a[19], 0);
   }
 
-  const a1 = Uint8Array.of();
+  const a1 = Uint16Array.of();
   const bs1 = ByteSequence.fromUint16Iterable(a1);
 
   assertStrictEquals(bs1.byteLength, 0);
