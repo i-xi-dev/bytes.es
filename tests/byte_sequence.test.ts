@@ -1580,6 +1580,206 @@ Deno.test("ByteSequence.prototype.asUint8Array(number, number)", () => {
   assertStrictEquals(v1.byteLength, 1);
 });
 
+Deno.test("ByteSequence.prototype.asUint8ClampedArray()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asUint8ClampedArray();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 1000);
+  assertStrictEquals(v1 instanceof Uint8ClampedArray, true);
+});
+
+Deno.test("ByteSequence.prototype.asInt8Array()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asInt8Array();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 1000);
+  assertStrictEquals(v1 instanceof Int8Array, true);
+});
+
+Deno.test("ByteSequence.prototype.asUint16Array()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asUint16Array();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 500);
+  assertStrictEquals(v1 instanceof Uint16Array, true);
+
+  assertThrows(
+    () => {
+      ByteSequence.allocate(1).asUint16Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.allocate(3).asUint16Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+});
+
+Deno.test("ByteSequence.prototype.asInt16Array()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asInt16Array();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 500);
+  assertStrictEquals(v1 instanceof Int16Array, true);
+
+  assertThrows(
+    () => {
+      ByteSequence.allocate(1).asInt16Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.allocate(3).asInt16Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+});
+
+Deno.test("ByteSequence.prototype.asUint32Array()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asUint32Array();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 250);
+  assertStrictEquals(v1 instanceof Uint32Array, true);
+
+  assertThrows(
+    () => {
+      ByteSequence.allocate(3).asUint32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.allocate(5).asUint32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+});
+
+Deno.test("ByteSequence.prototype.asInt32Array()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asInt32Array();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 250);
+  assertStrictEquals(v1 instanceof Int32Array, true);
+
+  assertThrows(
+    () => {
+      ByteSequence.allocate(3).asInt32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.allocate(5).asInt32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+});
+
+Deno.test("ByteSequence.prototype.asFloat32Array()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asFloat32Array();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 250);
+  assertStrictEquals(v1 instanceof Float32Array, true);
+
+  assertThrows(
+    () => {
+      ByteSequence.allocate(3).asFloat32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.allocate(5).asFloat32Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+});
+
+Deno.test("ByteSequence.prototype.asFloat64Array()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asFloat64Array();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 125);
+  assertStrictEquals(v1 instanceof Float64Array, true);
+
+  assertThrows(
+    () => {
+      ByteSequence.allocate(7).asFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.allocate(9).asFloat64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+});
+
+Deno.test("ByteSequence.prototype.asBigUint64Array()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asBigUint64Array();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 125);
+  assertStrictEquals(v1 instanceof BigUint64Array, true);
+
+  assertThrows(
+    () => {
+      ByteSequence.allocate(7).asBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.allocate(9).asBigUint64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+});
+
+Deno.test("ByteSequence.prototype.asBigInt64Array()", () => {
+  const bs1 = ByteSequence.allocate(1000);
+  const v1 = bs1.asBigInt64Array();
+  assertStrictEquals(v1.byteLength, 1000);
+  assertStrictEquals(v1.length, 125);
+  assertStrictEquals(v1 instanceof BigInt64Array, true);
+
+  assertThrows(
+    () => {
+      ByteSequence.allocate(7).asBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+  assertThrows(
+    () => {
+      ByteSequence.allocate(9).asBigInt64Array();
+    },
+    RangeError,
+    "byteLength",
+  );
+});
+
 Deno.test("ByteSequence.prototype.asDataView()", () => {
   const bs1 = ByteSequence.allocate(1000);
   const v1 = bs1.asDataView();
