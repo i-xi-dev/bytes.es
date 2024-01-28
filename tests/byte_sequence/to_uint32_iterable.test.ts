@@ -15,6 +15,13 @@ Deno.test("ByteSequence.prototype.toUint32Iterable()", () => {
     JSON.stringify([...bs2.toUint32Iterable(ByteOrder.BIG_ENDIAN)]),
   );
 
+  const a2l = [1, 2, 3, 4, 5, 6, 0, 255];
+  const bs2l = ByteSequence.fromArray(a2l);
+  assertStrictEquals(
+    JSON.stringify([67305985, 4278191621]),
+    JSON.stringify([...bs2l.toUint32Iterable(ByteOrder.LITTLE_ENDIAN)]),
+  );
+
   const a3 = [1, 2, 3, 4, 5, 6, 0, 0xFFFF];
   const bs3 = ByteSequence.fromUint16Iterable(a3, ByteOrder.BIG_ENDIAN);
   assertStrictEquals(

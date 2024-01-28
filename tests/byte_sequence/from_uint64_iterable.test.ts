@@ -2,7 +2,7 @@ import { assertStrictEquals, assertThrows, Platform } from "../deps.ts";
 import { ByteOrder, ByteSequence } from "../../mod.ts";
 
 Deno.test("ByteSequence.fromBigUint64Iterable(Array<bigint>, ByteOrder.BIG_ENDIAN)", () => {
-  const a0 = [ 253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n];
+  const a0 = [253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n];
   const bs0 = ByteSequence.fromBigUint64Iterable(a0, ByteOrder.BIG_ENDIAN);
 
   assertStrictEquals(bs0.byteLength, 32);
@@ -31,7 +31,7 @@ Deno.test("ByteSequence.fromBigUint64Iterable(Array<bigint>, ByteOrder.BIG_ENDIA
 });
 
 Deno.test("ByteSequence.fromBigUint64Iterable(Array<bigint>, ByteOrder.LITTLE_ENDIAN)", () => {
-  const a0 = [ 253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n];
+  const a0 = [253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n];
   const bs0 = ByteSequence.fromBigUint64Iterable(a0, ByteOrder.LITTLE_ENDIAN);
 
   assertStrictEquals(bs0.byteLength, 32);
@@ -60,7 +60,7 @@ Deno.test("ByteSequence.fromBigUint64Iterable(Array<bigint>, ByteOrder.LITTLE_EN
 });
 
 Deno.test("ByteSequence.fromBigUint64Iterable(Array<bigint>, auto)", () => {
-  const a0 = [ 253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n];
+  const a0 = [253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n];
   const bs0 = ByteSequence.fromBigUint64Iterable(a0);
 
   assertStrictEquals(bs0.byteLength, 32);
@@ -108,7 +108,7 @@ Deno.test("ByteSequence.fromBigUint64Iterable(Array<bigint>, auto)", () => {
 });
 
 Deno.test("ByteSequence.fromBigUint64Iterable(BigUint64Array, ByteOrder.BIG_ENDIAN)", () => {
-  const a0 =BigUint64Array.of(  253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n);
+  const a0 = BigUint64Array.of(253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n);
   const bs0 = ByteSequence.fromBigUint64Iterable(a0, ByteOrder.BIG_ENDIAN);
 
   assertStrictEquals(bs0.byteLength, 32);
@@ -137,7 +137,7 @@ Deno.test("ByteSequence.fromBigUint64Iterable(BigUint64Array, ByteOrder.BIG_ENDI
 });
 
 Deno.test("ByteSequence.fromBigUint64Iterable(BigUint64Array, ByteOrder.LITTLE_ENDIAN)", () => {
-  const a0 = BigUint64Array.of( 253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n);
+  const a0 = BigUint64Array.of(253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n);
   const bs0 = ByteSequence.fromBigUint64Iterable(a0, ByteOrder.LITTLE_ENDIAN);
 
   assertStrictEquals(bs0.byteLength, 32);
@@ -166,7 +166,7 @@ Deno.test("ByteSequence.fromBigUint64Iterable(BigUint64Array, ByteOrder.LITTLE_E
 });
 
 Deno.test("ByteSequence.fromBigUint64Iterable(BigUint64Array, auto)", () => {
-  const a0 = [ 253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n];
+  const a0 = [253n, 254n, 0xFFFFFFFF_FFFFFFFFn, 255n];
   const bs0 = ByteSequence.fromBigUint64Iterable(a0);
 
   assertStrictEquals(bs0.byteLength, 32);
@@ -207,7 +207,7 @@ Deno.test("ByteSequence.fromBigUint64Iterable(BigUint64Array, auto)", () => {
     assertStrictEquals(bs0a[30], 0);
     assertStrictEquals(bs0a[31], 0);
   }
-  const a1= BigUint64Array.of();
+  const a1 = BigUint64Array.of();
   const bs1 = ByteSequence.fromBigUint64Iterable(a1);
 
   assertStrictEquals(bs1.byteLength, 0);
