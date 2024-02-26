@@ -495,7 +495,7 @@ Deno.test("ByteSequence.parse(string, {radix:number})", () => {
 Deno.test("ByteSequence.parse(string, FormatOptions)", () => {
   const bs0 = ByteSequence.parse("0041004200430044", {
     radix: 16,
-    paddedLength: 4,
+    minIntegralDigits: 4,
     lowerCase: true,
   });
   assertStrictEquals(bs0.toString(), "41424344");
@@ -521,11 +521,11 @@ Deno.test("ByteSequence.prototype.format(Options)", () => {
 
   assertStrictEquals(bs1.format({ radix: 16, lowerCase: true }), "413c0a20a9");
   assertStrictEquals(
-    bs1.format({ radix: 16, paddedLength: 3, lowerCase: true }),
+    bs1.format({ radix: 16, minIntegralDigits: 3, lowerCase: true }),
     "04103c00a0200a9",
   );
   assertStrictEquals(
-    bs1.format({ radix: 10, paddedLength: 4 }),
+    bs1.format({ radix: 10, minIntegralDigits: 4 }),
     "00650060001000320169",
   );
 });

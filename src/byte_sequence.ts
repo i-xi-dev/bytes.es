@@ -14,9 +14,9 @@ import {
   Http,
   InvalidStateError,
   Isomorphic,
+  Loading,
   MediaType,
   Percent,
-  Reading,
   SafeInteger,
   // StringEx,
   Uint64,
@@ -1083,8 +1083,8 @@ export class ByteSequence {
    * @param options - The `BytesFormat.Options` dictionary.
    * @returns A new `ByteSequence` object.
    * @throws {TypeError} The `options.radix` is not 2, 8, 10, or 16.
-   * @throws {TypeError} The `options.paddedLength` is not positive integer.
-   * @throws {RangeError} The `options.paddedLength` is below the lower limit.
+   * @throws {TypeError} The `options.minIntegralDigits` is not positive integer.
+   * @throws {RangeError} The `options.minIntegralDigits` is below the lower limit.
    * @throws {TypeError} The `formattedBytes` contains the character sequence that does not match the specified format.
    * @example
    * ```javascript
@@ -1116,8 +1116,8 @@ export class ByteSequence {
    * @param options - The `BytesFormat.Options` dictionary.
    * @returns The string contains formatted bytes.
    * @throws {TypeError} The `options.radix` is not 2, 8, 10, or 16.
-   * @throws {TypeError} The `options.paddedLength` is not positive integer.
-   * @throws {RangeError} The `options.paddedLength` is below the lower limit.
+   * @throws {TypeError} The `options.minIntegralDigits` is not positive integer.
+   * @throws {RangeError} The `options.minIntegralDigits` is below the lower limit.
    * @example
    * ```javascript
    * const bytes = ByteSequence.of(0xE5, 0xAF, 0x8C, 0xE5, 0xA3, 0xAB, 0xE5, 0xB1, 0xB1);
@@ -1700,7 +1700,7 @@ export class ByteSequence {
    */
   static async fromStream(
     source: BytesStream.Source,
-    options?: Reading.Options,
+    options?: Loading.Options,
     onProgressChange?: (event: ProgressEvent) => void,
   ): Promise<ByteSequence> {
     if (
@@ -2466,7 +2466,7 @@ type Bytes = ByteSequence | BufferSource | BytesSource;
 /**
  * @experimental
  */
-type RequestOrResponseReadingOptions = Reading.Options & {
+type RequestOrResponseReadingOptions = Loading.Options & {
   // TODO verifyContentType
 
   verifyHeaders?: (headers: Headers) => [verified: boolean, message?: string];
