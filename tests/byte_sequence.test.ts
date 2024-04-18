@@ -2321,7 +2321,7 @@ Deno.test("ByteSequence.fromStream(ReadableStream, { total:number, signal: Abort
   const ac = new AbortController();
   setTimeout(() => {
     ac.abort();
-  }, 1);
+  }, 1);//build時は4くらい
   try {
     await ByteSequence.fromStream(stream, {
       total: 4096,

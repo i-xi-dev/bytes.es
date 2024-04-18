@@ -28,7 +28,7 @@ await build({
   rootTestDir: "./tests",
   package: {
     name: "@i-xi-dev/bytes",
-    version: "4.4.0",
+    version: "4.4.2",
     description:
       "A JavaScript byte array library for the browser, Deno and Node.js",
     license: "MIT",
@@ -63,10 +63,10 @@ await build({
     publishConfig: {
       access: "public",
     },
-    files: [
-      "esm",
-      "types",
-    ],
+    // files: [
+    //   "esm",
+    //   "types",
+    // ],
   },
   mappings: {
     "https://cdn.skypack.dev/encoding-japanese@2.0.0?dts": {

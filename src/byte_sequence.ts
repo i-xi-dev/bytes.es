@@ -4,6 +4,7 @@ import {
   _File,
   ArrayBufferViewConstructor,
   Base64,
+  BigUint64,
   BufferUtils,
   ByteOrder,
   BytesFormat,
@@ -19,7 +20,6 @@ import {
   Percent,
   SafeInteger,
   // StringEx,
-  Uint64,
   Uint8,
 } from "../deps.ts";
 import { _HttpUtilsEx, _Utf8 } from "./utils.ts";
@@ -948,7 +948,7 @@ export class ByteSequence {
    * //   → [ 0xE5AF_8CE5_A3AB_E5B1n ]
    * ```
    */
-  toBigUint64Iterable(byteOrder?: ByteOrder): Iterable<Uint64> {
+  toBigUint64Iterable(byteOrder?: ByteOrder): Iterable<BigUint64> {
     // BufferUtils.toBigUint64Iterableは読み取りしかしないので、this.#bufferをコピーせずに渡す
     return BufferUtils.toBigUint64Iterable(this.#buffer, byteOrder);
   }
